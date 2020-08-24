@@ -1,0 +1,1 @@
+<view class="login"><view data-event-opts="{{[['tap',[['toSigninPage',['$event']]]]]}}" class="redirect_btn" bindtap="__e">点击前往注册页面</view></view>

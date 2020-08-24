@@ -1,0 +1,1 @@
+<view class="mine"><view>个人中心页面</view><view data-event-opts="{{[['tap',[['toLoginPage',['$event']]]]]}}" class="redirect_btn" bindtap="__e">点击前往登录页</view></view>

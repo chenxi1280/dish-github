@@ -1,0 +1,45 @@
+{
+  "pages": [
+    "pages/dishover/dishover",
+    "pages/make/make",
+    "pages/mine/mine",
+    "pages/index/index",
+    "pages/login/login/login",
+    "pages/login/signin/signin"
+  ],
+  "subPackages": [],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "tabBar": {
+    "selectedColor": "#1296db",
+    "list": [
+      {
+        "pagePath": "pages/make/make",
+        "text": "制作",
+        "iconPath": "static/icon/tabBar_make.png",
+        "selectedIconPath": "static/icon/onTabBar_make.png",
+        "backgroundColor": "#fff"
+      },
+      {
+        "pagePath": "pages/dishover/dishover",
+        "text": "发现",
+        "iconPath": "static/icon/tabBar_discover.png",
+        "selectedIconPath": "static/icon/onTabBar_discover.png",
+        "backgroundColor": "#fff"
+      },
+      {
+        "pagePath": "pages/mine/mine",
+        "text": "我的",
+        "iconPath": "static/icon/tabBar_mine.png",
+        "selectedIconPath": "static/icon/onTabBar_mine.png",
+        "backgroundColor": "#fff"
+      }
+    ]
+  },
+  "usingComponents": {},
+  "sitemapLocation": "sitemap24.json"
+}
