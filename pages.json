@@ -1,6 +1,10 @@
 {
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
+			"path" : "pages/login/signin/signin",
+			"style" : {}
+		},
+		{
 			"path": "pages/dishover/dishover",
 			"style": {
 				"navigationBarTitleText": "发现"
@@ -28,10 +32,10 @@
             "path" : "pages/login/login/login",
             "style" : {}
         }
-        ,{
+        /* ,{
             "path" : "pages/login/signin/signin",
             "style" : {}
-        }
+        } */
     ],
 	"tabBar": {
 		"selectedColor":"#1296db",
@@ -61,7 +65,7 @@
 	},
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "uni-app",
+		"navigationBarTitleText": "四刻互动视频",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
 	}

@@ -1,16 +1,16 @@
 {
   "pages": [
+    "pages/login/signin/signin",
     "pages/dishover/dishover",
     "pages/make/make",
     "pages/mine/mine",
     "pages/index/index",
-    "pages/login/login/login",
-    "pages/login/signin/signin"
+    "pages/login/login/login"
   ],
   "subPackages": [],
   "window": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "uni-app",
+    "navigationBarTitleText": "四刻互动视频",
     "navigationBarBackgroundColor": "#F8F8F8",
     "backgroundColor": "#F8F8F8"
   },
@@ -40,6 +40,5 @@
       }
     ]
   },
-  "usingComponents": {},
-  "sitemapLocation": "sitemap24.json"
+  "usingComponents": {}
 }
