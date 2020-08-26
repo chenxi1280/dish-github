@@ -7,52 +7,197 @@
 			<view class="signin_redirect_btn" @click="toSigninPage">注册</view>
 		</view>
 		<view class="bottom">
-			<form @submit="formSubmit">
-				<view class="phoneBox">
-					<icon class="phoneIcon"></icon>
-					<input class="acount" type="text" placeholder="输入手机号"/>
+			<view class="phoneBox" :style="{'border': phoneBoxBorder}">
+				<icon class="phoneIcon"></icon>
+				<input @blur="onblurPhone" class="acount" type="text" v-model.trim="phone" placeholder="输入手机号"/>
+			</view>
+			<view class="pwdBox" :style="{'border': pwdBoxBorder}">
+				<icon  class="pwdIcon"></icon>
+				<input class="pwd" @blur="onblurPassword" v-model.trim="password" password placeholder="密码"/>
+			</view>
+			<view class="codeBox">
+				<view class="code" :style="{'border': codeBoxBorder}">
+					<input @blur="onblurVerfiy" onKeyUp="value=value.replace(/[\W]/g,'')" v-model.trim="verify" />
 				</view>
-				<view class="pwdBox">
-					<icon  class="pwdIcon"></icon>
-					<input class="pwd" password placeholder="密码"/>
+				<view class="codeImage" @click="getTextVerify">
+					<img :src="'data:image/jpeg;base64,'+imgSrc">
 				</view>
-				<view class="codeBox">
-					<input class="code" />
-					<view class="codeImage">
-						<image src=""></image>
-					</view>
-				</view>
-				<!-- form-type="submit" 点击按钮提交表单 -->
-				<button class="login" type="default" plain="true" form-type="submit">登录</button>
-			</form>
+			</view>
+			<button class="login" type="default" plain="true" >登录</button>
 		</view>
 	</view>
 </template>
-
 <script>
 	export default {
-		data() {
-			return {
-				
-			}
-		},
-		methods: {
-			toSigninPage () {
-				uni.navigateTo({
-					url: "../signin/signin"
-				})
-			}
-		}
+	  data () {
+	    return {
+	      phone: '', 
+	      password: '', 
+	      // 输入的图文验证码
+	      verify: '',
+	      // 图文验证码
+	      imgSrc: '',
+		  phoneBoxBorder: '',
+		  pwdBoxBorder: '',
+		  codeBoxBorder: ''
+	    }
+	  },
+	  onLoad () {
+	    this.getTextVerify()
+	  },
+	  methods: {
+	    // 登录功能
+	    async login () {
+	      // 请求前的预校验
+	      const regPhone = !/^1[3456789]\d{9}$/.test(this.phone)
+	      const regPwd = !/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,16}$/.test(this.password)
+	      const regCode = !/^[A-Za-z0-9]{4}$/.test(this.verify)
+	      if (regPhone) {
+			return  uni.showToast({
+				icon: 'none',
+			  	title: '请正确输入手机号'
+			  })
+	      } else if (regPwd) {
+			return  uni.showToast({
+				icon: 'none',
+			  	title: '密码输入错误'
+			  })
+	      } else if (regCode) {
+			return uni.showToast({
+				icon: 'none',
+			  	title: '请正确输入验证码'
+			  })
+	      } else {
+	        // console.log('成功发送登录请求')
+	        const imageCodeKey = uni.setStorageSync('imageCodeKey')
+			uni.request({
+				url: "http://192.168.1.10:8080/login",
+				Method: 'post',
+				data: {
+					password: this.password,
+					mobile: this.phone,
+					confirmCode: this.verify,
+					imageCodeKey: imageCodeKey
+				},
+				success: res=> {
+					if (res.data.status === 200) {
+					  console.log(res)
+					  uni.setStorageSync('token', res.data.data)
+					  uni.showToast({
+					    	title: '登录成功'
+					    })
+					} else if (res.data.status == 508) {
+					  for (let i = 0; i < res.data.data.length; i++) {
+					    if (res.data.data[i] == '501') {
+					      this.getTextVerify()
+						  return uni.showToast({
+								icon: 'none',
+						    	title: '请正确输入验证码'
+						    })
+					    } else if (res.data.data[i] == '505') {
+					      this.getTextVerify()
+						  return uni.showToast({
+								icon: 'none',
+								title: '账号未注册，请注册账号'
+						    })
+					    } else if (res.data.data[i] == '506') {
+					      this.getTextVerify()
+						  return uni.showToast({
+								icon: 'none',
+						    	title: '请正确输入密码'
+						    })
+					    } else if (res.data.data[i] == '509') {
+					      this.getTextVerify()
+						  return uni.showToast({
+								icon: 'none',
+						    	title: '账号被封禁'
+						    })
+					    }
+					  }
+					} else {
+						uni.showToast({
+							icon: 'none',
+							title: '登录异常，请重试'
+						})
+						this.getTextVerify()
+					}
+				}
+			})
+	      }
+	    },
+	    // 前往注册页面
+	    toSigninPage () {
+	    	uni.navigateTo({
+	    		url: "../signin/signin"
+	    	})
+	    },
+	    // 获取图文验证码
+	    getTextVerify () {
+			uni.request({
+				url: "http://192.168.1.10:8080/getConfirmCode",
+				Method: 'post',
+				success: res => {
+					this.imgSrc = res.data.data.base64Str
+					uni.setStorageSync('imageCodeKey', res.data.data.imageCodeKey)
+				}
+			})
+	    },
+	    // 手机号校验
+	    onblurPhone () {
+	      // 请求前的预校验
+	      const regPhone = /^1[3456789]\d{9}$/.test(this.phone)
+	      // 正则校验
+	      if (!regPhone) {
+	        uni.showToast({
+				icon: 'none',
+	        	title: '请正确输入手机号'
+	        })
+			this.phoneBoxBorder = '1px solid red'
+	      } else {
+			this.phoneBoxBorder = '1px solid black'
+	      }
+	    },
+	    // 密码校验
+	    onblurPassword () {
+	      // 请求前的预校验
+	      const regPassword = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,16}$/.test(this.password)
+	      // 正则校验
+	      if (!regPassword) {
+			  uni.showToast({
+				icon: 'none',
+			  	title: '请正确输入密码'
+			  })
+	        this.password = ''
+			this.pwdBoxBorder = '1px solid red'
+	      } else {
+	        this.pwdBoxBorder = '1px solid black'
+	      }
+	    },
+	    // 验证码校验
+	    onblurVerfiy () {
+	      // 请求前的预校验
+	      const regPassword = /^[A-Za-z0-9]{4}$/.test(this.verify)
+	      // 正则校验
+	      if (!regPassword) {
+			  uni.showToast({
+				icon: 'none',
+			  	title: '请正确输入图文验证码'
+			  })
+	        this.verify = ''
+	        this.codeBoxBorder = '1px solid red'
+	      } else {
+	        this.codeBoxBorder = '1px solid black'
+	      }
+	    }
+	  }
 	}
 </script>
 
 <style lang="scss">
 	page{
-		height: 100%;
+		background-color: #F08080;
 	}
 	.login {
-		height: 100%;
-		background-color: #F08080;
 		.top{
 			display: flex;
 			justify-content: space-between;
@@ -86,7 +231,7 @@
 					height: 100%;
 				}
 				.phoneIcon{
-					background: url(../../../static/icon/手机.png) no-repeat center;
+					background: url(../../../static/icon/mobile.png) no-repeat center;
 					width: 80rpx;
 					height: 92rpx;
 					background-size: 60rpx;
@@ -102,7 +247,7 @@
 				display: flex;
 				justify-content: flex-start;
 				.pwdIcon{
-					background: url(../../../static/icon/密码.png) no-repeat center;
+					background: url(../../../static/icon/password.png) no-repeat center;
 					width: 80rpx;
 					height: 80rpx;
 					background-size: 60rpx;
@@ -115,7 +260,6 @@
 			.codeBox{
 				width: 670rpx;
 				height: 92rpx;
-				/* border: 2rpx solid black; */
 				border-radius: 10rpx;
 				margin: 0 auto;
 				margin-top: 50rpx;
@@ -127,17 +271,24 @@
 					height: 100%;
 					width: 60%;
 					padding-left: 40rpx;
+					input{
+						width: 100%;
+						height: 100%;
+					}
 				}
 				.codeImage{
-					border: 2rpx solid black;
 					border-radius: 10rpx;
 					height: 100%;
 					width: 30%;
+					img {
+						width: 100%;
+						height: 100%;
+					}
 				}
 			}
 			.login{
 				&:hover{
-					background-color: #EBEBEB;
+					background-color: #EEEEE0;
 				}
 				border: 2rpx solid black;
 				width: 670rpx;

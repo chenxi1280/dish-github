@@ -1,11 +1,11 @@
 {
   "pages": [
-    "pages/login/signin/signin",
+    "pages/login/login/login",
     "pages/dishover/dishover",
     "pages/make/make",
     "pages/mine/mine",
     "pages/index/index",
-    "pages/login/login/login"
+    "pages/login/signin/signin"
   ],
   "subPackages": [],
   "window": {
