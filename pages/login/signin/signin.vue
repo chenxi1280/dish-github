@@ -34,7 +34,7 @@
 				</view>
 			</view>
 			<view class="deal_box">
-				<checkbox v-model="isChecked" color="black"></checkbox>
+				<checkbox :value="isChecked" color="black" @click="isClick" ></checkbox>
 				<a href="javascript:;">同意用户注册协议</a>
 			</view>
 			<view class="signin-btn" @click="signin">
@@ -46,6 +46,8 @@
 </template>
 
 <script>
+	import { baseURL } from '../config/config.js'
+	
 	export default {
 		data() {
 			return {
@@ -72,7 +74,7 @@
 				// 验证码
 				imgSrc: '',
 				// 复选框状态
-				isChecked: null,
+				isChecked: false,
 				// 表单验证通过纪录  通过验证为true 默认为false
 				isVerifyList: {
 					username: false,
@@ -128,8 +130,9 @@
 					})
 				} else {
 					uni.request({
-						url: "http://192.168.1.10:8080/register",
-						Method: 'post',
+						url: baseURL + "/wxRegister",
+						method: 'POST',
+						dataType: 'json',
 						data: {
 							password: this.password,
 							username: this.username,
@@ -151,9 +154,12 @@
 								this.verify = ''
 								this.isPassword = ''
 								this.verify_phone = ''
-								uni.navigateTo({
-									url: "../login/login"
-								})
+								setTimeout(function() {
+									uni.navigateTo({
+										animationDuration: 5000,
+										url: "../login/login"
+									})
+								}, 1500);
 							} else if (res.data.status === 502) {
 								uni.showToast({
 									icon: 'none',
@@ -186,6 +192,7 @@
 					this.isVerifyList.username = false
 					return uni.showToast({
 						icon: 'none',
+						duration: 2000,
 						title: '请按照规则输入用户名：长度为2-16，只能包含中文英文和下划线'
 					})
 				}
@@ -197,12 +204,14 @@
 					this.isVerifyList.username = false
 					uni.showToast({
 						icon: 'none',
+						duration: 2000,
 						title: '请按照规则输入用户名：长度为2-16，只能包含中文英文和下划线'
 					})
 				} else {
 					uni.request({
-						url: "http://192.168.1.10:8080/validateUserName",
-						Method: 'post',
+						url: baseURL + "/validateUserName",
+						method: 'POST',
+						dataType: 'json',
 						data: {
 							username: this.username
 						},
@@ -237,8 +246,9 @@
 					this.isVerifyStyle.phone = false
 				} else {
 					uni.request({
-						url: "http://192.168.1.10:8080/isExistMobile",
-						Method: 'post',
+						url: baseURL + "/isExistMobile",
+						method: 'POST',
+						dataType: 'json',
 						data: {
 							mobile: this.phone
 						},
@@ -268,6 +278,7 @@
 					this.isVerifyList.password = false
 					uni.showToast({
 						icon: 'none',
+						duration: 2000,
 						title: '请输入同时包含数字和英文8-16位密码'
 					})
 					this.password = ''
@@ -348,8 +359,9 @@
 				}
 				// 预校验通过 点击发送验证码先进行图文验证码判断
 				uni.request({
-					url: "http://192.168.1.10:8080/validateImageCode",
-					Method: 'post',
+					url: baseURL + "/validateImageCode",
+					method: 'POST',
+					dataType: 'json',
 					data: {
 						confirmCode: this.verify,
 						imageCodeKey: uni.getStorageSync('imageCodeKey')
@@ -364,12 +376,13 @@
 							this.codeDown(endDate)
 							// 发送请求获取验证码请求
 							uni.request({
-								url: "http://192.168.1.10:8080/validateImageCode",
-								Method: 'post',
+								url: baseURL + "/sendSMS",
+								method: 'post',
+								dataType: 'json',
 								data: {
 									mobile: this.phone
 								},
-								success: res => {
+								success: data => {
 									if (data.data.status === 200) {
 										uni.showToast({
 											icon: 'none',
@@ -420,13 +433,17 @@
 			// 获取图文验证码
 			getTextVerify() {
 				uni.request({
-					url: "http://192.168.1.10:8080/getConfirmCode",
-					Method: 'post',
+					url: baseURL + "/getWxConfirmCode",
+					method: 'post',
+					dataType: 'json',
 					success: res => {
 						this.imgSrc = res.data.data.base64Str
 						uni.setStorageSync('imageCodeKey', res.data.data.imageCodeKey)
 					}
 				})
+			},
+			isClick(){
+				this.isChecked=!this.isChecked
 			}
 		}
 	}
@@ -555,11 +572,13 @@
 					}
 
 					.codeImage {
+						border: 2rpx solid black;
 						border-radius: 10rpx;
 						height: 100%;
 						width: 30%;
 
 						img {
+							border-radius: 10rpx;
 							width: 100%;
 							height: 100%;
 

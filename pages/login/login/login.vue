@@ -23,11 +23,13 @@
 					<img :src="'data:image/jpeg;base64,'+imgSrc">
 				</view>
 			</view>
-			<button class="login" type="default" plain="true" >登录</button>
+			<button class="login" type="default" plain="true" @click="login">登录</button>
 		</view>
 	</view>
 </template>
 <script>
+	import { baseURL } from '../config/config.js'
+	
 	export default {
 	  data () {
 	    return {
@@ -69,10 +71,11 @@
 			  })
 	      } else {
 	        // console.log('成功发送登录请求')
-	        const imageCodeKey = uni.setStorageSync('imageCodeKey')
-			uni.request({
-				url: "http://192.168.1.10:8080/login",
-				Method: 'post',
+	        const imageCodeKey = uni.getStorageSync('imageCodeKey')
+			uni.request ({
+				url: baseURL + "/wxLogin",
+				method: 'POST',
+				dataType: 'json',
 				data: {
 					password: this.password,
 					mobile: this.phone,
@@ -134,8 +137,8 @@
 	    // 获取图文验证码
 	    getTextVerify () {
 			uni.request({
-				url: "http://192.168.1.10:8080/getConfirmCode",
-				Method: 'post',
+				url: baseURL + "/getWxConfirmCode",
+				method: 'POST',
 				success: res => {
 					this.imgSrc = res.data.data.base64Str
 					uni.setStorageSync('imageCodeKey', res.data.data.imageCodeKey)
@@ -277,10 +280,12 @@
 					}
 				}
 				.codeImage{
+					border: 2rpx solid black;
 					border-radius: 10rpx;
 					height: 100%;
 					width: 30%;
 					img {
+						border-radius: 10rpx;
 						width: 100%;
 						height: 100%;
 					}
