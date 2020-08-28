@@ -72,7 +72,7 @@
 	      } else {
 	        // console.log('成功发送登录请求')
 	        const imageCodeKey = uni.getStorageSync('imageCodeKey')
-			uni.request ({
+			await uni.request ({
 				url: baseURL + "/wxLogin",
 				method: 'POST',
 				dataType: 'json',
@@ -135,8 +135,8 @@
 	    	})
 	    },
 	    // 获取图文验证码
-	    getTextVerify () {
-			uni.request({
+	    async getTextVerify () {
+			await uni.request({
 				url: baseURL + "/getWxConfirmCode",
 				method: 'POST',
 				success: res => {

@@ -29,7 +29,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _signin_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./signin.vue?vue&type=script&lang=js& */ 57);
 /* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _signin_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _signin_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
 /* harmony import */ var _signin_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./signin.vue?vue&type=style&index=0&lang=scss& */ 59);
-/* harmony import */ var _Hbuild_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../../Hbuild/HBuilderX/plugins/uniapp-cli/node_modules/@dcloudio/vue-cli-plugin-uni/packages/vue-loader/lib/runtime/componentNormalizer.js */ 10);
+/* harmony import */ var _Hbuild_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../../Hbuild/HBuilderX/plugins/uniapp-cli/node_modules/@dcloudio/vue-cli-plugin-uni/packages/vue-loader/lib/runtime/componentNormalizer.js */ 14);
 
 var renderjs
 
@@ -130,7 +130,7 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _regenerator = _interopRequireDefault(__webpack_require__(/*! ./node_modules/@vue/babel-preset-app/node_modules/@babel/runtime/regenerator */ 18));
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _regenerator = _interopRequireDefault(__webpack_require__(/*! ./node_modules/@vue/babel-preset-app/node_modules/@babel/runtime/regenerator */ 8));
 
 
 
@@ -258,57 +258,58 @@ var _config = __webpack_require__(/*! ../config/config.js */ 11);function _inter
                 _this.isChecked) {_context.next = 13;break;}return _context.abrupt("return",
                 uni.showToast({
                   icon: 'none',
-                  title: '请先同意用户注册协议' }));case 13:
+                  title: '请先同意用户注册协议' }));case 13:_context.next = 15;return (
 
 
-                uni.request({
-                  url: _config.baseURL + "/wxRegister",
-                  method: 'POST',
-                  dataType: 'json',
-                  data: {
-                    password: _this.password,
-                    username: _this.username,
-                    mobile: _this.phone,
-                    confirmPwd: _this.isPassword,
-                    phoneConfirmCode: _this.verify_phone },
+                  uni.request({
+                    url: _config.baseURL + "/wxRegister",
+                    method: 'POST',
+                    dataType: 'json',
+                    data: {
+                      password: _this.password,
+                      username: _this.username,
+                      mobile: _this.phone,
+                      confirmPwd: _this.isPassword,
+                      phoneConfirmCode: _this.verify_phone,
+                      openid: uni.getStorageSync("openid") },
 
-                  success: function success(res) {
-                    if (res.data.status == 200) {
-                      // console.log(res)
-                      uni.showToast({
-                        title: '注册成功!' });
+                    success: function success(res) {
+                      if (res.data.status == 200) {
+                        // console.log(res)
+                        uni.showToast({
+                          title: '注册成功!' });
 
-                      // 注册清空表单
-                      _this.password = '';
-                      _this.username = '';
-                      _this.phone = '';
-                      _this.email = '';
-                      _this.verify = '';
-                      _this.isPassword = '';
-                      _this.verify_phone = '';
-                      setTimeout(function () {
-                        uni.navigateTo({
-                          animationDuration: 5000,
-                          url: "../login/login" });
+                        // 注册清空表单
+                        _this.password = '';
+                        _this.username = '';
+                        _this.phone = '';
+                        _this.email = '';
+                        _this.verify = '';
+                        _this.isPassword = '';
+                        _this.verify_phone = '';
+                        setTimeout(function () {
+                          uni.navigateTo({
+                            animationDuration: 5000,
+                            url: "../login/login" });
 
-                      }, 1500);
-                    } else if (res.data.status === 502) {
-                      uni.showToast({
-                        icon: 'none',
-                        title: '请正确填写手机验证码' });
+                        }, 1500);
+                      } else if (res.data.status === 502) {
+                        uni.showToast({
+                          icon: 'none',
+                          title: '请正确填写手机验证码' });
 
-                    } else if (res.data.status === 507) {
-                      uni.showToast({
-                        icon: 'none',
-                        title: '验证码超时，请重新获取' });
+                      } else if (res.data.status === 507) {
+                        uni.showToast({
+                          icon: 'none',
+                          title: '验证码超时，请重新获取' });
 
-                    } else {
-                      uni.showToast({
-                        icon: 'none',
-                        title: '注册失败，请重试' });
+                      } else {
+                        uni.showToast({
+                          icon: 'none',
+                          title: '注册失败，请重试' });
 
-                    }
-                  } });case 14:case "end":return _context.stop();}}}, _callee);}))();
+                      }
+                    } }));case 15:case "end":return _context.stop();}}}, _callee);}))();
 
 
     },
@@ -325,21 +326,21 @@ var _config = __webpack_require__(/*! ../config/config.js */ 11);function _inter
                 uni.showToast({
                   icon: 'none',
                   duration: 2000,
-                  title: '请按照规则输入用户名：长度为2-16，只能包含中文英文和下划线' }));case 5:
+                  title: '请按照规则输入用户名：长度为2-16，只能包含中文英文和下划线' }));case 5:if (
 
 
-                // 正则校验
-                if (!regUsername) {
-                  // 启用红色提示框
-                  _this2.isVerifyStyle.username = false;
-                  // 核验纪录
-                  _this2.isVerifyList.username = false;
-                  uni.showToast({
-                    icon: 'none',
-                    duration: 2000,
-                    title: '请按照规则输入用户名：长度为2-16，只能包含中文英文和下划线' });
 
-                } else {
+                regUsername) {_context2.next = 11;break;}
+                // 启用红色提示框
+                _this2.isVerifyStyle.username = false;
+                // 核验纪录
+                _this2.isVerifyList.username = false;
+                uni.showToast({
+                  icon: 'none',
+                  duration: 2000,
+                  title: '请按照规则输入用户名：长度为2-16，只能包含中文英文和下划线' });_context2.next = 13;break;case 11:_context2.next = 13;return (
+
+
                   uni.request({
                     url: _config.baseURL + "/validateUserName",
                     method: 'POST',
@@ -360,23 +361,23 @@ var _config = __webpack_require__(/*! ../config/config.js */ 11);function _inter
                         // 启用红色提示框
                         _this2.isVerifyStyle.username = false;
                       }
-                    } });
+                    } }));case 13:case "end":return _context2.stop();}}}, _callee2);}))();
 
-                }case 6:case "end":return _context2.stop();}}}, _callee2);}))();
+
     },
     // 手机号校验
     onblurPhone: function onblurPhone() {var _this3 = this;return _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee3() {var regPhone;return _regenerator.default.wrap(function _callee3$(_context3) {while (1) {switch (_context3.prev = _context3.next) {case 0:
                 // 请求前的预校验
                 regPhone = /^1[3456789]\d{9}$/.test(_this3.phone);
                 // 正则校验
-                if (!regPhone) {
-                  uni.showToast({
-                    icon: 'none',
-                    title: '请输入正确的手机号' });
+                if (regPhone) {_context3.next = 7;break;}
+                uni.showToast({
+                  icon: 'none',
+                  title: '请输入正确的手机号' });
 
-                  _this3.isVerifyList.phone = false;
-                  _this3.isVerifyStyle.phone = false;
-                } else {
+                _this3.isVerifyList.phone = false;
+                _this3.isVerifyStyle.phone = false;_context3.next = 9;break;case 7:_context3.next = 9;return (
+
                   uni.request({
                     url: _config.baseURL + "/isExistMobile",
                     method: 'POST',
@@ -396,9 +397,9 @@ var _config = __webpack_require__(/*! ../config/config.js */ 11);function _inter
                           title: '账号已被注册，请直接登录' });
 
                       }
-                    } });
+                    } }));case 9:case "end":return _context3.stop();}}}, _callee3);}))();
 
-                }case 2:case "end":return _context3.stop();}}}, _callee3);}))();
+
     },
     // 密码校验
     onblurPassword: function onblurPassword() {
@@ -471,8 +472,8 @@ var _config = __webpack_require__(/*! ../config/config.js */ 11);function _inter
       }
     },
     // 获取手机验证码
-    phoneVerify: function phoneVerify() {var _this4 = this;return _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee4() {var veriftStatus, verifyStyle, item;return _regenerator.default.wrap(function _callee4$(_context4) {while (1) {switch (_context4.prev = _context4.next) {case 0:if (!(
-                _this4.times != 60)) {_context4.next = 2;break;}return _context4.abrupt("return");case 2:
+    phoneVerify: function phoneVerify() {var _this4 = this;return _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee5() {var veriftStatus, verifyStyle, item;return _regenerator.default.wrap(function _callee5$(_context5) {while (1) {switch (_context5.prev = _context5.next) {case 0:if (!(
+                _this4.times != 60)) {_context5.next = 2;break;}return _context5.abrupt("return");case 2:
                 veriftStatus = _this4.isVerifyList;
                 verifyStyle = _this4.isVerifyStyle;
                 // 请求前的预校验
@@ -480,64 +481,64 @@ var _config = __webpack_require__(/*! ../config/config.js */ 11);function _inter
                 verifyStyle.phone = veriftStatus.phone;
                 verifyStyle.password = veriftStatus.password;
                 verifyStyle.isPassword = veriftStatus.isPassword;
-                verifyStyle.verify = veriftStatus.verify;_context4.t0 = _regenerator.default.keys(
-                _this4.isVerifyList);case 10:if ((_context4.t1 = _context4.t0()).done) {_context4.next = 16;break;}item = _context4.t1.value;if (
-                _this4.isVerifyList[item]) {_context4.next = 14;break;}return _context4.abrupt("return",
+                verifyStyle.verify = veriftStatus.verify;_context5.t0 = _regenerator.default.keys(
+                _this4.isVerifyList);case 10:if ((_context5.t1 = _context5.t0()).done) {_context5.next = 16;break;}item = _context5.t1.value;if (
+                _this4.isVerifyList[item]) {_context5.next = 14;break;}return _context5.abrupt("return",
                 uni.showToast({
                   icon: 'none',
-                  title: '请正确填写红色框内的信息' }));case 14:_context4.next = 10;break;case 16:
+                  title: '请正确填写红色框内的信息' }));case 14:_context5.next = 10;break;case 16:_context5.next = 18;return (
 
 
 
-                // 预校验通过 点击发送验证码先进行图文验证码判断
-                uni.request({
-                  url: _config.baseURL + "/validateImageCode",
-                  method: 'POST',
-                  dataType: 'json',
-                  data: {
-                    confirmCode: _this4.verify,
-                    imageCodeKey: uni.getStorageSync('imageCodeKey') },
 
-                  success: function success(res) {
-                    if (res.data.status === 200) {
-                      _this4.getTextVerify();
-                      // 将时间常量存到本地
-                      var endDate = new Date().getTime() + 60000;
-                      uni.setStorageSync('myEndTime', JSON.stringify(endDate));
-                      uni.setStorageSync('isShowTime', JSON.stringify(!_this4.isShowTime));
-                      _this4.codeDown(endDate);
-                      // 发送请求获取验证码请求
-                      uni.request({
-                        url: _config.baseURL + "/sendSMS",
-                        method: 'post',
-                        dataType: 'json',
-                        data: {
-                          mobile: _this4.phone },
+                  uni.request({
+                    url: _config.baseURL + "/validateImageCode",
+                    method: 'POST',
+                    dataType: 'json',
+                    data: {
+                      confirmCode: _this4.verify,
+                      imageCodeKey: uni.getStorageSync('imageCodeKey') },
 
-                        success: function success(data) {
-                          if (data.data.status === 200) {
-                            uni.showToast({
-                              icon: 'none',
-                              title: '验证码发送成功' });
+                    success: function () {var _success = _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee4(res) {var endDate;return _regenerator.default.wrap(function _callee4$(_context4) {while (1) {switch (_context4.prev = _context4.next) {case 0:if (!(
+                                res.data.status === 200)) {_context4.next = 10;break;}
+                                _this4.getTextVerify();
+                                // 将时间常量存到本地
+                                endDate = new Date().getTime() + 60000;
+                                uni.setStorageSync('myEndTime', JSON.stringify(endDate));
+                                uni.setStorageSync('isShowTime', JSON.stringify(!_this4.isShowTime));
+                                _this4.codeDown(endDate);
+                                // 发送请求获取验证码请求
+                                _context4.next = 8;return uni.request({
+                                  url: _config.baseURL + "/sendSMS",
+                                  method: 'post',
+                                  dataType: 'json',
+                                  data: {
+                                    mobile: _this4.phone },
 
-                          } else {
-                            uni.showToast({
-                              icon: 'none',
-                              title: '验证码发送失败' });
+                                  success: function success(data) {
+                                    if (data.data.status === 200) {
+                                      uni.showToast({
+                                        icon: 'none',
+                                        title: '验证码发送成功' });
 
-                          }
-                        } });
+                                    } else {
+                                      uni.showToast({
+                                        icon: 'none',
+                                        title: '验证码发送失败' });
 
-                      // console.log(res)
-                    } else {
-                      uni.showToast({
-                        icon: 'none',
-                        title: '请正确输入验证码' });
+                                    }
+                                  } });case 8:_context4.next = 12;break;case 10:
 
-                      // 重新获取验证码
-                      _this4.getTextVerify();
-                    }
-                  } });case 17:case "end":return _context4.stop();}}}, _callee4);}))();
+
+
+                                uni.showToast({
+                                  icon: 'none',
+                                  title: '请正确输入验证码' });
+
+                                // 重新获取验证码
+                                _this4.getTextVerify();case 12:case "end":return _context4.stop();}}}, _callee4);}));function success(_x) {return _success.apply(this, arguments);}return success;}() }));case 18:case "end":return _context5.stop();}}}, _callee5);}))();
+
+
 
     },
     // 将保存到本地的时间进行计算  防止页面刷新时间重置
@@ -563,15 +564,15 @@ var _config = __webpack_require__(/*! ../config/config.js */ 11);function _inter
       myEndTime && this.codeDown(myEndTime);
     },
     // 获取图文验证码
-    getTextVerify: function getTextVerify() {var _this6 = this;
-      uni.request({
-        url: _config.baseURL + "/getWxConfirmCode",
-        method: 'post',
-        dataType: 'json',
-        success: function success(res) {
-          _this6.imgSrc = res.data.data.base64Str;
-          uni.setStorageSync('imageCodeKey', res.data.data.imageCodeKey);
-        } });
+    getTextVerify: function getTextVerify() {var _this6 = this;return _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee6() {return _regenerator.default.wrap(function _callee6$(_context6) {while (1) {switch (_context6.prev = _context6.next) {case 0:_context6.next = 2;return (
+                  uni.request({
+                    url: _config.baseURL + "/getWxConfirmCode",
+                    method: 'post',
+                    dataType: 'json',
+                    success: function success(res) {
+                      _this6.imgSrc = res.data.data.base64Str;
+                      uni.setStorageSync('imageCodeKey', res.data.data.imageCodeKey);
+                    } }));case 2:case "end":return _context6.stop();}}}, _callee6);}))();
 
     },
     isClick: function isClick() {

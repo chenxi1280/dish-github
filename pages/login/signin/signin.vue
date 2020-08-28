@@ -129,7 +129,7 @@
 						title: '请先同意用户注册协议'
 					})
 				} else {
-					uni.request({
+					await uni.request({
 						url: baseURL + "/wxRegister",
 						method: 'POST',
 						dataType: 'json',
@@ -138,7 +138,8 @@
 							username: this.username,
 							mobile: this.phone,
 							confirmPwd: this.isPassword,
-							phoneConfirmCode: this.verify_phone
+							phoneConfirmCode: this.verify_phone,
+							openid: uni.getStorageSync("openid")
 						},
 						success: res => {
 							if (res.data.status == 200) {
@@ -208,7 +209,7 @@
 						title: '请按照规则输入用户名：长度为2-16，只能包含中文英文和下划线'
 					})
 				} else {
-					uni.request({
+					await uni.request({
 						url: baseURL + "/validateUserName",
 						method: 'POST',
 						dataType: 'json',
@@ -245,7 +246,7 @@
 					this.isVerifyList.phone = false
 					this.isVerifyStyle.phone = false
 				} else {
-					uni.request({
+					await uni.request({
 						url: baseURL + "/isExistMobile",
 						method: 'POST',
 						dataType: 'json',
@@ -358,7 +359,7 @@
 					}
 				}
 				// 预校验通过 点击发送验证码先进行图文验证码判断
-				uni.request({
+				await uni.request({
 					url: baseURL + "/validateImageCode",
 					method: 'POST',
 					dataType: 'json',
@@ -366,7 +367,7 @@
 						confirmCode: this.verify,
 						imageCodeKey: uni.getStorageSync('imageCodeKey')
 					},
-					success: res => {
+					success: async res => {
 						if (res.data.status === 200) {
 							this.getTextVerify()
 							// 将时间常量存到本地
@@ -375,7 +376,7 @@
 							uni.setStorageSync('isShowTime', JSON.stringify(!this.isShowTime))
 							this.codeDown(endDate)
 							// 发送请求获取验证码请求
-							uni.request({
+							await uni.request({
 								url: baseURL + "/sendSMS",
 								method: 'post',
 								dataType: 'json',
@@ -431,8 +432,8 @@
 				myEndTime && this.codeDown(myEndTime)
 			},
 			// 获取图文验证码
-			getTextVerify() {
-				uni.request({
+			async getTextVerify() {
+				await uni.request({
 					url: baseURL + "/getWxConfirmCode",
 					method: 'post',
 					dataType: 'json',
