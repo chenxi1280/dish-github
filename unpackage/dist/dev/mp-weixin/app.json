@@ -1,8 +1,8 @@
 {
   "pages": [
+    "pages/mine/mine",
     "pages/dishover/dishover",
     "pages/make/make",
-    "pages/mine/mine",
     "pages/index/index",
     "pages/login/login/login",
     "pages/login/signin/signin"
@@ -40,6 +40,5 @@
       }
     ]
   },
-  "usingComponents": {},
-  "sitemapLocation": "sitemap33.json"
+  "usingComponents": {}
 }
