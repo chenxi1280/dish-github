@@ -1,7 +1,24 @@
 <template>
 	<view class="mine">
-		<view>个人中心页面</view>
-		<view class="redirect_btn" @click="toLoginPage">点击前往登录页</view>
+		<view class="top">
+			<view class = "avatarUrl">
+				<image>头像</image>
+			</view>
+			<view>
+				<view class = "text">
+					<text>用户昵称</text>
+				</view>
+				<view class="userName">
+					<input />
+				</view>
+			</view>
+			<view>
+				<view class="problem">
+					<icon class="headSet"></icon>
+				</view>
+			</view>
+		</view>
+		
 	</view>
 </template>
 
