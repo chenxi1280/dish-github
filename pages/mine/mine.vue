@@ -1,41 +1,43 @@
 <template>
 	<view class="mine">
-			<u-sticky>
-			<view class="top">
-				<view class = "avatarUrl">
-					<image></image>
-				</view>
-				<view class="userinfo">
-					<view class = "text">
-						<text>用户昵称</text>
+		<u-sticky>
+			<view class="top_box">
+				<view class="top">
+					<view class = "avatarUrl">
+						<image></image>
 					</view>
-					<view class="userName">
-						<input />
-						<view class="line"></view>
+					<view class="userinfo">
+						<view class = "text">
+							<text>用户昵称</text>
+						</view>
+						<view class="userName">
+							<input />
+							<view class="line"></view>
+						</view>
+					</view>
+					<view>
+						<view class="problem">
+							<icon class="headset"></icon>
+						</view>
 					</view>
 				</view>
-				<view>
-					<view class="problem">
-						<icon class="headset"></icon>
+				<view class="mid">
+					<view class="loginBtn">
+						<a @click="toLoginPage">登录四刻互动账号</a>
 					</view>
 				</view>
-			</view>
-			<view class="mid">
-				<view class="loginBtn">
-					<a @click="toLoginPage">登录四刻互动账号</a>
-				</view>
+				<u-subsection :list="items" :current="0" @change="sectionChange"></u-subsection>
 			</view>
 		</u-sticky>
 		<view class="bottom">
-			<u-subsection :list="items" :current="0" @change="sectionChange"></u-subsection>
 			<view class="content">
 				<view v-if="current === 0">
 					<published></published>
-					<u-back-top :scroll-top="scrollTop"></u-back-top>
+					<!-- <u-back-top :scroll-top="scrollTop"></u-back-top> -->
 				</view>
 				<view v-if="current === 1">
 					<verfied></verfied>
-					<u-back-top :scroll-top="scrollTop"></u-back-top>
+					<!-- <u-back-top :scroll-top="scrollTop"></u-back-top> -->
 				</view>
 			</view>
 		</view>
@@ -43,12 +45,12 @@
 </template>
 
 <script>
-	import published from './published.vue'
-	import verfied from './verfied.vue'
+	import published from '../../components/mine/published.vue'
+	import verfied from '../../components/mine/verfied.vue'
 	export default {
 		data () {
 			return {
-				items: ['已审核', '已发布'],
+				items: ['已发布','已审核'],
 				current:0
 			}
 		},
@@ -72,58 +74,124 @@
 
 <style lang="scss">
 	@import "uview-ui/index.scss";
-	.mine {
-		.top{
-			display: flex;
-			justify-content: space-between;
-			width: 670rpx;
-			margin: 0 auto;
-			margin-top: 20rpx;
-			background-color: white;
-			.avatarUrl{
-				border: 2rpx solid black;
-				with: 200rpx;
-				height: 250rpx;
-				image{				
-					width: 250rpx;
-					height: 100%;
-				}
-			}
-			
-			.userinfo{
-				/* border: 2rpx solid black; */
-				with: 250rpx;
-				height: 150rpx;
-				margin-left: 20rpx;
-				input{
-					margin-top: 50rpx;
-					margin-left: 10rpx;
-				}
-				.line{
-					border: 2rpx solid #D1D1D1;
-					margin-left: 10rpx;
-				}
-			}
-			
-			.problem{
-				/* border: 2rpx solid black; */
-				height: 50rpx;
-				width: 50rpx;
-				margin-left: 20rpx;
-				.headset{
-					background: url(../../static/icon/headset.png) center no-repeat;
-					width: 100%;
-					height: 100%;
-					background-size: 50rpx;
-				}	
+	
+	#demo-warter {
+		border-radius: 16rpx;
+		margin: 10rpx;
+		background-color: #ffffff;
+		padding: 16rpx;
+		position: relative;
+		.demo-img-wrap{
+			.demo-image {
+				width: 100%;
+				border-radius: 8rpx;
 			}
 		}
 		
-		.mid{
-			margin-top: 40rpx;
-			background-color: white;
-			.loginBtn{
-				text-align: center;
+		.demo-title {
+			font-size: 30rpx;
+			margin-top: 10rpx;
+			color: $u-main-color;
+		}
+		
+		.demo-price {
+			font-size: 30rpx;
+			color: $u-type-error;
+			margin-top: 5px;
+		}
+		
+		.demo-tag {
+			display: flex;
+			margin-top: 10rpx;
+			.demo-tag-owner {
+				background-color: $u-type-error;
+				color: #FFFFFF;
+				display: flex;
+				align-items: center;
+				padding: 4rpx 14rpx;
+				border-radius: 50rpx;
+				font-size: 20rpx;
+				line-height: 1;
+			}
+			
+			.demo-tag-text {
+				border: 2rpx solid $u-type-primary;
+				color: $u-type-primary;
+				margin-left: 20rpx;
+				border-radius: 50rpx;
+				line-height: 1;
+				padding: 4rpx 14rpx;
+				display: flex;
+				align-items: center;
+				border-radius: 50rpx;
+				font-size: 20rpx;
+			}
+		}
+		.demo-shop {
+			font-size: 22rpx;
+			color: $u-tips-color;
+			margin-top: 10rpx;
+		}
+	}
+	
+	/* .u-close {
+		position: absolute;
+		top: 32rpx;
+		right: 32rpx;
+	} */
+	.mine {
+		.top_box{
+			background-color: #ffffff;
+			.top{
+				display: flex;
+				justify-content: space-between;
+				width: 670rpx;
+				margin: 0 auto;
+				padding-top: 20rpx;
+				.avatarUrl{
+					border: 2rpx solid black;
+					with: 200rpx;
+					height: 250rpx;
+					image{				
+						width: 250rpx;
+						height: 100%;
+					}
+				}
+				
+				.userinfo{
+					/* border: 2rpx solid black; */
+					with: 250rpx;
+					height: 150rpx;
+					margin-left: 20rpx;
+					input{
+						margin-top: 50rpx;
+						margin-left: 10rpx;
+					}
+					.line{
+						border: 2rpx solid #D1D1D1;
+						margin-left: 10rpx;
+					}
+				}
+				
+				.problem{
+					/* border: 2rpx solid black; */
+					height: 50rpx;
+					width: 50rpx;
+					margin-left: 20rpx;
+					.headset{
+						background: url(../../static/icon/headset.png) center no-repeat;
+						width: 100%;
+						height: 100%;
+						background-size: 50rpx;
+					}	
+				}
+			}
+			
+			.mid{
+				margin-top: 40rpx;
+				.loginBtn{
+					text-align: center;
+				}
 			}
 		}
 		.bottom{

@@ -1,6 +1,5 @@
 {
   "pages": [
-    "components/mine/product",
     "pages/mine/mine",
     "pages/dishover/dishover",
     "pages/search/search",

@@ -94,13 +94,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "components", function() { return components; });
 var components = {
   uSticky: function() {
-    return __webpack_require__.e(/*! import() | uview-ui/components/u-sticky/u-sticky */ "uview-ui/components/u-sticky/u-sticky").then(__webpack_require__.bind(null, /*! @/uview-ui/components/u-sticky/u-sticky.vue */ 162))
+    return __webpack_require__.e(/*! import() | uview-ui/components/u-sticky/u-sticky */ "uview-ui/components/u-sticky/u-sticky").then(__webpack_require__.bind(null, /*! @/uview-ui/components/u-sticky/u-sticky.vue */ 98))
   },
   uSubsection: function() {
-    return __webpack_require__.e(/*! import() | uview-ui/components/u-subsection/u-subsection */ "uview-ui/components/u-subsection/u-subsection").then(__webpack_require__.bind(null, /*! @/uview-ui/components/u-subsection/u-subsection.vue */ 103))
-  },
-  uBackTop: function() {
-    return __webpack_require__.e(/*! import() | uview-ui/components/u-back-top/u-back-top */ "uview-ui/components/u-back-top/u-back-top").then(__webpack_require__.bind(null, /*! @/uview-ui/components/u-back-top/u-back-top.vue */ 110))
+    return __webpack_require__.e(/*! import() | uview-ui/components/u-subsection/u-subsection */ "uview-ui/components/u-subsection/u-subsection").then(__webpack_require__.bind(null, /*! @/uview-ui/components/u-subsection/u-subsection.vue */ 105))
   }
 }
 var render = function() {
@@ -140,7 +137,9 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var published = function published() {__webpack_require__.e(/*! require.ensure | pages/mine/published */ "pages/mine/published").then((function () {return resolve(__webpack_require__(/*! ./published.vue */ 201));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var verfied = function verfied() {__webpack_require__.e(/*! require.ensure | pages/mine/verfied */ "pages/mine/verfied").then((function () {return resolve(__webpack_require__(/*! ./verfied.vue */ 179));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var _default =
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var published = function published() {__webpack_require__.e(/*! require.ensure | components/mine/published */ "components/mine/published").then((function () {return resolve(__webpack_require__(/*! ../../components/mine/published.vue */ 112));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var verfied = function verfied() {__webpack_require__.e(/*! require.ensure | components/mine/verfied */ "components/mine/verfied").then((function () {return resolve(__webpack_require__(/*! ../../components/mine/verfied.vue */ 119));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var _default =
+
+
 
 
 
@@ -190,7 +189,7 @@ __webpack_require__.r(__webpack_exports__);
 {
   data: function data() {
     return {
-      items: ['已审核', '已发布'],
+      items: ['已发布', '已审核'],
       current: 0 };
 
   },

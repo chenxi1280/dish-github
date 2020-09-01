@@ -1,0 +1,9 @@
+{
+  "usingComponents": {
+    "u-waterfall": "/uview-ui/components/u-waterfall/u-waterfall",
+    "u-loadmore": "/uview-ui/components/u-loadmore/u-loadmore",
+    "verfied-u-waterfall-left": "/components/mine/verfied-u-waterfall-left",
+    "verfied-u-waterfall-right": "/components/mine/verfied-u-waterfall-right"
+  },
+  "component": true
+}
