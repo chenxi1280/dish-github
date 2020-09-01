@@ -63,11 +63,14 @@
 
 <script>
 	export default {
+		options: {
+			addGlobalClass: true,
+		},
 		data() {
 			return {
 				loadStatus: 'loadmore',
-				flowList: [],
-				list: [
+				list: [],
+				flowList: [
 					{
 						price: 35,
 						title: '北国风光，千里冰封，万里雪飘',
@@ -163,7 +166,6 @@
 </script>
 
 <style lang="scss" scoped>
-	@import "uview-ui/index.scss";
 	.demo-warter {
 		border-radius: 16rpx;
 		margin: 10rpx;

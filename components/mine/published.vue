@@ -242,10 +242,8 @@
 	}
 </script>
 
-<style lang="scss">
-	@import "uview-ui/index.scss";
-	
-	#demo-warter {
+<style lang="scss" scoped>
+	.demo-warter {
 		border-radius: 16rpx;
 		margin: 10rpx;
 		background-color: #ffffff;

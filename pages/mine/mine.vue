@@ -75,7 +75,7 @@
 <style lang="scss">
 	@import "uview-ui/index.scss";
 	
-	#demo-warter {
+	.demo-warter {
 		border-radius: 16rpx;
 		margin: 10rpx;
 		background-color: #ffffff;
