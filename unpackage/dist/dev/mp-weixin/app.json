@@ -1,6 +1,8 @@
 {
   "pages": [
     "pages/dishover/dishover",
+    "pages/dishover/index/index",
+    "pages/search/search",
     "pages/make/make",
     "pages/mine/mine",
     "pages/index/index",
@@ -22,6 +24,13 @@
         "text": "制作",
         "iconPath": "static/icon/tabBar_make.png",
         "selectedIconPath": "static/icon/onTabBar_make.png",
+        "backgroundColor": "#fff"
+      },
+      {
+        "pagePath": "pages/dishover/index/index",
+        "text": "发现",
+        "iconPath": "static/icon/tabBar_discover.png",
+        "selectedIconPath": "static/icon/onTabBar_discover.png",
         "backgroundColor": "#fff"
       },
       {
