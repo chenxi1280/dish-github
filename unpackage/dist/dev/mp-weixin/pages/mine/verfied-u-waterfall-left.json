@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "verfied-u-waterfall-left": "/pages/mine/verfied-u-waterfall-left",
+    "verfied-u-waterfall-right": "/pages/mine/verfied-u-waterfall-right"
+  }
+}

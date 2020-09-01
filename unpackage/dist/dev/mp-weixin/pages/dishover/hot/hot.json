@@ -1,0 +1,10 @@
+{
+  "usingComponents": {
+    "u-waterfall": "/uview-ui/components/u-waterfall/u-waterfall",
+    "u-icon": "/uview-ui/components/u-icon/u-icon",
+    "u-loadmore": "/uview-ui/components/u-loadmore/u-loadmore",
+    "hot-u-waterfall-left": "/pages/dishover/hot/hot-u-waterfall-left",
+    "hot-u-waterfall-right": "/pages/dishover/hot/hot-u-waterfall-right"
+  },
+  "component": true
+}

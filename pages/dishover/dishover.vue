@@ -1,23 +1,20 @@
 <template>
 	<view>
-		<!-- 	<view class="container">
-			<u-sticky> -->
+			<view class="container">
+			<u-sticky>
 		<view class="search_view" @click="go_search_page">
 			<icon class="search_icon"></icon>
 			<input class="search_input" type="text" placeholder=" 查找你想看的视频" />
 		</view>
 
-		<!-- </u-sticky>
-		</view> -->
+		</u-sticky>
+		</view>
 		<u-subsection :list="items" :current="0" @change="sectionChange"></u-subsection>
 
 
 		<view class="content">
 			<view v-if="current === 0">
 				<hot></hot>
-			</view>
-			<view v-if="current === 1">
-				<sort></sort>
 			</view>
 			<u-back-top :scroll-top="scrollTop"></u-back-top>
 		</view>
@@ -32,16 +29,11 @@
 	import {
 		hot
 	} from './hot/hot.vue'
-	import {
-		sort
-	} from './index/index.vue'
-	import uniSegmentedControl from "@/components/uni-segmented-control/uni-segmented-control.vue"
+
 
 	export default {
 		components: {
-			hot,
-			sort,
-			uniSegmentedControl
+			hot
 		},
 		data() {
 			return {
@@ -70,7 +62,6 @@
 
 <style lang="scss">
 	@import "uview-ui/index.scss";
-
 	.wrap {
 		height: 200vh;
 	}
@@ -81,7 +72,7 @@
 		border-radius: 10px;
 
 		.search_icon {
-			background: url(../../static/icon/icon_search.png) no-repeat center;
+			// background: url(../../static/icon/icon_search.png) no-repeat center;
 			width: 80rpx;
 			height: 80rpx;
 			background-size: 60rpx;

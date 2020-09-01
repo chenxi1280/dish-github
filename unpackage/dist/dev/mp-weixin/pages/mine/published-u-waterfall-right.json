@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "published-u-waterfall-left": "/pages/mine/published-u-waterfall-left",
+    "published-u-waterfall-right": "/pages/mine/published-u-waterfall-right"
+  }
+}

@@ -1,6 +1,10 @@
 {
   "navigationBarTitleText": "我的",
   "usingComponents": {
-    "production": "/components/mine/product"
+    "u-sticky": "/uview-ui/components/u-sticky/u-sticky",
+    "u-subsection": "/uview-ui/components/u-subsection/u-subsection",
+    "u-back-top": "/uview-ui/components/u-back-top/u-back-top",
+    "published": "/pages/mine/published",
+    "verfied": "/pages/mine/verfied"
   }
 }

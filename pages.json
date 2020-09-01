@@ -4,6 +4,12 @@
 	},
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 	{
+		"path": "components/mine/product",
+		"style": {
+			"navigationBarTitleText": "我的"
+		}
+	},
+	{
 		"path": "pages/mine/mine",
 		"style": {
 			"navigationBarTitleText": "我的"
@@ -13,12 +19,6 @@
 			"path": "pages/dishover/dishover",
 			"style": {
 				"navigationBarTitleText": "发现"
-			}
-		},
-		{
-			"path": "pages/dishover/index/index",
-			"style": {
-				"navigationBarTitleText": "搜索"
 			}
 		},
 		{
@@ -62,13 +62,6 @@
 				"text": "制作",
 				"iconPath": "static/icon/tabBar_make.png",
 				"selectedIconPath":"static/icon/onTabBar_make.png",
-				"backgroundColor": "#fff"
-			},
-			{
-				"pagePath": "pages/dishover/index/index",
-				"text": "发现",
-				"iconPath": "static/icon/tabBar_discover.png",
-				"selectedIconPath":"static/icon/onTabBar_discover.png",
 				"backgroundColor": "#fff"
 			},
 			{

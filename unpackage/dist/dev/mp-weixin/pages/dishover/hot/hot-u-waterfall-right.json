@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "hot-u-waterfall-left": "/pages/dishover/hot/hot-u-waterfall-left",
+    "hot-u-waterfall-right": "/pages/dishover/hot/hot-u-waterfall-right"
+  }
+}

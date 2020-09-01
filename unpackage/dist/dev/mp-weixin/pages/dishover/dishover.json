@@ -1,10 +1,9 @@
 {
   "navigationBarTitleText": "发现",
   "usingComponents": {
+    "u-sticky": "/uview-ui/components/u-sticky/u-sticky",
     "u-subsection": "/uview-ui/components/u-subsection/u-subsection",
     "u-back-top": "/uview-ui/components/u-back-top/u-back-top",
-    "hot": "/pages/dishover/hot/hot",
-    "sort": "/pages/dishover/index/index",
-    "uni-segmented-control": "/components/uni-segmented-control/uni-segmented-control"
+    "hot": "/pages/dishover/hot/hot"
   }
 }

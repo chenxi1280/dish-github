@@ -1,0 +1,11 @@
+{
+  "usingComponents": {
+    "u-button": "/uview-ui/components/u-button/u-button",
+    "u-waterfall": "/uview-ui/components/u-waterfall/u-waterfall",
+    "u-icon": "/uview-ui/components/u-icon/u-icon",
+    "u-loadmore": "/uview-ui/components/u-loadmore/u-loadmore",
+    "verfied-u-waterfall-left": "/pages/mine/verfied-u-waterfall-left",
+    "verfied-u-waterfall-right": "/pages/mine/verfied-u-waterfall-right"
+  },
+  "component": true
+}
