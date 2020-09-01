@@ -74,20 +74,20 @@
 		width: 100%;
 		.tips{
 			border: 2rpx solid black;
-			width: 200rpx;
-			height: 300rpx;
+			width: 160rpx;
+			height: 210rpx;
 			position: absolute;
 			top: 0;
-			left: 302rpx;
+			left: 242rpx;
 			.work_publish{
-				width: 200rpx;
-				height: 100rpx;
+				width: 100%;
+				height: 70rpx;
 				box-sizing: border-box;
 				position: relative;
 				.btn_publish{
-					line-height: 100rpx;
+					line-height: 70rpx;
 					text-align: center;
-					font-size: 28rpx;
+					font-size: 20rpx;
 					&:hover{
 						background: #D3D3D3;
 					};
@@ -100,14 +100,14 @@
 				}
 			}
 			.work_code{
-				width: 200rpx;
-				height: 100rpx;
+				width: 100%;
+				height: 70rpx;
 				box-sizing: border-box;
 				position: relative;
 				.btn_code{
-					line-height: 100rpx;
+					line-height: 70rpx;
 					text-align: center;
-					font-size: 28rpx;
+					font-size: 20rpx;
 					&:hover{
 						background: #D3D3D3;
 					};
@@ -120,13 +120,13 @@
 				}
 			}
 			.work_delete{
-				width: 200rpx;
-				height: 100rpx;;
+				width: 100%;
+				height: 70rpx;;
 				position: relative;
 				.btn_delete{
-					line-height: 100rpx;
+					line-height: 70rpx;
 					text-align: center;
-					font-size: 28rpx;
+					font-size: 20rpx;
 					&:hover{
 						background: #D3D3D3;
 					};
@@ -136,13 +136,13 @@
 		
 		.product_main_view{
 			border: 2rpx solid black;
-			width: 300rpx;
+			width: 240rpx;
 			height: 400rpx;
 			position: relative;
 			.sign{
 				width: 80rpx;
 				height: 80rpx;
-				margin-left: 220rpx;
+				margin-left: 160rpx;
 				.more{
 					background: url(../../static/icon/more.png) center no-repeat;
 					width: 100%;

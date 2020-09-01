@@ -32,18 +32,17 @@
 			<view class="type_verify">
 				<view class="title_verify">
 					<text>已审核</text>
-					<production
-						v-for="(item, index) in currentPageData"
-						:key="index"
-						:authorName="item.userName"
-						:workName="item.artworkName"
-						:heatNum="item.heatNum"
-						:logoPath="item.logoPath">
-					</production>
+					<scroll-view scroll-x="true">
+						<production
+							v-for="(item, index) in currentPageData"
+							:key="index"
+							:authorName="item.userName"
+							:workName="item.artworkName"
+							:heatNum="item.heatNum"
+							:logoPath="item.logoPath">
+						</production>
+					</scroll-view> 
 				</view>
-				<text class="loading-text">
-				  {{loadingType === 0 ? contentText.contentdown : (loadingType === 1 ? contentText.contentrefresh : contentText.contentnomore)}}
-				</text>
 			</view>
 			<view class="type_publish">
 				<view class="title_publish">
@@ -57,9 +56,6 @@
 						:logoPath="item.logoPath" >
 					</production>
 				</view>
-				<text class="loading-text">
-				  {{loadingType === 0 ? contentText.contentdown : (loadingType === 1 ? contentText.contentrefresh : contentText.contentnomore)}}
-				</text>
 			</view>
 		</view>
 	</view>
@@ -109,7 +105,7 @@
 			  },
 			// 前往登录页面
 			toLoginPage () {
-				uni.reLaunch({
+				uni.redirectTo({
 					url: "../login/login/login"
 				})
 			},
