@@ -1,0 +1,20 @@
+{
+  "name": "dish",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "dependencies": {
+    "uview-ui": "^1.6.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/mpic/dish"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
