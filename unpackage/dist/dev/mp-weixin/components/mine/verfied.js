@@ -186,11 +186,13 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 //
 var _default =
 {
+  options: {
+    addGlobalClass: true },
+
   data: function data() {
     return {
       loadStatus: 'loadmore',
-      flowList: [],
-      list: [
+      flowList: [
       {
         price: 35,
         title: '北国风光，千里冰封，万里雪飘',
@@ -274,9 +276,9 @@ var _default =
   methods: {
     addRandomData: function addRandomData() {
       for (var i = 0; i < 10; i++) {
-        var index = this.$u.random(0, this.list.length - 1);
+        var index = this.$u.random(0, this.flowList.length - 1);
         // 先转成字符串再转成对象，避免数组对象引用导致数据混乱
-        var item = JSON.parse(JSON.stringify(this.list[index]));
+        var item = JSON.parse(JSON.stringify(this.flowList[index]));
         item.id = this.$u.guid();
         this.flowList.push(item);
       }

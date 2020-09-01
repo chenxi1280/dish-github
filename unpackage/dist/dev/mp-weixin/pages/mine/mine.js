@@ -98,6 +98,9 @@ var components = {
   },
   uSubsection: function() {
     return __webpack_require__.e(/*! import() | uview-ui/components/u-subsection/u-subsection */ "uview-ui/components/u-subsection/u-subsection").then(__webpack_require__.bind(null, /*! @/uview-ui/components/u-subsection/u-subsection.vue */ 105))
+  },
+  uBackTop: function() {
+    return __webpack_require__.e(/*! import() | uview-ui/components/u-back-top/u-back-top */ "uview-ui/components/u-back-top/u-back-top").then(__webpack_require__.bind(null, /*! @/uview-ui/components/u-back-top/u-back-top.vue */ 126))
   }
 }
 var render = function() {
@@ -206,6 +209,11 @@ __webpack_require__.r(__webpack_exports__);
     },
     sectionChange: function sectionChange(index) {
       this.current = index;
+    },
+    customerService: function customerService() {
+      uni.redirectTo({
+        url: "customService/customService" });
+
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 

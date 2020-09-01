@@ -69,7 +69,6 @@
 		data() {
 			return {
 				loadStatus: 'loadmore',
-				list: [],
 				flowList: [
 					{
 						price: 35,
@@ -154,9 +153,9 @@
 		methods: {
 			addRandomData() {
 				for(let i = 0; i < 10; i++) {
-					let index = this.$u.random(0, this.list.length - 1);
+					let index = this.$u.random(0, this.flowList.length - 1);
 					// 先转成字符串再转成对象，避免数组对象引用导致数据混乱
-					let item = JSON.parse(JSON.stringify(this.list[index]))
+					let item = JSON.parse(JSON.stringify(this.flowList[index]))
 					item.id = this.$u.guid();
 					this.flowList.push(item);
 				}

@@ -16,7 +16,7 @@
 						</view>
 					</view>
 					<view>
-						<view class="problem">
+						<view class="problem" @click="customerService">
 							<icon class="headset"></icon>
 						</view>
 					</view>
@@ -33,11 +33,11 @@
 			<view class="content">
 				<view v-if="current === 0">
 					<published></published>
-					<!-- <u-back-top :scroll-top="scrollTop"></u-back-top> -->
+					<u-back-top :scroll-top="scrollTop"></u-back-top>
 				</view>
 				<view v-if="current === 1">
 					<verfied></verfied>
-					<!-- <u-back-top :scroll-top="scrollTop"></u-back-top> -->
+					<u-back-top :scroll-top="scrollTop"></u-back-top>
 				</view>
 			</view>
 		</view>
@@ -68,13 +68,16 @@
 			sectionChange(index) {
 				this.current = index;
 			},
+			customerService(){
+				uni.redirectTo({
+					url: "customService/customService"
+				})
+			}
 		}
 	}
 </script>
 
 <style lang="scss">
-	@import "uview-ui/index.scss";
-	
 	.demo-warter {
 		border-radius: 16rpx;
 		margin: 10rpx;
@@ -174,7 +177,6 @@
 				}
 				
 				.problem{
-					/* border: 2rpx solid black; */
 					height: 50rpx;
 					width: 50rpx;
 					margin-left: 20rpx;
@@ -188,9 +190,10 @@
 			}
 			
 			.mid{
-				margin-top: 40rpx;
+				margin: 40rpx 0 20rpx 0;
 				.loginBtn{
 					text-align: center;
+					font-size: 36rpx;
 				}
 			}
 		}
