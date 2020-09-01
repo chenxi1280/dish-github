@@ -130,25 +130,121 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0; //
-//
-//
-//
-//
-//
-//
-var _default =
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var Production = function Production() {__webpack_require__.e(/*! require.ensure | components/mine/product */ "components/mine/product").then((function () {return resolve(__webpack_require__(/*! ../../components/mine/product */ 150));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var _default =
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {
   data: function data() {
-    return {};
+    return {
+      loadingType: 0,
+      contentText: {
+        contentdown: "上拉显示更多",
+        contentrefresh: "正在加载...",
+        contentnomore: "没有更多数据了" } };
+
 
   },
+  components: {
+    Production: Production },
+
   methods: {
+    // 产品列表数据
+    getNewsList: function getNewsList() {//第一次回去数据
+      _self.loadingType = 0;
+      uni.showNavigationBarLoading();
+      uni.request({
+        url: 'api地址',
+        method: 'POST',
+        data: {
+          //请求参数
+        },
+        success: function success(res) {
+          console.log(res.data.data);
+          _self.hotRecommendlist = res.data.data.response;
+          if (res.data.data.totalcount == res.data.data.response.length) {
+            uni.showToast({
+              title: '已是最新',
+              duration: 2000 });
+
+          }
+          uni.hideNavigationBarLoading(); //关闭加载动画
+          uni.stopPullDownRefresh(); //得到数据后停止下拉刷新
+        } });
+
+
+    },
     // 前往登录页面
     toLoginPage: function toLoginPage() {
-      uni.navigateTo({
+      uni.redirectTo({
         url: "../login/login/login" });
 
+    },
+    onload: function onload() {
+      // 产品列表数据默认加载	
+      _self = this;
+      this.getNewsList();
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 

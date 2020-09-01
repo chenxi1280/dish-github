@@ -1,1 +1,1 @@
-export const baseURL = 'https://wanxiangchengzhen/bpi/'
+export const baseURL = 'https://wanxiangchengzhen.com/bpi'

@@ -8480,7 +8480,7 @@ if (hadRuntime) {
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.baseURL = void 0;var baseURL = 'https://wanxiangchengzhen/bpi/';exports.baseURL = baseURL;
+Object.defineProperty(exports, "__esModule", { value: true });exports.baseURL = void 0;var baseURL = 'https://wanxiangchengzhen.com/bpi';exports.baseURL = baseURL;
 
 /***/ }),
 /* 12 */,
