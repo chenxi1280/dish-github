@@ -4,6 +4,12 @@
 	},
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 	{
+		"path": "components/mine/published",
+		"style": {
+			"navigationBarTitleText": "我的"
+		}
+	},
+	{
 		"path": "pages/mine/mine",
 		"style": {
 			"navigationBarTitleText": "我的"
@@ -47,6 +53,11 @@
             "path" : "pages/login/signin/signin",
             "style" : {}
         }
+		,{
+			"path" : "pages/mine/customService/customService",
+			"style" : {}
+		}
+		
     ],
 	"tabBar": {
 		"selectedColor":"#1296db",
