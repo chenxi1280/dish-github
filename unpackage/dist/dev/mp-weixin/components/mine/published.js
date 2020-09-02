@@ -137,107 +137,37 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0; //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-var _default =
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var mineProduction = function mineProduction() {__webpack_require__.e(/*! require.ensure | components/mine/mineProduction */ "components/mine/mineProduction").then((function () {return resolve(__webpack_require__(/*! ./mineProduction.vue */ 126));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var _default =
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {
   data: function data() {
     return {
@@ -319,6 +249,9 @@ var _default =
       default: false } },
 
 
+  components: {
+    mineProduction: mineProduction },
+
   onShow: function onShow() {
     this.addRandomData();
   },
@@ -331,10 +264,6 @@ var _default =
     }, 1000);
   },
   methods: {
-    showTips: function showTips() {
-      this.mainFlag = !this.mainFlag;
-      console.log(this.mainFlag);
-    },
     addRandomData: function addRandomData() {
       for (var i = 0; i < 10; i++) {
         var index = this.$u.random(0, this.flowList.length - 1);
