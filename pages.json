@@ -45,6 +45,11 @@
 			"path": "pages/login/signin/signin",
 			"style": {}
 		}
+		,{
+			"path" : "pages/mine/customService/customService",
+			"style" : {}
+		}
+		
 	],
 	"tabBar": {
 		"selectedColor": "#1296db",

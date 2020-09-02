@@ -45,7 +45,7 @@
 </template>
 
 <script>
-	import published from '../../components/mine/published.vue'
+	// import published from '../../components/mine/published.vue'
 	import verfied from '../../components/mine/verfied.vue'
 	export default {
 		data () {
@@ -55,7 +55,7 @@
 			}
 		},
 		components: {
-		    published,
+		    // published,
 			verfied
 		  },
 		methods: {
@@ -70,7 +70,7 @@
 			},
 			customerService(){
 				uni.redirectTo({
-					url: "customService/customService"
+					url: "./customService/customService"
 				})
 			}
 		}
@@ -82,7 +82,7 @@
 		border-radius: 16rpx;
 		margin: 10rpx;
 		background-color: #ffffff;
-		padding: 16rpx;
+		padding: 16rpx 16rpx 0 16rpx;
 		position: relative;
 		.demo-img-wrap{
 			.demo-image {
@@ -90,58 +90,62 @@
 				border-radius: 8rpx;
 			}
 		}
-		
-		.demo-title {
-			font-size: 30rpx;
-			margin-top: 10rpx;
-			color: $u-main-color;
-		}
-		
-		.demo-price {
-			font-size: 30rpx;
-			color: $u-type-error;
-			margin-top: 5px;
-		}
-		
-		.demo-tag {
-			display: flex;
-			margin-top: 10rpx;
-			.demo-tag-owner {
-				background-color: $u-type-error;
-				color: #FFFFFF;
-				display: flex;
-				align-items: center;
-				padding: 4rpx 14rpx;
-				border-radius: 50rpx;
-				font-size: 20rpx;
-				line-height: 1;
+		.padding_box{
+			width: 100%;
+			padding: 0 16rpx;
+			position: absolute;
+			left: 0;
+			bottom: 50rpx;
+			.work_info{
+				width: 100%;
+				background-color: rgba(0,0,0,.4);
+				.demo-title {
+						font-size: 22rpx;
+						margin: 10rpx 0 0 0;
+						color: white;
+				}
+					
+				.demo-price {
+					font-size: 22rpx;
+					color: white;
+					margin: 5rpx 0 0 0;
+				}
+					
+				.demo-tag {
+					display: flex;
+					margin: 10rpx 0 0 0;
+					.demo-tag-owner {
+						background-color: $u-type-error;
+						color: #FFFFFF;
+						display: flex;
+						align-items: center;
+						padding: 4rpx 14rpx;
+						border-radius: 50rpx;
+						font-size: 22rpx;
+						line-height: 1;
+					}
+						
+					.demo-tag-text {
+						border: 2rpx solid $u-type-primary;
+						color: $u-type-primary;
+						margin-left: 20rpx;
+						border-radius: 50rpx;
+						line-height: 1;
+						padding: 4rpx 14rpx;
+						display: flex;
+						align-items: center;
+						border-radius: 50rpx;
+						font-size: 22rpx;
+					}
+					}
+				.demo-shop {
+					font-size: 22rpx;
+					color: white;
+					margin: 10rpx 0 0 0;
+				}
 			}
-			
-			.demo-tag-text {
-				border: 2rpx solid $u-type-primary;
-				color: $u-type-primary;
-				margin-left: 20rpx;
-				border-radius: 50rpx;
-				line-height: 1;
-				padding: 4rpx 14rpx;
-				display: flex;
-				align-items: center;
-				border-radius: 50rpx;
-				font-size: 20rpx;
-			}
-		}
-		.demo-shop {
-			font-size: 22rpx;
-			color: $u-tips-color;
-			margin-top: 10rpx;
 		}
 	}
-	
-	/* .u-close {
-		position: absolute;
-		top: 32rpx;
-		right: 32rpx;
-	} */
 	.mine {
 		.top_box{
 			background-color: #ffffff;

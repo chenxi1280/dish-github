@@ -1,7 +1,7 @@
 <template>
 	<view class="u-waterfall">
-		<view id="u-left-column" class="u-column"><slot name="left" :leftList="leftList"></slot></view>
-		<view id="u-right-column" class="u-column"><slot name="right" :rightList="rightList"></slot></view>
+		<view id="u-left-column" class="u-column"><slot name="left" :leftList="leftList" :flag="flag"></slot></view>
+		<view id="u-right-column" class="u-column"><slot name="right" :rightList="rightList" :flag="flag"></slot></view>
 	</view>
 </template>
 
@@ -23,7 +23,11 @@ export default {
 			required: true,
 			default: function() {
 				return [];
-			}
+			},
+		},
+		flag: {
+			type: Boolean,
+			default: false
 		},
 		// 每次向结构插入数据的时间间隔，间隔越长，越能保证两列高度相近，但是对用户体验越不好
 		// 单位ms
@@ -49,6 +53,7 @@ export default {
 			rightList: [],
 			tempList: [],
 			children: []
+			
 		}
 	},
 	watch: {

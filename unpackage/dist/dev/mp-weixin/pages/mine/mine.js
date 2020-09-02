@@ -140,7 +140,7 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var published = function published() {__webpack_require__.e(/*! require.ensure | components/mine/published */ "components/mine/published").then((function () {return resolve(__webpack_require__(/*! ../../components/mine/published.vue */ 163));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var verfied = function verfied() {__webpack_require__.e(/*! require.ensure | components/mine/verfied */ "components/mine/verfied").then((function () {return resolve(__webpack_require__(/*! ../../components/mine/verfied.vue */ 170));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var _default =
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var verfied = function verfied() {__webpack_require__.e(/*! require.ensure | components/mine/verfied */ "components/mine/verfied").then((function () {return resolve(__webpack_require__(/*! ../../components/mine/verfied.vue */ 170));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var _default =
 
 
 
@@ -197,7 +197,7 @@ __webpack_require__.r(__webpack_exports__);
 
   },
   components: {
-    published: published,
+    // published,
     verfied: verfied },
 
   methods: {
@@ -212,7 +212,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     customerService: function customerService() {
       uni.redirectTo({
-        url: "customService/customService" });
+        url: "./customService/customService" });
 
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))

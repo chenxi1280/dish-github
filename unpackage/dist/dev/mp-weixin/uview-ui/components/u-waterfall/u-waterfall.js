@@ -141,6 +141,10 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
         return [];
       } },
 
+    flag: {
+      type: Boolean,
+      default: false },
+
     // 每次向结构插入数据的时间间隔，间隔越长，越能保证两列高度相近，但是对用户体验越不好
     // 单位ms
     addTime: {
@@ -165,6 +169,7 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
       rightList: [],
       tempList: [],
       children: [] };
+
 
   },
   watch: {
