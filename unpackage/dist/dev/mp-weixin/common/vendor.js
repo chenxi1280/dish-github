@@ -760,7 +760,7 @@ function initData(vueOptions, context) {
     try {
       data = data.call(context); // 支持 Vue.prototype 上挂的数据
     } catch (e) {
-      if (Object({"NODE_ENV":"development","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG) {
+      if (Object({"VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
         console.warn('根据 Vue 的 data 函数初始化小程序 data 失败，请尽量确保 data 函数中不访问 vm 对象，否则可能影响首次数据渲染速度。', data);
       }
     }
@@ -7122,7 +7122,7 @@ function type(obj) {
 
 function flushCallbacks$1(vm) {
     if (vm.__next_tick_callbacks && vm.__next_tick_callbacks.length) {
-        if (Object({"NODE_ENV":"development","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG) {
+        if (Object({"VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
             var mpInstance = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + vm._uid +
                 ']:flushCallbacks[' + vm.__next_tick_callbacks.length + ']');
@@ -7143,14 +7143,14 @@ function nextTick$1(vm, cb) {
     //1.nextTick 之前 已 setData 且 setData 还未回调完成
     //2.nextTick 之前存在 render watcher
     if (!vm.__next_tick_pending && !hasRenderWatcher(vm)) {
-        if(Object({"NODE_ENV":"development","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG){
+        if(Object({"VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG){
             var mpInstance = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + vm._uid +
                 ']:nextVueTick');
         }
         return nextTick(cb, vm)
     }else{
-        if(Object({"NODE_ENV":"development","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG){
+        if(Object({"VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG){
             var mpInstance$1 = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance$1.is || mpInstance$1.route) + '][' + vm._uid +
                 ']:nextMPTick');
@@ -7235,7 +7235,7 @@ var patch = function(oldVnode, vnode) {
     });
     var diffData = this.$shouldDiffData === false ? data : diff(data, mpData);
     if (Object.keys(diffData).length) {
-      if (Object({"NODE_ENV":"development","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG) {
+      if (Object({"VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
         console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + this._uid +
           ']差量更新',
           JSON.stringify(diffData));
@@ -7672,9 +7672,9 @@ module.exports = g;
 
 /***/ }),
 /* 4 */
-/*!**********************************!*\
-  !*** D:/gitWork/dish/pages.json ***!
-  \**********************************/
+/*!*********************************!*\
+  !*** E:/uniapp/dish/pages.json ***!
+  \*********************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -8473,9 +8473,9 @@ if (hadRuntime) {
 
 /***/ }),
 /* 11 */
-/*!****************************************************!*\
-  !*** D:/gitWork/dish/pages/login/config/config.js ***!
-  \****************************************************/
+/*!***************************************************!*\
+  !*** E:/uniapp/dish/pages/login/config/config.js ***!
+  \***************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -8614,9 +8614,9 @@ function normalizeComponent (
 
 /***/ }),
 /* 15 */
-/*!*****************************************!*\
-  !*** D:/gitWork/dish/uview-ui/index.js ***!
-  \*****************************************/
+/*!****************************************!*\
+  !*** E:/uniapp/dish/uview-ui/index.js ***!
+  \****************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -8760,9 +8760,9 @@ var install = function install(Vue) {
 
 /***/ }),
 /* 16 */
-/*!****************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/mixin/mixin.js ***!
-  \****************************************************/
+/*!***************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/mixin/mixin.js ***!
+  \***************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -8801,9 +8801,9 @@ var install = function install(Vue) {
 
 /***/ }),
 /* 17 */
-/*!******************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/request/index.js ***!
-  \******************************************************/
+/*!*****************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/request/index.js ***!
+  \*****************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -8981,9 +8981,9 @@ new Request();exports.default = _default;
 
 /***/ }),
 /* 18 */
-/*!***********************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/deepMerge.js ***!
-  \***********************************************************/
+/*!**********************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/deepMerge.js ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9021,9 +9021,9 @@ deepMerge;exports.default = _default;
 
 /***/ }),
 /* 19 */
-/*!***********************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/deepClone.js ***!
-  \***********************************************************/
+/*!**********************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/deepClone.js ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9054,9 +9054,9 @@ deepClone;exports.default = _default;
 
 /***/ }),
 /* 20 */
-/*!******************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/test.js ***!
-  \******************************************************/
+/*!*****************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/test.js ***!
+  \*****************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9296,9 +9296,9 @@ function code(value) {var len = arguments.length > 1 && arguments[1] !== undefin
 
 /***/ }),
 /* 21 */
-/*!*************************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/queryParams.js ***!
-  \*************************************************************/
+/*!************************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/queryParams.js ***!
+  \************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9364,9 +9364,9 @@ queryParams;exports.default = _default;
 
 /***/ }),
 /* 22 */
-/*!*******************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/route.js ***!
-  \*******************************************************/
+/*!******************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/route.js ***!
+  \******************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9460,9 +9460,9 @@ route;exports.default = _default;
 
 /***/ }),
 /* 23 */
-/*!************************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/timeFormat.js ***!
-  \************************************************************/
+/*!***********************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/timeFormat.js ***!
+  \***********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9522,9 +9522,9 @@ timeFormat;exports.default = _default;
 
 /***/ }),
 /* 24 */
-/*!**********************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/timeFrom.js ***!
-  \**********************************************************/
+/*!*********************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/timeFrom.js ***!
+  \*********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9578,9 +9578,9 @@ timeFrom;exports.default = _default;
 
 /***/ }),
 /* 25 */
-/*!***************************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/colorGradient.js ***!
-  \***************************************************************/
+/*!**************************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/colorGradient.js ***!
+  \**************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9687,9 +9687,9 @@ function rgbToHex(rgb) {
 
 /***/ }),
 /* 26 */
-/*!******************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/guid.js ***!
-  \******************************************************/
+/*!*****************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/guid.js ***!
+  \*****************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9738,9 +9738,9 @@ guid;exports.default = _default;
 
 /***/ }),
 /* 27 */
-/*!*******************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/color.js ***!
-  \*******************************************************/
+/*!******************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/color.js ***!
+  \******************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9785,9 +9785,9 @@ color;exports.default = _default;
 
 /***/ }),
 /* 28 */
-/*!***********************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/type2icon.js ***!
-  \***********************************************************/
+/*!**********************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/type2icon.js ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9830,9 +9830,9 @@ type2icon;exports.default = _default;
 
 /***/ }),
 /* 29 */
-/*!*************************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/randomArray.js ***!
-  \*************************************************************/
+/*!************************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/randomArray.js ***!
+  \************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9847,9 +9847,9 @@ randomArray;exports.default = _default;
 
 /***/ }),
 /* 30 */
-/*!*********************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/addUnit.js ***!
-  \*********************************************************/
+/*!********************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/addUnit.js ***!
+  \********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9865,9 +9865,9 @@ function addUnit() {var value = arguments.length > 0 && arguments[0] !== undefin
 
 /***/ }),
 /* 31 */
-/*!********************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/random.js ***!
-  \********************************************************/
+/*!*******************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/random.js ***!
+  \*******************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9885,9 +9885,9 @@ random;exports.default = _default;
 
 /***/ }),
 /* 32 */
-/*!******************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/trim.js ***!
-  \******************************************************/
+/*!*****************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/trim.js ***!
+  \*****************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9910,9 +9910,9 @@ trim;exports.default = _default;
 
 /***/ }),
 /* 33 */
-/*!*******************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/toast.js ***!
-  \*******************************************************/
+/*!******************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/toast.js ***!
+  \******************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9930,9 +9930,9 @@ toast;exports.default = _default;
 
 /***/ }),
 /* 34 */
-/*!***********************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/getParent.js ***!
-  \***********************************************************/
+/*!**********************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/getParent.js ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9987,9 +9987,9 @@ function getParent(name, keys) {
 
 /***/ }),
 /* 35 */
-/*!*********************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/$parent.js ***!
-  \*********************************************************/
+/*!********************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/$parent.js ***!
+  \********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10015,9 +10015,9 @@ function $parent() {var name = arguments.length > 0 && arguments[0] !== undefine
 
 /***/ }),
 /* 36 */
-/*!*****************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/sys.js ***!
-  \*****************************************************/
+/*!****************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/sys.js ***!
+  \****************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10033,9 +10033,9 @@ function sys() {
 
 /***/ }),
 /* 37 */
-/*!**********************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/debounce.js ***!
-  \**********************************************************/
+/*!*********************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/debounce.js ***!
+  \*********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10072,9 +10072,9 @@ debounce;exports.default = _default;
 
 /***/ }),
 /* 38 */
-/*!**********************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/function/throttle.js ***!
-  \**********************************************************/
+/*!*********************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/function/throttle.js ***!
+  \*********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10114,9 +10114,9 @@ throttle;exports.default = _default;
 
 /***/ }),
 /* 39 */
-/*!******************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/config/config.js ***!
-  \******************************************************/
+/*!*****************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/config/config.js ***!
+  \*****************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10137,9 +10137,9 @@ var version = '1.6.5';var _default =
 
 /***/ }),
 /* 40 */
-/*!******************************************************!*\
-  !*** D:/gitWork/dish/uview-ui/libs/config/zIndex.js ***!
-  \******************************************************/
+/*!*****************************************************!*\
+  !*** E:/uniapp/dish/uview-ui/libs/config/zIndex.js ***!
+  \*****************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10171,18 +10171,10 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /* 44 */,
 /* 45 */,
 /* 46 */,
-/* 47 */,
-/* 48 */,
-/* 49 */,
-/* 50 */,
-/* 51 */,
-/* 52 */,
-/* 53 */,
-/* 54 */,
-/* 55 */
-/*!*******************************************************!*\
-  !*** D:/gitWork/dish/pages/dishover/config/config.js ***!
-  \*******************************************************/
+/* 47 */
+/*!******************************************************!*\
+  !*** E:/uniapp/dish/pages/dishover/config/config.js ***!
+  \******************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 

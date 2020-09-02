@@ -1,9 +1,12 @@
 {
   "navigationBarTitleText": "发现",
   "usingComponents": {
-    "u-sticky": "/uview-ui/components/u-sticky/u-sticky",
     "u-subsection": "/uview-ui/components/u-subsection/u-subsection",
     "u-back-top": "/uview-ui/components/u-back-top/u-back-top",
-    "hot": "/pages/dishover/hot/hot"
+    "dishover-dishoversort-sortDiv": "/pages/dishover/dishover-dishoversort-sortDiv",
+    "hot": "/pages/dishover/hot/hot",
+    "dishoversort": "/pages/dishover/dishoversort/dishoversort",
+    "search": "/pages/search/search",
+    "test": "/pages/dishover/test/test"
   }
 }
