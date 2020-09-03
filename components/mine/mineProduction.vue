@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<!-- #ifdef MP-WEIXIN -->
-		<view v-if="inputFlag" class="tips" >
+		<view v-if="localFlag" class="tips" >
 			<view class="work_publish">
 				<button class="btn_publish">发布作品</button>
 				<view class="line"></view>
