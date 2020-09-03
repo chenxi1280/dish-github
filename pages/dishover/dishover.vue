@@ -10,23 +10,18 @@
 		<!-- </u-sticky>
 		</view> -->
 		<u-subsection :list="items" :current="0" @change="sectionChange"></u-subsection>
-
-
 		<view class="content">
-			<view v-if="current === 0">
-				<hot></hot>
-				<!-- <test></test> -->
+			<view v-if="current === 0" style="height: 100;">
+				<hot :flowList="flowList" :status="loadStatus"></hot>
 			</view>
 			<view v-if="current === 1">
 				<u-subsection :list="list" :current="currentsort" @change="changeSort" mode='subsection'  bold="false" active-color="#606266" height="50"  font-size="24" ></u-subsection>		
-<!-- 				<u-tabs :list="list" :is-scroll="true" :current="currentsort" @change="changeSort" font-size="24" height="50"
-				active-color="#606266" bold="false" gutter="60"></u-tabs> -->
-				
-				<view v-if="currentsort === 0"><dishoversort v-slot:sortDiv queryType='爱情'> </dishoversort></view>
-				<view v-if="currentsort === 1"><dishoversort v-slot:sortDiv queryType='搞笑'> </dishoversort></view>
-				<view v-if="currentsort === 2"><dishoversort v-slot:sortDiv queryType='日常'></dishoversort></view>
-				<view v-if="currentsort === 3"><dishoversort v-slot:sortDiv queryType='动漫'></dishoversort></view>
-				<view v-if="currentsort === 4"><dishoversort v-slot:sortDiv queryType='游戏'></dishoversort></view>
+						
+				<view v-if="currentsort === 0"><hot :flowList="flowList" :status="loadStatus"> </hot></view>
+				<view v-if="currentsort === 1"><hot :flowList="flowList" :status="loadStatus"> </hot></view>
+				<view v-if="currentsort === 2"><hot :flowList="flowList" :status="loadStatus"></hot></view>
+				<view v-if="currentsort === 3"><hot :flowList="flowList" :status="loadStatus"></hot></view>
+				<view v-if="currentsort === 4"><hot :flowList="flowList" :status="loadStatus"></hot></view>
 				
 			</view>
 			<u-back-top :scroll-top="scrollTop"></u-back-top>
@@ -42,15 +37,13 @@
 	import hot from './hot/hot.vue'
 	import dishoversort from './dishoversort/dishoversort.vue'
 	import search from '../search/search'
-	import test from './test/test'
-
-
+	// import test from './test/test'
 	export default {
 		components: {
 			hot,
 			dishoversort,
-			search,
-			test
+			search
+
 		},
 		data() {
 			return {
@@ -58,7 +51,7 @@
 				current: 0,
 				scrollTop: 0,
 				list: [{
-					name: '爱情故事'
+					name: '爱情'
 				}, {
 					name: '搞笑'
 				}, {
@@ -69,9 +62,19 @@
 					name: '游戏'
 				}],
 				currentsort: 0,
-				queryType: "1"
+				queryType: "爱情",
+				limit: 10,
+				page: 0,
+				flowList: [],
+				loadStatus: "loadmore"
 
 			}
+		},
+		onShow(){
+			this.addRandomDataHot()
+		},
+		onReachBottom(e) {
+				this.addChoose()
 		},
 		methods: {
 			go_search_page() {
@@ -80,13 +83,81 @@
 				})
 			},
 			sectionChange(index) {
+				this.page = 0
+				this.flowList =[]
 				this.current = index;
+				this.addChoose()
 			},
 			onPageScroll(e) {
 				this.scrollTop = e.scrollTop;
 			},
 			changeSort(index) {
+				this.page = 0
+				this.flowList =[]
+				this.queryType = this.list[index].name
 				this.currentsort = index;
+				this.addRandomDataSort()
+			},
+			addChoose(){
+				if(this.current == 0){
+					  this.addRandomDataHot();
+				}
+				if(this.current == 1){
+					  this.addRandomDataSort();	
+				}
+			},
+			
+			
+			addRandomDataHot() {
+				this.page = this.page + 1
+				uni.request({
+					url: 'http://192.168.1.15:8008/Ecmartwork/getFindArtWorks',
+					method: 'POST',
+					data: {
+						page: this.page,
+						limit: this.limit
+					},
+					success: res => {
+						if(res.data.data != null){
+							res.data.data.forEach(v => {
+								v.high = 320
+								this.flowList.push(v)
+							})
+							if(res.data.data.length < this.limit){
+								this.loadStatus = 'nomore'
+							}
+						}else{
+							this.loadStatus = 'nomore'
+						}
+					}
+				})
+			},
+			addRandomDataSort() {
+				this.page = this.page + 1
+				uni.request({
+					url: 'http://192.168.1.15:8008/Ecmartwork/getFindSortArtWorks',
+					method: 'POST',
+					data: {
+						page: this.page,
+						limit: this.limit,
+						queryType: this.queryType
+					},
+					success: res => {
+						if (res.data.data != null) {
+							res.data.data.forEach(v => {
+								v.high = 320
+								this.flowList.push(v)
+							})
+							if(res.data.data.length < this.limit){
+								this.loadStatus = 'nomore'
+							}
+						} else {
+							this.loadStatus = 'nomore'
+						}
+			
+					}
+				})
+			
 			}
 		}
 
@@ -95,7 +166,7 @@
 
 
 <style lang="scss">
-	@import "uview-ui/index.scss";
+
 
 	.search_view {
 		background-color: #e3e3e3;
@@ -120,7 +191,7 @@
 
 	.artWorkImgDiv {
 		width: 100%;
-		height: 100%;
+		// height: 100%;
 		border-radius: 4px;
 	}
 
@@ -133,22 +204,13 @@
 		position: relative;
 	}
 
-	.u-close {
-		position: absolute;
-		top: 32rpx;
-		right: 32rpx;
-	}
+
 
 	.demo-image {
 		width: 100%;
 		border-radius: 4px;
 	}
 
-	.demo-title {
-		font-size: 30rpx;
-		margin-top: 5px;
-		color: $u-main-color;
-	}
 
 	.demo-tag {
 		display: flex;
@@ -166,28 +228,5 @@
 		line-height: 1;
 	}
 
-	.demo-tag-text {
-		border: 1px solid $u-type-primary;
-		color: $u-type-primary;
-		margin-left: 10px;
-		border-radius: 50rpx;
-		line-height: 1;
-		padding: 4rpx 14rpx;
-		display: flex;
-		align-items: center;
-		border-radius: 50rpx;
-		font-size: 20rpx;
-	}
-
-	.demo-price {
-		font-size: 30rpx;
-		color: $u-type-error;
-		margin-top: 5px;
-	}
-
-	.demo-shop {
-		font-size: 22rpx;
-		color: $u-tips-color;
-		margin-top: 5px;
-	}
+	
 </style>

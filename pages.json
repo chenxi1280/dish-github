@@ -7,8 +7,11 @@
 			"path": "pages/dishover/dishover",
 			"style": {
 				"navigationBarTitleText": "发现"
-			}
-		},{
+			},
+			 "enablePullDownRefresh": true
+		}
+		
+		,{
 			"path": "pages/mine/mine",
 			"style": {
 				"navigationBarTitleText": "我的"
@@ -44,9 +47,15 @@
 		}, {
 			"path": "pages/login/signin/signin",
 			"style": {}
+		}, {
+			"path": "pages/playArtWork/playArtWork",
+			"style": {}
 		}
 		,{
 			"path" : "pages/mine/customService/customService",
+			"style" : {}
+		},{
+			"path" : "pages/ad/adPage",
 			"style" : {}
 		}
 		
@@ -80,7 +89,9 @@
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "四刻互动视频",
 		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8"
+		"backgroundColor": "#F8F8F8",
+		"onReachBottomDistance": 100
+		// "enablePullDownRefresh": true 
 	}
 
 }
