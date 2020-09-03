@@ -45,7 +45,7 @@
 </template>
 
 <script>
-	// import published from '../../components/mine/published.vue'
+	import published from '../../components/mine/published.vue'
 	import verfied from '../../components/mine/verfied.vue'
 	export default {
 		data () {
