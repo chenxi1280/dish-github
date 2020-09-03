@@ -3,24 +3,18 @@
 		"^u-(.*)": "@/uview-ui/components/u-$1/u-$1.vue"
 	},
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
-	{
-		"path": "components/mine/published",
-		"style": {
-			"navigationBarTitleText": "我的"
-		}
-	},
-	{
-		"path": "pages/mine/mine",
-		"style": {
-			"navigationBarTitleText": "我的"
-		}
-	},
 		{
 			"path": "pages/dishover/dishover",
 			"style": {
 				"navigationBarTitleText": "发现"
 			}
+		},{
+			"path": "pages/mine/mine",
+			"style": {
+				"navigationBarTitleText": "我的"
+			}
 		},
+		
 		{
 			"path": "pages/search/search",
 			"style": {
@@ -28,8 +22,8 @@
 			}
 		},
 		{
-			"path" : "pages/make/make",
-			"style" : {
+			"path": "pages/make/make",
+			"style": {
 				"navigationBarTitleText": "制作"
 			}
 		},
@@ -44,43 +38,40 @@
 			"style": {
 				"navigationBarTitleText": "uni-app"
 			}
+		}, {
+			"path": "pages/login/login/login",
+			"style": {}
+		}, {
+			"path": "pages/login/signin/signin",
+			"style": {}
 		}
-	    ,{
-            "path" : "pages/login/login/login",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/login/signin/signin",
-            "style" : {}
-        }
 		,{
 			"path" : "pages/mine/customService/customService",
 			"style" : {}
 		}
 		
-    ],
+	],
 	"tabBar": {
-		"selectedColor":"#1296db",
-		"list": [
-			{
-				"pagePath":"pages/make/make",
+		"selectedColor": "#1296db",
+		"list": [{
+				"pagePath": "pages/make/make",
 				"text": "制作",
 				"iconPath": "static/icon/tabBar_make.png",
-				"selectedIconPath":"static/icon/onTabBar_make.png",
+				"selectedIconPath": "static/icon/onTabBar_make.png",
 				"backgroundColor": "#fff"
 			},
 			{
-				"pagePath":"pages/dishover/dishover",
+				"pagePath": "pages/dishover/dishover",
 				"text": "发现",
 				"iconPath": "static/icon/tabBar_discover.png",
-				"selectedIconPath":"static/icon/onTabBar_discover.png",
+				"selectedIconPath": "static/icon/onTabBar_discover.png",
 				"backgroundColor": "#fff"
 			},
 			{
-				"pagePath":"pages/mine/mine",
+				"pagePath": "pages/mine/mine",
 				"text": "我的",
 				"iconPath": "static/icon/tabBar_mine.png",
-				"selectedIconPath":"static/icon/onTabBar_mine.png",
+				"selectedIconPath": "static/icon/onTabBar_mine.png",
 				"backgroundColor": "#fff"
 			}
 		]
@@ -91,5 +82,5 @@
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
 	}
-	
+
 }

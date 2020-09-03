@@ -1,72 +1,83 @@
 <template>
 	<view class="wrap">
-		<!-- <u-button @click="clear">清空列表</u-button> -->
+		<!-- <scroll-view @scrolltolower="addRandomData" scroll-y > -->
 		<u-waterfall v-model="flowList" ref="uWaterfall">
 			<template v-slot:left="{leftList}">
 				<view class="demo-warter" v-for="(item, index) in leftList" :key="index">
-					<!-- 警告：微信小程序不支持嵌入lazyload组件，请自行如下使用image标签 -->
-					<!-- #ifndef MP-WEIXIN -->
-					<u-lazy-load threshold="-450" border-radius="10" :image="item.image" :index="index"></u-lazy-load>
-					<!-- #endif -->
-					<!-- #ifdef MP-WEIXIN -->
-					<view class="demo-img-wrap">
-						<image class="demo-image" :src="item.image" mode="widthFix"></image>
-					</view>
-					<!-- #endif -->
-					<view class="demo-title">
-						{{item.title}}
-					</view>
-					<view class="demo-price">
-						{{item.price}}元
-					</view>
-					<view class="demo-tag">
-						<view class="demo-tag-owner">
-							自营
+
+					<!-- <u-lazy-load threshold="-450" border-radius="10" :image="item.image" :index="index"></u-lazy-load> -->
+
+					<view :style=' " background:url(" + item.logoPath + ") no-repeat center; background-size:100%;" ' class="artWorkImgDiv">
+
+						<view :style=' "height: " + item.high + "px;  display: flex;  flex-direction: column-reverse;" '>
+
+							<view style="background-color: rgba(0,0,0,.1); padding-left: 10rpx; ">
+								<view style="display: flex ;  padding-top: 5rpx;">
+									<image :src="item.logoPath" style="width: 60rpx; height: 60rpx; border-radius: 30rpx;"></image>
+									<view class="demo-price" style="color: #FFFFFF; padding-left: 10rpx;">
+										{{item.userName}}
+									</view>
+								</view>
+
+								<view class="demo-title" style="color: #FFFFFF;">
+									{{item.artworkName}}
+								</view>
+								<view style="color: #FFFFFF; padding-bottom: 10rpx; display: flex; ">
+									<view>
+										<image src="../../../static/icon/heat_degree.png" style="width: 40rpx; height: 40rpx; border-radius: 20rpx; color: #FA3534;"></image>
+									</view>
+									<view style="color: #FFFFFF; padding-left: 10rpx; padding-top: 6rpx;">
+										88888
+									</view>
+								</view>
+
+							</view>
 						</view>
-						<view class="demo-tag-text">
-							放心购
-						</view>
 					</view>
-					<view class="demo-shop">
-						{{item.shop}}
-					</view>
-					<!-- 微信小程序无效，因为它不支持在template中引入组件 -->
-					<u-icon name="close-circle-fill" color="#fa3534" size="34" class="u-close" @click="remove(item.id)"></u-icon>
+
+
+
+
 				</view>
 			</template>
 			<template v-slot:right="{rightList}">
 				<view class="demo-warter" v-for="(item, index) in rightList" :key="index">
-					<!-- #ifndef MP-WEIXIN -->
-					<u-lazy-load threshold="-450" border-radius="10" :image="item.image" :index="index"></u-lazy-load>
-					<!-- #endif -->
-					<!-- #ifdef MP-WEIXIN -->
-					<view class="demo-img-wrap">
-						<image class="demo-image" :src="item.image" mode="widthFix"></image>
-					</view>
-					<!-- #endif -->
-					<view class="demo-title">
-						{{item.title}}
-					</view>
-					<view class="demo-price">
-						{{item.price}}元
-					</view>
-					<view class="demo-tag">
-						<view class="demo-tag-owner">
-							自营
+
+
+					<view :style=' " background:url(" + item.logoPath + ");" ' class="artWorkImgDiv">
+
+						<view :style=' "height: " + item.high + "px;  display: flex;  flex-direction: column-reverse;" '>
+
+							<view style="background-color: rgba(0,0,0,.1); padding-left: 10rpx; ">
+								<view style="display: flex ;  padding-top: 5rpx;">
+									<image :src="item.logoPath" style="width: 60rpx; height: 60rpx; border-radius: 30rpx;"></image>
+									<view class="demo-price" style="color: #FFFFFF; padding-left: 10rpx;">
+										{{item.userName}}
+									</view>
+								</view>
+
+								<view class="demo-title" style="color: #FFFFFF;">
+									{{item.artworkName}}
+								</view>
+								<view style="color: #FFFFFF; padding-bottom: 10rpx; display: flex; ">
+									<view>
+										<image src="../../../static/icon/heat_degree.png" style="width: 40rpx; height: 40rpx; border-radius: 20rpx; color: #FA3534;"></image>
+									</view>
+									<view style="color: #FFFFFF; padding-left: 10rpx; padding-top: 6rpx;">
+										88888
+									</view>
+								</view>
+
+							</view>
 						</view>
-						<view class="demo-tag-text">
-							放心购
-						</view>
 					</view>
-					<view class="demo-shop">
-						{{item.shop}}
-					</view>
-					<!-- 微信小程序无效，因为它不支持在template中引入组件 -->
-					<u-icon name="close-circle-fill" color="#fa3534" size="34" class="u-close" @click="remove(item.id)"></u-icon>
+
+
 				</view>
 			</template>
 		</u-waterfall>
 		<u-loadmore bg-color="rgb(240, 240, 240)" :status="loadStatus" @loadmore="addRandomData"></u-loadmore>
+		<!-- </scroll-view> -->
 	</view>
 </template>
 
@@ -74,105 +85,54 @@
 	export default {
 		data() {
 			return {
+				limit: 10,
+				page: 0,
 				loadStatus: 'loadmore',
 				flowList: [],
-				list: [
-					{
-						price: 35,
-						title: '北国风光，千里冰封，万里雪飘',
-						shop: '李白杜甫白居易旗舰店',
-						image: 'http://pic.sc.chinaz.com/Files/pic/pic9/202002/zzpic23327_s.jpg',
-					},
-					{
-						price: 75,
-						title: '望长城内外，惟余莽莽',
-						shop: '李白杜甫白居易旗舰店',
-						image: 'http://pic.sc.chinaz.com/Files/pic/pic9/202002/zzpic23325_s.jpg',
-					},
-					{
-						price: 385,
-						title: '大河上下，顿失滔滔',
-						shop: '李白杜甫白居易旗舰店',
-						image: 'http://pic2.sc.chinaz.com/Files/pic/pic9/202002/hpic2119_s.jpg',
-					},
-					{
-						price: 784,
-						title: '欲与天公试比高',
-						shop: '李白杜甫白居易旗舰店',
-						image: 'http://pic2.sc.chinaz.com/Files/pic/pic9/202002/zzpic23369_s.jpg',
-					},
-					{
-						price: 7891,
-						title: '须晴日，看红装素裹，分外妖娆',
-						shop: '李白杜甫白居易旗舰店',
-						image: 'http://pic2.sc.chinaz.com/Files/pic/pic9/202002/hpic2130_s.jpg',
-					},
-					{
-						price: 2341,
-						shop: '李白杜甫白居易旗舰店',
-						title: '江山如此多娇，引无数英雄竞折腰',
-						image: 'http://pic1.sc.chinaz.com/Files/pic/pic9/202002/zzpic23346_s.jpg',
-					},
-					{
-						price: 661,
-						shop: '李白杜甫白居易旗舰店',
-						title: '惜秦皇汉武，略输文采',
-						image: 'http://pic1.sc.chinaz.com/Files/pic/pic9/202002/zzpic23344_s.jpg',
-					},
-					{
-						price: 1654,
-						title: '唐宗宋祖，稍逊风骚',
-						shop: '李白杜甫白居易旗舰店',
-						image: 'http://pic1.sc.chinaz.com/Files/pic/pic9/202002/zzpic23343_s.jpg',
-					},
-					{
-						price: 1678,
-						title: '一代天骄，成吉思汗',
-						shop: '李白杜甫白居易旗舰店',
-						image: 'http://pic1.sc.chinaz.com/Files/pic/pic9/202002/zzpic23343_s.jpg',
-					},
-					{
-						price: 924,
-						title: '只识弯弓射大雕',
-						shop: '李白杜甫白居易旗舰店',
-						image: 'http://pic1.sc.chinaz.com/Files/pic/pic9/202002/zzpic23343_s.jpg',
-					},
-					{
-						price: 8243,
-						title: '俱往矣，数风流人物，还看今朝',
-						shop: '李白杜甫白居易旗舰店',
-						image: 'http://pic1.sc.chinaz.com/Files/pic/pic9/202002/zzpic23343_s.jpg',
-					},
-				]
+				list: []
 			}
 		},
-		onReady(){
-			console.log(11)
+		onReady() {
 			this.addRandomData();
 		},
-		onReachBottom() {
-			this.loadStatus = 'loading';
-			// 模拟数据加载
-			setTimeout(() => {
-				this.addRandomData();
-				this.loadStatus = 'loadmore';
-			}, 1000)
-		},
+
 		methods: {
 			addRandomData() {
-				for(let i = 0; i < 10; i++) {
-					let index = this.$u.random(0, this.list.length - 1);
-					// 先转成字符串再转成对象，避免数组对象引用导致数据混乱
-					let item = JSON.parse(JSON.stringify(this.list[index]))
-					item.id = this.$u.guid();
-					this.flowList.push(item);
-				}
-			},
-			remove(id) {
-				this.$refs.uWaterfall.remove(id);
-			},
-			clear() {
-				this.$refs.uWaterfall.clear();
+
+
+				console.log(this.limit)
+				console.log(this.page)
+				this.page = this.page + 1
+				uni.request({
+					url: 'http://192.168.1.15:8008/Ecmartwork/getFindArtWorks',
+					method: 'POST',
+					data: {
+						page: this.page,
+						limit: this.limit
+					},
+					success: res => {
+						console.log(res);
+						res.data.data.forEach(v => {
+							if( v.code === "ad" ){
+								v.high = 100
+							}else{
+								v.high = 280
+							}
+							this.flowList.push(v)
+						})
+					}
+				})
+				console.log(this.flowList)
+
+				// for (let i = 0; i < 10; i++) {
+				// 	let index = this.$u.random(0, this.list.length - 1);
+				// 	// 先转成字符串再转成对象，避免数组对象引用导致数据混乱
+				// 	let item = JSON.parse(JSON.stringify(this.list[index]))
+				// 	item.id = this.$u.guid();
+				// 	this.flowList.push(item);
+				// }
+
+
 			}
 		}
 	}
@@ -185,39 +145,47 @@
 	}
 </style>
 
-<style lang="scss" scoped>
-	@import "uview-ui/index.scss";
-	
+<style lang="scss">
+	.artWorkImgDiv {
+		width: 100%;
+		height: 100%;
+		border-radius: 4px;
+	}
+
+
 	.demo-warter {
-		border-radius: 8px;
+		border-radius: 8px !important;
 		margin: 5px;
 		background-color: #ffffff;
 		padding: 8px;
+		height: 240px !important;
+		border: 10rpx solid red !important;
 		position: relative;
 	}
-	
+
 	.u-close {
 		position: absolute;
 		top: 32rpx;
 		right: 32rpx;
 	}
-	
+
 	.demo-image {
 		width: 100%;
 		border-radius: 4px;
+		color: #FFF;
 	}
-	
+
 	.demo-title {
 		font-size: 30rpx;
 		margin-top: 5px;
 		color: $u-main-color;
 	}
-	
+
 	.demo-tag {
 		display: flex;
 		margin-top: 5px;
 	}
-	
+
 	.demo-tag-owner {
 		background-color: $u-type-error;
 		color: #FFFFFF;
@@ -228,10 +196,10 @@
 		font-size: 20rpx;
 		line-height: 1;
 	}
-	
+
 	.demo-tag-text {
 		border: 1px solid $u-type-primary;
-		color: $u-type-primary;
+		color: #FFF;
 		margin-left: 10px;
 		border-radius: 50rpx;
 		line-height: 1;
@@ -241,18 +209,16 @@
 		border-radius: 50rpx;
 		font-size: 20rpx;
 	}
-	
+
 	.demo-price {
 		font-size: 30rpx;
-		color: $u-type-error;
+		color: #FFF;
 		margin-top: 5px;
 	}
-	
+
 	.demo-shop {
 		font-size: 22rpx;
-		color: $u-tips-color;
+		color: #FFF;
 		margin-top: 5px;
 	}
 </style>
-
-

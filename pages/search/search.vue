@@ -173,7 +173,7 @@
 	}
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 	@import "uview-ui/index.scss";
 	.demo-warter {
 		border-radius: 16rpx;

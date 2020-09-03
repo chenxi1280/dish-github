@@ -1,8 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "published-u-waterfall-left": "/components/mine/published-u-waterfall-left",
-    "published-u-waterfall-right": "/components/mine/published-u-waterfall-right",
-    "mine-production": "/components/mine/mineProduction"
-  }
-}
