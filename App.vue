@@ -114,5 +114,6 @@
 
 <style lang="scss">
 	@import "./common/css/base.scss";
+	
 	/*每个页面公共css */
 </style>

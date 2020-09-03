@@ -5,17 +5,18 @@
 		<u-waterfall v-model="flowList" ref="uWaterfall">
 			<template v-slot:left="{leftList}">
 				<view class="demo-warter" v-for="(item, index) in leftList" :key="index">
-
-					<!-- <u-lazy-load threshold="-450" border-radius="10" :image="item.image" :index="index"></u-lazy-load> -->
-
-					<view :style=' " background:url(" + item.logoPath + ") no-repeat center; background-size:100%;" ' class="artWorkImgDiv">
+					<view v-show="item.code  == 'ad'" @click="goADPage">
+						<image class="demo-image" :src="item.logoPath"></image>
+					</view>
+					<view :style=' " background:url(" + item.logoPath + ");" ' class="artWorkImgDiv" v-show="item.code  != 'ad'"
+					 @click="goPlayPage(item.pkArtworkId)">
 
 						<view :style=' "height: " + item.high + "px;  display: flex;  flex-direction: column-reverse;" '>
 
 							<view style="background-color: rgba(0,0,0,.1); padding-left: 10rpx; ">
 								<view style="display: flex ;  padding-top: 5rpx;">
 									<image :src="item.logoPath" style="width: 60rpx; height: 60rpx; border-radius: 30rpx;"></image>
-									<view class="demo-price" style="color: #FFFFFF; padding-left: 10rpx;">
+									<view class="demo-price" style="color: #FFFFFF; padding-left: 10rpx; padding-top: 12rpx;">
 										{{item.userName}}
 									</view>
 								</view>
@@ -28,31 +29,30 @@
 										<image src="../../../static/icon/heat_degree.png" style="width: 40rpx; height: 40rpx; border-radius: 20rpx; color: #FA3534;"></image>
 									</view>
 									<view style="color: #FFFFFF; padding-left: 10rpx; padding-top: 6rpx;">
-										88888
+										{{item.hotCount}}
 									</view>
 								</view>
 
 							</view>
 						</view>
 					</view>
-
-
-
-
 				</view>
 			</template>
 			<template v-slot:right="{rightList}">
 				<view class="demo-warter" v-for="(item, index) in rightList" :key="index">
 
-
-					<view :style=' " background:url(" + item.logoPath + ");" ' class="artWorkImgDiv">
+					<view v-show="item.code  == 'ad'" @click="goADPage">
+						<image class="demo-image" :src="item.logoPath"></image>
+					</view>
+					<view :style=' " background:url(" + item.logoPath + ");" ' class="artWorkImgDiv" v-show="item.code  != 'ad'"
+					 @click="goPlayPage(item.pkArtworkId)">
 
 						<view :style=' "height: " + item.high + "px;  display: flex;  flex-direction: column-reverse;" '>
 
 							<view style="background-color: rgba(0,0,0,.1); padding-left: 10rpx; ">
 								<view style="display: flex ;  padding-top: 5rpx;">
 									<image :src="item.logoPath" style="width: 60rpx; height: 60rpx; border-radius: 30rpx;"></image>
-									<view class="demo-price" style="color: #FFFFFF; padding-left: 10rpx;">
+									<view class="demo-price" style="color: #FFFFFF; padding-left: 10rpx; padding-top: 12rpx;">
 										{{item.userName}}
 									</view>
 								</view>
@@ -65,7 +65,7 @@
 										<image src="../../../static/icon/heat_degree.png" style="width: 40rpx; height: 40rpx; border-radius: 20rpx; color: #FA3534;"></image>
 									</view>
 									<view style="color: #FFFFFF; padding-left: 10rpx; padding-top: 6rpx;">
-										88888
+										{{item.hotCount}}
 									</view>
 								</view>
 
@@ -97,7 +97,7 @@
 			return {
 				limit: 10,
 				page: 0,
-				loadStatus: 'loadmore',
+				loadStatus: 'nomore',
 				flowList: [],
 				list: []
 			}
@@ -109,9 +109,6 @@
 		methods: {
 			addRandomData() {
 
-				console.log(this.queryType)
-				
-				
 				this.page = this.page + 1
 				uni.request({
 					url: 'http://192.168.1.15:8008/Ecmartwork/getFindSortArtWorks',
@@ -122,23 +119,32 @@
 						queryType: this.queryType
 					},
 					success: res => {
-						if(res.data.data != null){
+						if (res.data.data != null) {
 							res.data.data.forEach(v => {
-							if (v.code === "ad") {
-								v.high = 100
-							} else {
-								v.high = 280
-							}
-							this.flowList.push(v)
+								if (v.code === "ad") {
+									v.high = 100
+								} else {
+									v.high = 280
+								}
+								this.flowList.push(v)
 							})
-						}else{
+						} else {
 							this.loadStatus = 'nomore'
 						}
-						
-						
+
 					}
 				})
 
+			},
+			goPlayPage(pkArtworkId) {
+				uni.navigateTo({
+					url: "../playArtWork/playArtWork?pkArtworkId=" + pkArtworkId,
+				})
+			},
+			goADPage(adCode) {
+				uni.navigateTo({
+					url: "../ad/adPage",
+				})
 			}
 		}
 	}

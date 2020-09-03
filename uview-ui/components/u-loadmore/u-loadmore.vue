@@ -148,6 +148,7 @@
 		methods: {
 			loadMore() {
 				// 只有在“加载更多”的状态下才发送点击事件，内容不满一屏时无法触发底部上拉事件，所以需要点击来触发
+				console.log(111)
 				if(this.status == 'loadmore') this.$emit('loadmore');
 			}
 		}
