@@ -156,7 +156,7 @@
 								this.isPassword = ''
 								this.verify_phone = ''
 								setTimeout(function() {
-									uni.navigateTo({
+									uni.reLaunch({
 										animationDuration: 5000,
 										url: "../login/login"
 									})
