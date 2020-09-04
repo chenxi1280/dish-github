@@ -1,5 +1,10 @@
 <template>
+	
 	<view class="wrap">
+		<view class="search_view" >
+			<icon class="search_icon"></icon>
+			<input class="search_input" type="" placeholder=" 查找你想看的视频" />
+		</view>
 		<view class="item u-border-bottom" v-for="(item, index) in list" :key="index">
 			{{'第' + item + '条数据'}}
 		</view>
@@ -43,5 +48,27 @@
 		padding: 24rpx 0;
 		color: $u-content-color;
 		font-size: 28rpx;
+	}
+	
+	.search_view {
+		background-color: #e3e3e3;
+		display: flex;
+		border-radius: 10px;
+		
+	
+		.search_icon {
+			background: url(../../static/icon/icon_search.png) no-repeat center;
+			width: 80rpx;
+			height: 80rpx;
+			background-size: 60rpx;
+		}
+	
+		;
+	
+		.search_input {
+			width: 100%;
+			height: 80rpx;
+	
+		}
 	}
 </style>

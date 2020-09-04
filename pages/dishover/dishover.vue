@@ -2,9 +2,9 @@
 	<view>
 		<!-- 	<view class="container">
 			<u-sticky> -->
-		<view class="search_view" @click="go_search_page">
+		<view class="search_view" @click="go_search_page" >
 			<icon class="search_icon"></icon>
-			<input class="search_input" type="text" placeholder=" 查找你想看的视频" />
+			<input class="search_input" type="" placeholder=" 查找你想看的视频" />
 		</view>
 
 		<!-- </u-sticky>
@@ -118,9 +118,10 @@
 						limit: this.limit
 					},
 					success: res => {
+						console.log(res)
 						if(res.data.data != null){
 							res.data.data.forEach(v => {
-								v.high = 320
+								v.high = 287.1
 								this.flowList.push(v)
 							})
 							if(res.data.data.length < this.limit){
@@ -145,7 +146,7 @@
 					success: res => {
 						if (res.data.data != null) {
 							res.data.data.forEach(v => {
-								v.high = 320
+								v.high = 287.1
 								this.flowList.push(v)
 							})
 							if(res.data.data.length < this.limit){
@@ -172,6 +173,7 @@
 		background-color: #e3e3e3;
 		display: flex;
 		border-radius: 10px;
+		
 
 		.search_icon {
 			background: url(../../static/icon/icon_search.png) no-repeat center;
