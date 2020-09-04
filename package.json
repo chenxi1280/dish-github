@@ -4,6 +4,7 @@
   "description": "",
   "main": "main.js",
   "dependencies": {
+    "uni-simple-router": "^1.5.5",
     "uview-ui": "file:uview-ui"
   },
   "devDependencies": {},

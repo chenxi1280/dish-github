@@ -15,9 +15,9 @@
 				"navigationBarTitleText": "发现"
 			},
 			 "enablePullDownRefresh": true
-		}
+		},
 		
-		,{
+		/* ,{
 			"path": "pages/mine/mine",
 			"style": {
 				"navigationBarTitleText": "我的"

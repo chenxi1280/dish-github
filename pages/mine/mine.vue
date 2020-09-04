@@ -43,8 +43,8 @@
 </template>
 
 <script>
-	import published from '../../components/mine/published.vue'
-	import verfied from '../../components/mine/verfied.vue'
+	import published from './published.vue'
+	import verfied from './verfied.vue'
 	import { baseURL } from '../login/config/config.js'
 	
 	export default {
@@ -52,8 +52,8 @@
 			return {
 				items: ['已审核','已发布'],
 				current: 0,
-				image: 'http://pic2.sc.chinaz.com/Files/pic/pic9/202002/hpic2130_s.jpg',
-				userName: '元宝大傻猫'
+				image: '',
+				userName: ''
 			}
 		},
 		components: {
@@ -81,7 +81,7 @@
 			},
 			async getMineInfo(){
 				await uni.request ({
-					url: baseURL + "/getWxUserInfo",
+					url: baseURL + "/wxPersonalCenter/getWxUserInfo",
 					method: 'POST',
 					dataType: 'json',
 					data: {
