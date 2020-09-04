@@ -8,7 +8,8 @@
 						:broadcastCount="item.broadcastCount"
 						:title="item.artworkName"
 						:image="item.logoPath"
-						:xid="item.pkArtworkId"></mine-production>
+						:xid="item.pkArtworkId"
+						:status="item.artworkStatus"></mine-production>
 					</view>
 				</template>
 				<template v-slot:right="{rightList,flag}">
@@ -17,7 +18,8 @@
 						:broadcastCount="item.broadcastCount"
 						:title="item.artworkName"
 						:image="item.logoPath"
-						:xid="item.pkArtworkId"></mine-production>
+						:xid="item.pkArtworkId"
+						:status="item.artworkStatus"></mine-production>
 					</view>	
 				</template>
 			</u-waterfall>
@@ -26,8 +28,8 @@
 </template>
 
 <script>
-	import mineProduction from './mineProduction.vue'
-	import { baseURL } from '../../pages/login/config/config.js'
+	import mineProduction from '../../components/mine/mineProduction.vue';
+	import { baseURL } from '../login/config/config.js'
 	
 	export default {
 		data() {
@@ -51,12 +53,19 @@
 			//判断是否有token 有token 说明用户已登录根据token获取用户信息即作品
 			//没有token 未登录拿游客的个人信息opendata 拿头像，不展示作品
 			//此处应加标识 不需要每次都发请求加载页面
-			this.getMineArtWorks();
+			let requestFlag = uni.getStorageSync("verfiedRequestFlag");
+			if(requestFlag || requestFlag == null || requestFlag.length == 0 ){
+				this.getMineArtWorks();
+				console.log("我拿的请求的数据")
+			}else{
+				console.log("我拿的缓存的数据")
+				this.flowList = uni.getStorageSync("verfiedArtworks")
+			}
 		},
 		methods: {
 			async getMineArtWorks(){
 				await uni.request ({
-					url: baseURL + "/Ecmartwork/getWxUserArtWorks",
+					url: baseURL + "/wxPersonalCenter/getWxUserArtWorks",
 					method: 'POST',
 					dataType: 'json',
 					data: {
@@ -64,10 +73,11 @@
 					},
 					success: res=> {
 						this.flowList = res.data.data.verfied;
-						console.log(res.data.data.verfied[1].pkArtworkId)
+						uni.setStorageSync("verfiedArtworks", this.flowList)
+						uni.setStorageSync("verfiedRequestFlag",false);
 					}
 				})
-			}
+			},
 		}
 	}
 </script>

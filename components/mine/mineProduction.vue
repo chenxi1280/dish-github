@@ -13,6 +13,9 @@
 				<button class="btn_delete" @click="deleteArtWorkCode">删除</button>
 			</view>
 		</view>
+		<view v-if="codeFlag" class="wxCode_box">
+			<img :src="imgCodeSrc" class = "wxCode">
+		</view>
 		<view class="icon_box" @click="showTips">
 			<icon class="more_icon"></icon>
 		</view>
@@ -32,7 +35,8 @@
 				</view>
 			</view>
 		</view>
-		<view class="mask" v-if="localFlag" @click="hiddenTips"></view>
+		<view class="mask15" v-if="localFlag" @click="hiddenTips15"></view>
+		<view class="mask17" v-if="codeFlag" @click="hiddenTips17"></view>
 	</view>
 </template>
 
@@ -42,7 +46,9 @@
 	export default {
 		data() {
 			return {
-				localFlag: false
+				localFlag: false,
+				codeFlag: false,
+				imgCodeSrc: ''
 			}
 		},
 		props: {
@@ -64,17 +70,23 @@
 			},
 			xid: {
 				type: Number,
+			},
+			status: {
+				type: Number,
+				default: 2
 			}
 		},
 		methods: {
 			showTips() {
 				this.localFlag = true;
 			},
-			hiddenTips(){
+			hiddenTips15(){
 				this.localFlag = false;
 			},
+			hiddenTips17(){
+				this.codeFlag = false
+			},
 			async publishArtWork(){
-				console.log(this.xid)
 				await uni.request ({
 					url: baseURL + "/ecmArtWorkManager/modifyArtWorksStatus",
 					method: 'POST',
@@ -85,10 +97,26 @@
 					},
 					success: res=> {
 						if(res.data.status == 200){
-							return uni.showToast({
+							uni.showToast({
 								icon: 'none',
 							  	title: '发布成功'
 							})
+							if(this.status == 2){
+								uni.setStorageSync("verfiedRequestFlag",true)
+								uni.reLaunch({
+									url: "../../pages/mine/mine"
+								})
+							}else{
+								uni.setStorageSync("publishedRequestFlag",true)
+								uni.reLaunch({
+									url: "../../pages/mine/mine",
+									success(){
+										let pages = getCurrentPages();
+										pages[0].data.current;
+										console.log(pages[0].data.current);
+									},
+								})
+							}
 						}
 					}
 				})
@@ -96,19 +124,31 @@
 			/* 获取二维码暂时不看 */
 			async getArtWorkCode(){
 				console.log(this.xid)
+				console.log(this.status)
 				await uni.request ({
-					url: baseURL + "/Ecmartwork/getWxUserArtWorks",
+					url: baseURL + "/wxPersonalCenter/getWxcode",
 					method: 'POST',
 					dataType: 'json',
 					data: {
-						pkArtworkId: this.xid,
+						token: uni.getStorageSync("token"),
+						pkArtworkId: this.xid
 					},
 					success: res=> {
+						if(res.data.status == 200){
+							this.codeFlag = true
+							this.imgCodeSrc = res.data.data
+						}else{
+							return uni.showToast({
+								icon: 'none',
+							  	title: res.data.msg
+							})
+						}
 					}
 				})
 			},
 			async deleteArtWorkCode(){
 				console.log(this.xid)
+				console.log(this.status)
 				await uni.request ({
 					url: baseURL + "/ecmArtWorkManager/modifyArtWorksStatus",
 					method: 'POST',
@@ -119,10 +159,15 @@
 					},
 					success: res=> {
 						if(res.data.status == 200){
-							return uni.showToast({
+							uni.showToast({
 								icon: 'none',
 							  	title: '删除成功'
 							})
+							if(this.status == 2){
+								uni.setStorageSync("verfiedRequestFlag",true)
+							}else{
+								uni.setStorageSync("publishedRequestFlag",true)
+							}
 						}
 					}
 				})
@@ -132,13 +177,35 @@
 </script>
 
 <style lang="scss" scoped>
-	.mask{
+	.mask15{
 		position: fixed;
 		width: 100%;
 		height: 100%;
 		z-index: 15;
 		left: 0;
 		top: 0;
+	}
+	.mask17{
+		position: fixed;
+		background-color: rgba(0,0,0,.5);
+		width: 100%;
+		height: 100%;
+		z-index: 17;
+		left: 0;
+		top: 0;
+	}
+	.wxCode_box{
+		width: 300rpx;
+		height: 300rpx;
+		position: fixed;
+		top: 40%;
+		left: 50%;
+		z-index: 18;
+		transform: translateX(-50%);
+		.wxCode{
+			width: 100%;
+			height: 100%;
+		}
 	}
 	.tips{
 		z-index: 16;
