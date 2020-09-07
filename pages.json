@@ -3,33 +3,32 @@
 		"^u-(.*)": "@/uview-ui/components/u-$1/u-$1.vue"
 	},
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
-	{
-		"path": "pages/mine/mine",
-		"style": {
-			"navigationBarTitleText": "我的"
-		}
-	},
-		{
-			"path": "pages/dishover/dishover",
-			"style": {
-				"navigationBarTitleText": "发现"
-			},
-			 "enablePullDownRefresh": true
-		},
 		// {
 		// 	"path": "pages/mine/mine",
 		// 	"style": {
 		// 		"navigationBarTitleText": "我的"
 		// 	}
-		// }, 
+		// },
+		// {
+		// 	"path": "pages/search/search",
+		// 	"style": {
+		// 		"navigationBarTitleText": "搜索"
+		// 	}
+		// },
+		{
+			"path": "pages/dishover/dishover",
+			"style": {
+				"navigationBarTitleText": "发现"
+			},
+			"enablePullDownRefresh": true
 		},
-		
-		/* ,{
+		{
 			"path": "pages/mine/mine",
 			"style": {
 				"navigationBarTitleText": "我的"
 			}
-		}, */
+		},
+
 		{
 			"path": "pages/search/search",
 			"style": {
@@ -42,35 +41,41 @@
 				"navigationBarTitleText": "制作"
 			}
 		},
-		/* {
-			"path": "pages/mine/mine",
-			"style": {
-				"navigationBarTitleText": "我的"
-			}
-		}, */
 		{
 			"path": "pages/index/index",
 			"style": {
 				"navigationBarTitleText": "uni-app"
 			}
-		}, {
+		},
+		{
 			"path": "pages/login/login/login",
 			"style": {}
-		}, {
+		},
+		{
 			"path": "pages/login/signin/signin",
 			"style": {}
-		}, {
+		},
+		{
 			"path": "pages/playArtWork/playArtWork",
 			"style": {}
+		},
+		{
+			"path": "pages/mine/customService/customService",
+			"style": {}
+		},
+		{
+			"path": "pages/ad/adPage",
+			"style": {
+				"navigationBarTitleText": "广告"
+			}
+		}, 
+		{
+			"path": "pages/search/result/result",
+			"style": {
+				"navigationBarTitleText": "搜索结果"
+			}
 		}
-		,{
-			"path" : "pages/mine/customService/customService",
-			"style" : {}
-		},{
-			"path" : "pages/ad/adPage",
-			"style" : {}
-		}
-		
+
 	],
 	"tabBar": {
 		"selectedColor": "#1296db",

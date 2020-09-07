@@ -1,17 +1,17 @@
 <template>
 	<view>
-		<!-- 	<view class="container">
-			<u-sticky> -->
+
 		<view class="search_view" @click="go_search_page" >
 			<icon class="search_icon"></icon>
 			<input class="search_input" type="" placeholder=" 查找你想看的视频" />
+			
 		</view>
-
-		<!-- </u-sticky>
-		</view> -->
+		<!-- <view @click="go_search_page">	<u-search :show-action="false" action-text="搜索"  ></u-search></view> -->
+		
+	
 		<u-subsection :list="items" :current="0" @change="sectionChange"></u-subsection>
 		<view class="content">
-			<view v-if="current === 0" style="height: 100;">
+			<view v-if="current === 0" >
 				<hot :flowList="flowList" :status="loadStatus"></hot>
 			</view>
 			<view v-if="current === 1">
@@ -35,13 +35,11 @@
 		baseURL
 	} from './config/config.js'
 	import hot from './hot/hot.vue'
-	import dishoversort from './dishoversort/dishoversort.vue'
 	import search from '../search/search'
 	// import test from './test/test'
 	export default {
 		components: {
 			hot,
-			dishoversort,
 			search
 
 		},
@@ -74,7 +72,7 @@
 			this.addRandomDataHot()
 		},
 		onReachBottom(e) {
-				this.addChoose()
+			this.addChoose()
 		},
 		methods: {
 			go_search_page() {
@@ -118,7 +116,6 @@
 						limit: this.limit
 					},
 					success: res => {
-						console.log(res)
 						if(res.data.data != null){
 							res.data.data.forEach(v => {
 								v.high = 287.1
@@ -170,7 +167,7 @@
 
 
 	.search_view {
-		background-color: #e3e3e3;
+		background-color: #f2f2f2;
 		display: flex;
 		border-radius: 10px;
 		

@@ -1,14 +1,18 @@
 <template>
-	
-	<view class="wrap">
-		<view class="search_view" >
-			<icon class="search_icon"></icon>
-			<input class="search_input" type="" placeholder=" 查找你想看的视频" />
+	<view>
+		<view style="margin-top: 10rpx;"></view>
+		<u-search :show-action="true" action-text="搜索" :animation="true" @search="searchEvent" @custom="searchEvent" v-model="searchText"></u-search>
+		<view class="wrap">
+			<view class="search_div">
+				<!-- <text class="title">热度搜索榜</text> -->
+			</view>
+			<view class="item u-border-bottom" v-for="(item, index) in list" :key="index">
+				<view class="ranking_view" @click="goPlayPage(item.pkArtworkId)">
+					<text class="ranking_top" :class="[index <=2 ? 'ranking_top' : 'ranking_body']">{{ index+1 }}</text>
+					<text style="margin-left: 30rpx;">{{item.artworkName}}</text>
+				</view>
+			</view>
 		</view>
-		<view class="item u-border-bottom" v-for="(item, index) in list" :key="index">
-			{{'第' + item + '条数据'}}
-		</view>
-		<u-loadmore :status="status" />
 	</view>
 </template>
 
@@ -16,25 +20,45 @@
 	export default {
 		data() {
 			return {
-				status: 'loadmore',
-				list: 15,
-				page: 0,
-				pkArtworkId: 0
+				list: [],
+				searchText: ""
+
 			}
 		},
-		onReachBottom() {
-			if(this.page >= 3) return ;
-			this.status = 'loading';
-			this.page = ++ this.page;
-			setTimeout(() => {
-				this.list += 10;
-				if(this.page >= 3) this.status = 'nomore';
-				else this.status = 'loading';
-			}, 2000)
-		},
 		onLoad(option) {
-			this.pkArtworkId = option.pkArtworkId
-			console.log(this.pkArtworkId)
+
+			uni.request({
+				url: 'http://192.168.1.15:8008/Ecmartwork/getRankingArtWorks',
+				method: 'POST',
+				data: {
+					page: 1,
+					limit: 10
+				},
+				success: res => {
+					if (res.data.data != null) {
+						res.data.data.forEach(v => {
+							if (v.artworkName.length >= 23) {
+								v.artworkName = v.artworkName.substr(0, 22) + '...'
+
+							}
+							this.list.push(v)
+						})
+					}
+				}
+			})
+		},
+		methods: {
+			goPlayPage(pkArtworkId) {
+				uni.navigateTo({
+					url: "../playArtWork/playArtWork?pkArtworkId=" + pkArtworkId,
+				})
+			},
+			searchEvent() {
+				console.log(this.searchText)
+				uni.navigateTo({
+					url: "./result/result?searchText=" + this.searchText,
+				})
+			}
 		}
 	}
 </script>
@@ -44,31 +68,32 @@
 		padding: 24rpx;
 	}
 	
-	.item {
-		padding: 24rpx 0;
-		color: $u-content-color;
-		font-size: 28rpx;
-	}
-	
-	.search_view {
-		background-color: #e3e3e3;
-		display: flex;
-		border-radius: 10px;
+	.search_div{
+		display: flex; 
+		justify-content: center ;
+		.title{
+			color: #FF4500;
+			 font-size:45rpx; 
+			 display: inline-block;
+		}
 		
-	
-		.search_icon {
-			background: url(../../static/icon/icon_search.png) no-repeat center;
-			width: 80rpx;
-			height: 80rpx;
-			background-size: 60rpx;
+	}
+
+	.ranking_view {
+		padding: 24rpx 0;
+
+		.ranking_top {
+			color: #FF4500;
+			font-size: 30rpx;
+			font-weight: bold;
+			font-style: italic;
 		}
-	
-		;
-	
-		.search_input {
-			width: 100%;
-			height: 80rpx;
-	
+
+		.ranking_body {
+			color: #FF8C00;
+			font-size: 30rpx;
+			font-style: italic;
 		}
+
 	}
 </style>
