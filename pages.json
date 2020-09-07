@@ -3,18 +3,12 @@
 		"^u-(.*)": "@/uview-ui/components/u-$1/u-$1.vue"
 	},
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
-		// {
-		// 	"path": "pages/mine/mine",
-		// 	"style": {
-		// 		"navigationBarTitleText": "我的"
-		// 	}
-		// },
-		// {
-		// 	"path": "pages/search/search",
-		// 	"style": {
-		// 		"navigationBarTitleText": "搜索"
-		// 	}
-		// },
+		{
+			"path": "pages/mine/mine",
+			"style": {
+				"navigationBarTitleText": "我的"
+			}
+		},
 		{
 			"path": "pages/dishover/dishover",
 			"style": {
@@ -22,13 +16,12 @@
 			},
 			"enablePullDownRefresh": true
 		},
-		{
+		/* {
 			"path": "pages/mine/mine",
 			"style": {
 				"navigationBarTitleText": "我的"
 			}
-		},
-
+		}, */
 		{
 			"path": "pages/search/search",
 			"style": {
@@ -64,19 +57,10 @@
 			"style" : {}
 		},
 		{
-			"path" : "pages/ad/adPage",
-			"style" : {}
-		},
-		{
 			"path": "pages/mine/published"
 		},
 		{
 			"path": "pages/mine/verfied"
-		}
-		},
-		{
-			"path": "pages/mine/customService/customService",
-			"style": {}
 		},
 		{
 			"path": "pages/ad/adPage",
