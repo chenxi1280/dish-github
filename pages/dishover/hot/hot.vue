@@ -9,14 +9,14 @@
 					<view v-show="item.code  == 'ad'" @click="goADPage">
 						<image class="demo-image" :src="item.logoPath"></image>
 					</view>
-					<view :style=' " background:url(" + item.logoPath + ");" ' class="artWorkImgDiv" v-show="item.code  != 'ad'"
+					<view :style=' " background:url(" + item.logoPath + ")  center ;background-size: cover; " ' class="artWorkImgDiv" v-show="item.code  != 'ad'"
 					 @click="goPlayPage(item.pkArtworkId)">
 
 						<view :style=' "height: " + item.high + "px;  display: flex;  flex-direction: column-reverse;" '>
 
 							<view style="background-color: rgba(0,0,0,.1); padding-left: 10rpx; ">
 								<view style="display: flex ;  padding-top: 5rpx;">
-									<image :src="item.logoPath" style="width: 60rpx; height: 60rpx; border-radius: 30rpx;"></image>
+									<image :src="item.userLogoUrl" style="width: 60rpx; height: 60rpx; border-radius: 30rpx;"></image>
 									<view class="demo-price" style="color: #FFFFFF; padding-left: 10rpx; padding-top: 12rpx;">
 										{{item.userName}}
 									</view>
@@ -47,14 +47,14 @@
 					<view v-show="item.code  == 'ad'" @click="goADPage">
 						<image class="demo-image" :src="item.logoPath"></image>
 					</view>
-					<view :style=' " background:url(" + item.logoPath + ");" ' class="artWorkImgDiv" v-show="item.code  != 'ad'"
+					<view :style=' " background:url(" + item.logoPath + ") center; background-size: cover;" ' class="artWorkImgDiv" v-show="item.code  != 'ad'"
 					 @click="goPlayPage(item.pkArtworkId)">
 
 						<view :style=' "height: " + item.high + "px;  display: flex;  flex-direction: column-reverse;" '>
 
 							<view style="background-color: rgba(0,0,0,.1); padding-left: 10rpx; ">
 								<view style="display: flex ;  padding-top: 5rpx;">
-									<image :src="item.logoPath" style="width: 60rpx; height: 60rpx; border-radius: 30rpx;"></image>
+									<image :src="item.userLogoUrl" style="width: 60rpx; height: 60rpx; border-radius: 30rpx;"></image>
 									<view class="demo-price" style="color: #FFFFFF; padding-left: 10rpx; padding-top: 12rpx;">
 										{{item.userName}}
 									</view>
@@ -130,6 +130,7 @@
 				})
 			},
 			goPlayPage(pkArtworkId) {
+				console.log(pkArtworkId)
 				uni.navigateTo({
 					url: "../playArtWork/playArtWork?pkArtworkId=" + pkArtworkId,
 				})
