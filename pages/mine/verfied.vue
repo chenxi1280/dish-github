@@ -23,7 +23,7 @@
 					</view>	
 				</template>
 			</u-waterfall>
-			<u-loadmore bg-color="rgb(240, 240, 240)" :status="loadStatus" @loadmore="addData"></u-loadmore>
+			<u-loadmore bg-color="rgb(240, 240, 240)" :status="loadStatus" ></u-loadmore>
 		</view>
 	</view>
 </template>
@@ -55,14 +55,7 @@
 			this.getMineArtWorks();
 			//console.log("我去请求拿数据")
 		},
-		onReachBottom() {
-			console.log("verfied到底了")
-			this.getMineArtWorks()
-		},
 		methods: {
-			addData(){
-				this.getMineArtWorks()
-			},
 			async getMineArtWorks(){
 				this.page = this.page + 1,
 				await uni.request ({
