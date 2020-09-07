@@ -84,11 +84,16 @@
 				},
 				success: res=> {
 					if (res.data.status === 200) {
-					  console.log(res)
-					  uni.setStorageSync('token', res.data.data)
-					  uni.showToast({
-					    	title: '登录成功'
-					    })
+						console.log(res)
+						uni.setStorageSync('token', res.data.data)
+						uni.showToast({
+								title: '登录成功'
+							})
+						setTimeout(function() {
+							uni.reLaunch({
+								url: "../../mine/mine"
+							})
+						}, 1500);
 					} else if (res.data.status == 508) {
 					  for (let i = 0; i < res.data.data.length; i++) {
 					    if (res.data.data[i] == '501') {
@@ -130,7 +135,7 @@
 	    },
 	    // 前往注册页面
 	    toSigninPage () {
-	    	uni.navigateTo({
+	    	uni.redirectTo({
 	    		url: "../signin/signin"
 	    	})
 	    },

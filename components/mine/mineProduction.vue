@@ -1,11 +1,11 @@
 <template>
 	<view>
 		<view v-if="localFlag" class="tips" >
-			<view class="work_publish">
+			<view class="work_publish" v-if="publish_flag">
 				<button class="btn_publish" @click="publishArtWork">发布作品</button>
 				<view class="line"></view>
 			</view>
-			<view class="work_code">
+			<view class="work_code" v-if="code_flag">
 				<button class="btn_code"  @click="getArtWorkCode">作品二维码</button>
 				<view class="line"></view>
 			</view>
@@ -48,7 +48,9 @@
 			return {
 				localFlag: false,
 				codeFlag: false,
-				imgCodeSrc: ''
+				imgCodeSrc: '',
+				publish_flag: false,
+				code_flag: false
 			}
 		},
 		props: {
@@ -74,6 +76,13 @@
 			status: {
 				type: Number,
 				default: 2
+			}
+		},
+		onReady() {
+			if(this.status == 2){
+				this.publish_flag = true
+			}else{
+				this.code_flag = true
 			}
 		},
 		methods: {
@@ -102,19 +111,17 @@
 							  	title: '发布成功'
 							})
 							if(this.status == 2){
-								uni.setStorageSync("verfiedRequestFlag",true)
-								uni.reLaunch({
-									url: "../../pages/mine/mine"
-								})
-							}else{
-								uni.setStorageSync("publishedRequestFlag",true)
+								uni.setStorageSync("mine_current",0)
 								uni.reLaunch({
 									url: "../../pages/mine/mine",
-									success(){
-										let pages = getCurrentPages();
-										pages[0].data.current;
-										console.log(pages[0].data.current);
-									},
+									fail() {
+										console.log('跳转失败')
+									}
+								})
+							}else{
+								uni.setStorageSync("mine_current",1)
+								uni.reLaunch({
+									url: "../../pages/mine/mine"
 								})
 							}
 						}
@@ -164,9 +171,15 @@
 							  	title: '删除成功'
 							})
 							if(this.status == 2){
-								uni.setStorageSync("verfiedRequestFlag",true)
+								uni.setStorageSync("mine_current",0)
+								uni.reLaunch({
+									url: "../../pages/mine/mine"
+								})
 							}else{
-								uni.setStorageSync("publishedRequestFlag",true)
+								uni.setStorageSync("mine_current",1)
+								uni.reLaunch({
+									url: "../../pages/mine/mine"
+								})
 							}
 						}
 					}

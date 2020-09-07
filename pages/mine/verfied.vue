@@ -1,5 +1,5 @@
 <template>
-	<view class="wrap">
+	<view>
 		<view class="wrap">
 			<u-waterfall v-model="flowList" ref="uWaterfall" :flag="mainFlag">
 				<template v-slot:left="{leftList,flag}">
@@ -23,6 +23,7 @@
 					</view>	
 				</template>
 			</u-waterfall>
+			<u-loadmore bg-color="rgb(240, 240, 240)" :status="loadStatus" @loadmore="addData"></u-loadmore>
 		</view>
 	</view>
 </template>
@@ -36,7 +37,9 @@
 			return {
 				mainFlag: false,
 				loadStatus: 'loadmore',
-				flowList: []
+				flowList: [],
+				page: 0,
+				limit: 10
 			}
 		},
 		props: {
@@ -49,32 +52,40 @@
 			mineProduction
 		},
 		onReady() {	
-			console.log('页面加载');
-			//判断是否有token 有token 说明用户已登录根据token获取用户信息即作品
-			//没有token 未登录拿游客的个人信息opendata 拿头像，不展示作品
-			//此处应加标识 不需要每次都发请求加载页面
-			let requestFlag = uni.getStorageSync("verfiedRequestFlag");
-			if(requestFlag || requestFlag == null || requestFlag.length == 0 ){
-				this.getMineArtWorks();
-				console.log("我拿的请求的数据")
-			}else{
-				console.log("我拿的缓存的数据")
-				this.flowList = uni.getStorageSync("verfiedArtworks")
-			}
+			this.getMineArtWorks();
+			//console.log("我去请求拿数据")
+		},
+		onReachBottom() {
+			console.log("verfied到底了")
+			this.getMineArtWorks()
 		},
 		methods: {
+			addData(){
+				this.getMineArtWorks()
+			},
 			async getMineArtWorks(){
+				this.page = this.page + 1,
 				await uni.request ({
 					url: baseURL + "/wxPersonalCenter/getWxUserArtWorks",
 					method: 'POST',
 					dataType: 'json',
 					data: {
-						token: uni.getStorageSync("token")
+						token: uni.getStorageSync("token"),
+						page: this.page,
+						limit: this.limit,
+						artworkStatus: 2
 					},
 					success: res=> {
-						this.flowList = res.data.data.verfied;
-						uni.setStorageSync("verfiedArtworks", this.flowList)
-						uni.setStorageSync("verfiedRequestFlag",false);
+						if (res.data.data == null || typeof(res.data.data) == "undefined") {
+							this.loadStatus = 'nomore'
+						}else{
+							//console.log("我获取了"+res.data.data.length+"条数据")
+							this.flowList = [...this.flowList,...res.data.data];
+							//console.log("我有"+this.flowList.length+"条数据")
+							if(res.data.data.length < this.limit){
+								this.loadStatus = 'nomore'
+							}
+						}
 					}
 				})
 			},

@@ -14,23 +14,7 @@
 				language: null
 		    }
 		},
-		 methods: {
-            getUserInfo() {
-                let _this = this
-				uni.getUserInfo({
-					provider: 'weixin',
-					success: function(infoRes) {
-						_this.nickName = infoRes.userInfo.nickName; 
-						_this.gender = infoRes.userInfo.gender; 
-						_this.avatarUrl = infoRes.userInfo.avatarUrl; 
-						_this.country =infoRes.userInfo.country;
-						_this.province = infoRes.userInfo.province;
-						_this.city = infoRes.userInfo.city;
-						_this.language = infoRes.userInfo.language
-						_this.login();
-					}
-				})
-            },　　　　　　
+		 methods: {　　　　　　
             login() {
                 let _this = this
                 uni.login({
@@ -98,7 +82,7 @@
 						url: "pages/dishover/dishover"
 					})
 				}else{
-					_this.getUserInfo()
+					_this.login()
 				}
 			},
 			onShow: function() {
