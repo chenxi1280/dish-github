@@ -1,14 +1,17 @@
 <template>
 	<view>
 		<hot :flowList="flowList" :status="loadStatus"></hot>
+		<waterfall :flowList="flowList" :status="loadStatus"></waterfall>
 	</view>
 </template>
 
 <script>
-	import hot from '../../dishover/hot/hot.vue'
+
+	import waterfall from '../waterfall_view/waterfall.vue'
 	export default {
 		components: {
-			hot
+
+			waterfall
 		},
 		data() {
 			return {
@@ -23,9 +26,6 @@
 		onLoad(option) {
 			this.searchText = option.searchText
 			this.addRandomDataHot()
-		},
-		onReady(){
-			
 		},
 		methods:{
 			addRandomDataHot() {

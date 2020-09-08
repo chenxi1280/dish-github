@@ -334,7 +334,7 @@
 		display: flex;
 		overflow: hidden;
 		align-items: center;
-
+		width: 180px !important ;
 	}
 
 </style>

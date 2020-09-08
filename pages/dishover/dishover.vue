@@ -1,28 +1,39 @@
 <template>
 	<view>
 
-		<view class="search_view" @click="go_search_page" >
+		<view class="search_view" @click="go_search_page">
 			<icon class="search_icon"></icon>
 			<input class="search_input" type="" placeholder=" 查找你想看的视频" />
-			
+
 		</view>
 		<!-- <view @click="go_search_page">	<u-search :show-action="false" action-text="搜索"  ></u-search></view> -->
-		
-	
+
+
 		<u-subsection :list="items" :current="0" @change="sectionChange"></u-subsection>
 		<view class="content">
-			<view v-if="current === 0" >
-				<hot :flowList="flowList" :status="loadStatus"></hot>
+			<view v-if="current === 0">
+				<waterfall :flowList="hotList" :status="hotloadStatus"></waterfall>
 			</view>
 			<view v-if="current === 1">
-				<u-subsection :list="list" :current="currentsort" @change="changeSort" mode='subsection'  bold="false" active-color="#606266" height="50"  font-size="24" ></u-subsection>		
-						
-				<view v-if="currentsort === 0"><hot :flowList="flowList" :status="loadStatus"> </hot></view>
-				<view v-if="currentsort === 1"><hot :flowList="flowList" :status="loadStatus"> </hot></view>
-				<view v-if="currentsort === 2"><hot :flowList="flowList" :status="loadStatus"></hot></view>
-				<view v-if="currentsort === 3"><hot :flowList="flowList" :status="loadStatus"></hot></view>
-				<view v-if="currentsort === 4"><hot :flowList="flowList" :status="loadStatus"></hot></view>
-				
+				<u-subsection :list="list" :current="currentsort" @change="changeSort" mode='subsection' bold="false" active-color="#606266"
+				 height="50" font-size="24"></u-subsection>
+
+				<view v-if="currentsort === 0">
+					<waterfall :flowList="sortList" :status="loadStatus"></waterfall>
+				</view>
+				<view v-if="currentsort === 1">
+					<waterfall :flowList="sortList" :status="loadStatus"></waterfall>
+				</view>
+				<view v-if="currentsort === 2">
+					<waterfall :flowList="sortList" :status="loadStatus"></waterfall>
+				</view>
+				<view v-if="currentsort === 3">
+					<waterfall :flowList="sortList" :status="loadStatus"></waterfall>
+				</view>
+				<view v-if="currentsort === 4">
+					<waterfall :flowList="sortList" :status="loadStatus"></waterfall>
+				</view>
+
 			</view>
 			<u-back-top :scroll-top="scrollTop"></u-back-top>
 		</view>
@@ -34,12 +45,12 @@
 	import {
 		baseURL
 	} from './config/config.js'
-	import hot from './hot/hot.vue'
+
 	import search from '../search/search'
-	// import test from './test/test'
+	import waterfall from './waterfall_view/waterfall.vue'
 	export default {
 		components: {
-			hot,
+			waterfall,
 			search
 
 		},
@@ -62,17 +73,32 @@
 				currentsort: 0,
 				queryType: "爱情",
 				limit: 10,
-				page: 0,
-				flowList: [],
-				loadStatus: "loadmore"
+				loadStatus: "loadmore",
+				hotList: [],
+				sortList: [],
+				pageHot: 0,
+				pageSort: 0,
+				hotLoadStatus: "loadmore"
 
 			}
 		},
-		onShow(){
+		onShow() {
 			this.addRandomDataHot()
 		},
 		onReachBottom(e) {
-			this.addChoose()
+			if (this.hotLoadStatus == "loadmore") {
+				this.addRandomDataHot()
+			}
+			if (this.loadStatus == "loadmore") {
+				this.addRandomDataSort()
+			}
+
+		},
+		onPullDownRefresh() {
+		    console.log('下拉刷新');
+		    setTimeout(function () {
+		        uni.stopPullDownRefresh();
+		    }, 1000);
 		},
 		methods: {
 			go_search_page() {
@@ -81,81 +107,80 @@
 				})
 			},
 			sectionChange(index) {
-				this.page = 0
-				this.flowList =[]
 				this.current = index;
-				this.addChoose()
+				if (this.current == 1) {
+					this.addRandomDataSort();
+				}
 			},
 			onPageScroll(e) {
 				this.scrollTop = e.scrollTop;
 			},
 			changeSort(index) {
-				this.page = 0
-				this.flowList =[]
-				this.queryType = this.list[index].name
 				this.currentsort = index;
+				this.pageSort = 0
+				this.sortList = []
+				this.queryType = this.list[index].name
+
 				this.addRandomDataSort()
 			},
-			addChoose(){
-				if(this.current == 0){
-					  this.addRandomDataHot();
-				}
-				if(this.current == 1){
-					  this.addRandomDataSort();	
-				}
-			},
-			
-			
 			addRandomDataHot() {
-				this.page = this.page + 1
-				uni.request({
-					url: 'http://192.168.1.15:8008/Ecmartwork/getFindArtWorks',
-					method: 'POST',
-					data: {
-						page: this.page,
-						limit: this.limit
-					},
-					success: res => {
-						if(res.data.data != null){
-							res.data.data.forEach(v => {
-								v.high = 287.1
-								this.flowList.push(v)
-							})
-							if(res.data.data.length < this.limit){
-								this.loadStatus = 'nomore'
+				if (this.current == 0) {
+					this.pageHot = this.pageHot + 1
+
+					uni.request({
+						url: 'http://192.168.1.15:8008/Ecmartwork/getFindArtWorks',
+						method: 'POST',
+						data: {
+							page: this.pageHot,
+							limit: this.limit
+						},
+						success: res => {
+							if (res.data.data != null) {
+								res.data.data.forEach(v => {
+									v.high = 287.1
+									this.hotList.push(v)
+								})
+								if (res.data.data.length < this.limit) {
+									this.hotLoadStatus = 'nomore'
+								}
+								// uni.setStorageSync( 'isHot' , true )
+
+							} else {
+								this.hotLoadStatus = 'nomore'
 							}
-						}else{
-							this.loadStatus = 'nomore'
 						}
-					}
-				})
+					})
+				}
+				console.log(this.hotList)
 			},
 			addRandomDataSort() {
-				this.page = this.page + 1
-				uni.request({
-					url: 'http://192.168.1.15:8008/Ecmartwork/getFindSortArtWorks',
-					method: 'POST',
-					data: {
-						page: this.page,
-						limit: this.limit,
-						queryType: this.queryType
-					},
-					success: res => {
-						if (res.data.data != null) {
-							res.data.data.forEach(v => {
-								v.high = 287.1
-								this.flowList.push(v)
-							})
-							if(res.data.data.length < this.limit){
+				if (this.current == 1) {
+					this.pageSort = this.pageSort + 1
+					uni.request({
+						url: 'http://192.168.1.15:8008/Ecmartwork/getFindSortArtWorks',
+						method: 'POST',
+						data: {
+							page: this.pageSort,
+							limit: this.limit,
+							queryType: this.queryType
+						},
+						success: res => {
+							if (res.data.data != null) {
+								res.data.data.forEach(v => {
+									v.high = 287.1
+									this.sortList.push(v)
+								})
+								if (res.data.data.length < this.limit) {
+									this.loadStatus = 'nomore'
+								}
+							} else {
 								this.loadStatus = 'nomore'
 							}
-						} else {
-							this.loadStatus = 'nomore'
+
 						}
-			
-					}
-				})
-			
+					})
+				}
+
 			}
 		}
 
@@ -164,13 +189,11 @@
 
 
 <style lang="scss">
-
-
 	.search_view {
 		background-color: #f2f2f2;
 		display: flex;
 		border-radius: 10px;
-		
+
 
 		.search_icon {
 			background: url(../../static/icon/icon_search.png) no-repeat center;
@@ -226,6 +249,4 @@
 		font-size: 20rpx;
 		line-height: 1;
 	}
-
-	
 </style>
