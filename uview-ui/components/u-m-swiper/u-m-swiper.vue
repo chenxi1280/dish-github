@@ -6,7 +6,7 @@
 		 :previous-margin="effect3d ? effect3dPreviousMargin + 'rpx' : '0'" :next-margin="effect3d ? effect3dPreviousMargin + 'rpx' : '0'"
 		 :style="{
 				height: height + 'rpx'
-			}">
+			}" >
 			<swiper-item class="u-swiper-item" v-for="(item, index) in list" :key="index">
 				<view class="u-list-image-wrap" @tap.stop.prevent="listClick(index)" :class="[uCurrent != index ? 'u-list-scale' : '']" :style="{
 						borderRadius: `${borderRadius}rpx`,
@@ -334,7 +334,8 @@
 		display: flex;
 		overflow: hidden;
 		align-items: center;
-		width: 180px !important ;
+		width: 90px !important ;
+		margin-left: 50px;
 	}
 
 </style>
