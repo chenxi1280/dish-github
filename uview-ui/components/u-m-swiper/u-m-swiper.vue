@@ -10,8 +10,8 @@
 			<swiper-item class="u-swiper-item" v-for="(item, index) in list" :key="index">
 				<view class="u-list-image-wrap" @tap.stop.prevent="listClick(index)" :class="[uCurrent != index ? 'u-list-scale' : '']" :style="{
 						borderRadius: `${borderRadius}rpx`,
-						transform: effect3d && uCurrent != index ? 'scaleY(0.9)' : 'scaleY(1)',
-						margin: effect3d && uCurrent != index ? '0 20rpx' : 0,
+						transform: isBig && uCurrent == index ? 'scaleY(1)' :  'scaleY(0.9)',
+						margin: isBig && uCurrent    == index ? 0 : '0 20rpx',
 						backgroundColor: bgColor
 					}">
 					<image class="u-swiper-image" :src="item[name]" :mode="imgMode"></image>
@@ -23,28 +23,17 @@
 				</view>
 			</swiper-item>
 		</swiper>
-		<view class="u-swiper-indicator" :style="{
+<!-- 		<view class="u-swiper-indicator" :style="{
 				top: indicatorPos == 'topLeft' || indicatorPos == 'topCenter' || indicatorPos == 'topRight' ? '12rpx' : 'auto',
 				bottom: indicatorPos == 'bottomLeft' || indicatorPos == 'bottomCenter' || indicatorPos == 'bottomRight' ? '12rpx' : 'auto',
 				justifyContent: justifyContent,
 				padding: `0 ${effect3d ? '74rpx' : '24rpx'}`
 			}">
-			<block v-if="mode == 'rect'">
+			<block >
 				<view class="u-indicator-item-rect" :class="{ 'u-indicator-item-rect-active': index == uCurrent }" v-for="(item, index) in list"
 				 :key="index"></view>
 			</block>
-			<block v-if="mode == 'dot'">
-				<view class="u-indicator-item-dot" :class="{ 'u-indicator-item-dot-active': index == uCurrent }" v-for="(item, index) in list"
-				 :key="index"></view>
-			</block>
-			<block v-if="mode == 'round'">
-				<view class="u-indicator-item-round" :class="{ 'u-indicator-item-round-active': index == uCurrent }" v-for="(item, index) in list"
-				 :key="index"></view>
-			</block>
-			<block v-if="mode == 'number'">
-				<view class="u-indicator-item-number">{{ uCurrent + 1 }}/{{ list.length }}</view>
-			</block>
-		</view>
+		</view> -->
 	</view>
 </template>
 
@@ -169,6 +158,11 @@
 					return {}
 				}
 			}
+			,
+			isBig:{
+				type: Boolean,
+				default: false
+			}
 		},
 		watch: {
 			// 如果外部的list发生变化，判断长度是否被修改，如果前后长度不一致，重置uCurrent值，避免溢出
@@ -183,7 +177,8 @@
 		},
 		data() {
 			return {
-				uCurrent: this.current // 当前活跃的swiper-item的index
+				uCurrent: this.current ,// 当前活跃的swiper-item的index
+
 			};
 		},
 		computed: {
@@ -335,7 +330,7 @@
 		overflow: hidden;
 		align-items: center;
 		width: 90px !important ;
-		margin-left: 50px;
+		margin-left: 55px;
 	}
 
 </style>

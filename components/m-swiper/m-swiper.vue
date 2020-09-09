@@ -1,18 +1,13 @@
 <template>
-	<view class="u-swiper-wrap" :style="{
-		borderRadius: `${borderRadius}rpx`
-	}">
-		<swiper :current="elCurrent" @change="change" @animationfinish="animationfinish" :interval="interval" :circular="circular" :duration="duration" :autoplay="autoplay"
-		 :previous-margin="effect3d ? effect3dPreviousMargin + 'rpx' : '0'" :next-margin="effect3d ? effect3dPreviousMargin + 'rpx' : '0'"
-		 :style="{
-				height: height + 'rpx'
-			}">
-			<swiper-item class="u-swiper-item" v-for="(item, index) in list" :key="index">
+	<view>
+		<swiper >
+			<swiper-item  v-for="(item, index) in list" :key="index">
 				<view class="u-list-image-wrap" @tap.stop.prevent="listClick(index)" :class="[uCurrent != index ? 'u-list-scale' : '']" :style="{
 						borderRadius: `${borderRadius}rpx`,
 						transform: effect3d && uCurrent != index ? 'scaleY(0.9)' : 'scaleY(1)',
 						margin: effect3d && uCurrent != index ? '0 20rpx' : 0,
-						backgroundColor: bgColor
+						backgroundColor: bgColor,
+						
 					}">
 					<image class="u-swiper-image" :src="item[name]" :mode="imgMode"></image>
 					<view v-if="title" class="u-swiper-title u-line-1" :style="[{
@@ -29,20 +24,9 @@
 				justifyContent: justifyContent,
 				padding: `0 ${effect3d ? '74rpx' : '24rpx'}`
 			}">
-			<block v-if="mode == 'rect'">
+			<block >
 				<view class="u-indicator-item-rect" :class="{ 'u-indicator-item-rect-active': index == uCurrent }" v-for="(item, index) in list"
 				 :key="index"></view>
-			</block>
-			<block v-if="mode == 'dot'">
-				<view class="u-indicator-item-dot" :class="{ 'u-indicator-item-dot-active': index == uCurrent }" v-for="(item, index) in list"
-				 :key="index"></view>
-			</block>
-			<block v-if="mode == 'round'">
-				<view class="u-indicator-item-round" :class="{ 'u-indicator-item-round-active': index == uCurrent }" v-for="(item, index) in list"
-				 :key="index"></view>
-			</block>
-			<block v-if="mode == 'number'">
-				<view class="u-indicator-item-number">{{ uCurrent + 1 }}/{{ list.length }}</view>
 			</block>
 		</view>
 	</view>
@@ -231,7 +215,6 @@
 </script>
 
 <style lang="scss" scoped>
-	@import "../../libs/css/style.components.scss";
 	
 	.u-swiper-wrap {
 		position: relative;
