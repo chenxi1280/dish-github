@@ -5,23 +5,18 @@
 				<video :src="videoUrl" autoplay="true" direction="0" show-mute-btn="true" 
 				show-fullscreen-btn="false" id="myVideo" enable-play-gesture="true" @ended="videoEnd"></video>
 			</view>
-			<view class="chooseTips" v-if="chooseTipsShowFlag">
-				<view class="closeBox" @click="closeChooseTips">
-					<icon class="closeIcon"></icon>
-				</view>
-				<view class="title">请做出你的选择</view>
-				<view class="splitLine"></view>
-				<view class="option1Box" @touchstart="changeBackground(1)" @touchend="rebackBackground(1)"  :style="{'background': background1}">
-					<view class="option1">{{option1Value}}</view>
-				</view>
-				<view class="option2Box" @touchstart="changeBackground(2)" @touchend="rebackBackground(2)" :style="{'background': background2}">
-					<view class="option2">{{option2Value}}</view>
-				</view>
-				<view class="option3Box" @touchstart="changeBackground(3)" @touchend="rebackBackground(3)" :style="{'background': background3}">
-					<view class="option3">{{option3Value}}</view>
-				</view>
-				<view class="option4Box" @touchstart="changeBackground(4)" @touchend="rebackBackground(4)" :style="{'background': background4}">
-					<view class="option4">{{option4Value}}</view>
+			<view class="chooseTipsMask16" v-if="chooseTipsShowFlag">
+				<view class="chooseTips" >
+					<view class="closeBox" @click="closeChooseTips">
+						<icon class="closeIcon"></icon>
+					</view>
+					<view class="title">请做出你的选择</view>
+					<view class="splitLine"></view>
+					<view class="tips" v-for="(item, index) in tipsArray" :key="index">
+						<view class="optionBox" @touchstart="changeBackground(index)" @touchend="rebackBackground(index)" :style="{'background': background[index]}">
+							<view class="option">{{option[index]}}</view>
+						</view>
+					</view>
 				</view>
 			</view>
 			<view class="storyLineBox" @click="showStoryLineContent">
@@ -60,34 +55,72 @@
 		data() {
 			return {
 				videoUrl: "http://1259381296.vod2.myqcloud.com/68c83cf0vodcq1259381296/f500ff0e5285890801715884127/MEh0MnydAY8A.mp4",	
-				option1Value: "我是选项1",
-				option2Value: "我是选项2",
-				option3Value: "我是选项3",
-				option4Value: "我是选项4",
-				background1: "",
-				background2: "",
-				background3: "",
-				background4: "",
+				option: ["我是选项1","我是选项2","我是选项3","我是选项4"],
+				background: ["","","",""],
 				chooseTipsShowFlag: false,
 				storyLineContentFlag: false,
-				reportContentFlag: false
+				reportContentFlag: false,
+				artworkId: 113,
+				detailId: 0,
+				playedHistoryArray: [],
+				childs: [],
+				tipsArray: []
 			}
 		},
 		onReady(){
-			this.getVideoUrl();
+			let artworkTree = uni.getStorageSync("artworkTree");
+			if(artworkTree == null || typeof(artworkTree) == "undefined" || artworkTree.length == 0){
+				this.getArtworkTree();
+			}else{
+				//初始化数据
+				this.initPlayData(artworkTree);
+			}
 		},
 		methods: {
-			async getVideoUrl(){
+			initPlayData(artworkTree){
+				//初始化视频及选项
+				this.videoUrl = artworkTree.videoUrl;
+				this.playedHistoryArray.push(artworkTree.pkDetailId);
+				this.savaPlayRecord();
+				let childs = artworkTree.childs;
+				if(childs){
+					this.tipsArray.length = childs.length;
+					for(let i = 0;i < childs.length;i++){
+						this.childs.splice(i,1,childs[i]);
+						this.option[i] = childs[i].selectTitle;
+					}
+					console.log(this.childs);
+				}
+			},
+			async getArtworkTree(){
 				await uni.request({
 					url: baseURL + "/wxPlay/playArtWork",
 					method: 'POST',
 					dataType: 'json',
 					data: {
-						pkArtworkId: 113
+						pkArtworkId: this.artworkId
 					},
 					success: res=> {
-						console.log(res)
-						console.log(res.data.data)
+						uni.setStorageSync("artworkTree",res.data.data);
+						this.detailId = res.data.data.pkDetailId;
+						this.initPlayData(res.data.data);
+					}
+				})
+			},
+			async savaPlayRecord(){
+				await uni.request({
+					url: baseURL + "/wxPlay/savaPlayRecord",
+					method: 'POST',
+					dataType: 'json',
+					data: {
+						pkArtworkId: this.artworkId,
+						userId: uni.getStorageSync("userId"),
+						detailId: this.detailId
+					},
+					success: res=> {
+						if(res.data.status == 200){
+							console.log("我去存数据"+this.detailId+":"+ this.artworkId)
+						}
 					}
 				})
 			},
@@ -102,40 +135,48 @@
 			},
 			changeBackground(index){
 				switch(index){
+					case 0: {
+						this.background.splice(index,1,"#96CDCD");
+						break;
+					}
 					case 1: {
-						this.background1 = "#96CDCD";
+						this.background.splice(index,1,"#96CDCD");
 						break;
 					}
 					case 2: {
-						this.background2 = "#96CDCD";
+						this.background.splice(index,1,"#96CDCD");
 						break;
 					}
 					case 3: {
-						this.background3 = "#96CDCD";
-						break;
-					}
-					case 4: {
-						this.background4 = "#96CDCD";
+						this.background.splice(index,1,"#96CDCD");
 						break;
 					}
 				}
 			},
 			rebackBackground(index){
 				switch(index){
+					case 0: {
+						this.background.splice(index,1,"");
+						this.chooseTipsShowFlag = false
+						this.initPlayData(this.childs[index])
+						break;
+					}
 					case 1: {
-						this.background1 = "";
+						this.background.splice(index,1,"");
+						this.chooseTipsShowFlag = false
+						this.initPlayData(this.childs[index])
 						break;
 					}
 					case 2: {
-						this.background2 = "";
+						this.background.splice(index,1,"");
+						this.chooseTipsShowFlag = false
+						this.initPlayData(this.childs[index])
 						break;
 					}
 					case 3: {
-						this.background3 = "";
-						break;
-					}
-					case 4: {
-						this.background4 = "";
+						this.background.splice(index,1,"");
+						this.chooseTipsShowFlag = false
+						this.initPlayData(this.childs[index])
 						break;
 					}
 				}
@@ -171,100 +212,59 @@
 						height: 100%;
 					}
 				}
-				.chooseTips{
+				.chooseTipsMask16{
+					background-color: rgba(255,255,255,.9);
 					position: fixed;
 					left: 10%;
 					top: 50%;
 					width: 80%;
 					height: 38%;
-					z-index: 25;
-					background-color: rgba(255,255,255,.5);
-					.closeBox{
-						position: absolute;
-						width: 46rpx;
-						height: 46rpx;
-						right: 20rpx;
-						top: 20rpx;
-						.closeIcon{
-							width: 100%;
-							height: 100%;
-							background: url(../../static/icon/close.png) no-repeat center;
-							background-size: 46rpx;
-						}
-					}
-					.title{
-						text-align: center;
-						color: white;
-						font-size: 36rpx;
-						line-height: 100rpx;
-					}
-					.splitLine{
-						border: 2rpx solid #D3D3D3;
-						width: 80%;
-						margin: 0 auto;
-					}
-					.option1Box{
+					z-index: 16;
+					.chooseTips{
 						width: 100%;
-						margin: 0 auto;
-						margin-top: 30rpx;
-						line-height: 80rpx;
-						display: flex;
-						justify-content: space-between;
-						.option1{
-							color: white;
-							padding-left: 20rpx;
+						height: 100%;
+						z-index: 25;
+						background-color: rgba(0,0,0,.3);
+						.closeBox{
+							position: absolute;
+							width: 46rpx;
+							height: 46rpx;
+							right: 20rpx;
+							top: 20rpx;
+							.closeIcon{
+								width: 100%;
+								height: 100%;
+								background: url(../../static/icon/close.png) no-repeat center;
+								background-size: 46rpx;
+							}
 						}
-						.selectedFlag1{
+						.title{
+							text-align: center;
 							color: white;
-							padding-right: 20rpx;
+							font-size: 36rpx;
+							line-height: 100rpx;
 						}
-					}
-					.option2Box{
-						width: 100%;
-						margin: 0 auto;
-						line-height: 80rpx;
-						display: flex;
-						justify-content: space-between;
-						.option2{
-							color: white;
-							padding-left: 20rpx;
+						.splitLine{
+							border: 2rpx solid #D3D3D3;
+							width: 80%;
+							margin: 0 auto;
 						}
-						.selectedFlag2{
-							color: white;
-							padding-right: 20rpx;
-						}
-					}
-					.option3Box{
-						width: 100%;
-						margin: 0 auto;
-						line-height: 80rpx;
-						display: flex;
-						justify-content: space-between;
-						.option3{
-							color: white;
-							padding-left: 20rpx;
-						}
-						.selectedFlag3{
-							color: white;
-							padding-right: 20rpx;
-						}
-					}
-					.option4Box{
-						width: 100%;
-						margin: 0 auto;
-						line-height: 80rpx;
-						display: flex;
-						justify-content: space-between;
-						.option4{
-							color: white;
-							padding-left: 20rpx;
-						}
-						.selectedFlag4{
-							color: white;
-							padding-right: 20rpx;
+						.tips{
+							.optionBox{
+								width: 100%;
+								margin: 0 auto;
+								line-height: 80rpx;
+								display: flex;
+								justify-content: space-between;
+								.option{
+									color: white;
+									padding-left: 20rpx;
+								}
+							}
 						}
 					}
 				}
+				
 				.storyLineBox{
 					position: fixed;
 					right: 40rpx;
