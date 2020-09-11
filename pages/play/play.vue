@@ -57,7 +57,7 @@
 							</checkbox-group>
 						</view>
 						<view class="uni-textarea">
-							<textarea />
+							<textarea v-model="textareaContent"/>
 						</view>
 						<view class="uploadBox">
 							<view class="subTitle">上传图片</view>
@@ -83,20 +83,36 @@
 	export default {
 		data() {
 			return {
-				videoUrl: "",	
+				//视频路径
+				videoUrl: "",
+				//选项参数
 				option: ["我是选项1","我是选项2","我是选项3","我是选项4"],
+				//选项背景颜色
 				background: ["","","",""],
+				//是否展示选项开关
 				chooseTipsShowFlag: false,
+				//是否展示故事线开关
 				storyLineContentFlag: false,
+				//是否展示举报开关
 				reportContentFlag: false,
+				//上传图片展示开关
 				uploadImageFlag:false,
+				//是否显示上传图片按钮开关
 				uploadBtnFlag: true,
+				//视屏是否播放结束标志
 				endFlag: true,
 				artworkId: 113,
 				detailId: 0,
+				//播放历史的作品id容器
 				playedHistoryArray: [],
 				childs: [],
+				//通过tipsArray数组长度控制选项个数
 				tipsArray: [],
+				//举报类型
+				reportType: "",
+				//举报内容
+				textareaContent: "",
+				//举报类型选项数组
 				items: [
 					{
 						value: 'tort',
@@ -125,16 +141,90 @@
 			}
 		},
 		methods: {
+			uploadImage(){
+				uni.chooseImage({
+					count: 1,
+					sizeType: ['original'],
+					sourceType: ['album','camera'],
+					success: res=> {
+						let cos = this.getCos();
+						let filePath = res.tempFilePaths[0];//获取文件路径
+						let Key = filePath.substr(filePath.lastIndexOf('/')+1);//这里指定上传的文件名
+						let dateObj = new Date();
+						let timestamp = dateObj.getTime();
+						let nowDate = dateObj.toLocaleDateString();
+						let formatDate = nowDate.replace(/\//g,'-');//格式斜杠日期
+						let newKey = formatDate +'/'+timestamp+Key;//cos上定义目录
+						let tempObj = {};
+						tempObj.imgLocation = 'https://' + 'sike-1259692143'+'.cos.' + 'ap-chongqing' + '.myqcloud.com/'+newKey;//返回上传的绝对 URL
+						//SDK 提供的cos上传函数，如果想批量上传，可以在这里加上for循环。
+						cos.putObject({
+							Bucket:'sike-1259692143',//存储桶名称
+							Region:'ap-chongqing',//地域名字
+							Key:newKey,
+							FilePath:filePath,//本地文件临时地址
+						},function(err,data){
+							if(err){
+							   wx.showModal({
+								  title:'返回错误',
+								  content:'请求失败'+err,
+								  showCancel:false
+							   })
+							}else{
+							   if(data){
+								  //data.headers.Location  这里是返回的图片URL，这里可以为界面中需要显示的图片src赋值
+								  that.setData({
+									  headImage:data.headers.Location
+								  })
+							   }
+							}
+						})
+					}
+				})
+				
+			},
+			getCos(){
+				var COS = require('cos-wx-sdk-v5');
+				uni.request ({
+					url: baseURL + "/artworkMaking/findCosSingature",
+					method: 'POST',
+					success: res=> {
+						// console.log(JSON.parse(res.data.data))
+						const data = JSON.parse(res.data.data);
+						// 创建COS实例  获取签名
+						const cos = new COS({
+							// 必选参数
+							getAuthorization: (options, callback) => {
+							  const obj = {
+								TmpSecretId: data.credentials.tmpSecretId,
+								TmpSecretKey: data.credentials.tmpSecretKey,
+								XCosSecurityToken: data.credentials.sessionToken,
+								StartTime: data.startTime, // 时间戳，单位秒，如：1580000000
+								ExpiredTime: data.expiredTime // 时间戳，单位秒，如：1580000900
+							  }
+							  callback(obj)
+							}
+						});
+						return cos;
+					},
+				})
+			},
+			submit(){
+				console.log(this.textareaContent);
+				console.log(this.reportType);
+			},
 			checkboxChange(e) {
 				var items = this.items,
 					values = e.detail.value;
-					//那用户最后点击的那个checkbox 实现单选
+				//那用户最后点击的那个checkbox 实现单选
 				const value = values[values.length-1];
+				//避免用户单次数的点击导致values为空
 				if(!value){return;}
 				for (var i = 0, lenI = items.length; i < lenI; ++i) {
 					const item = items[i]
 					if(value.includes(item.value)){
 						this.$set(item,'checked',true)
+						this.reportType = item.name;
 					}else{
 						this.$set(item,'checked',false)
 					}
