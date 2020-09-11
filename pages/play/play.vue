@@ -42,7 +42,36 @@
 					</view>
 					<view class="title">举报</view>
 					<view class="splitLine"></view>
-					<view class="reportContent"></view>
+					<view class="subTitle">举报内容：</view>
+					<view class="reportContent">
+						<view class="uni-list">
+							<checkbox-group @change="checkboxChange">
+								<label class="checkBox" v-for="item in items" :key="item.value">
+									<view>
+										<checkbox :value="item.value" :checked="item.checked" />
+									</view>
+									<view class="nameBox">
+										<view class="name">{{item.name}}</view>
+									</view>
+								</label>
+							</checkbox-group>
+						</view>
+						<view class="uni-textarea">
+							<textarea />
+						</view>
+						<view class="uploadBox">
+							<view class="subTitle">上传图片</view>
+							<view class="uploadBtnBox" v-if="uploadBtnFlag" @click="uploadImage">
+								<icon></icon>
+							</view>
+							<view class="uploadImageBox" v-if="uploadImageFlag">
+								<image></image>
+							</view>
+						</view>
+						<view class="submitBtnBox" @click="submit">
+							<view class="btnText">提交</view>
+						</view>
+					</view>
 				</view>
 			</view>
 		</view>
@@ -54,20 +83,39 @@
 	export default {
 		data() {
 			return {
-				videoUrl: "http://1259381296.vod2.myqcloud.com/68c83cf0vodcq1259381296/f500ff0e5285890801715884127/MEh0MnydAY8A.mp4",	
+				videoUrl: "",	
 				option: ["我是选项1","我是选项2","我是选项3","我是选项4"],
 				background: ["","","",""],
 				chooseTipsShowFlag: false,
 				storyLineContentFlag: false,
 				reportContentFlag: false,
+				uploadImageFlag:false,
+				uploadBtnFlag: true,
+				endFlag: true,
 				artworkId: 113,
 				detailId: 0,
 				playedHistoryArray: [],
 				childs: [],
-				tipsArray: []
+				tipsArray: [],
+				items: [
+					{
+						value: 'tort',
+						name: '侵犯版权'
+					},
+					{
+						value: 'illegal',
+						name: '出现违规内容',
+						// checked: 'true'
+					},
+					{
+						value: 'other',
+						name: '其它'
+					}
+				]
 			}
 		},
 		onReady(){
+			this.endFlag = true;
 			let artworkTree = uni.getStorageSync("artworkTree");
 			if(artworkTree == null || typeof(artworkTree) == "undefined" || artworkTree.length == 0){
 				this.getArtworkTree();
@@ -77,9 +125,25 @@
 			}
 		},
 		methods: {
+			checkboxChange(e) {
+				var items = this.items,
+					values = e.detail.value;
+					//那用户最后点击的那个checkbox 实现单选
+				const value = values[values.length-1];
+				if(!value){return;}
+				for (var i = 0, lenI = items.length; i < lenI; ++i) {
+					const item = items[i]
+					if(value.includes(item.value)){
+						this.$set(item,'checked',true)
+					}else{
+						this.$set(item,'checked',false)
+					}
+				}
+			},
 			initPlayData(artworkTree){
 				//初始化视频及选项
 				this.videoUrl = artworkTree.videoUrl;
+				this.detailId = artworkTree.pkDetailId;
 				this.playedHistoryArray.push(artworkTree.pkDetailId);
 				this.savaPlayRecord();
 				let childs = artworkTree.childs;
@@ -90,6 +154,9 @@
 						this.option[i] = childs[i].selectTitle;
 					}
 					console.log(this.childs);
+				}else{
+					//控制视频播放结束是否弹框的标志
+					this.endFlag = false;
 				}
 			},
 			async getArtworkTree(){
@@ -102,7 +169,6 @@
 					},
 					success: res=> {
 						uni.setStorageSync("artworkTree",res.data.data);
-						this.detailId = res.data.data.pkDetailId;
 						this.initPlayData(res.data.data);
 					}
 				})
@@ -125,7 +191,11 @@
 				})
 			},
 			videoEnd(){
-				this.chooseTipsShowFlag = true
+				if(this.endFlag){
+					this.chooseTipsShowFlag = true;
+				}else{
+					this.chooseTipsShowFlag = false;
+				}
 			},
 			showStoryLineContent(){
 				this.storyLineContentFlag = true
@@ -355,8 +425,13 @@
 						}
 						.splitLine{
 							border: 2rpx solid #D3D3D3;
-							width: 80%;
+							width: 100%;
 							margin: 0 auto;
+						}
+						.subTitle{
+							color: white;
+							margin: 10rpx 0 0 10rpx;
+							font-size: 30rpx;
 						}
 						.closeBox{
 							position: absolute;
@@ -369,6 +444,71 @@
 								height: 100%;
 								background: url(../../static/icon/close.png) no-repeat center;
 								background-size: 46rpx;
+							}
+						}
+						.reportContent{
+							.uni-list{
+								.checkBox{
+									margin: 30rpx 0 0 30rpx;
+									display: flex;
+									justify-content: flex-start;
+									.nameBox{
+										height: 48rpx;
+										.name{
+											line-height: 48rpx;
+											color: white;
+										}
+									}
+								}
+							}
+							.uni-textarea{
+								margin: 30rpx 0 0 30rpx;
+								textarea{
+									background: white;
+								}
+							}
+							.uploadBox{
+								margin: 30rpx 0 0 0;
+								.subTitle{
+									color: white;
+									font-size: 30rpx;
+								}
+								.uploadBtnBox{
+									margin: 30rpx 0 0 30rpx;
+									border: 2rpx solid white;
+									width: 200rpx;
+									height: 300rpx;
+									icon {
+										width: 100%;
+										height: 100%;
+										background: url(../../static/icon/add.png) no-repeat center;
+										background-size: 200rpx 200rpx;
+									};
+								}
+								.uploadImageBox{
+									margin: 30rpx 0 0 30rpx;
+									border: 2rpx solid red;
+									width: 200rpx;
+									height: 300rpx;
+									border: 2rpx solid white;
+									image {
+										width: 100%;
+										height: 100%;
+									};
+								}
+							}
+							.submitBtnBox{
+								margin: 0 auto;
+								margin-top: 20rpx;
+								font-size: 30rpx;
+								width: 150rpx;
+								height: 60rpx;
+								color: white;
+								border: 2rpx solid white;
+								.btnText{
+									line-height: 60rpx;
+									text-align: center;
+								}
 							}
 						}
 					}
