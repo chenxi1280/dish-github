@@ -2,28 +2,31 @@
 	<view class="u-swiper-wrap" :style="{
 		borderRadius: `${borderRadius}rpx`
 	}">
-		<swiper :current="elCurrent" @change="change" @animationfinish="animationfinish" :interval="interval" :circular="circular" :duration="duration" :autoplay="autoplay"
-		 :previous-margin="effect3d ? effect3dPreviousMargin + 'rpx' : '0'" :next-margin="effect3d ? effect3dPreviousMargin + 'rpx' : '0'"
-		 :style="{
+		<swiper :current="elCurrent" @change="change" @animationfinish="animationfinish" :interval="interval" :circular="circular"
+		 :duration="duration" :autoplay="autoplay" :previous-margin="effect3d ? effect3dPreviousMargin + 'rpx' : '0'"
+		 :next-margin="effect3d ? effect3dPreviousMargin + 'rpx' : '0'" :style="{
 				height: height + 'rpx'
-			}" >
+			}">
 			<swiper-item class="u-swiper-item" v-for="(item, index) in list" :key="index">
-				<view class="u-list-image-wrap" @tap.stop.prevent="listClick(index)" :class="[uCurrent != index ? 'u-list-scale' : '']" :style="{
+				<view class="u-list-image-wrap" @tap.stop.prevent="listClick(index)" :class="[uCurrent != index ? 'u-list-scale' : '']"
+				 :style="{
 						borderRadius: `${borderRadius}rpx`,
-						transform: isBig && uCurrent == index ? 'scaleY(1)' :  'scaleY(0.9)',
+						transform: isBig && uCurrent == index ? 'scaleY(1)' :  'scaleY(0.85)',
 						margin: isBig && uCurrent    == index ? 0 : '0 20rpx',
 						backgroundColor: bgColor
 					}">
 					<image class="u-swiper-image" :src="item[name]" :mode="imgMode"></image>
-					<view v-if="title" class="u-swiper-title u-line-1" :style="[{
-							'padding-bottom': titlePaddingBottom
-						}, titleStyle]">
-						{{ item.title }}
+					<view class="u-swiper-title" :style="{
+						height:  item.isWatch ? '40%': '100%'
+					}">
+					<view v-show="!item.isWatch && !(isBig && (uCurrent == index)) " style="font-size:200rpx; padding-left: 36rpx;">?</view>
+					<view v-show="!item.isWatch && (isBig && (uCurrent == index))" style="font-size:200rpx; text-align: center;">?</view>
+						<text>{{ item.title }}</text>
 					</view>
 				</view>
 			</swiper-item>
 		</swiper>
-<!-- 		<view class="u-swiper-indicator" :style="{
+		<!-- 		<view class="u-swiper-indicator" :style="{
 				top: indicatorPos == 'topLeft' || indicatorPos == 'topCenter' || indicatorPos == 'topRight' ? '12rpx' : 'auto',
 				bottom: indicatorPos == 'bottomLeft' || indicatorPos == 'bottomCenter' || indicatorPos == 'bottomRight' ? '12rpx' : 'auto',
 				justifyContent: justifyContent,
@@ -154,12 +157,18 @@
 			// 标题的样式，对象形式
 			titleStyle: {
 				type: Object,
-				default() {
+				default () {
 					return {}
 				}
-			}
-			,
-			isBig:{
+			},
+			isBig: {
+				type: Boolean,
+				default: false
+			},
+			nowFloor: {
+				type: Number,
+			},
+			isWatch: {
 				type: Boolean,
 				default: false
 			}
@@ -167,7 +176,7 @@
 		watch: {
 			// 如果外部的list发生变化，判断长度是否被修改，如果前后长度不一致，重置uCurrent值，避免溢出
 			list(nVal, oVal) {
-				if(nVal.length !== oVal.length) this.uCurrent = 0;
+				if (nVal.length !== oVal.length) this.uCurrent = 0;
 			},
 			// 监听外部current的变化，实时修改内部依赖于此测uCurrent值，如果更新了current，而不是更新uCurrent，
 			// 就会错乱，因为指示器是依赖于uCurrent的
@@ -177,7 +186,7 @@
 		},
 		data() {
 			return {
-				uCurrent: this.current ,// 当前活跃的swiper-item的index
+				uCurrent: this.current, // 当前活跃的swiper-item的index
 
 			};
 		},
@@ -206,13 +215,13 @@
 		},
 		methods: {
 			listClick(index) {
-				this.$emit('click', index);
+				this.$emit('click', index, this.nowFloor);
 			},
 			change(e) {
 				let current = e.detail.current;
 				this.uCurrent = current;
 				// 发出change事件，表示当前自动切换的index，从0开始
-				this.$emit('change', current);
+				this.$emit('change', current, this.nowFloor);
 			},
 			// 头条小程序不支持animationfinish事件，改由change事件
 			// 暂不监听此事件，因为不再给swiper绑定uCurrent属性
@@ -220,14 +229,17 @@
 				// #ifndef MP-TOUTIAO
 				// this.uCurrent = e.detail.current;
 				// #endif
-			}
+			},
+			catchTouchMove() {
+				return false;
+			},
 		}
 	};
 </script>
 
 <style lang="scss" scoped>
 	@import "../../libs/css/style.components.scss";
-	
+
 	.u-swiper-wrap {
 		position: relative;
 		overflow: hidden;
@@ -305,7 +317,7 @@
 	}
 
 	.u-list-image-wrap {
-		width: 100% ;
+		width: 100%;
 		height: 100%;
 		flex: 1;
 		transition: all 0.5s;
@@ -319,7 +331,7 @@
 		background-color: rgba(0, 0, 0, 0.3);
 		bottom: 0;
 		left: 0;
-		width: 100%;
+		width: 126px;
 		font-size: 28rpx;
 		padding: 12rpx 24rpx;
 		color: rgba(255, 255, 255, 0.9);
@@ -329,8 +341,7 @@
 		display: flex;
 		overflow: hidden;
 		align-items: center;
-		width: 90px !important ;
-		margin-left: 55px;
+		width: 117px !important;
+		margin-left: 150rpx;
 	}
-
 </style>

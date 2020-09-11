@@ -31,7 +31,7 @@
 			addRandomDataHot() {
 				this.page = this.page + 1
 				uni.request({
-					url: 'http://192.168.1.15:8008/Ecmartwork/search',
+					url: 'https://wanxiangchengzhen.com/bpi/Ecmartwork/search',
 					method: 'POST',
 					data: {
 						page: this.page,

@@ -1,0 +1,236 @@
+<template>
+	<view class="wrap">
+
+		<!-- <u-mask :show="true" style="width: 375px ; height: 100px;  position: fixed; left: 0; top: 0;z-index: 10;" ></u-mask> -->
+		<view class="cpt-mask"> </view>
+		<swiper :vertical="true" :previous-margin="200" :next-margin="200" :current="onfloor" @change="floorChange" style="width: 100%; height: 100%; ">
+			<swiper-item v-for="(item, floor) in floorList" :key="floor" style="margin-top: 12rpx; height: 224px; ">
+				<u-m-swiper :list="item" :title="true" :circular="false" :autoplay="false" :height="416" :effect3d="true" :isBig="onfloor == floor"
+				 :effect3d-previous-margin="80" @change="columnChange" @click="goPlay" :nowFloor="floor"></u-m-swiper>
+			</swiper-item>
+		</swiper>
+		<view class="cpt-mask-tips-bottom"> </view>
+			<view class="cpt-mask-tips-top"> </view>
+		<u-toast ref="uToast" />
+	</view>
+</template>
+
+<script>
+	import mswiper from '../../components/m-swiper/m-swiper'
+	export default {
+		props:{
+			//需要传递的2个值pkArtworkId 作品id ，pkDetailIds 播放过的节点id数组
+			pkArtworkId:{
+				type: [Number, String],
+				default:110
+			},
+			pkDetailIds: {
+				type: Array,
+				default(){
+					return	[778, 779, 781, 783, 785, 788]
+				}
+			}
+		},
+		components: {
+			mswiper
+		},
+		data() {
+			return {
+				list: [],
+				floorList: [],
+				onfloor: 0,
+				oncolumn: 0,
+				lockFloor: 0,
+				lockColumn: 0
+
+			}
+		},
+
+		onLoad(option) {
+			this.onfloor = this.pkDetailIds.length - 1
+			// console.log(this.onfloor)
+			uni.request({
+				url: 'https://wanxiangchengzhen.com/bpi/Ecmartwork/getArtWorkNodes',
+				method: 'POST',
+				data: {
+					pkArtworkId: this.pkArtworkId
+				},
+				success: res => {
+					// console.log(res.data.data)
+					res.data.data.forEach(node => {
+						this.pkDetailIds.forEach(v => {
+							if (v === node.pkDetailId) {
+								this.setNode(node.brotherNode, v)
+								this.list.push(node.brotherNode)
+								this.floorList.push(node.brotherNode)
+							}
+						})
+					})
+					// this.floorList = this.deepCopy(this.list)
+					this.clearnBrother()
+				}
+			})
+		},
+		methods: {
+			setNode(data, pkNodeId) {
+				for (let i = 0; i < data.length; i++) {
+					data[i].title = data[i].selectTitle
+					data[i].image = data[i].nodeImgUrl
+					data[i].isWatch = false
+					if (pkNodeId === data[i].pkDetailId )  {
+						data[i].isWatch = true
+						data.unshift(data[i])
+						data.splice(i+1, 1)
+					}
+				}
+				return data
+			},
+			columnChange(index, nowFloor) {
+
+				// console.log(index, nowFloor)
+				if (nowFloor == this.onfloor) {
+					this.oncolumn = index
+					this.lockFloor = this.onfloor
+					if (this.isMustClear) {
+						this.isMustClear = !this.isMustClear
+					}
+					if (this.onfloor != this.pkDetailIds.length) {
+						if (index != 0) {
+							this.floorList.splice(this.onfloor + 1, this.floorList.length - this.onfloor - 1)
+						} else {
+							let a = this.floorList.concat(this.list.slice(this.onfloor + 1))
+							this.floorList = a
+							this.clearnBrother()
+						}
+					}
+				} else {
+					// console.log("不应该滑动的楼层")
+				}
+
+			},
+			floorChange(e) {
+				let current = e.detail.current;
+				// this.clearnBrother()	
+				this.floorChangeCount = this.floorChangeCount + 1
+
+				for (let i = 0; i < this.floorList.length; i++) {
+					//原来的楼层
+					if (this.onfloor == i) {
+						if (this.oncolumn == 0) {
+							// this.floorList = this.deepCopy(this.list)
+							this.floorList[i].splice(1, this.floorList[i].length - 1)
+						}
+						if (this.onfloor != this.lockFloor) {
+							this.floorList[i].splice(1, this.floorList[i].length - 1)
+						}
+					}
+					//现楼层操作
+					if (current == i) {
+						let a = this.deepCopy(this.list)
+						this.floorList[i] = a[i]
+					}
+				}
+
+
+				this.onfloor = current
+			},
+			clearnBrother() {
+				// let a = this.deepCopy(this.floorList)
+				this.floorList = this.deepCopy(this.list)
+				for (let i = 0; i < this.floorList.length; i++) {
+					if (this.onfloor != i) {
+						if (this.oncolumn == 0) {
+							// this.floorList = this.deepCopy(this.list)
+							this.floorList[i].splice(1, this.floorList[i].length - 1)
+						} else {
+							// this.floorList =  a
+
+						}
+					}
+				}
+			},
+			deepCopy(o) {
+				return JSON.parse(JSON.stringify(o))
+			},
+			addBrother() {
+
+				for (let i = 0; i < this.floorList.length; i++) {
+					if (this.onfloor != i) {
+						if (this.oncolumn == 0) {
+							this.floorList[i].splice(1, this.floorList[i].length - 1)
+						}
+					}
+				}
+
+			},
+			goPlay(index, nowFloor) {
+				if (nowFloor != this.onfloor) {
+					this.showToast()
+
+				}else{
+
+					let a = this.floorList[nowFloor][index]
+					this.$refs.uToast.show({
+						title: '选中跳转到' + a.selectTitle,
+						type: 'success',
+					})
+					uni.navigateTo({
+						url: "../playArtWork/playArtWork" ,
+					})
+				}
+			},
+			showToast() {
+				this.$refs.uToast.show({
+					title: '请在选中行进行跳转',
+					type: 'error',
+				})
+			}
+
+
+
+		}
+	}
+</script>
+
+<style lang="scss">
+	.wrap {
+		// transform: translateY();
+		width: 100%;
+		height: 100%;
+		position:fixed
+	}
+
+	.cpt-mask {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 400rpx;
+		opacity: 0.5;
+		z-index: 99;
+		// background-color: #000000;
+	}
+
+	.cpt-mask-tips-bottom {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 10rpx;
+		opacity: 0.5;
+		z-index: 99;
+		margin-top: 820rpx;
+		background-color: #909399;
+	}
+	.cpt-mask-tips-top{
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 10rpx;
+		margin-top: 398rpx;
+		opacity: 0.5;
+		z-index: 99;
+		background-color: #909399;
+	}
+</style>

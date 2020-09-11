@@ -128,7 +128,7 @@
 					this.pageHot = this.pageHot + 1
 
 					uni.request({
-						url: 'http://192.168.1.15:8008/Ecmartwork/getFindArtWorks',
+						url: 'https://wanxiangchengzhen.com/bpi/Ecmartwork/getFindArtWorks',
 						method: 'POST',
 						data: {
 							page: this.pageHot,
@@ -157,7 +157,7 @@
 				if (this.current == 1) {
 					this.pageSort = this.pageSort + 1
 					uni.request({
-						url: 'http://192.168.1.15:8008/Ecmartwork/getFindSortArtWorks',
+						url: 'https://wanxiangchengzhen.com/bpi/Ecmartwork/getFindSortArtWorks',
 						method: 'POST',
 						data: {
 							page: this.pageSort,
