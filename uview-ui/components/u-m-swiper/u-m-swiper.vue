@@ -1,13 +1,13 @@
 <template>
 	<view class="u-swiper-wrap" :style="{
-		borderRadius: `${borderRadius}rpx`
-	}">
-		<swiper :current="elCurrent" @change="change" @animationfinish="animationfinish" :interval="interval" :circular="circular"
+		borderRadius: `${borderRadius}rpx`}">
+		
+		<swiper :current="elCurrent" @change="change"  @animationfinish="animationfinish" :interval="interval" :circular="circular"
 		 :duration="duration" :autoplay="autoplay" :previous-margin="effect3d ? effect3dPreviousMargin + 'rpx' : '0'"
 		 :next-margin="effect3d ? effect3dPreviousMargin + 'rpx' : '0'" :style="{
 				height: height + 'rpx'
 			}">
-			<swiper-item class="u-swiper-item" v-for="(item, index) in list" :key="index">
+			<swiper-item class="u-swiper-item" v-for="(item, index) in list" :key="index"  @touchstart="catchTouchMove"  @touchend="catchTouchMove" >
 				<view class="u-list-image-wrap" @tap.stop.prevent="listClick(index)" :class="[uCurrent != index ? 'u-list-scale' : '']"
 				 :style="{
 						borderRadius: `${borderRadius}rpx`,
@@ -26,17 +26,6 @@
 				</view>
 			</swiper-item>
 		</swiper>
-		<!-- 		<view class="u-swiper-indicator" :style="{
-				top: indicatorPos == 'topLeft' || indicatorPos == 'topCenter' || indicatorPos == 'topRight' ? '12rpx' : 'auto',
-				bottom: indicatorPos == 'bottomLeft' || indicatorPos == 'bottomCenter' || indicatorPos == 'bottomRight' ? '12rpx' : 'auto',
-				justifyContent: justifyContent,
-				padding: `0 ${effect3d ? '74rpx' : '24rpx'}`
-			}">
-			<block >
-				<view class="u-indicator-item-rect" :class="{ 'u-indicator-item-rect-active': index == uCurrent }" v-for="(item, index) in list"
-				 :key="index"></view>
-			</block>
-		</view> -->
 	</view>
 </template>
 
@@ -162,13 +151,16 @@
 				}
 			},
 			isBig: {
+				// 是否放大
 				type: Boolean,
 				default: false
 			},
 			nowFloor: {
+				// 现在楼层放大
 				type: Number,
 			},
 			isWatch: {
+				//是否观看过得
 				type: Boolean,
 				default: false
 			}
@@ -230,9 +222,10 @@
 				// this.uCurrent = e.detail.current;
 				// #endif
 			},
-			catchTouchMove() {
-				return false;
-			},
+			catchTouchMove(res){
+				console.log(res)
+			    return false
+			  }
 		}
 	};
 </script>

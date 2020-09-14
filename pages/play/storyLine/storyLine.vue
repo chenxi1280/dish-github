@@ -3,8 +3,9 @@
 
 		<!-- <u-mask :show="true" style="width: 375px ; height: 100px;  position: fixed; left: 0; top: 0;z-index: 10;" ></u-mask> -->
 		<view class="cpt-mask"> </view>
-		<swiper :vertical="true" :previous-margin="200" :next-margin="200" :current="onfloor" @change="floorChange" style="width: 100%; height: 100%; ">
-			<swiper-item v-for="(item, floor) in floorList" :key="floor" style="margin-top: 12rpx; height: 224px; ">
+		<swiper :vertical="true" :previous-margin="200" :next-margin="200" :current="onfloor" @change="floorChange" 
+		style="width: 100%; height: 100%; ">
+			<swiper-item v-for="(item, floor) in floorList" :key="floor" style="margin-top: 12rpx; height: 224px; "  >
 				<u-m-swiper :list="item" :title="true" :circular="false" :autoplay="false" :height="416" :effect3d="true" :isBig="onfloor == floor"
 				 :effect3d-previous-margin="80" @change="columnChange" @click="goPlay" :nowFloor="floor"></u-m-swiper>
 			</swiper-item>
@@ -16,32 +17,30 @@
 </template>
 
 <script>
-	import mswiper from '../../components/m-swiper/m-swiper'
+
 	export default {
 		props:{
 			//需要传递的2个值pkArtworkId 作品id ，pkDetailIds 播放过的节点id数组
 			pkArtworkId:{
 				type: [Number, String],
-				default:110
+				default:113
 			},
 			pkDetailIds: {
 				type: Array,
 				default(){
-					return	[778, 779, 781, 783, 785, 788]
+					return	[887,888,892,897]
 				}
 			}
 		},
-		components: {
-			mswiper
-		},
+
 		data() {
 			return {
 				list: [],
 				floorList: [],
-				onfloor: 0,
-				oncolumn: 0,
-				lockFloor: 0,
-				lockColumn: 0
+				onfloor: 0,	  // 当前楼
+				oncolumn: 0,  // 当前列
+				lockFloor: 0, // 锁定楼层
+				lockColumn: 0 // 锁定列
 
 			}
 		},
@@ -112,7 +111,6 @@
 				let current = e.detail.current;
 				// this.clearnBrother()	
 				this.floorChangeCount = this.floorChangeCount + 1
-
 				for (let i = 0; i < this.floorList.length; i++) {
 					//原来的楼层
 					if (this.onfloor == i) {
@@ -130,17 +128,15 @@
 						this.floorList[i] = a[i]
 					}
 				}
-
-
 				this.onfloor = current
 			},
+			//清除兄弟
 			clearnBrother() {
 				// let a = this.deepCopy(this.floorList)
 				this.floorList = this.deepCopy(this.list)
 				for (let i = 0; i < this.floorList.length; i++) {
 					if (this.onfloor != i) {
 						if (this.oncolumn == 0) {
-							// this.floorList = this.deepCopy(this.list)
 							this.floorList[i].splice(1, this.floorList[i].length - 1)
 						} else {
 							// this.floorList =  a
@@ -149,9 +145,11 @@
 					}
 				}
 			},
+			// 深拷贝 方法
 			deepCopy(o) {
 				return JSON.parse(JSON.stringify(o))
 			},
+			// 增加改楼的 兄弟节点
 			addBrother() {
 
 				for (let i = 0; i < this.floorList.length; i++) {
@@ -175,7 +173,7 @@
 						type: 'success',
 					})
 					uni.navigateTo({
-						url: "../playArtWork/playArtWork" ,
+						url: "../playArtWork/playArtWork?artworkNode="+ floorList[nowFloor][index],
 					})
 				}
 			},
@@ -184,7 +182,8 @@
 					title: '请在选中行进行跳转',
 					type: 'error',
 				})
-			}
+			},
+
 
 
 
