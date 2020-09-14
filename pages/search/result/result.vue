@@ -1,14 +1,17 @@
 <template>
 	<view>
 		<hot :flowList="flowList" :status="loadStatus"></hot>
+		<waterfall :flowList="flowList" :status="loadStatus"></waterfall>
 	</view>
 </template>
 
 <script>
-	import hot from '../../dishover/hot/hot.vue'
+
+	import waterfall from '../waterfall_view/waterfall.vue'
 	export default {
 		components: {
-			hot
+
+			waterfall
 		},
 		data() {
 			return {
@@ -24,14 +27,11 @@
 			this.searchText = option.searchText
 			this.addRandomDataHot()
 		},
-		onReady(){
-			
-		},
 		methods:{
 			addRandomDataHot() {
 				this.page = this.page + 1
 				uni.request({
-					url: 'http://192.168.1.15:8008/Ecmartwork/search',
+					url: 'https://wanxiangchengzhen.com/bpi/Ecmartwork/search',
 					method: 'POST',
 					data: {
 						page: this.page,

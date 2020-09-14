@@ -2,11 +2,11 @@
 	<view class="playBox">
 		<view class="play">
 			<view class="videoBox">
-				<video :src="videoUrl" autoplay="true" direction="0" show-mute-btn="true" 
-				show-fullscreen-btn="false" id="myVideo" enable-play-gesture="true" @ended="videoEnd"></video>
+				<video :src="videoUrl" autoplay="true" direction="0" show-mute-btn="true" show-fullscreen-btn="false" id="myVideo"
+				 enable-play-gesture="true" @ended="videoEnd"></video>
 			</view>
 			<view class="chooseTipsMask16" v-if="chooseTipsShowFlag">
-				<view class="chooseTips" >
+				<view class="chooseTips">
 					<view class="closeBox" @click="closeChooseTips">
 						<icon class="closeIcon"></icon>
 					</view>
@@ -32,7 +32,9 @@
 					</view>
 					<view class="title">故事线</view>
 					<view class="splitLine"></view>
-					<view class="storyLineContent"></view>
+					<view class="storyLineContent">
+						<storyLine :pkArtworkId="artworkId" :pkDetailIds="playedHistoryArray"></storyLine>
+					</view>
 				</view>
 			</view>
 			<view class="reportContentMask16" v-if="reportContentFlag">
@@ -57,8 +59,8 @@
 							</checkbox-group>
 						</view>
 						<view class="uni-textarea">
-							<textarea v-model="textareaContent"/>
-						</view>
+							<textarea v-model="textareaContent" />
+							</view>
 						<view class="uploadBox">
 							<view class="subTitle">上传图片</view>
 							<view class="uploadBtnBox" v-if="uploadBtnFlag" @click="uploadImage">
@@ -80,7 +82,11 @@
 
 <script>
 	import { baseURL } from '../login/config/config.js'
+	import storyLine from './storyLine/storyLine.vue'
 	export default {
+		components:{
+			storyLine
+		},
 		data() {
 			return {
 				//视频路径
@@ -101,7 +107,7 @@
 				uploadBtnFlag: true,
 				//视屏是否播放结束标志 true是未播放结束
 				endFlag: true,
-				artworkId: 113,
+				artworkId: 0,
 				detailId: 0,
 				//播放历史的作品id容器
 				playedHistoryArray: [],
@@ -132,15 +138,29 @@
 				]
 			}
 		},
+		onLoad(option) {
+			this.artworkId = option.pkArtworkId
+			this.pkDetailId = option.pkDetailId
+			console.log(this.pkDetailId )
+		},
 		onReady(){
 			//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
 			this.endFlag = true;
-			let artworkTree = uni.getStorageSync("artworkTree");
-			if(artworkTree == null || typeof(artworkTree) == "undefined" || artworkTree.length == 0){
+			
+			if(this.pkDetailId != null){
 				this.getArtworkTree();
 			}else{
-				//初始化数据
-				this.initPlayData(artworkTree);
+				let artworkTree = uni.getStorageSync("artworkTree");
+				if(artworkTree == null || typeof(artworkTree) == "undefined" || artworkTree.length == 0){
+				this.getArtworkTree();
+				}else{
+					//初始化数据
+					if(artworkTree.fkArtworkId != this.artworkId){
+						this.getArtworkTree();
+					}else{
+						this.initPlayData(artworkTree);
+					}
+				}
 			}
 		},
 		methods: {
@@ -273,6 +293,7 @@
 				this.detailId = artworkTree.pkDetailId;
 				//将播放过的作品的detailId保存下来 playedHistoryArray此数组的最后一个元素为artworkId
 				this.playedHistoryArray.push(artworkTree.pkDetailId);
+				uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
 				//将当前播放的作品的detailId保存在缓存用于举报时确定是哪个具体的作品
 				uni.setStorageSync("detailId",this.detailId);
 				//保存播放过的作品的id
@@ -292,15 +313,19 @@
 			},
 			//异步请求获取作品树
 			async getArtworkTree(){
+				console.log( this.artworkId)
 				await uni.request({
-					url: baseURL + "/wxPlay/playArtWork",
+					// url: baseURL + "/wxPlay/playArtWorkByChildTree",
+					url: "http://192.168.1.15:8008/wxPlay/playArtWorkByChildTree",
 					method: 'POST',
 					dataType: 'json',
 					data: {
-						pkArtworkId: this.artworkId
+						pkArtworkId: this.artworkId,
+						detailId:  this.pkDetailId
 					},
 					success: res=> {
 						if(res.data.status == 200){
+							console.log(res.data.data)
 							uni.setStorageSync("artworkTree",res.data.data);
 							this.initPlayData(res.data.data);
 						}

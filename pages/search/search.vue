@@ -28,7 +28,7 @@
 		onLoad(option) {
 
 			uni.request({
-				url: 'http://192.168.1.15:8008/Ecmartwork/getRankingArtWorks',
+				url: 'https://wanxiangchengzhen.com/bpi/Ecmartwork/getRankingArtWorks',
 				method: 'POST',
 				data: {
 					page: 1,

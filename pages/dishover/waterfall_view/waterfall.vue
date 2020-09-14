@@ -1,7 +1,7 @@
 <template>
-	<view class="wrap" @onReachBottom="addRandomData">
+	<view class="wrap" @onReachBottom="addRandomData" >
 
-		<u-waterfall v-model="flowList" ref="uWaterfall" @onReachBottom="addRandomData">
+		<u-waterfall v-model="flowList" ref="uWaterfall" >
 			<template v-slot:left="{leftList}">
 				<view class="demo-warter" v-for="(item, index) in leftList" :key="index">
 
@@ -110,29 +110,10 @@
 		},
 
 		methods: {
-			addRandomData() {
-
-				this.page = this.page + 1
-				uni.request({
-					url: 'http://192.168.1.15:8008/Ecmartwork/getFindArtWorks',
-					method: 'POST',
-					data: {
-						page: this.page,
-						limit: this.limit
-					},
-					success: res => {
-						console.log(res.data.data)
-						res.data.data.forEach(v => {
-							v.high = 320
-							this.flowList.push(v)
-						})
-					}
-				})
-			},
 			goPlayPage(pkArtworkId) {
 				console.log(pkArtworkId)
 				uni.navigateTo({
-					url: "../playArtWork/playArtWork?pkArtworkId=" + pkArtworkId,
+					url: "../play/play?pkArtworkId=" + pkArtworkId,
 				})
 			},
 			goADPage(adCode) {
