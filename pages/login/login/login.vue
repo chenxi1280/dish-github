@@ -171,7 +171,7 @@
 	      const regPassword = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,16}$/.test(this.password)
 	      // 正则校验
 	      if (!regPassword) {
-			  uni.showToast({
+			uni.showToast({
 				icon: 'none',
 			  	title: '请正确输入密码'
 			  })
@@ -187,7 +187,7 @@
 	      const regPassword = /^[A-Za-z0-9]{4}$/.test(this.verify)
 	      // 正则校验
 	      if (!regPassword) {
-			  uni.showToast({
+			uni.showToast({
 				icon: 'none',
 			  	title: '请正确输入图文验证码'
 			  })
