@@ -239,9 +239,11 @@
 					success: res=> {
 						if(res.data.status == 200){
 							uni.showToast({
+								icon: 'none',
 								title: "举报成功,待管理员审核",
 								position: 'center'
 							})
+							this.reportContentFlag = false;
 						}
 					}
 				})
