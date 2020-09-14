@@ -4,6 +4,8 @@
   "description": "",
   "main": "main.js",
   "dependencies": {
+    "cos-js-sdk-v5": "^0.5.27",
+    "cos-wx-sdk-v5": "^0.7.11",
     "uni-simple-router": "^1.5.5",
     "uview-ui": "file:uview-ui"
   },

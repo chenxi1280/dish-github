@@ -57,7 +57,7 @@
 							</checkbox-group>
 						</view>
 						<view class="uni-textarea">
-							<textarea />
+							<textarea v-model="textareaContent"/>
 						</view>
 						<view class="uploadBox">
 							<view class="subTitle">上传图片</view>
@@ -83,38 +83,57 @@
 	export default {
 		data() {
 			return {
-				videoUrl: "",	
+				//视频路径
+				videoUrl: "",
+				//选项参数
 				option: ["我是选项1","我是选项2","我是选项3","我是选项4"],
+				//选项背景颜色
 				background: ["","","",""],
+				//是否展示选项开关
 				chooseTipsShowFlag: false,
+				//是否展示故事线开关
 				storyLineContentFlag: false,
+				//是否展示举报开关
 				reportContentFlag: false,
+				//上传图片展示开关
 				uploadImageFlag:false,
+				//是否显示上传图片按钮开关
 				uploadBtnFlag: true,
+				//视屏是否播放结束标志 true是未播放结束
 				endFlag: true,
 				artworkId: 113,
 				detailId: 0,
+				//播放历史的作品id容器
 				playedHistoryArray: [],
 				childs: [],
+				//通过tipsArray数组长度控制选项个数
 				tipsArray: [],
+				//举报类型
+				reportType: "",
+				//举报内容
+				textareaContent: "",
+				//云端举报图片url
+				headImage: "",
+				//举报类型选项数组
 				items: [
 					{
-						value: 'tort',
+						value: 1,
 						name: '侵犯版权'
 					},
 					{
-						value: 'illegal',
+						value: 2,
 						name: '出现违规内容',
 						// checked: 'true'
 					},
 					{
-						value: 'other',
+						value: 3,
 						name: '其它'
 					}
 				]
 			}
 		},
 		onReady(){
+			//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
 			this.endFlag = true;
 			let artworkTree = uni.getStorageSync("artworkTree");
 			if(artworkTree == null || typeof(artworkTree) == "undefined" || artworkTree.length == 0){
@@ -125,26 +144,138 @@
 			}
 		},
 		methods: {
+			//上传截图到腾讯云
+			uploadImage(){
+				var COS = require('cos-wx-sdk-v5');
+				let that = this;
+				uni.chooseImage({
+					count: 1,
+					sizeType: ['original'],
+					sourceType: ['album','camera'],
+					success: res=> {
+						uni.showLoading({
+						    title: '加载中',
+							mask: true
+						});
+						uni.request ({
+							url: baseURL + "/artworkMaking/findCosSingature",
+							method: 'POST',
+							success: result=> {
+								// console.log(JSON.parse(res.data.data))
+								const data = JSON.parse(result.data.data);
+								// 创建COS实例  获取签名
+								const cos = new COS({
+									// 必选参数
+									getAuthorization: (options, callback) => {
+									  const obj = {
+										TmpSecretId: data.credentials.tmpSecretId,
+										TmpSecretKey: data.credentials.tmpSecretKey,
+										XCosSecurityToken: data.credentials.sessionToken,
+										StartTime: data.startTime, // 时间戳，单位秒，如：1580000000
+										ExpiredTime: data.expiredTime // 时间戳，单位秒，如：1580000900
+									  }
+									  callback(obj)
+									}
+								});
+								//获取文件路径
+								let filePath = res.tempFilePaths[0];
+								//这里指定上传的文件名
+								let Key = filePath.substr(filePath.lastIndexOf('/')+1);
+								let dateObj = new Date();
+								let timestamp = dateObj.getTime();
+								let nowDate = dateObj.toLocaleDateString();
+								//格式斜杠日期
+								let formatDate = nowDate.replace(/\//g,'-');
+								//cos上定义目录
+								let newKey = formatDate +'/'+timestamp+Key;
+								let tempObj = {};
+								tempObj.imgLocation = 'https://' + 'sike-1259692143'+'.cos.' + 'ap-chongqing' + '.myqcloud.com/'+newKey;//返回上传的绝对 URL
+								//SDK 提供的cos上传函数，如果想批量上传，可以在这里加上for循环。
+								cos.postObject({
+									//存储桶名称
+									Bucket:'sike-1259692143',
+									//地域名字
+									Region:'ap-chongqing',
+									Key:newKey,
+									//本地文件临时地址
+									FilePath:filePath,
+								},function(err,data){
+									if(err){
+									   wx.showModal({
+										  title:'返回错误',
+										  content:'请求失败'+err,
+										  showCancel:false
+									   })
+									}else{
+									   if(data){
+										  // 这里是返回的图片URL
+										  that.headImage = data.headers.Location;
+										  uni.hideLoading();
+									   }
+									}
+								})
+							},
+						})
+					}
+				})
+			},
+			//提交举报
+			async submit(){
+				console.log(this.textareaContent);
+				console.log(this.reportType);
+				console.log(this.headImage);
+				await uni.request ({
+					url: baseURL + "/wxPlay/savaReportInfo",
+					method: 'POST',
+					dataType: 'json',
+					data: {
+						imgUrl: this.headImage,
+						content: this.textareaContent,
+						reportStatue: this.reportType,
+						fkUserid: uni.getStorageSync("userId"),
+						fkArtworkNodeId: uni.getStorageSync("detailId"),
+						fkArtworkId: this.artworkId
+					},
+					success: res=> {
+						if(res.data.status == 200){
+							uni.showToast({
+								icon: 'none',
+								title: "举报成功,待管理员审核",
+								position: 'center'
+							})
+							this.reportContentFlag = false;
+						}
+					}
+				})
+			},
+			//举报页面复选框
 			checkboxChange(e) {
 				var items = this.items,
 					values = e.detail.value;
-					//那用户最后点击的那个checkbox 实现单选
+				//那用户最后点击的那个checkbox 实现单选
 				const value = values[values.length-1];
+				//避免用户单次数的点击导致values为空
 				if(!value){return;}
 				for (var i = 0, lenI = items.length; i < lenI; ++i) {
 					const item = items[i]
 					if(value.includes(item.value)){
 						this.$set(item,'checked',true)
+						this.reportType = item.value;
 					}else{
 						this.$set(item,'checked',false)
 					}
 				}
 			},
+			//视频播放初始化保存播放记录  将作品detailId留存提供给故事线
 			initPlayData(artworkTree){
 				//初始化视频及选项
 				this.videoUrl = artworkTree.videoUrl;
 				this.detailId = artworkTree.pkDetailId;
+				//将播放过的作品的detailId保存下来 playedHistoryArray此数组的最后一个元素为artworkId
 				this.playedHistoryArray.push(artworkTree.pkDetailId);
+				//将当前播放的作品的detailId保存在缓存用于举报时确定是哪个具体的作品
+				uni.setStorageSync("detailId",this.detailId);
+				//保存播放过的作品的id
 				this.savaPlayRecord();
 				let childs = artworkTree.childs;
 				if(childs){
@@ -155,10 +286,11 @@
 					}
 					console.log(this.childs);
 				}else{
-					//控制视频播放结束是否弹框的标志
+					//是不是最后一个视频标志 最后一个视频不需要弹窗
 					this.endFlag = false;
 				}
 			},
+			//异步请求获取作品树
 			async getArtworkTree(){
 				await uni.request({
 					url: baseURL + "/wxPlay/playArtWork",
@@ -168,11 +300,14 @@
 						pkArtworkId: this.artworkId
 					},
 					success: res=> {
-						uni.setStorageSync("artworkTree",res.data.data);
-						this.initPlayData(res.data.data);
+						if(res.data.status == 200){
+							uni.setStorageSync("artworkTree",res.data.data);
+							this.initPlayData(res.data.data);
+						}
 					}
 				})
 			},
+			//异步请求保存播放记录
 			async savaPlayRecord(){
 				await uni.request({
 					url: baseURL + "/wxPlay/savaPlayRecord",
@@ -190,7 +325,9 @@
 					}
 				})
 			},
+			//开关控制是否展示 选项框 故事线 举报页面
 			videoEnd(){
+				//根据是否是最后一个视频标志 判断是否弹窗
 				if(this.endFlag){
 					this.chooseTipsShowFlag = true;
 				}else{
@@ -203,6 +340,7 @@
 			showReportContent(){
 				this.reportContentFlag = true
 			},
+			//触摸start事件
 			changeBackground(index){
 				switch(index){
 					case 0: {
@@ -223,6 +361,7 @@
 					}
 				}
 			},
+			//触摸end事件
 			rebackBackground(index){
 				switch(index){
 					case 0: {
@@ -251,6 +390,7 @@
 					}
 				}
 			},
+			//关闭按钮触发事件
 			closeChooseTips(){
 				this.chooseTipsShowFlag = false
 			},
