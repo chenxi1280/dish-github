@@ -113,7 +113,7 @@
 			goPlayPage(pkArtworkId) {
 				console.log(pkArtworkId)
 				uni.navigateTo({
-					url: "../../playArtWork/playArtWork?pkArtworkId=" + pkArtworkId ,
+					url: "../play/play?pkArtworkId=" + pkArtworkId,
 				})
 			},
 			goADPage(adCode) {

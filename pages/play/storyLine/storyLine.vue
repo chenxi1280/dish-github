@@ -6,17 +6,18 @@
 		<swiper :vertical="true" :previous-margin="200" :next-margin="200" :current="onfloor" @change="floorChange" 
 		style="width: 100%; height: 100%; ">
 			<swiper-item v-for="(item, floor) in floorList" :key="floor" style="margin-top: 12rpx; height: 224px; "  >
-				<u-m-swiper :list="item" :title="true" :circular="false" :autoplay="false" :height="416" :effect3d="true" :isBig="onfloor == floor"
-				 :effect3d-previous-margin="80" @change="columnChange" @click="goPlay" :nowFloor="floor"></u-m-swiper>
+				<mswiper :list="item" :title="true" :circular="false" :autoplay="false" :height="416" :effect3d="true" :isBig="onfloor == floor"
+				 :effect3d-previous-margin="80" @change="columnChange" @click="goPlay" :nowFloor="floor"></mswiper>
 			</swiper-item>
 		</swiper>
 		<view class="cpt-mask-tips-bottom"> </view>
-			<view class="cpt-mask-tips-top"> </view>
+		<view class="cpt-mask-tips-top"> </view>
 		<u-toast ref="uToast" />
 	</view>
 </template>
 
 <script>
+	import mswiper from '../../../components/m-swiper/m-swiper'
 
 	export default {
 		props:{
@@ -32,12 +33,14 @@
 				}
 			}
 		},
-
+		components:{
+			mswiper
+		},
 		data() {
 			return {
 				list: [],
 				floorList: [],
-				onfloor: 0,	  // 当前楼
+				onfloor: 5,	  // 当前楼
 				oncolumn: 0,  // 当前列
 				lockFloor: 0, // 锁定楼层
 				lockColumn: 0 // 锁定列
@@ -45,9 +48,11 @@
 			}
 		},
 
-		onLoad(option) {
+		onReady(option) {
+
 			this.onfloor = this.pkDetailIds.length - 1
-			// console.log(this.onfloor)
+			console.log(this.pkDetailIds)
+
 			uni.request({
 				url: 'https://wanxiangchengzhen.com/bpi/Ecmartwork/getArtWorkNodes',
 				method: 'POST',
@@ -67,6 +72,7 @@
 					})
 					// this.floorList = this.deepCopy(this.list)
 					this.clearnBrother()
+
 				}
 			})
 		},
@@ -85,7 +91,6 @@
 				return data
 			},
 			columnChange(index, nowFloor) {
-
 				// console.log(index, nowFloor)
 				if (nowFloor == this.onfloor) {
 					this.oncolumn = index
@@ -166,14 +171,22 @@
 					this.showToast()
 
 				}else{
-
+					uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
+					let b = uni.getStorageSync("pkDetailIds")
 					let a = this.floorList[nowFloor][index]
+					// 父节点跳转
+					// for(let i= 0 ;i<b.length;i++){
+					// 	if(b[i] == a.pkDetailId){
+							
+					// 	}
+						
+					// }
 					this.$refs.uToast.show({
-						title: '选中跳转到' + a.selectTitle,
+						title: '选中跳转到' + a.selectTitle +a.pkDetailId,
 						type: 'success',
 					})
 					uni.navigateTo({
-						url: "../playArtWork/playArtWork?artworkNode="+ floorList[nowFloor][index],
+						url: "../play/play?pkArtworkId=" + this.pkArtworkId +"&pkDetailId=" + a.pkDetailId,
 					})
 				}
 			},
@@ -183,10 +196,6 @@
 					type: 'error',
 				})
 			},
-
-
-
-
 		}
 	}
 </script>
@@ -207,6 +216,7 @@
 		height: 400rpx;
 		opacity: 0.5;
 		z-index: 99;
+		margin-top: 100rpx;
 		// background-color: #000000;
 	}
 
@@ -218,8 +228,8 @@
 		height: 10rpx;
 		opacity: 0.5;
 		z-index: 99;
-		margin-top: 820rpx;
-		background-color: #909399;
+		margin-top: 930rpx;
+		background-color: 	#E1FFFF;
 	}
 	.cpt-mask-tips-top{
 		position: fixed;
@@ -227,9 +237,9 @@
 		left: 0;
 		width: 100%;
 		height: 10rpx;
-		margin-top: 398rpx;
+		margin-top: 500rpx;
 		opacity: 0.5;
 		z-index: 99;
-		background-color: #909399;
+		background-color: 	#E1FFFF;
 	}
 </style>
