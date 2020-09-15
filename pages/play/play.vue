@@ -141,30 +141,44 @@
 		onLoad(option) {
 			this.artworkId = option.pkArtworkId
 			this.pkDetailId = option.pkDetailId
-			console.log(this.pkDetailId )
+			this.detailId = null;
+			uni.setStorageSync("detailId",this.detailId);
 		},
 		onReady(){
 			//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
 			this.endFlag = true;
-			
+
 			if(this.pkDetailId != null){
 				this.getArtworkTree();
 				this.playedHistoryArray = uni.getStorageSync("pkDetailIds")
 			}else{
-				let artworkTree = uni.getStorageSync("artworkTree");
-				if(artworkTree == null || typeof(artworkTree) == "undefined" || artworkTree.length == 0){
 				this.getArtworkTree();
-				}else{
-					//初始化数据
-					if(artworkTree.fkArtworkId != this.artworkId){
-						
-						this.detailId = null;
-						this.getArtworkTree();
-					}else{
-						this.initPlayData(artworkTree);
-					}
-				}
+				
+				// let artworkTree = uni.getStorageSync("artworkTree");
+				// if(artworkTree == null || typeof(artworkTree) == "undefined" || artworkTree.length == 0){
+				// 	this.getArtworkTree();
+				// 	console.log(2.1)
+				// }else{
+				// 	console.log(2.2)
+				// 	//初始化数据
+				// 	if(artworkTree.fkArtworkId != this.artworkId){
+				// 		console.log(3.1)
+				// 		this.getArtworkTree();
+				// 	}else{
+				// 		console.log(3.2)
+				// 		this.initPlayData(artworkTree);
+				// 	}
+				// }
 			}
+		},
+		onBackPress(){
+			console.log(111)
+		},
+		onUnload(){
+			
+			uni.navigateBack({
+			    delta: 1
+			});
 		},
 		methods: {
 			//上传截图到腾讯云
