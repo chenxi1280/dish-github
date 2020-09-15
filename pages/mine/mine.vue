@@ -28,8 +28,11 @@
 					</view>
 				</view>
 				<view class="mid">
-					<view class="loginBtn">
+					<view class="loginBtn" v-if="unLoginedFlag">
 						<a @click="toLoginPage">登录四刻互动账号</a>
+					</view>
+					<view class="logined" v-if="loginedFlag">
+						<text>已登录</text>
 					</view>
 				</view>
 				<u-subsection :list="items" :current="current" @change="sectionChange"></u-subsection>
@@ -64,7 +67,9 @@
 				userName: '',
 				scrollTop: 0,
 				userFlag: false,
-				wxUserFlag: true
+				wxUserFlag: true,
+				unLoginedFlag: true,
+				loginedFlag: false
 			}
 		},
 		components: {
@@ -75,6 +80,8 @@
 			this.current = uni.getStorageSync("mine_current")
 			let token = uni.getStorageSync("token");
 			if(token != null && typeof(token) != "undefined" && token.length != 0){
+				this.loginedFlag = true;
+				this.unLoginedFlag = false;
 				console.log("我去发请求")
 				this.getMineInfo();
 			}
@@ -209,6 +216,10 @@
 			.mid{
 				margin: 40rpx 0 20rpx 0;
 				.loginBtn{
+					text-align: center;
+					font-size: 30rpx;
+				}
+				.logined{
 					text-align: center;
 					font-size: 30rpx;
 				}

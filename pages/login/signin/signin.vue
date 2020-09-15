@@ -97,6 +97,11 @@
 			// 获取验证码
 			this.getTextVerify()
 		},
+		onUnload() {
+			uni.navigateBack({
+				url: "../login/login"
+			})
+		},
 		computed: {
 			isShowVerify: (that) => {
 				if (that.times === 59) {
