@@ -149,6 +149,7 @@
 			
 			if(this.pkDetailId != null){
 				this.getArtworkTree();
+				this.playedHistoryArray = uni.getStorageSync("pkDetailIds")
 			}else{
 				let artworkTree = uni.getStorageSync("artworkTree");
 				if(artworkTree == null || typeof(artworkTree) == "undefined" || artworkTree.length == 0){
@@ -156,6 +157,8 @@
 				}else{
 					//初始化数据
 					if(artworkTree.fkArtworkId != this.artworkId){
+						
+						this.detailId = null;
 						this.getArtworkTree();
 					}else{
 						this.initPlayData(artworkTree);
@@ -292,6 +295,7 @@
 				this.videoUrl = artworkTree.videoUrl;
 				this.detailId = artworkTree.pkDetailId;
 				//将播放过的作品的detailId保存下来 playedHistoryArray此数组的最后一个元素为artworkId
+
 				this.playedHistoryArray.push(artworkTree.pkDetailId);
 				uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
 				//将当前播放的作品的detailId保存在缓存用于举报时确定是哪个具体的作品

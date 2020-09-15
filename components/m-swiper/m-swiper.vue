@@ -223,7 +223,7 @@
 				// #endif
 			},
 			catchTouchMove(res){
-				console.log(res)
+			
 			    return false
 			  }
 		}
