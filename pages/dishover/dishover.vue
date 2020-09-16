@@ -3,7 +3,7 @@
 
 		<view class="search_view" @click="go_search_page">
 			<icon class="search_icon"></icon>
-			<input class="search_input" type="" placeholder=" 查找你想看的视频" />
+			<input class="search_input" type="" placeholder=" 查找你想看的视频" disabled="" />
 
 		</view>
 		<!-- <view @click="go_search_page">	<u-search :show-action="false" action-text="搜索"  ></u-search></view> -->

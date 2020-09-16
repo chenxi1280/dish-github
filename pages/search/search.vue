@@ -50,7 +50,7 @@
 		methods: {
 			goPlayPage(pkArtworkId) {
 				uni.navigateTo({
-					url: "../playArtWork/playArtWork?pkArtworkId=" + pkArtworkId,
+					url: "../play/play?pkArtworkId=" + pkArtworkId,
 				})
 			},
 			searchEvent() {

@@ -3,8 +3,8 @@
 
 		<!-- <u-mask :show="true" style="width: 375px ; height: 100px;  position: fixed; left: 0; top: 0;z-index: 10;" ></u-mask> -->
 		<view class="cpt-mask"> </view>
-		<swiper :vertical="true" :previous-margin="200" :next-margin="200" :current="onfloor" @change="floorChange" 
-		style="width: 100%; height: 100%; ">
+		<swiper :vertical="true" :previous-margin="'170'" :next-margin="'280'" :current="onfloor" @change="floorChange" 
+		style="width: 100%; height: 650px; ">
 			<swiper-item v-for="(item, floor) in floorList" :key="floor" style="margin-top: 12rpx; height: 224px; "  >
 				<mswiper :list="item" :title="true" :circular="false" :autoplay="false" :height="416" :effect3d="true" :isBig="onfloor == floor"
 				 :effect3d-previous-margin="80" @change="columnChange" @click="goPlay" :nowFloor="floor"></mswiper>
@@ -171,16 +171,19 @@
 					this.showToast()
 
 				}else{
-					uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
+					// uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
 					let b = uni.getStorageSync("pkDetailIds")
 					let a = this.floorList[nowFloor][index]
+					let c = this.floorList[nowFloor][0]
+		
 					// 父节点跳转
-					// for(let i= 0 ;i<b.length;i++){
-					// 	if(b[i] == a.pkDetailId){
-							
-					// 	}
-						
-					// }
+					for(let i= 0 ;i<b.length;i++){
+						if(b[i] == c.pkDetailId){
+							b.splice(i)
+						}
+					}
+
+					uni.setStorageSync("pkDetailIds",b);
 					this.$refs.uToast.show({
 						title: '选中跳转到' + a.selectTitle +a.pkDetailId,
 						type: 'success',
@@ -228,7 +231,7 @@
 		height: 10rpx;
 		opacity: 0.5;
 		z-index: 99;
-		margin-top: 930rpx;
+		margin-top: 890rpx;
 		background-color: 	#E1FFFF;
 	}
 	.cpt-mask-tips-top{
@@ -237,7 +240,7 @@
 		left: 0;
 		width: 100%;
 		height: 10rpx;
-		margin-top: 500rpx;
+		margin-top: 440rpx;
 		opacity: 0.5;
 		z-index: 99;
 		background-color: 	#E1FFFF;
