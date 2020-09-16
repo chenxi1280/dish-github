@@ -2,11 +2,13 @@
 	"easycom": {
 		"^u-(.*)": "@/uview-ui/components/u-$1/u-$1.vue"
 	},
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
-				
-				// {
-				// 	"path": "pages/play/storyLine/storyLine"
-				// },
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages	
+	{
+		"path": "pages/mine/mine",
+		"style": {
+			"navigationBarTitleText": "我的"
+		}
+	},
 				{
 					"path": "pages/dishover/dishover",
 					"style": {
@@ -20,12 +22,12 @@
 				{
 					"path": "pages/play/play"
 				},
-				{
+				/* {
 					"path": "pages/mine/mine",
 					"style": {
 						"navigationBarTitleText": "我的"
 					}
-				},
+				}, */
 				{
 					"path": "pages/search/search",
 					"style": {
@@ -47,7 +49,7 @@
 				{
 					"path": "pages/login/login/login",
 					"style": {}
-				}, 
+				},
 				{
 					"path": "pages/login/signin/signin",
 					"style": {}

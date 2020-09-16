@@ -6,29 +6,42 @@
 			</view>
 			<view class="signin_redirect_btn" @click="toSigninPage">注册</view>
 		</view>
+		 <!-- #ifdef MP-WEIXIN -->
 		<view class="bottom">
 			<view class="phoneBox" :style="{'border': phoneBoxBorder}">
 				<icon class="phoneIcon"></icon>
-				<input @blur="onblurPhone" class="acount" type="text" v-model.trim="phone" placeholder="输入手机号"/>
+				<input v-on:blur="onblurPhone" class="acount" type="text" v-model.trim="phone" placeholder="输入手机号"/>
 			</view>
 			<view class="pwdBox" :style="{'border': pwdBoxBorder}">
 				<icon  class="pwdIcon"></icon>
-				<input class="pwd" @blur="onblurPassword" v-model.trim="password" password placeholder="密码"/>
+				<input class="pwd" v-on:blur="onblurPassword" v-model.trim="password" password placeholder="密码"/>
 			</view>
 			<view class="codeBox">
 				<view class="code" :style="{'border': codeBoxBorder}">
-					<input @blur="onblurVerfiy" onKeyUp="value=value.replace(/[\W]/g,'')" v-model.trim="verify" />
+					<input v-on:blur="onblurVerfiy" onKeyUp="value=value.replace(/[\W]/g,'')" v-model.trim="verify" />
 				</view>
 				<view class="codeImage" @click="getTextVerify">
 					<img :src="'data:image/jpeg;base64,'+imgSrc">
 				</view>
 			</view>
 			<button class="login" type="default" plain="true" @click="login">登录</button>
+			<view class="forgetPwdBox" @click="showLinkAddress">
+				<view class="forgetPwd">忘记密码</view>
+			</view>
 		</view>
+		<view class="component">
+			<my-dialog message="密码修改链接：https://wanxiangchengzhen.com/ivetool/#/login/password"
+					  confirmContext="复制"
+					  concelContext="取消"
+					  @confirm="confirm" ></my-dialog>
+		</view>
+		<!-- #endif -->
 	</view>
 </template>
 <script>
 	import { baseURL } from '../config/config.js'
+	import myDialog from '../../../components/dialog/myDialog.vue'
+	import {globalBus} from '../../../common/js/util.js'
 	
 	export default {
 	  data () {
@@ -44,10 +57,27 @@
 		  codeBoxBorder: ''
 	    }
 	  },
+	  components: {
+	  		myDialog
+	  },
 	  onLoad () {
 	    this.getTextVerify()
 	  },
 	  methods: {
+		showLinkAddress(){
+			globalBus.$emit('deliver',true)
+		},
+		confirm(param){
+			uni.setClipboardData({
+			        data: 'https://wanxiangchengzhen.com/ivetool/#/login/password',
+			        success: res=> {
+						uni.showToast({
+							icon: 'none',
+							title:'复制成功'
+						})
+			        }
+			    });
+		},
 	    // 登录功能
 	    async login () {
 	      // 请求前的预校验
@@ -84,7 +114,7 @@
 				},
 				success: res=> {
 					if (res.data.status === 200) {
-						console.log(res)
+						// console.log(res)
 						uni.setStorageSync('token', res.data.data)
 						uni.showToast({
 								title: '登录成功'
@@ -135,7 +165,7 @@
 	    },
 	    // 前往注册页面
 	    toSigninPage () {
-	    	uni.redirectTo({
+	    	uni.navigateTo({
 	    		url: "../signin/signin"
 	    	})
 	    },
@@ -304,6 +334,22 @@
 				width: 670rpx;
 				margin: 0 auto;
 				margin-top: 50rpx;
+			}
+			.forgetPwdBox{
+				margin: 0 auto;
+				margin-top: 20rpx;
+				width: 670rpx;
+				height: 50rpx;
+				.forgetPwd{
+					line-height: 50rpx;
+					text-align: center;
+				}
+				.popup-box{
+					border: 2rpx solid black;
+					background-color: white;
+					width: 400rpx;
+					height: 300rpx;
+				}
 			}
 		}
 	}

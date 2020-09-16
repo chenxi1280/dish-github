@@ -97,11 +97,6 @@
 			// 获取验证码
 			this.getTextVerify()
 		},
-		onUnload() {
-			uni.navigateBack({
-				url: "../login/login"
-			})
-		},
 		computed: {
 			isShowVerify: (that) => {
 				if (that.times === 59) {
@@ -162,7 +157,7 @@
 								this.isPassword = ''
 								this.verify_phone = ''
 								setTimeout(function() {
-									uni.reLaunch({
+									uni.redirectTo({
 										animationDuration: 5000,
 										url: "../login/login"
 									})
