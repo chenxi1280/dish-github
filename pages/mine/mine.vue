@@ -4,8 +4,11 @@
 			<view class="top_box">
 				<view class="top">
 					<view class="author_box" v-if="userFlag">
-						<view class = "avatarUrl">
+						<view class = "avatarUrl" v-if="realFlag">
 							<image :src="image" ></image>
+						</view>
+						<view class = "unreal"  v-if="unrealFlag">
+							<text>没有头像</text>
 						</view>
 						<view class="userinfo">
 							<view class="userName">
@@ -66,8 +69,14 @@
 				image: '',
 				userName: '',
 				scrollTop: 0,
+				//用户未上传头像开关
+				realFlag: false,
+				unrealFlag: true,
+				//展示用户头像开关
 				userFlag: false,
+				//展示游客头像开关
 				wxUserFlag: true,
+				//是否登录开关
 				unLoginedFlag: true,
 				loginedFlag: false
 			}
@@ -124,8 +133,15 @@
 						if(res.data.status == 200){
 							this.userName = res.data.data.username
 							this.image = res.data.data.userLogoUrl
-							this.wxUserFlag = false
-							this.userFlag = true
+							if(this.image){
+								this.wxUserFlag = false
+								this.realFlag = true
+								this.userFlag = true
+								this.unrealFlag = false
+							}else{
+								this.wxUserFlag = false
+								this.userFlag = true
+							}
 						}
 					}
 				})
@@ -158,6 +174,17 @@
 							border-radius: 50%;
 							width: 100%;
 							height: 100%;
+						}
+					}
+					.unreal{
+						width: 200rpx;
+						height: 200rpx;
+						margin: 10rpx;
+						border: 2rpx solid black;
+						border-radius: 50%;
+						text-align: center;
+						text{
+							line-height: 200rpx;
 						}
 					}
 					.userinfo{
