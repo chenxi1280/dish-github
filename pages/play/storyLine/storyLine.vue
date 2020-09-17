@@ -3,9 +3,8 @@
 
 		<!-- <u-mask :show="true" style="width: 375px ; height: 100px;  position: fixed; left: 0; top: 0;z-index: 10;" ></u-mask> -->
 		<view class="cpt-mask"> </view>
-		<swiper :vertical="true" :previous-margin="'170'" :next-margin="'280'" :current="onfloor" @change="floorChange" 
-		style="width: 100%; height: 650px; ">
-			<swiper-item v-for="(item, floor) in floorList" :key="floor" style="margin-top: 12rpx; height: 224px; "  >
+		<swiper :vertical="true" :previous-margin="'170'" :next-margin="'280'" :current="onfloor" @change="floorChange" style="width: 100%; height: 650px; ">
+			<swiper-item v-for="(item, floor) in floorList" :key="floor" style="margin-top: 12rpx; height: 224px; ">
 				<mswiper :list="item" :title="true" :circular="false" :autoplay="false" :height="416" :effect3d="true" :isBig="onfloor == floor"
 				 :effect3d-previous-margin="80" @change="columnChange" @click="goPlay" :nowFloor="floor"></mswiper>
 			</swiper-item>
@@ -20,28 +19,28 @@
 	import mswiper from '../../../components/m-swiper/m-swiper'
 
 	export default {
-		props:{
+		props: {
 			//需要传递的2个值pkArtworkId 作品id ，pkDetailIds 播放过的节点id数组
-			pkArtworkId:{
+			pkArtworkId: {
 				type: [Number, String],
-				default:113
+				default: 113
 			},
 			pkDetailIds: {
 				type: Array,
-				default(){
-					return	[887,888,892,897]
+				default () {
+					return [887, 888, 892, 897]
 				}
 			}
 		},
-		components:{
+		components: {
 			mswiper
 		},
 		data() {
 			return {
 				list: [],
 				floorList: [],
-				onfloor: 5,	  // 当前楼
-				oncolumn: 0,  // 当前列
+				onfloor: 5, // 当前楼
+				oncolumn: 0, // 当前列
 				lockFloor: 0, // 锁定楼层
 				lockColumn: 0 // 锁定列
 
@@ -49,10 +48,7 @@
 		},
 
 		onReady(option) {
-
 			this.onfloor = this.pkDetailIds.length - 1
-			console.log(this.pkDetailIds)
-
 			uni.request({
 				url: 'https://wanxiangchengzhen.com/bpi/Ecmartwork/getArtWorkNodes',
 				// url: 'http://192.168.1.15:8008/Ecmartwork/getArtWorkNodes',
@@ -71,9 +67,7 @@
 							}
 						})
 					})
-					// this.floorList = this.deepCopy(this.list)
 					this.clearnBrother()
-
 				}
 			})
 		},
@@ -83,10 +77,10 @@
 					data[i].title = data[i].selectTitle
 					data[i].image = data[i].nodeImgUrl
 					data[i].isWatch = false
-					if (pkNodeId === data[i].pkDetailId )  {
+					if (pkNodeId === data[i].pkDetailId) {
 						data[i].isWatch = true
 						data.unshift(data[i])
-						data.splice(i+1, 1)
+						data.splice(i + 1, 1)
 					}
 				}
 				return data
@@ -165,38 +159,33 @@
 						}
 					}
 				}
-
 			},
 			goPlay(index, nowFloor) {
-				if (nowFloor != this.onfloor) {
-					this.showToast()
-
-				}else{
-					// uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
+				if (nowFloor == this.onfloor && index == this.oncolumn) {
 					let b = uni.getStorageSync("pkDetailIds")
 					let a = this.floorList[nowFloor][index]
 					let c = this.floorList[nowFloor][0]
-		
 					// 父节点跳转
-					for(let i= 0 ;i<b.length;i++){
-						if(b[i] == c.pkDetailId){
+					for (let i = 0; i < b.length; i++) {
+						if (b[i] == c.pkDetailId) {
 							b.splice(i)
 						}
 					}
-
-					uni.setStorageSync("pkDetailIds",b);
+					uni.setStorageSync("pkDetailIds", b);
 					this.$refs.uToast.show({
-						title: '选中跳转到' + a.selectTitle +a.pkDetailId,
+						title: '选中跳转到' + a.selectTitle + a.pkDetailId,
 						type: 'success',
 					})
 					uni.navigateTo({
-						url: "../play/play?pkArtworkId=" + this.pkArtworkId +"&pkDetailId=" + a.pkDetailId,
+						url: "../play/play?pkArtworkId=" + this.pkArtworkId + "&pkDetailId=" + a.pkDetailId,
 					})
+				} else {
+					this.showToast()
 				}
 			},
 			showToast() {
 				this.$refs.uToast.show({
-					title: '请在选中行进行跳转',
+					title: '请在选择中心位进行跳转',
 					type: 'error',
 				})
 			},
@@ -209,7 +198,7 @@
 		// transform: translateY();
 		width: 100%;
 		height: 100%;
-		position:fixed
+		position: fixed
 	}
 
 	.cpt-mask {
@@ -233,9 +222,10 @@
 		opacity: 0.5;
 		z-index: 99;
 		margin-top: 890rpx;
-		background-color: 	#E1FFFF;
+		background-color: #E1FFFF;
 	}
-	.cpt-mask-tips-top{
+
+	.cpt-mask-tips-top {
 		position: fixed;
 		top: 0;
 		left: 0;
@@ -244,6 +234,6 @@
 		margin-top: 440rpx;
 		opacity: 0.5;
 		z-index: 99;
-		background-color: 	#E1FFFF;
+		background-color: #E1FFFF;
 	}
 </style>
