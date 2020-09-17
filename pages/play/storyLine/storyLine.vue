@@ -55,6 +55,7 @@
 
 			uni.request({
 				url: 'https://wanxiangchengzhen.com/bpi/Ecmartwork/getArtWorkNodes',
+				// url: 'http://192.168.1.15:8008/Ecmartwork/getArtWorkNodes',
 				method: 'POST',
 				data: {
 					pkArtworkId: this.pkArtworkId
