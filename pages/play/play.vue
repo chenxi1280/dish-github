@@ -1,7 +1,7 @@
 <template>
 	<view class="playBox">
 		<view class="play">
-			<view class="videoBox">
+			<view class="videoBox" @click="showButton">
 				<video :src="videoUrl" autoplay="true" direction="0" show-mute-btn="true" show-fullscreen-btn="false" id="myVideo"
 				 enable-play-gesture="true" @ended="videoEnd"></video>
 			</view>
@@ -19,11 +19,13 @@
 					</view>
 				</view>
 			</view>
+			<view v-if="hiddenBtnFlag">
+				<view class="reportBox" @click="showReportContent">
+					<view class="report">举报</view>
+				</view>
+			</view>
 			<view class="storyLineBox" @click="showStoryLineContent">
 				<view class="storyLine">故事线</view>
-			</view>
-			<view class="reportBox" @click="showReportContent">
-				<view class="report">举报</view>
 			</view>
 			<view class="storyLineContentMask16" v-if="storyLineContentFlag">
 				<view class="storyLineContentBox">
@@ -95,6 +97,8 @@
 				option: ["我是选项1","我是选项2","我是选项3","我是选项4"],
 				//选项背景颜色
 				background: ["","","",""],
+				//隐藏按钮开关
+				hiddenBtnFlag: false,
 				//是否展示选项开关
 				chooseTipsShowFlag: false,
 				//是否展示故事线开关
@@ -181,6 +185,16 @@
 			});
 		},
 		methods: {
+			showButton(){
+				this.hiddenBtnFlag = !this.hiddenBtnFlag;
+				if(this.hiddenBtnFlag){
+					setTimeout(() => {
+						this.hiddenBtnFlag = false;
+						console.log(this.hiddenBtnFlag)
+					}, 5000);
+				}
+				clearTimeout();
+			},
 			//上传截图到腾讯云
 			uploadImage(){
 				var COS = require('cos-wx-sdk-v5');
@@ -333,8 +347,7 @@
 			async getArtworkTree(){
 				console.log( this.artworkId)
 				await uni.request({
-					// url: baseURL + "/wxPlay/playArtWorkByChildTree",
-					url: "http://192.168.1.15:8008/wxPlay/playArtWorkByChildTree",
+					url: baseURL + "/wxPlay/playArtWorkByChildTree",
 					method: 'POST',
 					dataType: 'json',
 					data: {
@@ -468,9 +481,10 @@
 				.chooseTipsMask16{
 					background-color: rgba(255,255,255,.9);
 					position: fixed;
-					left: 10%;
+					left: 0;
 					top: 50%;
-					width: 80%;
+					transform: translateY(-50%);
+					width: 100%;
 					height: 38%;
 					z-index: 16;
 					.chooseTips{

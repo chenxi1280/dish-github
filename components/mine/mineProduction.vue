@@ -1,92 +1,94 @@
 <template>
 	<view>
-		<view v-if="localFlag" class="tips" >
-			<view class="work_publish" v-if="publish_flag">
-				<button class="btn_publish" @click="publishArtWork">发布作品</button>
-				<view class="line"></view>
-			</view>
-			<view class="work_code" v-if="code_flag">
-				<button class="btn_code"  @click="getArtWorkCode">作品二维码</button>
-				<view class="line"></view>
-			</view>
-			<view class="work_delete">
-				<button class="btn_delete" @click="deleteArtWorkCode">删除</button>
-			</view>
-		</view>
-		<view class="icon_box" @click="showTips">
-			<icon class="more_icon"></icon>
-		</view>
-		<view class="demo-img-wrap">
-			<image class="demo-image" :src="image" mode="widthFix" ></image>
-		</view>
-		<view class="padding_box">
-			<view class="work_info">
-				<view class="demo-title">
-					{{title}}
-				</view>
-				<view class="hot_box">
-					<view class="hot_icon_box">
-						<icon></icon>
-					</view>
-					<view class="demo-price">{{broadcastCount}}</view>
-				</view>
-			</view>
-		</view>
-		<view class="mask15" v-if="localFlag" @click="hiddenTips15"></view>
-		<view class="mask17" v-if="codeFlag" @click="hiddenTips17"></view>
 		<view>
-			<u-modal v-model="publishShow" 
-					:title-style="{color: 'black'}" 
-					show-cancel-button="true" 
-					title="发布作品" 
-					:cancel-style="{background: '#B5B5B5'}"
-					confirm-text="复制链接"
-					:confirm-style="{background: '#F08080'}"
-					cancel-color="white"
-					confirm-color="white"
-					:content-style="{'word-wrap': 'break-word', 
-									'word-break': 'break-all',
-									'white-space': 'pre-line',
-									'text-align': 'center',
-									'margin': '5% 5%'}"
-					@confirm="publishLink">
-				<view class="slot-content">
-					<rich-text :nodes="publishContent"></rich-text>
+			<view v-if="localFlag" class="tips" >
+				<view class="work_publish" v-if="publish_flag">
+					<button class="btn_publish" @click="publishArtWork">发布作品</button>
+					<view class="line"></view>
 				</view>
-			</u-modal>
-			<u-modal v-model="deleteShow"
-					show-cancel-button="true" 
-					:cancel-style="{background: '#B5B5B5'}"
-					:confirm-style="{background: '#F08080'}"
-					:show-title = 'false'
-					cancel-color="white"
-					confirm-color="white"
-					:content-style="{'text-align': 'center',
-									'margin': '10% 10%'}"
-					@confirm="confirmDelete">
-				<view class="slot-content">
-					<rich-text :nodes="deleteContent"></rich-text>
+				<view class="work_code" v-if="code_flag">
+					<button class="btn_code"  @click="getArtWorkCode">作品二维码</button>
+					<view class="line"></view>
 				</view>
-			</u-modal>
-			<u-modal v-model="codeShow"
-					show-cancel-button="true" 
-					:cancel-style="{background: '#B5B5B5'}"
-					confirm-text="复制链接"
-					:confirm-style="{background: '#F08080'}"
-					:show-title = 'false'
-					cancel-color="white"
-					confirm-color="white"
-					:content-style="{'word-wrap': 'break-word', 
-									'word-break': 'break-all',
-									'white-space': 'pre-line',
-									'text-align': 'center',
-									'margin': '20% 20%'}"
-					@confirm="codeLink">
-				<view class="slot-content">
-					<rich-text :nodes="codeContent"></rich-text>
-					<img :src="imgCodeSrc" class = "wxCode">
+				<view class="work_delete">
+					<button class="btn_delete" @click="deleteArtWorkCode">删除</button>
 				</view>
-			</u-modal>
+			</view>
+			<view class="icon_box" @click="showTips">
+				<icon class="more_icon"></icon>
+			</view>
+			<view class="demo-img-wrap" @click="play(xid,status)">
+				<image class="demo-image" :src="image" mode="widthFix" ></image>
+			</view>
+			<view class="padding_box">
+				<view class="work_info">
+					<view class="demo-title">
+						{{title}}
+					</view>
+					<view class="hot_box">
+						<view class="hot_icon_box">
+							<icon></icon>
+						</view>
+						<view class="demo-price">{{broadcastCount}}</view>
+					</view>
+				</view>
+			</view>
+			<view class="mask15" v-if="localFlag" @click="hiddenTips15"></view>
+			<view class="mask17" v-if="codeFlag" @click="hiddenTips17"></view>
+			<view>
+				<u-modal v-model="publishShow" 
+						:title-style="{color: 'black'}" 
+						show-cancel-button="true" 
+						title="发布作品" 
+						:cancel-style="{background: '#B5B5B5'}"
+						confirm-text="确定"
+						:confirm-style="{background: '#F08080'}"
+						cancel-color="white"
+						confirm-color="white"
+						:content-style="{'word-wrap': 'break-word', 
+										'word-break': 'break-all',
+										'white-space': 'pre-line',
+										'text-align': 'center',
+										'margin': '5% 5%'}"
+						@confirm="publishLink">
+					<view class="slot-content">
+						<rich-text :nodes="publishContent"></rich-text>
+					</view>
+				</u-modal>
+				<u-modal v-model="deleteShow"
+						show-cancel-button="true" 
+						:cancel-style="{background: '#B5B5B5'}"
+						:confirm-style="{background: '#F08080'}"
+						:show-title = 'false'
+						cancel-color="white"
+						confirm-color="white"
+						:content-style="{'text-align': 'center',
+										'margin': '10% 10%'}"
+						@confirm="confirmDelete">
+					<view class="slot-content">
+						<rich-text :nodes="deleteContent"></rich-text>
+					</view>
+				</u-modal>
+				<u-modal v-model="codeShow"
+						show-cancel-button="true" 
+						:cancel-style="{background: '#B5B5B5'}"
+						confirm-text="复制链接"
+						:confirm-style="{background: '#F08080'}"
+						:show-title = 'false'
+						cancel-color="white"
+						confirm-color="white"
+						:content-style="{'word-wrap': 'break-word', 
+										'word-break': 'break-all',
+										'white-space': 'pre-line',
+										'text-align': 'center',
+										'margin': '20% 20%'}"
+						@confirm="codeLink">
+					<view class="slot-content">
+						<rich-text :nodes="codeContent"></rich-text>
+						<img :src="imgCodeSrc" class = "wxCode">
+					</view>
+				</u-modal>
+			</view>
 		</view>
 	</view>
 </template>
@@ -104,7 +106,7 @@
 				publish_flag: false,
 				code_flag: false,
 				//弹窗开关及对应内容
-				publishContent: '作品二维码和链接已生成,可前往web端已发布中查看\n\n网站地址：https://wanxiangchengzhen.com/ivetool/#/login/password',
+				publishContent: '作品二维码和链接点击生成,可前往web端已发布中查看\n\n网站地址：https://wanxiangchengzhen.com/ivetool/#/login/password',
 				publishShow: false,
 				deleteContent: '确认删除？',
 				deleteShow: false,
@@ -145,31 +147,52 @@
 			}
 		},
 		methods: {
-			publishLink(){
+			play(xid,status){
+				console.log(xid)
+				if(status == 4){
+					uni.navigateTo({
+						url: "../play/play?pkArtworkId=" + xid,
+					})
+				}
+			},
+			async publishLink(){
 				uni.setClipboardData({
 					data: 'https://wanxiangchengzhen.com/ivetool/#/login/password',
 					success: res=> {
 						uni.showToast({
 							icon: 'none',
-							title:'复制成功'
+							title:'链接已复制到剪切板'
 						})
 					}
 				})
-				if(this.status == 2){
-					setTimeout(function() {
-						uni.setStorageSync("mine_current",0)
-						uni.reLaunch({
-							url: "../../pages/mine/mine",
-						})
-					}, 1500);
-				}else{
-					setTimeout(function() {
-						uni.setStorageSync("mine_current",1)
-						uni.reLaunch({
-							url: "../../pages/mine/mine",
-						})
-					}, 1500);
-				}
+				await uni.request ({
+					url: baseURL + "/ecmArtWorkManager/modifyArtWorksStatus",
+					method: 'POST',
+					dataType: 'json',
+					data: {
+						pkArtworkId: this.xid,
+						code: 'publish'
+					},
+					success: res=> {
+						if(res.data.status == 200){
+							if(this.status == 2){
+								setTimeout(function() {
+									uni.setStorageSync("mine_current",0)
+									uni.reLaunch({
+										url: "../../pages/mine/mine",
+									})
+								}, 1500);
+							}else{
+								setTimeout(function() {
+									uni.setStorageSync("mine_current",1)
+									uni.reLaunch({
+										url: "../../pages/mine/mine",
+									})
+								}, 1500);
+							}
+						}
+					}
+				})
 			},
 			codeLink(){
 				uni.setClipboardData({
@@ -216,29 +239,18 @@
 					}
 				})
 			},
-			showTips() {
+			showTips(e) {
+				console.log("我是e",e)
+				e.cancelBubble = true;
 				this.localFlag = true;
 			},
 			hiddenTips15(){
 				this.localFlag = false;
 			},
-			async publishArtWork(){
+			publishArtWork(){
 				console.log(this.xid)
 				console.log(this.status)
-				await uni.request ({
-					url: baseURL + "/ecmArtWorkManager/modifyArtWorksStatus",
-					method: 'POST',
-					dataType: 'json',
-					data: {
-						pkArtworkId: this.xid,
-						code: 'publish'
-					},
-					success: res=> {
-						if(res.data.status == 200){
-							this.publishShow = true
-						}
-					}
-				})
+				this.publishShow = true;
 			},
 			deleteArtWorkCode(){
 				console.log(this.xid)
