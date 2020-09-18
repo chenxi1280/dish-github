@@ -122,6 +122,8 @@
 				reportType: "",
 				//举报内容
 				textareaContent: "",
+				//延时函数
+				time: Function,
 				//云端举报图片url
 				headImage: "",
 				//举报类型选项数组
@@ -174,26 +176,26 @@
 				// 	}
 				// }
 			}
+			this.showButton();
 		},
 		onBackPress(){
 			console.log(111)
 		},
 		onUnload(){
-			
 			uni.navigateBack({
 			    delta: 1
 			});
 		},
 		methods: {
 			showButton(){
+				clearTimeout(this.time);
 				this.hiddenBtnFlag = !this.hiddenBtnFlag;
 				if(this.hiddenBtnFlag){
-					setTimeout(() => {
+					this.time = setTimeout(() => {
 						this.hiddenBtnFlag = false;
 						console.log(this.hiddenBtnFlag)
 					}, 5000);
 				}
-				clearTimeout();
 			},
 			//上传截图到腾讯云
 			uploadImage(){
