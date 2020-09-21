@@ -12,28 +12,56 @@
 		<u-subsection :list="items" :current="0" @change="sectionChange"></u-subsection>
 		<view class="content">
 			<view v-if="current === 0">
-				<waterfall :flowList="hotList" :status="hotloadStatus"></waterfall>
+				<waterfall :flowList="hotList" :status="hotloadStatus" ></waterfall>
 			</view>
 			<view v-if="current === 1">
-				<u-subsection :list="list" :current="currentsort" @change="changeSort" mode='subsection' bold="false" active-color="#606266"
-				 height="50" font-size="24"></u-subsection>
+					
+					<u-sticky :bg-color="'#ffffff'" > 
+						<u-subsection :list="list" :current="currentsort" @change="changeSort"  :mode="'button'" :bold="false"
+						:height="50" :font-size="26"></u-subsection>
+						<view style="height: 8rpx; background-color: #F0F0F0;"></view>
+					</u-sticky>
+				
+				<!-- 				<u-tabs  :list="list" :is-scroll="true" :current="currentsort" @change="changeSort" :height="50" :show-bar="false"
+				 :bold="false" :active-color="'#606266'" :inactive-color="'#606266'"></u-tabs> -->
 
-				<view v-if="currentsort === 0">
-					<waterfall :flowList="sortList" :status="loadStatus"></waterfall>
-				</view>
-				<view v-if="currentsort === 1">
-					<waterfall :flowList="sortList" :status="loadStatus"></waterfall>
-				</view>
-				<view v-if="currentsort === 2">
-					<waterfall :flowList="sortList" :status="loadStatus"></waterfall>
-				</view>
-				<view v-if="currentsort === 3">
-					<waterfall :flowList="sortList" :status="loadStatus"></waterfall>
-				</view>
-				<view v-if="currentsort === 4">
-					<waterfall :flowList="sortList" :status="loadStatus"></waterfall>
-				</view>
+				<!-- 	<u-tabs-swiper ref="tabs" :list="list" :is-scroll="false" :current="currentsort" @change="changeSort"></u-tabs-swiper> -->
+				<view style="width: 100%;height: 100%;  position: absolute;  ">
+					<swiper :current="swiperCurrent" @change="swiperchange" style="height: 100%" @transition="transition"
+					 @animationfinish="animationfinish">
 
+						<swiper-item class="swiper-item">
+							<scroll-view scroll-y style="width: 100%;" @scrolltolower="onreachBottom">
+								<waterfall :flowList="sortList0" :status="loadStatus"></waterfall>
+							</scroll-view>
+						</swiper-item>
+						
+						<swiper-item class="swiper-item">
+							<scroll-view scroll-y style="height: 100%;width: 100%;" @scrolltolower="onreachBottom">
+								<waterfall :flowList="sortList1" :status="loadStatus"></waterfall>
+							</scroll-view>
+						</swiper-item>
+						
+						<swiper-item class="swiper-item">
+							<scroll-view scroll-y style="height: 100%;width: 100%;" @scrolltolower="onreachBottom">
+								<waterfall :flowList="sortList2" :status="loadStatus"></waterfall>
+							</scroll-view>
+						</swiper-item>
+						
+						<swiper-item class="swiper-item">
+							<scroll-view scroll-y style="height: 100%;width: 100%;" @scrolltolower="onreachBottom">
+								<waterfall :flowList="sortList3" :status="loadStatus"></waterfall>
+							</scroll-view>
+						</swiper-item>
+						
+						<swiper-item class="swiper-item">
+							<scroll-view scroll-y style="height: 100%;width: 100%;" @scrolltolower="onreachBottom">
+								<waterfall :flowList="sortList4" :status="loadStatus"></waterfall>
+							</scroll-view>
+						</swiper-item>
+						
+					</swiper>
+				</view>
 			</view>
 			<u-back-top :scroll-top="scrollTop"></u-back-top>
 		</view>
@@ -78,29 +106,57 @@
 				sortList: [],
 				pageHot: 0,
 				pageSort: 0,
-				hotLoadStatus: "loadmore"
-
+				hotLoadStatus: "loadmore",
+				sortList0: [],
+				sortList1: [],
+				sortList2: [],
+				sortList3: [],
+				sortList4: [],
+				pageSort0: 0,
+				pageSort1: 0,
+				pageSort2: 0,
+				pageSort3: 0,
+				pageSort4: 0,
+				swiperCurrent: 0
 			}
 		},
 		onShow() {
 			this.addRandomDataHot()
 		},
 		onReachBottom(e) {
-			if (this.hotLoadStatus == "loadmore") {
-				this.addRandomDataHot()
+			if(this.current == 0 ){
+				if (this.hotLoadStatus == "loadmore") {
+					this.addRandomDataHot()
+				}
+			}else if(this.current == 1){
+				if (this.loadStatus == "loadmore") {
+					console.log("懒加载22")
+					this.addRandomDataSort()
+				}
 			}
-			if (this.loadStatus == "loadmore") {
-				this.addRandomDataSort()
-			}
+			
 
 		},
 		onPullDownRefresh() {
-		    console.log('下拉刷新');
-		    setTimeout(function () {
-		        uni.stopPullDownRefresh();
-		    }, 1000);
+			console.log('下拉刷新');
+			setTimeout(function() {
+				uni.stopPullDownRefresh();
+			}, 1000);
 		},
 		methods: {
+			transition(e) {
+				// let dx = e.detail.dx;
+				// console.log(dx)
+				// this.$refs.uTabs.setDx(dx);
+			},
+			// 由于swiper的内部机制问题，快速切换swiper不会触发dx的连续变化，需要在结束时重置状态
+			// swiper滑动结束，分别设置tabs和swiper的状态
+			animationfinish(e) {
+				// let a = e.detail.current;
+				// this.$refs.uTabs.setFinishCurrent(a);
+				// this.swiperCurrent = a;
+				// this.currentsort = a;
+			},
 			go_search_page() {
 				uni.navigateTo({
 					url: "../search/search"
@@ -116,12 +172,15 @@
 				this.scrollTop = e.scrollTop;
 			},
 			changeSort(index) {
+			
+				
 				this.currentsort = index;
 				this.pageSort = 0
-				this.sortList = []
+				this.swiperCurrent = index;
 				this.queryType = this.list[index].name
-
-				this.addRandomDataSort()
+				this['sortList' + this.currentsort]
+			
+				this.judgesortData()
 			},
 			addRandomDataHot() {
 				if (this.current == 0) {
@@ -155,12 +214,12 @@
 			},
 			addRandomDataSort() {
 				if (this.current == 1) {
-					this.pageSort = this.pageSort + 1
+					this['pageSort' + this.currentsort] = this['pageSort' + this.currentsort] + 1
 					uni.request({
 						url: 'https://wanxiangchengzhen.com/bpi/Ecmartwork/getFindSortArtWorks',
 						method: 'POST',
 						data: {
-							page: this.pageSort,
+							page: this['pageSort' + this.currentsort],
 							limit: this.limit,
 							queryType: this.queryType
 						},
@@ -168,7 +227,8 @@
 							if (res.data.data != null) {
 								res.data.data.forEach(v => {
 									v.high = 287.1
-									this.sortList.push(v)
+									this['sortList' + this.currentsort].push(v)
+									// this.sortList.push(v)
 								})
 								if (res.data.data.length < this.limit) {
 									this.loadStatus = 'nomore'
@@ -180,8 +240,34 @@
 						}
 					})
 				}
+			},
+			swiperchange(e) {
+				let a = e.detail.current;
 
+				this.currentsort = a;
+				this.pageSort = 0
+				this.swiperCurrent = a;
+				this.queryType = this.list[a].name
+				this['sortList' + this.currentsort]
+
+				this.judgesortData()
+				// this.sortList = []
+				// this.addRandomDataSort()
+				// console.log(this.sortList)
+			},
+			judgesortData() {
+				if (this['sortList' + this.currentsort].length == 0 && this['pageSort' + this.currentsort] == 0) {
+					console.log("111")
+					this.addRandomDataSort()
+					console.log(this['sortList' + this.currentsort])
+				}
+			},
+			onreachBottom(){
+				if (this.loadStatus == "loadmore") {
+					this.addRandomDataSort()
+				}
 			}
+
 		}
 
 	}

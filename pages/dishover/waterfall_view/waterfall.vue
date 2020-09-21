@@ -105,7 +105,7 @@
 
 		onShow(e) {
 
-			console.log('触底加载更多');
+			
 			console.log(this.flowList)
 		},
 

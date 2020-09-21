@@ -66,7 +66,7 @@
 						<view class="uploadBox">
 							<view class="subTitle">上传图片</view>
 							<view class="uploadBtnBox" v-if="uploadBtnFlag" @click="uploadImage">
-								<icon></icon>
+								<icon></icon>mysql 中data 和datatime
 							</view>
 							<view class="uploadImageBox" v-if="uploadImageFlag">
 								<image></image>
@@ -181,7 +181,9 @@
 		onUnload(){
 			
 			uni.navigateBack({
-			    delta: 1
+			    delta: 1 ,
+				animationDuration: 10,
+				animationType: null
 			});
 		},
 		methods: {
@@ -272,9 +274,6 @@
 			},
 			//提交举报
 			async submit(){
-				console.log(this.textareaContent);
-				console.log(this.reportType);
-				console.log(this.headImage);
 				await uni.request ({
 					url: baseURL + "/wxPlay/savaReportInfo",
 					method: 'POST',
@@ -387,6 +386,7 @@
 				if(this.endFlag){
 					this.chooseTipsShowFlag = true;
 				}else{
+					this.storyLineContentFlag = true
 					this.chooseTipsShowFlag = false;
 				}
 			},
