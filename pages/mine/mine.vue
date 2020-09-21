@@ -117,7 +117,7 @@
 				this.current = index;
 			},
 			customerService(){
-				uni.redirectTo({
+				uni.navigateTo({
 					url: "./customService/customService"
 				})
 			},
