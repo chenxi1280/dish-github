@@ -39,7 +39,7 @@
 				<u-modal v-model="publishShow" 
 						:title-style="{color: 'black'}" 
 						show-cancel-button="true" 
-						title="发布作品" 
+						title="确定要发布作品吗？" 
 						:cancel-style="{background: '#B5B5B5'}"
 						confirm-text="确定"
 						:confirm-style="{background: '#F08080'}"
@@ -106,7 +106,7 @@
 				publish_flag: false,
 				code_flag: false,
 				//弹窗开关及对应内容
-				publishContent: '作品二维码和链接点击生成,可前往web端已发布中查看\n\n网站地址：https://wanxiangchengzhen.com/ivetool/#/login/password',
+				publishContent: '作品二维码和播放链接将会在点击确定后生成，可前往web端个人空间已发布中查看\n\n网站地址：https://wanxiangchengzhen.com/ivetool/#/login/password',
 				publishShow: false,
 				deleteContent: '确认删除？',
 				deleteShow: false,
@@ -372,8 +372,8 @@
 	}
 	.icon_box{
 		// border: 2rpx solid red;
-		width: 50rpx;
-		height: 30rpx;
+		width: 80rpx;
+		height: 50rpx;
 		position: absolute;
 		right: 26rpx;
 		top: 26rpx;

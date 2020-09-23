@@ -1,24 +1,29 @@
 <template>
 	<view class="playBox">
 		<view class="play">
+			<!-- 播放主体 -->
 			<view class="videoBox" @click="showButton">
-				<video :src="videoUrl" autoplay="true" direction="0" show-mute-btn="true" show-fullscreen-btn="false" id="myVideo"
-				 enable-play-gesture="true" @ended="videoEnd"></video>
+				<video :src="videoUrl" :autoplay="true" direction="0" :show-mute-btn="true" :show-fullscreen-btn="false" id="myVideo"
+				 :enable-play-gesture="true" @ended="videoEnd"></video>
 			</view>
-			<view class="chooseTipsMask16" v-if="chooseTipsShowFlag">
-				<view class="chooseTips">
-					<view class="closeBox" @click="closeChooseTips">
-						<icon class="closeIcon"></icon>
-					</view>
-					<view class="title">请做出你的选择</view>
-					<view class="splitLine"></view>
-					<view class="tips" v-for="(item, index) in tipsArray" :key="index">
-						<view class="optionBox" @touchstart="changeBackground(index)" @touchend="rebackBackground(index)" :style="{'background': background[index]}">
-							<view class="option">{{option[index]}}</view>
+			<!-- 选项 -->
+			<view class="chooseTipsMask15"  v-if="chooseTipsMaskFlag">
+				<view class="chooseTipsMask16" v-if="chooseTipsShowFlag">
+					<view class="chooseTips">
+						<view class="closeBox" @click="closeChooseTips">
+							<icon class="closeIcon"></icon>
+						</view>
+						<view class="title">请做出你的选择</view>
+						<view class="splitLine"></view>
+						<view class="tips" v-for="(item, index) in tipsArray" :key="index">
+							<view class="optionBox" @touchstart="changeBackground(index)" @touchend="rebackBackground(index)" :style="{'background': background[index]}">
+								<view class="option">{{option[index]}}</view>
+							</view>
 						</view>
 					</view>
 				</view>
 			</view>
+			<!-- 故事线和举报 -->
 			<view v-if="hiddenBtnFlag">
 				<view class="reportBox" @click="showReportContent">
 					<view class="report">举报</view>
@@ -27,6 +32,7 @@
 			<view class="storyLineBox" @click="showStoryLineContent">
 				<view class="storyLine">故事线</view>
 			</view>
+			<!-- 故事线内容呈现在蒙板之上 -->
 			<view class="storyLineContentMask16" v-if="storyLineContentFlag">
 				<view class="storyLineContentBox">
 					<view class="closeBox" @click="closeStoryLineContent">
@@ -39,6 +45,7 @@
 					</view>
 				</view>
 			</view>
+				<!-- 举报内容呈现在蒙板之上 -->
 			<view class="reportContentMask16" v-if="reportContentFlag">
 				<view class="reportContentBox">
 					<view class="closeBox" @click="closeReportContent">
@@ -101,6 +108,8 @@
 				hiddenBtnFlag: false,
 				//是否展示选项开关
 				chooseTipsShowFlag: false,
+				//选项最底层蒙版
+				chooseTipsMaskFlag: false,
 				//是否展示故事线开关
 				storyLineContentFlag: false,
 				//是否展示举报开关
@@ -388,8 +397,10 @@
 				//根据是否是最后一个视频标志 判断是否弹窗
 				if(this.endFlag){
 					this.chooseTipsShowFlag = true;
+					this.chooseTipsMaskFlag = true;
 				}else{
 					this.chooseTipsShowFlag = false;
+					this.chooseTipsMaskFlag = false;
 				}
 			},
 			showStoryLineContent(){
@@ -425,24 +436,28 @@
 					case 0: {
 						this.background.splice(index,1,"");
 						this.chooseTipsShowFlag = false
+						this.chooseTipsMaskFlag = false
 						this.initPlayData(this.childs[index])
 						break;
 					}
 					case 1: {
 						this.background.splice(index,1,"");
 						this.chooseTipsShowFlag = false
+						this.chooseTipsMaskFlag = false
 						this.initPlayData(this.childs[index])
 						break;
 					}
 					case 2: {
 						this.background.splice(index,1,"");
 						this.chooseTipsShowFlag = false
+						this.chooseTipsMaskFlag = false
 						this.initPlayData(this.childs[index])
 						break;
 					}
 					case 3: {
 						this.background.splice(index,1,"");
 						this.chooseTipsShowFlag = false
+						this.chooseTipsMaskFlag = false
 						this.initPlayData(this.childs[index])
 						break;
 					}
@@ -451,6 +466,10 @@
 			//关闭按钮触发事件
 			closeChooseTips(){
 				this.chooseTipsShowFlag = false
+				this.chooseTipsMaskFlag = false
+				const videoContext = uni.createVideoContext('myVideo')
+				videoContext.play()
+				this.showButton()
 			},
 			closeStoryLineContent(){
 				this.storyLineContentFlag = false
@@ -480,54 +499,63 @@
 						height: 100%;
 					}
 				}
-				.chooseTipsMask16{
-					background-color: rgba(255,255,255,.9);
+				.chooseTipsMask15{
+					background-color: rgba(0, 0, 0, .1);
 					position: fixed;
 					left: 0;
-					top: 50%;
-					transform: translateY(-50%);
+					top: 0;
 					width: 100%;
-					height: 38%;
-					z-index: 16;
-					.chooseTips{
+					height: 100%;
+					z-index: 15;
+					.chooseTipsMask16{
+						background-color: rgba(255,255,255,.9);
+						position: fixed;
+						left: 0;
+						top: 50%;
+						transform: translateY(-50%);
 						width: 100%;
-						height: 100%;
-						z-index: 25;
-						background-color: rgba(0,0,0,.3);
-						.closeBox{
-							position: absolute;
-							width: 46rpx;
-							height: 46rpx;
-							right: 20rpx;
-							top: 20rpx;
-							.closeIcon{
-								width: 100%;
-								height: 100%;
-								background: url(../../static/icon/close.png) no-repeat center;
-								background-size: 46rpx;
+						height: 38%;
+						z-index: 16;
+						.chooseTips{
+							width: 100%;
+							height: 100%;
+							z-index: 25;
+							background-color: rgba(0,0,0,.3);
+							.closeBox{
+								position: absolute;
+								width: 46rpx;
+								height: 46rpx;
+								right: 20rpx;
+								top: 20rpx;
+								.closeIcon{
+									width: 100%;
+									height: 100%;
+									background: url(../../static/icon/close.png) no-repeat center;
+									background-size: 46rpx;
+								}
 							}
-						}
-						.title{
-							text-align: center;
-							color: white;
-							font-size: 36rpx;
-							line-height: 100rpx;
-						}
-						.splitLine{
-							border: 2rpx solid #D3D3D3;
-							width: 80%;
-							margin: 0 auto;
-						}
-						.tips{
-							.optionBox{
-								width: 100%;
+							.title{
+								text-align: center;
+								color: white;
+								font-size: 36rpx;
+								line-height: 100rpx;
+							}
+							.splitLine{
+								border: 2rpx solid #D3D3D3;
+								width: 80%;
 								margin: 0 auto;
-								line-height: 80rpx;
-								display: flex;
-								justify-content: space-between;
-								.option{
-									color: white;
-									padding-left: 20rpx;
+							}
+							.tips{
+								.optionBox{
+									width: 100%;
+									margin: 0 auto;
+									line-height: 80rpx;
+									display: flex;
+									justify-content: space-between;
+									.option{
+										color: white;
+										padding-left: 20rpx;
+									}
 								}
 							}
 						}
@@ -551,8 +579,8 @@
 				}
 				.reportBox{
 					position: fixed;
-					left: 40rpx;
-					top: 40rpx;
+					right: 40rpx;
+					bottom: 120rpx;
 					height: 80rpx;
 					width: 120rpx;
 					z-index: 15;
