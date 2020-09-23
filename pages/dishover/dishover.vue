@@ -6,8 +6,6 @@
 			<input class="search_input" type="" placeholder=" 查找你想看的视频" disabled="" />
 
 		</view>
-		<!-- <view @click="go_search_page">	<u-search :show-action="false" action-text="搜索"  ></u-search></view> -->
-
 
 		<u-subsection :list="items" :current="0" @change="sectionChange"></u-subsection>
 		<view class="content">
@@ -15,25 +13,48 @@
 				<waterfall :flowList="hotList" :status="hotloadStatus"></waterfall>
 			</view>
 			<view v-if="current === 1">
-				<u-subsection :list="list" :current="currentsort" @change="changeSort" mode='subsection' bold="false" active-color="#606266"
-				 height="50" font-size="24"></u-subsection>
 
-				<view v-if="currentsort === 0">
-					<waterfall :flowList="sortList" :status="loadStatus"></waterfall>
-				</view>
-				<view v-if="currentsort === 1">
-					<waterfall :flowList="sortList" :status="loadStatus"></waterfall>
-				</view>
-				<view v-if="currentsort === 2">
-					<waterfall :flowList="sortList" :status="loadStatus"></waterfall>
-				</view>
-				<view v-if="currentsort === 3">
-					<waterfall :flowList="sortList" :status="loadStatus"></waterfall>
-				</view>
-				<view v-if="currentsort === 4">
-					<waterfall :flowList="sortList" :status="loadStatus"></waterfall>
-				</view>
+				<u-sticky :bg-color="'#ffffff'">
+					<u-subsection :list="list" :current="currentsort" @change="changeSort" :mode="'button'" :bold="false"
+					 :height="50" :font-size="26"></u-subsection>
+					<view style="height: 8rpx; background-color: #F0F0F0;"></view>
+				</u-sticky>
 
+				<view style="width: 100%;height: 100%;  position: absolute;  ">
+					<swiper :current="swiperCurrent" @change="swiperchange" style="height: 100%">
+
+						<swiper-item class="swiper-item">
+							<scroll-view scroll-y style="width: 100%;" @scrolltolower="onreachBottom">
+								<waterfall :flowList="sortList0" :status="loadStatus"></waterfall>
+							</scroll-view>
+						</swiper-item>
+
+						<swiper-item class="swiper-item">
+							<scroll-view scroll-y style="height: 100%;width: 100%;" @scrolltolower="onreachBottom">
+								<waterfall :flowList="sortList1" :status="loadStatus"></waterfall>
+							</scroll-view>
+						</swiper-item>
+
+						<swiper-item class="swiper-item">
+							<scroll-view scroll-y style="height: 100%;width: 100%;" @scrolltolower="onreachBottom">
+								<waterfall :flowList="sortList2" :status="loadStatus"></waterfall>
+							</scroll-view>
+						</swiper-item>
+
+						<swiper-item class="swiper-item">
+							<scroll-view scroll-y style="height: 100%;width: 100%;" @scrolltolower="onreachBottom">
+								<waterfall :flowList="sortList3" :status="loadStatus"></waterfall>
+							</scroll-view>
+						</swiper-item>
+
+						<swiper-item class="swiper-item">
+							<scroll-view scroll-y style="height: 100%;width: 100%;" @scrolltolower="onreachBottom">
+								<waterfall :flowList="sortList4" :status="loadStatus"></waterfall>
+							</scroll-view>
+						</swiper-item>
+
+					</swiper>
+				</view>
 			</view>
 			<u-back-top :scroll-top="scrollTop"></u-back-top>
 		</view>
@@ -52,7 +73,6 @@
 		components: {
 			waterfall,
 			search
-
 		},
 		data() {
 			return {
@@ -78,27 +98,38 @@
 				sortList: [],
 				pageHot: 0,
 				pageSort: 0,
-				hotLoadStatus: "loadmore"
-
+				hotLoadStatus: "loadmore",
+				sortList0: [],
+				sortList1: [],
+				sortList2: [],
+				sortList3: [],
+				sortList4: [],
+				pageSort0: 0,
+				pageSort1: 0,
+				pageSort2: 0,
+				pageSort3: 0,
+				pageSort4: 0,
+				swiperCurrent: 0
 			}
 		},
 		onShow() {
 			this.addRandomDataHot()
 		},
 		onReachBottom(e) {
-			if (this.hotLoadStatus == "loadmore") {
-				this.addRandomDataHot()
+			if (this.current == 0) {
+				if (this.hotLoadStatus == "loadmore") {
+					this.addRandomDataHot()
+				}
+			} else if (this.current == 1) {
+				if (this.loadStatus == "loadmore") {
+					this.addRandomDataSort()
+				}
 			}
-			if (this.loadStatus == "loadmore") {
-				this.addRandomDataSort()
-			}
-
 		},
 		onPullDownRefresh() {
-		    console.log('下拉刷新');
-		    setTimeout(function () {
-		        uni.stopPullDownRefresh();
-		    }, 1000);
+			setTimeout(function() {
+				uni.stopPullDownRefresh();
+			}, 1000);
 		},
 		methods: {
 			go_search_page() {
@@ -118,10 +149,11 @@
 			changeSort(index) {
 				this.currentsort = index;
 				this.pageSort = 0
-				this.sortList = []
+				this.swiperCurrent = index;
 				this.queryType = this.list[index].name
+				this['sortList' + this.currentsort]
 
-				this.addRandomDataSort()
+				this.judgesortData()
 			},
 			addRandomDataHot() {
 				if (this.current == 0) {
@@ -151,16 +183,16 @@
 						}
 					})
 				}
-				console.log(this.hotList)
+
 			},
 			addRandomDataSort() {
 				if (this.current == 1) {
-					this.pageSort = this.pageSort + 1
+					this['pageSort' + this.currentsort] = this['pageSort' + this.currentsort] + 1
 					uni.request({
 						url: 'https://wanxiangchengzhen.com/bpi/Ecmartwork/getFindSortArtWorks',
 						method: 'POST',
 						data: {
-							page: this.pageSort,
+							page: this['pageSort' + this.currentsort],
 							limit: this.limit,
 							queryType: this.queryType
 						},
@@ -168,7 +200,8 @@
 							if (res.data.data != null) {
 								res.data.data.forEach(v => {
 									v.high = 287.1
-									this.sortList.push(v)
+									this['sortList' + this.currentsort].push(v)
+									// this.sortList.push(v)
 								})
 								if (res.data.data.length < this.limit) {
 									this.loadStatus = 'nomore'
@@ -180,14 +213,35 @@
 						}
 					})
 				}
+			},
+			swiperchange(e) {
+				let a = e.detail.current;
 
+				this.currentsort = a;
+				this.pageSort = 0
+				this.swiperCurrent = a;
+				this.queryType = this.list[a].name
+				this['sortList' + this.currentsort]
+
+				this.judgesortData()
+
+			},
+			judgesortData() {
+				if (this['sortList' + this.currentsort].length == 0 && this['pageSort' + this.currentsort] == 0) {
+					console.log("111")
+					this.addRandomDataSort()
+					console.log(this['sortList' + this.currentsort])
+				}
+			},
+			onreachBottom() {
+				if (this.loadStatus == "loadmore") {
+					this.addRandomDataSort()
+				}
 			}
 		}
-
 	}
+
 </script>
-
-
 <style lang="scss">
 	.search_view {
 		background-color: #f2f2f2;
@@ -200,9 +254,7 @@
 			width: 80rpx;
 			height: 80rpx;
 			background-size: 60rpx;
-		}
-
-		;
+		};
 
 		.search_input {
 			width: 100%;
@@ -226,8 +278,6 @@
 		position: relative;
 	}
 
-
-
 	.demo-image {
 		width: 100%;
 		border-radius: 4px;
@@ -249,4 +299,5 @@
 		font-size: 20rpx;
 		line-height: 1;
 	}
+	
 </style>
