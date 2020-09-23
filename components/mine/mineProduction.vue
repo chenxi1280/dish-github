@@ -33,7 +33,6 @@
 					</view>
 				</view>
 			</view>
-			<view class="mask15" v-if="localFlag" @click="hiddenTips15"></view>
 			<view class="mask17" v-if="codeFlag" @click="hiddenTips17"></view>
 			<view>
 				<u-modal v-model="publishShow" 
@@ -95,13 +94,15 @@
 
 <script>
 	import { baseURL } from '../../pages/login/config/config.js'
-	
+	import { globalBus } from '../../common/js/util.js'
 	export default {
 		data() {
 			return {
 				imgCodeSrc: '',
 				//组件是否展示开关
 				localFlag: false,
+				//蒙板开关
+				mask15Flag: false,
 				//tip的开关 分辨是发布和作品品二维码
 				publish_flag: false,
 				code_flag: false,
@@ -145,6 +146,9 @@
 			}else{
 				this.code_flag = true
 			}
+		},
+		mounted() {
+			this.hiddenTips()
 		},
 		methods: {
 			play(xid,status){
@@ -240,12 +244,15 @@
 				})
 			},
 			showTips(e) {
-				console.log("我是e",e)
 				e.cancelBubble = true;
+				//先触发了tips 将所有的置为false 再将当前组件置为true
+				globalBus.$emit("tips")
 				this.localFlag = true;
 			},
-			hiddenTips15(){
-				this.localFlag = false;
+			hiddenTips(){
+				globalBus.$on("tips",() => {
+					this.localFlag = false;
+				})
 			},
 			publishArtWork(){
 				console.log(this.xid)
@@ -287,14 +294,6 @@
 </script>
 
 <style lang="scss" scoped>
-	.mask15{
-		position: fixed;
-		width: 100%;
-		height: 100%;
-		z-index: 15;
-		left: 0;
-		top: 0;
-	}
 	.slot-content{
 		.wxCode{
 			width: 300rpx;

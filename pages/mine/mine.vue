@@ -60,6 +60,7 @@
 	import published from './published.vue'
 	import verfied from './verfied.vue'
 	import { baseURL } from '../login/config/config.js'
+	import { globalBus } from '../../common/js/util.js'
 	
 	export default {
 		data () {
@@ -112,6 +113,7 @@
 			},
 			onPageScroll(e) {
 				this.scrollTop = e.scrollTop;
+				globalBus.$emit("tips");
 			},
 			sectionChange(index) {
 				this.current = index;
