@@ -4,7 +4,7 @@
 			<!-- 播放主体 -->
 			<view class="videoBox" @click="showButton">
 				<video :src="videoUrl" :autoplay="true" direction="0" :show-mute-btn="true" :show-fullscreen-btn="false" id="myVideo"
-				 :enable-play-gesture="true" @ended="videoEnd"></video>
+				 :enable-play-gesture="true" @ended="videoEnd" @pause="videoPause"></video>
 			</view>
 			<!-- 选项 -->
 			<view class="chooseTipsMask15"  v-if="chooseTipsMaskFlag">
@@ -199,7 +199,7 @@
 		methods: {
 			showButton(){
 				clearTimeout(this.time);
-				this.hiddenBtnFlag = !this.hiddenBtnFlag;
+				this.hiddenBtnFlag = true;
 				if(this.hiddenBtnFlag){
 					this.time = setTimeout(() => {
 						this.hiddenBtnFlag = false;
@@ -340,8 +340,8 @@
 				this.videoUrl = artworkTree.videoUrl+'?uuid='+uuid;
 				this.detailId = artworkTree.pkDetailId;
 				//将播放过的作品的detailId保存下来 playedHistoryArray此数组的最后一个元素为artworkId
-
 				this.playedHistoryArray.push(artworkTree.pkDetailId);
+				this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray));
 				uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
 				//将当前播放的作品的detailId保存在缓存用于举报时确定是哪个具体的作品
 				uni.setStorageSync("detailId",this.detailId);
@@ -429,6 +429,10 @@
 					this.chooseTipsShowFlag = false;
 					this.chooseTipsMaskFlag = false;
 				}
+			},
+			videoPause(){
+				console.log('我暂停了')
+				this.hiddenBtnFlag = true;
 			},
 			showStoryLineContent(){
 				this.storyLineContentFlag = true
