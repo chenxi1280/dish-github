@@ -6,7 +6,7 @@
 				<view class="demo-warter" v-for="(item, index) in leftList" :key="index">
 
 
-					<view v-show="item.code  == 'ad'" @click="goADPage">
+					<view v-show="item.code  == 'ad'" >
 						<image class="demo-image" :src="item.logoPath"></image>
 					</view>
 					<view :style=' " background:url(" + item.logoPath + ")  center ;background-size: cover; " ' class="artWorkImgDiv" v-show="item.code  != 'ad'"
