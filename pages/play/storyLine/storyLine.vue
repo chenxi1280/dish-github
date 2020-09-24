@@ -166,14 +166,14 @@
 					let b = uni.getStorageSync("pkDetailIds")
 					let a = this.floorList[nowFloor][index]
 					let c = this.floorList[nowFloor][0]
-					console.log(a)
-					console.log(b)
-					console.log(c)
 					// 父节点跳转
 					for (let i = 0; i < b.length; i++) {
 						if (b[i] == c.pkDetailId) {
 							b.splice(i)
 						}
+					}
+					if (a.isLink == 1){
+						a.pkDetailId = a.linkUrl
 					}
 					uni.setStorageSync("pkDetailIds", b);
 					this.$refs.uToast.show({
