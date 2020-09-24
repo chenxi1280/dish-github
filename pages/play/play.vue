@@ -290,6 +290,12 @@
 			},
 			//提交举报
 			async submit(){
+				if(!this.reportType){
+					return uni.showToast({
+						icon: 'none',
+						title: '请选择举报类型'
+					})
+				}
 				await uni.request ({
 					url: baseURL + "/wxPlay/savaReportInfo",
 					method: 'POST',
