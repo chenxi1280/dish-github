@@ -63,6 +63,11 @@
 	  onLoad () {
 	    this.getTextVerify()
 	  },
+	  onUnload() {
+	  	uni.switchTab({
+	  		url: '../../mine/mine'
+	  	})
+	  },
 	  methods: {
 		showLinkAddress(){
 			globalBus.$emit('deliver',true)
@@ -120,8 +125,8 @@
 								title: '登录成功'
 							})
 						setTimeout(function() {
-							uni.reLaunch({
-								url: "../../mine/mine"
+							uni.navigateBack({
+								delta: 1
 							})
 						}, 1500);
 					} else if (res.data.status == 508) {
