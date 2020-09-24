@@ -80,15 +80,13 @@
 				current: 0,
 				scrollTop: 0,
 				list: [{
-					name: '爱情'
+					name: '测试类'
 				}, {
-					name: '搞笑'
+					name: '剧情类'
 				}, {
-					name: '日常'
+					name: '科普类'
 				}, {
-					name: '动漫'
-				}, {
-					name: '游戏'
+					name: '展示类'
 				}],
 				currentsort: 0,
 				queryType: "爱情",
