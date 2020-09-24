@@ -4,7 +4,7 @@
 			<view class="login_redirect_btn">登录
 				<view>Welcome</view>
 			</view>
-			<view class="signin_redirect_btn" @click="toSigninPage">注册</view>
+			<!-- <view class="signin_redirect_btn" @click="toSigninPage">注册</view> -->
 		</view>
 		 <!-- #ifdef MP-WEIXIN -->
 		<view class="bottom">
@@ -63,6 +63,11 @@
 	  onLoad () {
 	    this.getTextVerify()
 	  },
+	  onUnload() {
+	  	uni.switchTab({
+	  		url: '../../mine/mine'
+	  	})
+	  },
 	  methods: {
 		showLinkAddress(){
 			globalBus.$emit('deliver',true)
@@ -120,8 +125,8 @@
 								title: '登录成功'
 							})
 						setTimeout(function() {
-							uni.reLaunch({
-								url: "../../mine/mine"
+							uni.navigateBack({
+								delta: 1
 							})
 						}, 1500);
 					} else if (res.data.status == 508) {

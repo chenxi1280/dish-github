@@ -105,7 +105,7 @@
 				//选项背景颜色
 				background: ["","","",""],
 				//隐藏按钮开关
-				hiddenBtnFlag: false,
+				hiddenBtnFlag: true,
 				//是否展示选项开关
 				chooseTipsShowFlag: false,
 				//选项最底层蒙版
@@ -184,7 +184,7 @@
 				// 	}
 				// }
 			}
-			this.showButton();
+			/* this.showButton(); */
 		},
 		onBackPress(){
 			console.log(111)
@@ -197,7 +197,7 @@
 			});
 		},
 		methods: {
-			showButton(){
+			/* showButton(){
 				clearTimeout(this.time);
 				this.hiddenBtnFlag = true;
 				if(this.hiddenBtnFlag){
@@ -206,7 +206,7 @@
 						console.log(this.hiddenBtnFlag)
 					}, 5000);
 				}
-			},
+			}, */
 			//上传截图到腾讯云
 			uploadImage(){
 				var COS = require('cos-wx-sdk-v5');
@@ -502,7 +502,7 @@
 				this.chooseTipsMaskFlag = false
 				const videoContext = uni.createVideoContext('myVideo')
 				videoContext.play()
-				this.showButton()
+				/* this.showButton() */
 			},
 			closeStoryLineContent(){
 				this.storyLineContentFlag = false
@@ -616,8 +616,8 @@
 				}
 				.reportBox{
 					position: fixed;
-					right: 40rpx;
-					bottom: 120rpx;
+					left: 40rpx;
+					top: 40rpx;
 					height: 80rpx;
 					width: 120rpx;
 					z-index: 15;
