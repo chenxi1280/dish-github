@@ -73,10 +73,10 @@
 						<view class="uploadBox">
 							<view class="subTitle">上传图片</view>
 							<view class="uploadBtnBox" v-if="uploadBtnFlag" @click="uploadImage">
-								<icon></icon>mysql 中data 和datatime
+								<icon></icon>
 							</view>
 							<view class="uploadImageBox" v-if="uploadImageFlag">
-								<image></image>
+								<image :src="headImage" mode="scaleToFill"></image>
 							</view>
 						</view>
 						<view class="submitBtnBox" @click="submit">
@@ -162,7 +162,6 @@
 		onReady(){
 			//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
 			this.endFlag = true;
-
 			if(this.pkDetailId != null){
 				this.getArtworkTree();
 				this.playedHistoryArray = uni.getStorageSync("pkDetailIds")
@@ -275,6 +274,12 @@
 										  // 这里是返回的图片URL
 										  that.headImage = data.headers.Location;
 										  uni.hideLoading();
+										  uni.showToast({
+											icon: 'none',
+										  	title: '上传成功'
+										  })
+										  that.uploadBtnFlag = false;
+										  that.uploadImageFlag = true;
 									   }
 									}
 								})
@@ -330,7 +335,9 @@
 			//视频播放初始化保存播放记录  将作品detailId留存提供给故事线
 			initPlayData(artworkTree){
 				//初始化视频及选项
-				this.videoUrl = artworkTree.videoUrl;
+				//0到10w的随机数 但还是有可能重复
+				const uuid = Math.random().toString(36).substring(2);
+				this.videoUrl = artworkTree.videoUrl+'?uuid='+uuid;
 				this.detailId = artworkTree.pkDetailId;
 				//将播放过的作品的detailId保存下来 playedHistoryArray此数组的最后一个元素为artworkId
 
@@ -349,8 +356,28 @@
 					}
 					console.log(this.childs);
 				}else{
-					//是不是最后一个视频标志 最后一个视频不需要弹窗
-					this.endFlag = false;
+					//islink不是null且值为1说明该节点是跳转节点
+					if(artworkTree.isLink != null && artworkTree.isLink === 1){
+						//从缓存中拿到主树
+						const linkId = artworkTree.linkUrl;
+						const mainTree = uni.getStorageSync("artworkTree");
+						this.getTargetTree(mainTree,linkId)
+					}else{
+						//是不是最后一个视频标志 最后一个视频不需要弹窗
+						this.endFlag = false;
+					}
+				}
+			},
+			getTargetTree(mainTree,linkId){
+				if(mainTree.pkDetailId == linkId){
+					return this.initPlayData(mainTree);
+				}else{
+					const childs = mainTree.childs;
+					if(childs){
+						for(let i = 0;i < childs.length;i++){
+							this.getTargetTree(childs[i],linkId);
+						}
+					}
 				}
 			},
 			//异步请求获取作品树
@@ -408,6 +435,8 @@
 			},
 			showReportContent(){
 				this.reportContentFlag = true
+				this.uploadBtnFlag = true;
+				this.uploadImageFlag = false;
 			},
 			//触摸start事件
 			changeBackground(index){
@@ -473,6 +502,10 @@
 			},
 			closeStoryLineContent(){
 				this.storyLineContentFlag = false
+				if(!this.endFlag){
+					const videoContext = uni.createVideoContext('myVideo')
+					videoContext.play()
+				}
 			},
 			closeReportContent(){
 				this.reportContentFlag = false

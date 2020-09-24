@@ -67,7 +67,7 @@
 			},
 			setLineHeightByMessage(){
 				if(this.message.length <= 14){
-					this.lineHeight = "200rpx"
+					this.lineHeight = "300rpx"
 				}else{
 					this.margin = "10% 2%";
 				}
@@ -80,7 +80,7 @@
 	.popup-box{
 		background-color: white;
 		width: 70%;
-		height: 300rpx;
+		height: 400rpx;
 		border-radius: 20rpx;
 		position: fixed;
 		left: 50%;
@@ -90,7 +90,7 @@
 		overflow: hidden;
 		.message-box{
 			width: 96%;
-			height: 200rpx;
+			height: 300rpx;
 			box-sizing: border-box;
 			.message{
 				word-wrap: break-word;

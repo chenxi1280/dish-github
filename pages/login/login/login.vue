@@ -30,7 +30,7 @@
 			</view>
 		</view>
 		<view class="component">
-			<my-dialog message="密码修改链接：https://wanxiangchengzhen.com/ivetool/#/login/password"
+			<my-dialog message= '修改密码请前往四刻互动专业版web端进行操作\n\n网站地址：https://wanxiangchengzhen.com/ivetool/#/login/password'
 					  confirmContext="复制"
 					  concelContext="取消"
 					  @confirm="confirm" ></my-dialog>
@@ -249,6 +249,9 @@
 				margin-top: 100rpx;
 			}
 			.signin_redirect_btn{
+				// border: 2rpx solid red;
+				height: 80rpx;
+				width: 80rpx;
 				color: #FCFCFC;
 				font-weight: bold;
 				margin: 20rpx;

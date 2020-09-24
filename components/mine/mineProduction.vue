@@ -18,7 +18,7 @@
 				<icon class="more_icon"></icon>
 			</view>
 			<view class="demo-img-wrap" @click="play(xid,status)">
-				<image class="demo-image" :src="image" mode="widthFix" ></image>
+				<image class="demo-image" :src="image+'/common'" mode="widthFix" ></image>
 			</view>
 			<view class="padding_box">
 				<view class="work_info">
@@ -107,7 +107,7 @@
 				publish_flag: false,
 				code_flag: false,
 				//弹窗开关及对应内容
-				publishContent: '作品二维码和播放链接将会在点击确定后生成，可前往web端个人空间已发布中查看\n\n网站地址：https://wanxiangchengzhen.com/ivetool/#/login/password',
+				publishContent: '发布的作品将展示在发现页面\n\n作品二维码和播放链接将会在点击确定后生成，可前往web端个人空间已发布中查看\n\n网站地址：https://wanxiangchengzhen.com/ivetool/#/login/password',
 				publishShow: false,
 				deleteContent: '确认删除？',
 				deleteShow: false,
