@@ -48,6 +48,7 @@
 		},
 
 		onReady(option) {
+			
 			this.onfloor = this.pkDetailIds.length - 1
 			uni.request({
 				url: 'https://wanxiangchengzhen.com/bpi/Ecmartwork/getArtWorkNodes',
@@ -59,7 +60,7 @@
 				success: res => {
 					// console.log(res.data.data)
 					res.data.data.forEach(node => {
-						this.pkDetailIds.forEach(v => {
+						this.pkDetailIds.forEach( v => {
 							if (v === node.pkDetailId) {
 								this.setNode(node.brotherNode, v)
 								this.list.push(node.brotherNode)
@@ -165,6 +166,9 @@
 					let b = uni.getStorageSync("pkDetailIds")
 					let a = this.floorList[nowFloor][index]
 					let c = this.floorList[nowFloor][0]
+					console.log(a)
+					console.log(b)
+					console.log(c)
 					// 父节点跳转
 					for (let i = 0; i < b.length; i++) {
 						if (b[i] == c.pkDetailId) {
