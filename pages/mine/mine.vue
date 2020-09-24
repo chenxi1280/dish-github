@@ -1,7 +1,7 @@
 <template>
 	<view class="mine">
 		<u-sticky>
-			<view class="top_box">
+			<view class="top_box" @click="hiddenTips">
 				<view class="top">
 					<view class="author_box" v-if="userFlag">
 						<view class = "avatarUrl" v-if="realFlag">
@@ -105,8 +105,12 @@
 			}
 		},
 		methods: {
+			hiddenTips(){
+				globalBus.$emit("tips");
+			},
 			// 前往登录页面
-			toLoginPage () {
+			toLoginPage (e) {
+				e.cancelBubble = true;
 				uni.navigateTo({
 					url: "../login/login/login"
 				})
@@ -118,7 +122,8 @@
 			sectionChange(index) {
 				this.current = index;
 			},
-			customerService(){
+			customerService(e){
+				e.cancelBubble = true;
 				uni.navigateTo({
 					url: "./customService/customService"
 				})
