@@ -1,8 +1,8 @@
 <template>
 	<view class="playBox">
 		<view class="play">
-			<!-- 播放主体 -->
-			<view class="videoBox" @click="showButton">
+			<!-- 播放主体   @click="showButton"-->
+			<view class="videoBox">
 				<video :src="videoUrl" :autoplay="true" direction="0" :show-mute-btn="true" :show-fullscreen-btn="false" id="myVideo"
 				 :enable-play-gesture="true" @ended="videoEnd" @pause="videoPause"></video>
 			</view>
@@ -163,28 +163,14 @@
 			//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
 			this.endFlag = true;
 			if(this.pkDetailId != null){
-				this.getArtworkTree();
+				//故事线跳转过来存一棵主树 跳转用
+				this.getArtworkTreeByArtworkId();
+				this.getArtworkTreeByDetailId();
 				this.playedHistoryArray = uni.getStorageSync("pkDetailIds")
 			}else{
-				this.getArtworkTree();
-				
-				// let artworkTree = uni.getStorageSync("artworkTree");
-				// if(artworkTree == null || typeof(artworkTree) == "undefined" || artworkTree.length == 0){
-				// 	this.getArtworkTree();
-				// 	console.log(2.1)
-				// }else{
-				// 	console.log(2.2)
-				// 	//初始化数据
-				// 	if(artworkTree.fkArtworkId != this.artworkId){
-				// 		console.log(3.1)
-				// 		this.getArtworkTree();
-				// 	}else{
-				// 		console.log(3.2)
-				// 		this.initPlayData(artworkTree);
-				// 	}
-				// }
+				//存一棵主树
+				this.getArtworkTreeByArtworkId();
 			}
-			/* this.showButton(); */
 		},
 		onBackPress(){
 			console.log(111)
@@ -197,16 +183,6 @@
 			});
 		},
 		methods: {
-			/* showButton(){
-				clearTimeout(this.time);
-				this.hiddenBtnFlag = true;
-				if(this.hiddenBtnFlag){
-					this.time = setTimeout(() => {
-						this.hiddenBtnFlag = false;
-						console.log(this.hiddenBtnFlag)
-					}, 5000);
-				}
-			}, */
 			//上传截图到腾讯云
 			uploadImage(){
 				var COS = require('cos-wx-sdk-v5');
@@ -296,6 +272,13 @@
 						title: '请选择举报类型'
 					})
 				}
+				const regPhone = /[\u4e00-\u9fa5]{8,}/.test(this.textareaContent);
+				if(!regPhone){
+					return uni.showToast({
+						icon: 'none',
+						title: '请填写举报内容，不少于8个字'
+					})
+				}
 				await uni.request ({
 					url: baseURL + "/wxPlay/savaReportInfo",
 					method: 'POST',
@@ -341,13 +324,10 @@
 			//视频播放初始化保存播放记录  将作品detailId留存提供给故事线
 			initPlayData(artworkTree){
 				//初始化视频及选项
-				//0到10w的随机数 但还是有可能重复
+				//随机数
 				const uuid = Math.random().toString(36).substring(2);
 				this.videoUrl = artworkTree.videoUrl+'?uuid='+uuid;
 				this.detailId = artworkTree.pkDetailId;
-				//将播放过的作品的detailId保存下来 playedHistoryArray此数组的最后一个元素为artworkId
-				this.playedHistoryArray.push(artworkTree.pkDetailId);
-				this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray));
 				uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
 				//将当前播放的作品的detailId保存在缓存用于举报时确定是哪个具体的作品
 				uni.setStorageSync("detailId",this.detailId);
@@ -366,13 +346,18 @@
 					if(artworkTree.isLink != null && artworkTree.isLink === 1){
 						//从缓存中拿到主树
 						const linkId = artworkTree.linkUrl;
-						const mainTree = uni.getStorageSync("artworkTree");
+						uni.setStorageSync('jumpNode',linkId);
+						const mainTree = uni.getStorageSync("mainArtworkTree");
 						this.getTargetTree(mainTree,linkId)
 					}else{
 						//是不是最后一个视频标志 最后一个视频不需要弹窗
 						this.endFlag = false;
 					}
 				}
+				const jumpNode = uni.getStorageSync('jumpNode');
+				if (jumpNode == this.detailId) return uni.removeStorageSync('jumpNode');
+				this.playedHistoryArray.push(artworkTree.pkDetailId);
+				this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray));
 			},
 			getTargetTree(mainTree,linkId){
 				if(mainTree.pkDetailId == linkId){
@@ -387,7 +372,28 @@
 				}
 			},
 			//异步请求获取作品树
-			async getArtworkTree(){
+			async getArtworkTreeByArtworkId(){
+				console.log( this.artworkId)
+				await uni.request({
+					url: baseURL + "/wxPlay/playArtWorkByChildTree",
+					method: 'POST',
+					dataType: 'json',
+					data: {
+						pkArtworkId: this.artworkId
+					},
+					success: res=> {
+						if(res.data.status == 200){
+							console.log(res.data.data)
+							uni.setStorageSync("mainArtworkTree",res.data.data);
+							//传到播放页面带pkDetailId参数 说明故事线跳转，只需要存一棵主树跳转节点用不用去播放视频
+							if(this.pkDetailId != null) return;
+							this.initPlayData(res.data.data);
+						}
+					}
+				})
+			},
+			//异步请求获取作品树
+			async getArtworkTreeByDetailId(){
 				console.log( this.artworkId)
 				await uni.request({
 					url: baseURL + "/wxPlay/playArtWorkByChildTree",
@@ -442,11 +448,15 @@
 			},
 			showStoryLineContent(){
 				this.storyLineContentFlag = true
+				const videoContext = uni.createVideoContext('myVideo')
+				videoContext.pause()
 			},
 			showReportContent(){
 				this.reportContentFlag = true
 				this.uploadBtnFlag = true;
 				this.uploadImageFlag = false;
+				const videoContext = uni.createVideoContext('myVideo')
+				videoContext.pause()
 			},
 			//触摸start事件
 			changeBackground(index){
@@ -508,17 +518,16 @@
 				this.chooseTipsMaskFlag = false
 				const videoContext = uni.createVideoContext('myVideo')
 				videoContext.play()
-				/* this.showButton() */
 			},
 			closeStoryLineContent(){
 				this.storyLineContentFlag = false
-				if(!this.endFlag){
-					const videoContext = uni.createVideoContext('myVideo')
-					videoContext.play()
-				}
+				const videoContext = uni.createVideoContext('myVideo')
+				videoContext.play()
 			},
 			closeReportContent(){
 				this.reportContentFlag = false
+				const videoContext = uni.createVideoContext('myVideo')
+				videoContext.play()
 			}
 		}
 	}
