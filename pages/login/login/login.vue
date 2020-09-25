@@ -125,8 +125,13 @@
 								title: '登录成功'
 							})
 						setTimeout(function() {
-							uni.redirectTo({
-								url: '../../mine/mine'
+							uni.switchTab({
+								url: '../../mine/mine',
+								 success: function (e) {
+									var page = getCurrentPages().pop();
+									if (page == undefined || page == null) return;
+									page.onLoad();
+								}
 							})
 						}, 1500);
 					} else if (res.data.status == 508) {
