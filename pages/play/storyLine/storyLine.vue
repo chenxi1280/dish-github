@@ -51,14 +51,14 @@
 			
 			this.onfloor = this.pkDetailIds.length - 1
 			uni.request({
-				url: 'https://wanxiangchengzhen.com/bpi/Ecmartwork/getArtWorkNodes',
-				// url: 'http://192.168.1.15:8008/Ecmartwork/getArtWorkNodes',
+				// url: 'https://wanxiangchengzhen.com/bpi/Ecmartwork/getArtWorkNodes',
+				url: 'http://192.168.1.15:8008/Ecmartwork/getArtWorkNodes',
 				method: 'POST',
 				data: {
 					pkArtworkId: this.pkArtworkId
 				},
 				success: res => {
-					// console.log(res.data.data)
+					console.log(res.data.data)
 					res.data.data.forEach(node => {
 						this.pkDetailIds.forEach( v => {
 							if (v === node.pkDetailId) {
@@ -173,13 +173,16 @@
 						}
 					}
 					if (a.isLink == 1){
+						
 						a.pkDetailId = a.linkUrl
+						
 					}
 					uni.setStorageSync("pkDetailIds", b);
 					this.$refs.uToast.show({
 						title: '选中跳转到' + a.selectTitle + a.pkDetailId,
 						type: 'success',
 					})
+					console.log( a.pkDetailId)
 					uni.navigateTo({
 						url: "../play/play?pkArtworkId=" + this.pkArtworkId + "&pkDetailId=" + a.pkDetailId,
 					})
