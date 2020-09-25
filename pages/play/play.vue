@@ -154,7 +154,31 @@
 			}
 		},
 		onLoad(option) {
-			this.artworkId = option.pkArtworkId
+			if(option.scene){
+				uni.request ({
+					url: baseURL + "/wxPlay/getUserIdByArtwordId",
+					method: 'POST',
+					dataType: 'json',
+					data: {
+						pkArtworkId: option.scene
+					},
+					success: result=> {
+						if(result.data.status == 200){
+							const userId = uni.getStorageSync('userId');
+							if(result.data.data == userId){
+								this.artworkId = option.scene;
+							}else{
+								uni.showToast({
+									icon: 'none',
+									title: '预览作品只能作者自己观看'
+								})
+							}
+						}
+					}
+				});
+			}else{
+				this.artworkId = option.pkArtworkId
+			}
 			this.pkDetailId = option.pkDetailId
 			this.detailId = null;
 			uni.setStorageSync("detailId",this.detailId);
