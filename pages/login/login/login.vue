@@ -125,8 +125,8 @@
 								title: '登录成功'
 							})
 						setTimeout(function() {
-							uni.navigateBack({
-								delta: 1
+							uni.redirectTo({
+								url: '../../mine/mine'
 							})
 						}, 1500);
 					} else if (res.data.status == 508) {
