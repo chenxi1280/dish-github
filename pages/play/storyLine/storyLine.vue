@@ -111,7 +111,7 @@
 			floorChange(e) {
 				let current = e.detail.current;
 				// this.clearnBrother()	
-				this.floorChangeCount = this.floorChangeCount + 1
+				
 				for (let i = 0; i < this.floorList.length; i++) {
 					//原来的楼层
 					if (this.onfloor == i) {
@@ -130,6 +130,7 @@
 					}
 				}
 				this.onfloor = current
+				this.oncolumn = 0
 			},
 			//清除兄弟
 			clearnBrother() {

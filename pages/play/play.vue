@@ -328,7 +328,6 @@
 				const uuid = Math.random().toString(36).substring(2);
 				this.videoUrl = artworkTree.videoUrl+'?uuid='+uuid;
 				this.detailId = artworkTree.pkDetailId;
-				uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
 				//将当前播放的作品的detailId保存在缓存用于举报时确定是哪个具体的作品
 				uni.setStorageSync("detailId",this.detailId);
 				//保存播放过的作品的id
@@ -345,19 +344,28 @@
 					//islink不是null且值为1说明该节点是跳转节点
 					if(artworkTree.isLink != null && artworkTree.isLink === 1){
 						//从缓存中拿到主树
+						console.log(artworkTree)
 						const linkId = artworkTree.linkUrl;
-						uni.setStorageSync('jumpNode',linkId);
+						this.likeNodeId = linkId
 						const mainTree = uni.getStorageSync("mainArtworkTree");
+						this.playedHistoryArray.push(artworkTree.pkDetailId);
+						this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray));
+						uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
 						this.getTargetTree(mainTree,linkId)
 					}else{
 						//是不是最后一个视频标志 最后一个视频不需要弹窗
 						this.endFlag = false;
 					}
 				}
-				const jumpNode = uni.getStorageSync('jumpNode');
-				if (jumpNode == this.detailId) return uni.removeStorageSync('jumpNode');
-				this.playedHistoryArray.push(artworkTree.pkDetailId);
-				this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray));
+				console.log(this.likeNodeId)
+				console.log( this.detailId)
+				if (this.likeNodeId != this.detailId) {
+					this.playedHistoryArray.push(artworkTree.pkDetailId);
+					this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray));
+					uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
+					this.likeNodeId = null
+				}
+
 			},
 			getTargetTree(mainTree,linkId){
 				if(mainTree.pkDetailId == linkId){
