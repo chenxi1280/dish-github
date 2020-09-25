@@ -47,11 +47,7 @@
 							</scroll-view>
 						</swiper-item>
 
-						<swiper-item class="swiper-item">
-							<scroll-view scroll-y style="height: 100%;width: 100%;" @scrolltolower="onreachBottom">
-								<waterfall :flowList="sortList4" :status="loadStatus"></waterfall>
-							</scroll-view>
-						</swiper-item>
+					
 
 					</swiper>
 				</view>
@@ -168,6 +164,7 @@
 							if (res.data.data != null) {
 								res.data.data.forEach(v => {
 									v.high = 287.1
+									v.logoPath = v.logoPath + '/common'
 									this.hotList.push(v)
 								})
 								if (res.data.data.length < this.limit) {

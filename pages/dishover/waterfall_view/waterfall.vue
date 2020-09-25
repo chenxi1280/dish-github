@@ -9,7 +9,7 @@
 					<view v-show="item.code  == 'ad'" >
 						<image class="demo-image" :src="item.logoPath"></image>
 					</view>
-					<view :style=' " background:url(" + item.logoPath + ")  center ;background-size: cover; " ' class="artWorkImgDiv" v-show="item.code  != 'ad'"
+					<view :style=' " background:url(" + item.logoPath + ") no-repeat center ;background-size: 100% 100%; " ' class="artWorkImgDiv" v-show="item.code  != 'ad'"
 					 @click="goPlayPage(item.pkArtworkId)">
 
 						<view :style=' "height: " + item.high + "px;  display: flex;  flex-direction: column-reverse;" '>
