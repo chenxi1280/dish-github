@@ -339,12 +339,10 @@
 						this.childs.splice(i,1,childs[i]);
 						this.option[i] = childs[i].selectTitle;
 					}
-					console.log(this.childs);
 				}else{
 					//islink不是null且值为1说明该节点是跳转节点
 					if(artworkTree.isLink != null && artworkTree.isLink === 1){
 						//从缓存中拿到主树
-						console.log(artworkTree)
 						const linkId = artworkTree.linkUrl;
 						this.likeNodeId = linkId
 						const mainTree = uni.getStorageSync("mainArtworkTree");
@@ -357,8 +355,6 @@
 						this.endFlag = false;
 					}
 				}
-				console.log(this.likeNodeId)
-				console.log( this.detailId)
 				if (this.likeNodeId != this.detailId) {
 					this.playedHistoryArray.push(artworkTree.pkDetailId);
 					this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray));
