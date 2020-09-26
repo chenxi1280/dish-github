@@ -180,10 +180,9 @@
 					}
 					uni.setStorageSync("pkDetailIds", b);
 					this.$refs.uToast.show({
-						title: '选中跳转到' + a.selectTitle + a.pkDetailId,
+						title: '选中跳转到' + a.selectTitle ,
 						type: 'success',
 					})
-					console.log( a.pkDetailId)
 					uni.navigateTo({
 						url: "../play/play?pkArtworkId=" + this.pkArtworkId + "&pkDetailId=" + a.pkDetailId,
 					})
@@ -193,7 +192,7 @@
 			},
 			showToast() {
 				this.$refs.uToast.show({
-					title: '请在选择中心位进行跳转',
+					title: '请滑动至选择中心位进行跳转',
 					type: 'error',
 				})
 			},
