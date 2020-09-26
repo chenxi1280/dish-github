@@ -4,7 +4,7 @@
 			<view class="login_redirect_btn">登录
 				<view>Welcome</view>
 			</view>
-			<!-- <view class="signin_redirect_btn" @click="toSigninPage">注册</view> -->
+			<view class="signin_redirect_btn" @click="toSigninPage">注册</view>
 		</view>
 		 <!-- #ifdef MP-WEIXIN -->
 		<view class="bottom">
@@ -35,6 +35,11 @@
 					  concelContext="取消"
 					  @confirm="confirm" ></my-dialog>
 		</view>
+		<view>
+			<temporary confirmContext="确定"
+					  concelContext="取消"
+					   @confirm="mistake"></temporary>
+		</view>
 		<!-- #endif -->
 	</view>
 </template>
@@ -42,6 +47,7 @@
 	import { baseURL } from '../config/config.js'
 	import myDialog from '../../../components/dialog/myDialog.vue'
 	import {globalBus} from '../../../common/js/util.js'
+	import temporary from '../../../components/dialog/temporary.vue'
 	
 	export default {
 	  data () {
@@ -58,7 +64,8 @@
 	    }
 	  },
 	  components: {
-	  		myDialog
+	  		myDialog,
+			temporary
 	  },
 	  onLoad () {
 	    this.getTextVerify()
@@ -175,10 +182,25 @@
 	    },
 	    // 前往注册页面
 	    toSigninPage () {
-	    	uni.navigateTo({
+	    	/* uni.navigateTo({
 	    		url: "../signin/signin"
-	    	})
+	    	}) */
+			//暂不开放 显示邀请码弹窗
+			globalBus.$emit('show',true)
 	    },
+		mistake(){
+			//临时用来解决注册暂不开放的解决方案
+			uni.showLoading({
+				mask: true
+			});
+			setTimeout( () => {
+				 uni.hideLoading();
+				 uni.showToast({
+				 	icon: 'none',
+					title: '请输入正确邀请码'
+				 })
+			}, 200);
+		},
 	    // 获取图文验证码
 	    async getTextVerify () {
 			await uni.request({
@@ -264,6 +286,7 @@
 				width: 80rpx;
 				color: #FCFCFC;
 				font-weight: bold;
+				font-size: 36rpx;
 				margin: 20rpx;
 			}
 		}
