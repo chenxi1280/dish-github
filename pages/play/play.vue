@@ -154,28 +154,38 @@
 			}
 		},
 		onLoad(option) {
+			//option.scene 不为空说明是扫码跳转过来播放的
 			if(option.scene){
-				uni.request ({
-					url: baseURL + "/wxPlay/getUserIdByArtwordId",
-					method: 'POST',
-					dataType: 'json',
-					data: {
-						pkArtworkId: option.scene
-					},
-					success: result=> {
-						if(result.data.status == 200){
-							const userId = uni.getStorageSync('userId');
-							if(result.data.data == userId){
-								this.artworkId = option.scene;
-							}else{
-								uni.showToast({
-									icon: 'none',
-									title: '预览作品只能作者自己观看'
-								})
+				let scene = decodeURIComponent(option.scene);
+				var arr = scene.split('=')
+				//a是artworkId b是status
+				let a = arr[1] - 0
+				let b = arr[3] - 0
+				if(b == 2){
+					uni.request ({
+						url: baseURL + "/wxPlay/getUserIdByArtwordId",
+						method: 'POST',
+						dataType: 'json',
+						data: {
+							pkArtworkId: a
+						},
+						success: result=> {
+							if(result.data.status == 200){
+								const userId = uni.getStorageSync('userId');
+								if(result.data.data == userId){
+									this.artworkId = a;
+								}else{
+									uni.showToast({
+										icon: 'none',
+										title: '预览作品只能作者自己观看'
+									})
+								}
 							}
 						}
-					}
-				});
+					});
+				}else{
+					this.artworkId = a;
+				}
 			}else{
 				this.artworkId = option.pkArtworkId
 			}
