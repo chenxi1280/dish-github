@@ -161,7 +161,7 @@
 				//a是artworkId b是status
 				let a = arr[1] - 0
 				let b = arr[3] - 0
-				if(b == 2){
+				if(b == 1){
 					uni.request ({
 						url: baseURL + "/wxPlay/getUserIdByArtwordId",
 						method: 'POST',
