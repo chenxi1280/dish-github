@@ -25,9 +25,9 @@
 				</view>
 			</view>
 			<button class="login" type="default" plain="true" @click="login">登录</button>
-			<view class="forgetPwdBox" @click="showLinkAddress">
+			<!-- <view class="forgetPwdBox" @click="showLinkAddress">
 				<view class="forgetPwd">忘记密码</view>
-			</view>
+			</view> -->
 		</view>
 		<view class="component">
 			<my-dialog message= '修改密码请前往四刻互动专业版web端进行操作\n\n网站地址：https://wanxiangchengzhen.com/ivetool/#/login/password'
@@ -122,12 +122,14 @@
 					password: this.password,
 					mobile: this.phone,
 					confirmCode: this.verify,
-					imageCodeKey: imageCodeKey
+					imageCodeKey: imageCodeKey,
+					openid: uni.getStorageSync('openid')
 				},
 				success: res=> {
 					if (res.data.status === 200) {
 						// console.log(res)
-						uni.setStorageSync('token', res.data.data)
+						uni.setStorageSync('token', res.data.data.token)
+						uni.setStorageSync('userId', res.data.data.userId)
 						uni.showToast({
 								title: '登录成功'
 							})
