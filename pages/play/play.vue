@@ -1,6 +1,9 @@
 <template>
 	<view class="playBox">
 		<view class="play">
+			<view class="container" v-if="showSvgFlag">
+			  <cax-element id="svg-a"></cax-element>
+			</view>
 			<!-- 播放主体   @click="showButton"-->
 			<view class="videoBox">
 				<video :src="videoUrl" :autoplay="true" direction="0" :show-mute-btn="true" :show-fullscreen-btn="false" id="myVideo"
@@ -92,12 +95,40 @@
 <script>
 	import { baseURL } from '../login/config/config.js'
 	import storyLine from './storyLine/storyLine.vue'
+	import { html, renderSVG } from '../../wxcomponents/cax/cax'
 	export default {
 		components:{
 			storyLine
 		},
 		data() {
 			return {
+				//定位选项mock数据
+				nodeLocationList: [{
+						"pkDetailId": 5925,
+						"circleX": 0.1,
+						"circleY": 0.1,
+						"textRectX": 0.44266666666666665,
+						"textRectY": 0.09550224887556222,
+						"isHide": "1"
+					}, {
+						"pkDetailId": 5927,
+						"circleX": 0.1,
+						"circleY": 0.2,
+						"textRectX": 0.48,
+						"textRectY": 0.18950524737631186,
+						"isHide": "1"
+					}, {
+						"pkDetailId": 5928,
+						"circleX": 0.1,
+						"circleY": 0.30000000000000004,
+						"textRectX": 0.2,
+						"textRectY": 0.30000000000000004,
+						"isHide": "1"
+				}],
+				//窗口宽度
+				windowWidth: 0,
+				//窗口高度（不包括手机通知栏、小程序标题栏和tabBar）
+				windowHeight: 0,
 				//视频路径
 				videoUrl: "",
 				//选项参数
@@ -120,6 +151,8 @@
 				uploadBtnFlag: true,
 				//视屏是否播放结束标志 true是未播放结束
 				endFlag: true,
+				//展示画布开关
+				showSvgFlag: true,
 				artworkId: 0,
 				detailId: 0,
 				//播放历史的作品id容器
@@ -154,11 +187,27 @@
 			}
 		},
 		onLoad(option) {
+			//初始化画布（临时）
+			var that = this
+			//获取手机屏幕尺寸 单位是px
+			const {windowWidth, windowHeight} = uni.getSystemInfoSync();
+			this.windowWidth = windowWidth;
+			this.windowHeight = windowHeight;
+			renderSVG(html`
+				<svg width="${this.windowWidth}" height="${this.windowHeight}">
+						<rect bindtap="tapHandler"
+							height="110" width="110"
+							style="stroke:#ff0000; fill: #ccccff"
+							transform="translate(100 50) rotate(45 50 50)">
+						</rect>
+						<line x1="0" y1="0" x2="200" y2="200"
+						  style="stroke:rgb(255,0,0);stroke-width:2"/>
+				</svg>`, 'svg-a', that);
 			//option.scene 不为空说明是扫码跳转过来播放的
 			if(option.scene){
 				let scene = decodeURIComponent(option.scene);
 				var arr = scene.split('=')
-				//a是artworkId b是status
+				//a是artworkId b是status -0是为了将string 转化成number
 				let a = arr[1] - 0
 				let b = arr[3] - 0
 				if(b == 1){
@@ -566,6 +615,9 @@
 				this.reportContentFlag = false
 				const videoContext = uni.createVideoContext('myVideo')
 				videoContext.play()
+			},
+			tapHandler() {
+			  console.log('你点击了 rect')
 			}
 		}
 	}
@@ -581,6 +633,14 @@
 			.play{
 				width: 100%;
 				height: 100%;
+				.container{
+					width: 100%;
+					height: 100%;
+					position: fixed;
+					left: 0;
+					top: 0;
+					z-index: 17;
+				}
 				.videoBox{
 					width: 100%;
 					height: 100%;
