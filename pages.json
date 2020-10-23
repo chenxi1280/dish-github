@@ -4,12 +4,7 @@
 	},
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages	
 	{
-		"path": "pages/play/play",
-		"style": {
-			"usingComponents":{
-				"cax-element": "/wxcomponents/cax/index"
-			}
-		}
+		"path": "pages/play/play"
 	},
 		{
 			"path": "pages/dishover/dishover",
@@ -22,12 +17,7 @@
 			"path": "pages/play/storyLine/storyLine"
 		},
 		/* {
-			"path": "pages/play/play",
-			"style": {
-				"usingComponents":{
-					"cax-element": "/wxcomponents/cax/index"
-				}
-			}
+			"path": "pages/play/play"
 		}, */
 		{
 			"path": "pages/mine/mine",

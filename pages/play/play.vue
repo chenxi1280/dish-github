@@ -1,8 +1,8 @@
 <template>
 	<view class="playBox">
 		<view class="play">
-			<view class="container" v-if="showSvgFlag">
-			  <cax-element id="svg-a"></cax-element>
+			<view class="container"  v-if="showCanvasFlag">
+			  <canvas canvas-id="myCanvas" @touchstart="getTouchPosition" @touchend="accordingRectTodo" :style="{'width': windowWidth+'rpx', 'height': windowHeight+'rpx'}"></canvas>
 			</view>
 			<!-- 播放主体   @click="showButton"-->
 			<view class="videoBox">
@@ -95,7 +95,6 @@
 <script>
 	import { baseURL } from '../login/config/config.js'
 	import storyLine from './storyLine/storyLine.vue'
-	import { html, renderSVG } from '../../wxcomponents/cax/cax'
 	export default {
 		components:{
 			storyLine
@@ -104,31 +103,34 @@
 			return {
 				//定位选项mock数据
 				nodeLocationList: [{
+						"isHide": "1",
 						"pkDetailId": 5925,
-						"circleX": 0.1,
-						"circleY": 0.1,
-						"textRectX": 0.44266666666666665,
-						"textRectY": 0.09550224887556222,
-						"isHide": "1"
+						"circleX": 0.2866666666666667,
+						"circleY": 0.3833583208395802,
+						"textRectX": 0.736,
+						"textRectY": 0.08950524737631185
 					}, {
+						"isHide": "1",
 						"pkDetailId": 5927,
-						"circleX": 0.1,
-						"circleY": 0.2,
-						"textRectX": 0.48,
-						"textRectY": 0.18950524737631186,
-						"isHide": "1"
+						"circleX": 0.356,
+						"circleY": 0.39190404797601197,
+						"textRectX": 0.6213333333333333,
+						"textRectY": 0.25697151424287856
 					}, {
+						"isHide": "1",
 						"pkDetailId": 5928,
-						"circleX": 0.1,
-						"circleY": 0.30000000000000004,
-						"textRectX": 0.2,
-						"textRectY": 0.30000000000000004,
-						"isHide": "1"
-				}],
-				//窗口宽度
-				windowWidth: 0,
-				//窗口高度（不包括手机通知栏、小程序标题栏和tabBar）
-				windowHeight: 0,
+						"circleX": 0.24666666666666667,
+						"circleY": 0.3779610194902549,
+						"textRectX": 0.112,
+						"textRectY": 0.6688155922038981
+					}, {
+						"isHide": "1",
+						"pkDetailId": 5973,
+						"circleX": 0.32133333333333336,
+						"circleY": 0.3880059970014993,
+						"textRectX": 0.5146666666666667,
+						"textRectY": 0.7148425787106447
+					}],
 				//视频路径
 				videoUrl: "",
 				//选项参数
@@ -152,7 +154,7 @@
 				//视屏是否播放结束标志 true是未播放结束
 				endFlag: true,
 				//展示画布开关
-				showSvgFlag: true,
+				showCanvasFlag: true,
 				artworkId: 0,
 				detailId: 0,
 				//播放历史的作品id容器
@@ -183,26 +185,20 @@
 						value: 3,
 						name: '其它'
 					}
-				]
+				],
+				//窗口宽度
+				windowWidth: '600rpx',
+				//窗口高度（不包括手机通知栏、小程序标题栏和tabBar）
+				windowHeight: '300rpx',
+				//矩形框数据数组
+				rectArray: [],
+				//默认是个不会被触发的数字 
+				touchRectNum: 5,
+				//是否被点击的标志
+				isClickFlag: false
 			}
 		},
 		onLoad(option) {
-			//初始化画布（临时）
-			var that = this
-			//获取手机屏幕尺寸 单位是px
-			const {windowWidth, windowHeight} = uni.getSystemInfoSync();
-			this.windowWidth = windowWidth;
-			this.windowHeight = windowHeight;
-			renderSVG(html`
-				<svg width="${this.windowWidth}" height="${this.windowHeight}">
-						<rect bindtap="tapHandler"
-							height="110" width="110"
-							style="stroke:#ff0000; fill: #ccccff"
-							transform="translate(100 50) rotate(45 50 50)">
-						</rect>
-						<line x1="0" y1="0" x2="200" y2="200"
-						  style="stroke:rgb(255,0,0);stroke-width:2"/>
-				</svg>`, 'svg-a', that);
 			//option.scene 不为空说明是扫码跳转过来播放的
 			if(option.scene){
 				let scene = decodeURIComponent(option.scene);
@@ -243,6 +239,12 @@
 			uni.setStorageSync("detailId",this.detailId);
 		},
 		onReady(){
+			//初始化定位选项画布
+			//获取手机屏幕尺寸 单位是px
+			const {windowWidth, windowHeight} = uni.getSystemInfoSync();
+			this.windowWidth = windowWidth*2;
+			this.windowHeight = windowHeight*2;
+			this.initCanvas();
 			//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
 			this.endFlag = true;
 			if(this.pkDetailId != null){
@@ -618,6 +620,224 @@
 			},
 			tapHandler() {
 			  console.log('你点击了 rect')
+			},
+			initCanvas(){
+				this.rectArray = [];
+				const ctx = uni.createCanvasContext('myCanvas')
+				ctx.clearRect(0 , 0 , this.windowWidth/2, this.windowHeight/2)
+				for(let i = 0; i < this.nodeLocationList.length; i++){
+					if(this.nodeLocationList[i].isHide == 1){
+						console.log(1)
+						//矩形左上角点的坐标(X,Y)
+						//rpx转px 故(this.windowWidth)/2
+						let rectX = Math.ceil((this.nodeLocationList[i].textRectX+0)*(this.windowWidth)/2)
+						let rectY = Math.ceil((this.nodeLocationList[i].textRectY+0)*(this.windowHeight)/2)
+						//文字距离左右两个边框的间距
+						let marginLeftAndRightSides = 8
+						//矩形框高度
+						let rectH = 30 
+						//字体大小
+						let fontSize = 15
+						//文字距离矩形框下边框边距
+						let marginBottom = 10
+						//文本内容
+						let btnOneText = '未命名选项'
+						//测量之前要先确定字体大小 因为矩形宽是根据字体的长度来绘画的 不设置会影响测量
+						ctx.setFontSize(fontSize)
+						//测量文本宽度
+						let metrics = ctx.measureText(btnOneText)
+						//宽度取整 Math.ceil向上取整即省去小数再加1 宽度由文本的宽度加边距组成
+						let rectW = Math.ceil(metrics.width)+marginLeftAndRightSides;
+						//末尾小圆圈的横纵坐标
+						let cX = Math.ceil((this.nodeLocationList[i].circleX+0)*(this.windowWidth)/2)
+						let cY = Math.ceil((this.nodeLocationList[i].circleY+0)*(this.windowHeight)/2)
+						
+						//画线 连线到小圆心
+						let cr = 4
+						ctx.moveTo(cX,cY)
+						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
+						ctx.lineTo((Math.ceil(rectW/2)+rectX)-(rectW/2),(Math.ceil(rectH/2)+rectY)-(rectH/2))
+						ctx.setStrokeStyle('white')
+						ctx.stroke()
+						
+						//画末尾小圆圈
+						//x,y,r,sAngle（起始弧度,单位弧度（在3点钟方向）），eAngle（终止弧度）counterclockwise可选，默认是false 标识顺时针 
+						//让起始点转到12点就需要倒退0.5* Math.PI 但整圆是2 * Math.PI 故终止弧度加0.5* Math.PI
+						ctx.beginPath()
+						ctx.arc(cX, cY, cr, 0, 2 * Math.PI)
+						ctx.setStrokeStyle('black')
+						ctx.setFillStyle('#E3E3E3')
+						ctx.fill()
+						ctx.stroke()
+						
+						//画矩形
+						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
+						ctx.beginPath()
+						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
+						this.drawRect(ctx, rectX-(rectW/2), rectY-(rectH/2), rectW, rectH, 4)
+						//将坐标收纳成对象保存到数组，为绑定事件做准备
+						let rectOne={
+							x: rectX-(rectW/2),
+							y: rectY-(rectH/2),
+							w: rectW,
+							h: rectH
+						}
+						this.rectArray.push(rectOne)
+						if(this.isClickFlag){
+							if(this.touchRectNum == i){
+									//矩形边框颜色
+									ctx.setStrokeStyle('#96CDCD')
+									//矩形填充色
+									ctx.setFillStyle('#96CDCD')
+									this.isClickFlag = false
+								}else{
+									ctx.setStrokeStyle('rgba(255, 255, 255, 0.5)')
+									ctx.setFillStyle('rgba(255, 255, 255, 0.5)')
+								}
+						}else{
+							ctx.setStrokeStyle('rgba(255, 255, 255, 0.5)')
+							ctx.setFillStyle('rgba(255, 255, 255, 0.5)')
+						}
+						ctx.fill()
+						//开始描绘
+						ctx.stroke()
+						
+						//写字
+						//设置字体颜色
+						ctx.setFillStyle('white')
+						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
+						ctx.fillText(btnOneText, (rectX+(marginLeftAndRightSides/2))-(rectW/2),(rectH+rectY-marginBottom)-(rectH/2))
+						//开始描绘
+						ctx.stroke()
+						ctx.draw(true)
+					}else{
+						console.log(0)
+						//矩形左上角点的坐标(X,Y)
+						//rpx转px 故(this.windowWidth)/2
+						let rectX = Math.ceil((this.nodeLocationList[i].textRectX+0)*(this.windowWidth)/2)
+						let rectY = Math.ceil((this.nodeLocationList[i].textRectY+0)*(this.windowHeight)/2)
+						//文字距离左右两个边框的间距
+						let marginLeftAndRightSides = 0
+						//矩形框高度
+						let rectH = 22
+						//字体大小
+						let fontSize = 15
+						//文字距离矩形框下边框边距
+						let marginBottom = 10
+						//文本内容
+						let btnOneText = '未命名选项'
+						//测量之前要先确定字体大小 因为矩形宽是根据字体的长度来绘画的 不设置会影响测量
+						ctx.setFontSize(fontSize)
+						//测量文本宽度
+						let metrics = ctx.measureText(btnOneText)
+						//宽度取整 Math.ceil向上取整即省去小数再加1 宽度由文本的宽度加边距组成
+						let rectW = Math.ceil(metrics.width)+marginLeftAndRightSides;
+						
+						//画矩形
+						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
+						ctx.beginPath()
+						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
+						this.drawRect(ctx, rectX, rectY, rectW, rectH, 3)
+						//将坐标收纳成对象保存到数组，为绑定事件做准备
+						let rectOne={
+							x: rectX,
+							y: rectY,
+							w: rectW,
+							h: rectH
+						}
+						this.rectArray.push(rectOne)
+						if(this.isClickFlag){
+							if(this.touchRectNum == i){
+									//矩形边框颜色
+									ctx.setStrokeStyle('#96CDCD')
+									//矩形填充色
+									ctx.setFillStyle('#96CDCD')
+									this.isClickFlag = false
+								}else{
+									ctx.setStrokeStyle('rgba(255, 255, 255, 0.1)')
+									ctx.setFillStyle('rgba(255, 255, 255, 0.1)')
+								}
+						}else{
+							ctx.setStrokeStyle('rgba(255, 255, 255, 0.1)')
+							ctx.setFillStyle('rgba(255, 255, 255, 0.1)')
+						}
+						ctx.fill()
+						//开始描绘
+						ctx.stroke()
+						ctx.draw(true)
+					}
+				}
+			},
+			// (x,y):圆角矩形起始坐标; width: 矩形宽度; height: 矩形高度; r: 矩形圆角;
+			drawRect(ctx, x, y, width, height, r){
+				ctx.beginPath();
+				ctx.moveTo(x + r, y);
+				ctx.lineTo(x + width - r, y);
+				ctx.arc(x + width - r, y + r, r, Math.PI*1.5, Math.PI*2);
+				ctx.lineTo(x + width, y + height - r);
+				ctx.arc(x + width - r, y + height - r, r, 0, Math.PI*0.5);
+				ctx.lineTo(x + r, y + height);
+				ctx.arc(x + r, y + height - r, r, Math.PI*0.5, Math.PI);
+				ctx.lineTo(x, y + r);
+				ctx.arc(x + r, y + r, r, Math.PI, Math.PI*1.5);
+			},
+			drawText(t,x,y,w){
+				//参数t是文本 w是屏幕宽度,
+				var chr = t.split("");
+				var temp = "";				
+				var row = [];
+				
+				context.font = "20px Arial";
+				context.fillStyle = "black";
+				context.textBaseline = "middle";
+				
+				for(var a = 0; a < chr.length; a++){
+					if( context.measureText(temp).width > w ){
+						row.push(temp);
+						temp = "";
+					}
+					temp += chr[a];
+				}
+				
+				row.push(temp);
+				
+				for(var b = 0; b < row.length; b++){
+					context.fillText(row[b],x,y+(b+1)*20);
+				}
+			},
+			getTouchPosition(e){
+				//之后写入for循环中
+				if(this.rectArray.length != 0){
+					for(let i = 0; i<this.nodeLocationList.length; i++){
+						let touchX = e.changedTouches[0].x;
+						let touchY = e.changedTouches[0].y;
+						let xLowLimit = this.rectArray[i].x;
+						let yLowLimit = this.rectArray[i].y;
+						let xUpperLimit = this.rectArray[i].x+this.rectArray[i].w;
+						let yUpperLimit = this.rectArray[i].y+this.rectArray[i].h;
+						//判断边界办法
+						if(touchX > xLowLimit && touchX < xUpperLimit && touchY > yLowLimit && touchY < yUpperLimit){
+							this.touchRectNum = i;
+						}
+					}
+					if(this.touchRectNum < 4){
+						this.isClickFlag = true
+						this.initCanvas()
+					}
+				}
+			},
+			accordingRectTodo(){
+				if(this.touchRectNum == 0){
+					console.log("第一个选项被触发了")
+				}else if(this.touchRectNum == 1){
+					console.log("第二个选项被触发了")
+				}else if(this.touchRectNum == 2){
+					console.log("第三个选项被触发了")
+				}else if(this.touchRectNum == 3){
+					console.log("第四个选项被触发了")
+				}
+				//回到默认值
+				this.touchRectNum = 5
 			}
 		}
 	}
@@ -640,6 +860,8 @@
 					left: 0;
 					top: 0;
 					z-index: 17;
+					/* background: url(https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/1600828961029) no-repeat center;
+					background-size: 100% 100%; */
 				}
 				.videoBox{
 					width: 100%;
