@@ -101,36 +101,18 @@
 		},
 		data() {
 			return {
-				//定位选项mock数据
-				nodeLocationList: [{
-						"isHide": "1",
-						"pkDetailId": 5925,
-						"circleX": 0.2866666666666667,
-						"circleY": 0.3833583208395802,
-						"textRectX": 0.736,
-						"textRectY": 0.08950524737631185
-					}, {
-						"isHide": "1",
-						"pkDetailId": 5927,
-						"circleX": 0.356,
-						"circleY": 0.39190404797601197,
-						"textRectX": 0.6213333333333333,
-						"textRectY": 0.25697151424287856
-					}, {
-						"isHide": "1",
-						"pkDetailId": 5928,
-						"circleX": 0.24666666666666667,
-						"circleY": 0.3779610194902549,
-						"textRectX": 0.112,
-						"textRectY": 0.6688155922038981
-					}, {
-						"isHide": "1",
-						"pkDetailId": 5973,
-						"circleX": 0.32133333333333336,
-						"circleY": 0.3880059970014993,
-						"textRectX": 0.5146666666666667,
-						"textRectY": 0.7148425787106447
-					}],
+				//定位选项标志
+				isPosition: 0,
+				//数值选项标志
+				isNUmberSelect: 0,
+				//定位选项数据
+				nodeLocationList: [],
+				//数值选项数据
+				advancedList: [],
+				//视频黑边像素 (单边的 height)
+				hblackSideNum: 0,
+				//视频黑边像素 (单边的 width)
+				wblackSideNum: 0,
 				//视频路径
 				videoUrl: "",
 				//选项参数
@@ -154,9 +136,13 @@
 				//视屏是否播放结束标志 true是未播放结束
 				endFlag: true,
 				//展示画布开关
-				showCanvasFlag: true,
+				showCanvasFlag: false,
+				//作品id
 				artworkId: 0,
+				//作品详情id
 				detailId: 0,
+				//跳转目标节点的detailId
+				linkNodeId: 0,
 				//播放历史的作品id容器
 				playedHistoryArray: [],
 				childs: [],
@@ -242,9 +228,11 @@
 			//初始化定位选项画布
 			//获取手机屏幕尺寸 单位是px
 			const {windowWidth, windowHeight} = uni.getSystemInfoSync();
+			this.validateBlackSide(windowWidth, windowHeight)
 			this.windowWidth = windowWidth*2;
 			this.windowHeight = windowHeight*2;
-			this.initCanvas();
+			//test
+			this.artworkId = 316;
 			//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
 			this.endFlag = true;
 			if(this.pkDetailId != null){
@@ -413,10 +401,80 @@
 				const uuid = Math.random().toString(36).substring(2);
 				this.videoUrl = artworkTree.videoUrl+'?uuid='+uuid;
 				this.detailId = artworkTree.pkDetailId;
+				//是否是定位选项的标志 1是定位选项 其他是普通选项
+				this.isPosition = artworkTree.isPosition
+				//是否是数值选项的标志 1是数值选项 其它是普通选项
+				this.isNUmberSelect = artworkTree.isNUmberSelect
 				//将当前播放的作品的detailId保存在缓存用于举报时确定是哪个具体的作品
 				uni.setStorageSync("detailId",this.detailId);
 				//保存播放过的作品的id
 				this.savaPlayRecord();
+				if(this.isPosition == 1){
+					if(this.isNUmberSelect == 1){
+						//定位选项中的数值选项
+						//获取定位选项数据
+						this.nodeLocationList = artworkTree.nodeLocationList
+						//初始化画布
+						this.initCanvas();
+						//获取数值选项参数
+						this.calculateSelectOptionScore(artworkTree)
+					}else{
+						//定位选项中的普通选项
+						this.nodeLocationList = artworkTree.nodeLocationList
+						//初始化画布
+						this.initCanvas();
+						//获取每个子节点信息 并判断子节点中是否有跳转节点
+						this.getSelectTextAndJudgeIsLink(artworkTree)
+					}
+				}else{
+					if(this.isNUmberSelect == 1){
+						//普通选项中的数值选项
+						this.calculateSelectOptionScore(artworkTree)
+					}else{
+						//常规选项
+						//获取每个子节点信息 并判断子节点中是否有跳转节点
+						this.getSelectTextAndJudgeIsLink(artworkTree)
+					}
+				}
+
+			},
+			calculateSelectOptionScore(artworkTree){
+				let childs = artworkTree.childs;
+				//获取数值选项参数
+				this.advancedList = artworkTree.onAdvancedList
+				// 要根据advancedList里面的条件进行判断是否显示childs的选项 还要根据点击时间去做相应的扣分
+				//不显示选项的方法是 把childs.length值减掉 这样选项数量就减少了
+				if(childs){
+					this.tipsArray.length = childs.length;
+					for(let i = 0;i < childs.length;i++){
+						this.childs.splice(i,1,childs[i]);
+						this.option[i] = childs[i].selectTitle;
+					}
+				}else{
+					//islink不是null且值为1说明该节点是跳转节点
+					if(artworkTree.isLink != null && artworkTree.isLink === 1){
+						//从缓存中拿到主树
+						const linkId = artworkTree.linkUrl;
+						//存储跳转目标节点的detailId
+						this.linkNodeId = linkId
+						const mainTree = uni.getStorageSync("mainArtworkTree");
+						this.playedHistoryArray.push(artworkTree.pkDetailId);
+						this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray));
+						uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
+						this.getTargetTree(mainTree,linkId)
+					}else{
+						//是不是最后一个视频标志 最后一个视频不需要弹窗
+						this.endFlag = false;
+					}
+				}
+				if (this.linkNodeId != this.detailId) {
+					this.playedHistoryArray.push(artworkTree.pkDetailId);
+					this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray));
+					uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
+					this.linkNodeId = null
+				}
+			},
+			getSelectTextAndJudgeIsLink(artworkTree){
 				let childs = artworkTree.childs;
 				if(childs){
 					this.tipsArray.length = childs.length;
@@ -429,7 +487,8 @@
 					if(artworkTree.isLink != null && artworkTree.isLink === 1){
 						//从缓存中拿到主树
 						const linkId = artworkTree.linkUrl;
-						this.likeNodeId = linkId
+						//存储跳转目标节点的detailId
+						this.linkNodeId = linkId
 						const mainTree = uni.getStorageSync("mainArtworkTree");
 						this.playedHistoryArray.push(artworkTree.pkDetailId);
 						this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray));
@@ -440,13 +499,12 @@
 						this.endFlag = false;
 					}
 				}
-				if (this.likeNodeId != this.detailId) {
+				if (this.linkNodeId != this.detailId) {
 					this.playedHistoryArray.push(artworkTree.pkDetailId);
 					this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray));
 					uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
-					this.likeNodeId = null
+					this.linkNodeId = null
 				}
-
 			},
 			getTargetTree(mainTree,linkId){
 				if(mainTree.pkDetailId == linkId){
@@ -460,7 +518,7 @@
 					}
 				}
 			},
-			//异步请求获取作品树
+			//异步请求获取作品树 by ArtworkId
 			async getArtworkTreeByArtworkId(){
 				console.log( this.artworkId)
 				await uni.request({
@@ -481,7 +539,7 @@
 					}
 				})
 			},
-			//异步请求获取作品树
+			//异步请求获取作品树 by DetailId
 			async getArtworkTreeByDetailId(){
 				console.log( this.artworkId)
 				await uni.request({
@@ -521,14 +579,22 @@
 			},
 			//开关控制是否展示 选项框 故事线 举报页面
 			videoEnd(){
-				//根据是否是最后一个视频标志 判断是否弹窗
+				//根据是否是最后一个视频标志 最后一个视频播放结束弹出故事线
 				if(this.endFlag){
-					this.chooseTipsShowFlag = true;
-					this.chooseTipsMaskFlag = true;
+					if(this.isPosition == 1){
+						this.chooseTipsShowFlag = false;
+						this.chooseTipsMaskFlag = false;
+						this.showCanvasFlag = true;
+					}else{
+						this.showCanvasFlag = false;
+						this.chooseTipsShowFlag = true;
+						this.chooseTipsMaskFlag = true;
+					}
 				}else{
 					this.storyLineContentFlag = true
 					this.chooseTipsShowFlag = false;
 					this.chooseTipsMaskFlag = false;
+					this.showCanvasFlag = false;
 				}
 			},
 			videoPause(){
@@ -622,16 +688,16 @@
 			  console.log('你点击了 rect')
 			},
 			initCanvas(){
-				this.rectArray = [];
+				this.rectArray = []
 				const ctx = uni.createCanvasContext('myCanvas')
 				ctx.clearRect(0 , 0 , this.windowWidth/2, this.windowHeight/2)
 				for(let i = 0; i < this.nodeLocationList.length; i++){
 					if(this.nodeLocationList[i].isHide == 1){
 						console.log(1)
 						//矩形左上角点的坐标(X,Y)
-						//rpx转px 故(this.windowWidth)/2
-						let rectX = Math.ceil((this.nodeLocationList[i].textRectX+0)*(this.windowWidth)/2)
-						let rectY = Math.ceil((this.nodeLocationList[i].textRectY+0)*(this.windowHeight)/2)
+						//rpx转px 故(this.windowWidth)/2 算总长度时应该减去黑边
+						let rectX = Math.ceil((this.nodeLocationList[i].textRectX+0)*(this.windowWidth-this.wblackSideNum)/2)
+						let rectY = Math.ceil((this.nodeLocationList[i].textRectY+0)*(this.windowHeight-this.hblackSideNum)/2)
 						//文字距离左右两个边框的间距
 						let marginLeftAndRightSides = 8
 						//矩形框高度
@@ -641,20 +707,20 @@
 						//文字距离矩形框下边框边距
 						let marginBottom = 10
 						//文本内容
-						let btnOneText = '未命名选项'
+						let btnOneText = this.option[i]
 						//测量之前要先确定字体大小 因为矩形宽是根据字体的长度来绘画的 不设置会影响测量
 						ctx.setFontSize(fontSize)
 						//测量文本宽度
 						let metrics = ctx.measureText(btnOneText)
 						//宽度取整 Math.ceil向上取整即省去小数再加1 宽度由文本的宽度加边距组成
 						let rectW = Math.ceil(metrics.width)+marginLeftAndRightSides;
-						//末尾小圆圈的横纵坐标
-						let cX = Math.ceil((this.nodeLocationList[i].circleX+0)*(this.windowWidth)/2)
-						let cY = Math.ceil((this.nodeLocationList[i].circleY+0)*(this.windowHeight)/2)
+						//末尾小圆圈的横纵坐标 算总长度时应该减去黑边
+						let cX = Math.ceil((this.nodeLocationList[i].circleX+0)*(this.windowWidth-this.wblackSideNum)/2)
+						let cY = Math.ceil((this.nodeLocationList[i].circleY+0)*(this.windowHeight-this.hblackSideNum)/2)
 						
 						//画线 连线到小圆心
 						let cr = 4
-						ctx.moveTo(cX,cY)
+						ctx.moveTo(cX+this.wblackSideNum,cY+this.hblackSideNum)
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
 						ctx.lineTo((Math.ceil(rectW/2)+rectX)-(rectW/2),(Math.ceil(rectH/2)+rectY)-(rectH/2))
 						ctx.setStrokeStyle('white')
@@ -664,7 +730,7 @@
 						//x,y,r,sAngle（起始弧度,单位弧度（在3点钟方向）），eAngle（终止弧度）counterclockwise可选，默认是false 标识顺时针 
 						//让起始点转到12点就需要倒退0.5* Math.PI 但整圆是2 * Math.PI 故终止弧度加0.5* Math.PI
 						ctx.beginPath()
-						ctx.arc(cX, cY, cr, 0, 2 * Math.PI)
+						ctx.arc(cX+this.wblackSideNum, cY+this.hblackSideNum, cr, 0, 2 * Math.PI)
 						ctx.setStrokeStyle('black')
 						ctx.setFillStyle('#E3E3E3')
 						ctx.fill()
@@ -674,11 +740,11 @@
 						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
 						ctx.beginPath()
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
-						this.drawRect(ctx, rectX-(rectW/2), rectY-(rectH/2), rectW, rectH, 4)
+						this.drawRect(ctx, rectX-(rectW/2)+this.wblackSideNum, rectY-(rectH/2)+this.hblackSideNum, rectW, rectH, 4)
 						//将坐标收纳成对象保存到数组，为绑定事件做准备
 						let rectOne={
-							x: rectX-(rectW/2),
-							y: rectY-(rectH/2),
+							x: rectX-(rectW/2)+this.wblackSideNum,
+							y: rectY-(rectH/2)+this.hblackSideNum,
 							w: rectW,
 							h: rectH
 						}
@@ -706,16 +772,18 @@
 						//设置字体颜色
 						ctx.setFillStyle('white')
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
-						ctx.fillText(btnOneText, (rectX+(marginLeftAndRightSides/2))-(rectW/2),(rectH+rectY-marginBottom)-(rectH/2))
+						let textX = (rectX+(marginLeftAndRightSides/2))-(rectW/2)+this.wblackSideNum
+						let textY = (rectH+rectY-marginBottom)-(rectH/2)+this.hblackSideNum
+						ctx.fillText(btnOneText, textX, textY)
 						//开始描绘
 						ctx.stroke()
 						ctx.draw(true)
 					}else{
 						console.log(0)
 						//矩形左上角点的坐标(X,Y)
-						//rpx转px 故(this.windowWidth)/2
-						let rectX = Math.ceil((this.nodeLocationList[i].textRectX+0)*(this.windowWidth)/2)
-						let rectY = Math.ceil((this.nodeLocationList[i].textRectY+0)*(this.windowHeight)/2)
+						//rpx转px 故(this.windowWidth)/2 计算总长度时要减去黑边
+						let rectX = Math.ceil((this.nodeLocationList[i].textRectX+0)*(this.windowWidth-this.wblackSideNum)/2)
+						let rectY = Math.ceil((this.nodeLocationList[i].textRectY+0)*(this.windowHeight-this.hblackSideNum)/2)
 						//文字距离左右两个边框的间距
 						let marginLeftAndRightSides = 0
 						//矩形框高度
@@ -737,11 +805,11 @@
 						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
 						ctx.beginPath()
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
-						this.drawRect(ctx, rectX, rectY, rectW, rectH, 3)
+						this.drawRect(ctx, rectX+this.wblackSideNum, rectY+this.hblackSideNum, rectW, rectH, 3)
 						//将坐标收纳成对象保存到数组，为绑定事件做准备
 						let rectOne={
-							x: rectX,
-							y: rectY,
+							x: rectX+this.wblackSideNum,
+							y: rectY+this.hblackSideNum,
 							w: rectW,
 							h: rectH
 						}
@@ -768,7 +836,7 @@
 					}
 				}
 			},
-			// (x,y):圆角矩形起始坐标; width: 矩形宽度; height: 矩形高度; r: 矩形圆角;
+			// 绘制圆角矩形方法 (x,y):圆角矩形起始坐标; width: 矩形宽度; height: 矩形高度; r: 矩形圆角;
 			drawRect(ctx, x, y, width, height, r){
 				ctx.beginPath();
 				ctx.moveTo(x + r, y);
@@ -781,6 +849,7 @@
 				ctx.lineTo(x, y + r);
 				ctx.arc(x + r, y + r, r, Math.PI, Math.PI*1.5);
 			},
+			// canvas中计算控制文本换行方法
 			drawText(t,x,y,w){
 				//参数t是文本 w是屏幕宽度,
 				var chr = t.split("");
@@ -805,6 +874,7 @@
 					context.fillText(row[b],x,y+(b+1)*20);
 				}
 			},
+			// canvas的touchStart事件
 			getTouchPosition(e){
 				//之后写入for循环中
 				if(this.rectArray.length != 0){
@@ -826,18 +896,38 @@
 					}
 				}
 			},
+			// canvas的touchEnd事件
 			accordingRectTodo(){
 				if(this.touchRectNum == 0){
 					console.log("第一个选项被触发了")
+					this.showCanvasFlag = false
+					this.initPlayData(this.childs[this.touchRectNum])
 				}else if(this.touchRectNum == 1){
 					console.log("第二个选项被触发了")
+					this.showCanvasFlag = false
+					this.initPlayData(this.childs[this.touchRectNum])
 				}else if(this.touchRectNum == 2){
 					console.log("第三个选项被触发了")
+					this.showCanvasFlag = false
+					this.initPlayData(this.childs[this.touchRectNum])
 				}else if(this.touchRectNum == 3){
 					console.log("第四个选项被触发了")
+					this.showCanvasFlag = false
+					this.initPlayData(this.childs[this.touchRectNum])
 				}
 				//回到默认值
 				this.touchRectNum = 5
+			},
+			// 校正黑边
+			validateBlackSide(windowWidth, windowHeight){
+				if(windowHeight/windowWidth>16/9){
+					//高度变高了出现上下黑边
+					this.hblackSideNum = Math.ceil((windowHeight-(16/9)*windowWidth)/2)
+				}else{
+					//宽度变宽了出现左右黑边
+					this.wblackSideNum = Math.ceil((windowWidth-(9/16)*windowHeight)/2)
+				}
+				console.log("黑边的高："+this.hblackSideNum+"黑边的宽："+this.wblackSideNum)
 			}
 		}
 	}
@@ -860,8 +950,8 @@
 					left: 0;
 					top: 0;
 					z-index: 17;
-					/* background: url(https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/1600828961029) no-repeat center;
-					background-size: 100% 100%; */
+					// background: url(https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/1600828961029) no-repeat center;
+					// background-size: 100% 100%;
 				}
 				.videoBox{
 					width: 100%;
@@ -936,8 +1026,8 @@
 				
 				.storyLineBox{
 					position: fixed;
-					right: 40rpx;
-					top: 40rpx;
+					right: 6%;
+					top: 6%;
 					height: 80rpx;
 					width: 120rpx;
 					z-index: 15;
@@ -951,8 +1041,8 @@
 				}
 				.reportBox{
 					position: fixed;
-					left: 40rpx;
-					top: 40rpx;
+					left: 6%;
+					top: 6%;
 					height: 80rpx;
 					width: 120rpx;
 					z-index: 15;
