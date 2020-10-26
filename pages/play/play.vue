@@ -145,9 +145,12 @@
 				linkNodeId: 0,
 				//播放历史的作品id容器
 				playedHistoryArray: [],
+				//选项对象容器
 				childs: [],
 				//通过tipsArray数组长度控制选项个数
 				tipsArray: [],
+				//数值选项 用户分数记录容器
+				userScoreArray: [],
 				//举报类型
 				reportType: "",
 				//举报内容
@@ -220,13 +223,23 @@
 			}else{
 				this.artworkId = option.pkArtworkId
 			}
+			// 故事线跳转进来的地方 会带上pkArtworkId and pkDetailId
 			this.pkDetailId = option.pkDetailId
+			// 每次的故事线跳转都要重置当前播放节点
+			for(let i=0; i<this.userScoreArray.length; i++){
+				let targetDetailId = this.userScoreArray[i].detailId
+				if(targetDetailId == this.pkDetailId){
+					let userScore = this.userScoreArray[i].userScore
+					uni.setStorageSync('userScore',userScore)
+					break
+				}
+			}
 			this.detailId = null;
 			uni.setStorageSync("detailId",this.detailId);
 		},
 		onReady(){
 			//test
-			this.artworkId = 316;
+			this.artworkId = 317;
 			//初始化定位选项画布
 			//获取手机屏幕尺寸 单位是px
 			const {windowWidth, windowHeight} = uni.getSystemInfoSync()
@@ -255,6 +268,8 @@
 				animationDuration: 10,
 				animationType: null
 			});
+			// 退出播放页面 重置用户存储的用户分数数组，以便于下次故事线跳转时的分数查找
+			this.userScoreArray = [];
 		},
 		methods: {
 			// 举报页面上传截图到腾讯云
@@ -399,21 +414,25 @@
 			initPlayData(artworkTree){
 				//初始化视频及选项
 				//随机数 
-				const uuid = Math.random().toString(36).substring(2);
-				this.videoUrl = artworkTree.videoUrl+'?uuid='+uuid;
-				this.detailId = artworkTree.pkDetailId;
+				const uuid = Math.random().toString(36).substring(2)
+				this.videoUrl = artworkTree.videoUrl+'?uuid='+uuid
+				this.detailId = artworkTree.pkDetailId
 				//是否是定位选项的标志 1是定位选项 其他是普通选项
 				this.isPosition = artworkTree.isPosition
 				//是否是数值选项的标志 1是数值选项 其它是普通选项
 				this.isNUmberSelect = artworkTree.isNUmberSelect
 				//将当前播放的作品的detailId保存在缓存用于举报时确定是哪个具体的作品
-				uni.setStorageSync("detailId",this.detailId);
+				uni.setStorageSync("detailId",this.detailId)
 				//保存播放过的作品的id
 				this.savaPlayRecord();
 				if(this.isPosition == 1){
 					if(this.isNUmberSelect == 1){
 						//定位选项中的数值选项
 						//获取定位选项数据
+						this.userScoreArray.push({
+							'detailId': this.detailId,
+							'userScore': uni.getStorageSync('userScore')
+						})
 						this.nodeLocationList = artworkTree.nodeLocationList
 						//初始化画布
 						this.initCanvas();
@@ -430,6 +449,10 @@
 				}else{
 					if(this.isNUmberSelect == 1){
 						//普通选项中的数值选项
+						this.userScoreArray.push({
+							'detailId': this.detailId,
+							'userScore': uni.getStorageSync('userScore')
+						})
 						this.calculateSelectOptionScore(artworkTree)
 					}else{
 						//常规选项
@@ -453,19 +476,19 @@
 						let conditionSymbol = this.advancedList[i].appear;
 						let conditionNumber = this.advancedList[i].appearValue - 0;
 						let userScore = uni.getStorageSync('userScore');
-						if('>'.equals(conditionSymbol)){
+						if('>' === conditionSymbol){
 							if(userScore > conditionNumber){
 								this.option.push(childs[i].selectTitle);
 							}else{
 								continue;
 							}
-						}else if('<'.equals(conditionSymbol)){
+						}else if('<' === conditionSymbol){
 							if(userScore < conditionNumber){
 								this.option.push(childs[i].selectTitle);
 							}else{
 								continue;
 							}
-						}else if('='.equals(conditionSymbol)){
+						}else if('=' === conditionSymbol){
 							if(userScore == conditionNumber){
 								this.option.push(childs[i].selectTitle);
 							}else{
@@ -674,7 +697,7 @@
 						if(this.isNUmberSelect == 1){
 							let countSymbol = this.advancedList[index].change
 							let countNumber = this.advancedList[index].changeValue
-							if('+'.equals(countSymbol)){
+							if('+' === countSymbol){
 								let userScore = uni.getStorageSync('userScore') + countNumber
 								uni.setStorageSync('userScore', userScore)
 							}else{
@@ -696,7 +719,7 @@
 						if(this.isNUmberSelect == 1){
 							let countSymbol = this.advancedList[index].change
 							let countNumber = this.advancedList[index].changeValue
-							if('+'.equals(countSymbol)){
+							if('+' === countSymbol){
 								let userScore = uni.getStorageSync('userScore') + countNumber
 								uni.setStorageSync('userScore', userScore)
 							}else{
@@ -718,7 +741,7 @@
 						if(this.isNUmberSelect == 1){
 							let countSymbol = this.advancedList[index].change
 							let countNumber = this.advancedList[index].changeValue
-							if('+'.equals(countSymbol)){
+							if('+' === countSymbol){
 								let userScore = uni.getStorageSync('userScore') + countNumber
 								uni.setStorageSync('userScore', userScore)
 							}else{
@@ -740,7 +763,7 @@
 						if(this.isNUmberSelect == 1){
 							let countSymbol = this.advancedList[index].change
 							let countNumber = this.advancedList[index].changeValue
-							if('+'.equals(countSymbol)){
+							if('+' === countSymbol){
 								let userScore = uni.getStorageSync('userScore') + countNumber
 								uni.setStorageSync('userScore', userScore)
 							}else{
@@ -994,7 +1017,7 @@
 					if(this.isNUmberSelect == 1){
 						let countSymbol = this.advancedList[this.touchRectNum].change
 						let countNumber = this.advancedList[this.touchRectNum].changeValue
-						if('+'.equals(countSymbol)){
+						if('+' === countSymbol){
 							let userScore = uni.getStorageSync('userScore') + countNumber
 							uni.setStorageSync('userScore', userScore)
 						}else{
@@ -1011,7 +1034,7 @@
 					if(this.isNUmberSelect == 1){
 						let countSymbol = this.advancedList[this.touchRectNum].change
 						let countNumber = this.advancedList[this.touchRectNum].changeValue
-						if('+'.equals(countSymbol)){
+						if('+' === countSymbol){
 							let userScore = uni.getStorageSync('userScore') + countNumber
 							uni.setStorageSync('userScore', userScore)
 						}else{
@@ -1028,7 +1051,7 @@
 					if(this.isNUmberSelect == 1){
 						let countSymbol = this.advancedList[this.touchRectNum].change
 						let countNumber = this.advancedList[this.touchRectNum].changeValue
-						if('+'.equals(countSymbol)){
+						if('+' === countSymbol){
 							let userScore = uni.getStorageSync('userScore') + countNumber
 							uni.setStorageSync('userScore', userScore)
 						}else{
@@ -1045,7 +1068,7 @@
 					if(this.isNUmberSelect == 1){
 						let countSymbol = this.advancedList[this.touchRectNum].change
 						let countNumber = this.advancedList[this.touchRectNum].changeValue
-						if('+'.equals(countSymbol)){
+						if('+' === countSymbol){
 							let userScore = uni.getStorageSync('userScore') + countNumber
 							uni.setStorageSync('userScore', userScore)
 						}else{
