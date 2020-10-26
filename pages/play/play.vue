@@ -225,14 +225,15 @@
 			uni.setStorageSync("detailId",this.detailId);
 		},
 		onReady(){
-			//初始化定位选项画布
-			//获取手机屏幕尺寸 单位是px
-			const {windowWidth, windowHeight} = uni.getSystemInfoSync();
-			this.validateBlackSide(windowWidth, windowHeight)
-			this.windowWidth = windowWidth*2;
-			this.windowHeight = windowHeight*2;
 			//test
 			this.artworkId = 316;
+			//初始化定位选项画布
+			//获取手机屏幕尺寸 单位是px
+			const {windowWidth, windowHeight} = uni.getSystemInfoSync()
+			this.validateBlackSide(windowWidth, windowHeight)
+			this.windowWidth = windowWidth*2
+			this.windowHeight = windowHeight*2
+			uni.setStorageSync('userScore',0)
 			//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
 			this.endFlag = true;
 			if(this.pkDetailId != null){
@@ -256,7 +257,7 @@
 			});
 		},
 		methods: {
-			//上传截图到腾讯云
+			// 举报页面上传截图到腾讯云
 			uploadImage(){
 				var COS = require('cos-wx-sdk-v5');
 				let that = this;
@@ -397,7 +398,7 @@
 			//视频播放初始化保存播放记录  将作品detailId留存提供给故事线
 			initPlayData(artworkTree){
 				//初始化视频及选项
-				//随机数
+				//随机数 
 				const uuid = Math.random().toString(36).substring(2);
 				this.videoUrl = artworkTree.videoUrl+'?uuid='+uuid;
 				this.detailId = artworkTree.pkDetailId;
@@ -438,18 +439,41 @@
 				}
 
 			},
+			// 计算获取需要展示的数值选项的内容
 			calculateSelectOptionScore(artworkTree){
 				let childs = artworkTree.childs;
 				//获取数值选项参数
 				this.advancedList = artworkTree.onAdvancedList
-				// 要根据advancedList里面的条件进行判断是否显示childs的选项 还要根据点击时间去做相应的扣分
+				// 要根据advancedList里面的条件进行判断是否显示childs的选项 还要根据点击事件去做相应的扣分
 				//不显示选项的方法是 把childs.length值减掉 这样选项数量就减少了
 				if(childs){
-					this.tipsArray.length = childs.length;
 					for(let i = 0;i < childs.length;i++){
 						this.childs.splice(i,1,childs[i]);
-						this.option[i] = childs[i].selectTitle;
+						//选项是否显示的标志
+						let conditionSymbol = this.advancedList[i].appear;
+						let conditionNumber = this.advancedList[i].appearValue - 0;
+						let userScore = uni.getStorageSync('userScore');
+						if('>'.equals(conditionSymbol)){
+							if(userScore > conditionNumber){
+								this.option.push(childs[i].selectTitle);
+							}else{
+								continue;
+							}
+						}else if('<'.equals(conditionSymbol)){
+							if(userScore < conditionNumber){
+								this.option.push(childs[i].selectTitle);
+							}else{
+								continue;
+							}
+						}else if('='.equals(conditionSymbol)){
+							if(userScore == conditionNumber){
+								this.option.push(childs[i].selectTitle);
+							}else{
+								continue;
+							}
+						}
 					}
+					this.tipsArray.length = this.option.length;
 				}else{
 					//islink不是null且值为1说明该节点是跳转节点
 					if(artworkTree.isLink != null && artworkTree.isLink === 1){
@@ -474,6 +498,7 @@
 					this.linkNodeId = null
 				}
 			},
+			//获取非数值选项的选项内容和判断是否是跳转节点
 			getSelectTextAndJudgeIsLink(artworkTree){
 				let childs = artworkTree.childs;
 				if(childs){
@@ -506,6 +531,7 @@
 					this.linkNodeId = null
 				}
 			},
+			// 递归获取跳转节点对应的目标节点的detailId并拿到对应子树再重新初始化数据
 			getTargetTree(mainTree,linkId){
 				if(mainTree.pkDetailId == linkId){
 					return this.initPlayData(mainTree);
@@ -579,7 +605,7 @@
 			},
 			//开关控制是否展示 选项框 故事线 举报页面
 			videoEnd(){
-				//根据是否是最后一个视频标志 最后一个视频播放结束弹出故事线
+				//根据是否是最后一个视频标志 最后一个视频播放结束弹出故事线 endFlag = true 表示不是最后一个视频
 				if(this.endFlag){
 					if(this.isPosition == 1){
 						this.chooseTipsShowFlag = false;
@@ -595,17 +621,22 @@
 					this.chooseTipsShowFlag = false;
 					this.chooseTipsMaskFlag = false;
 					this.showCanvasFlag = false;
+					uni.setStorageSync('userScore',0)
 				}
 			},
+			//视屏暂停操作
 			videoPause(){
 				console.log('我暂停了')
 				this.hiddenBtnFlag = true;
 			},
+			//展示故事线内容的时候暂停视频
 			showStoryLineContent(){
 				this.storyLineContentFlag = true
 				const videoContext = uni.createVideoContext('myVideo')
+				//暂停视屏
 				videoContext.pause()
 			},
+			//展示举报内容的时候暂停视频
 			showReportContent(){
 				this.reportContentFlag = true
 				this.uploadBtnFlag = true;
@@ -613,7 +644,7 @@
 				const videoContext = uni.createVideoContext('myVideo')
 				videoContext.pause()
 			},
-			//触摸start事件
+			//触摸选项start事件
 			changeBackground(index){
 				switch(index){
 					case 0: {
@@ -634,59 +665,120 @@
 					}
 				}
 			},
-			//触摸end事件
+			//触摸选项end事件
 			rebackBackground(index){
 				switch(index){
 					case 0: {
+						// splice替换数组元素
 						this.background.splice(index,1,"");
-						this.chooseTipsShowFlag = false
-						this.chooseTipsMaskFlag = false
-						this.initPlayData(this.childs[index])
+						if(this.isNUmberSelect == 1){
+							let countSymbol = this.advancedList[index].change
+							let countNumber = this.advancedList[index].changeValue
+							if('+'.equals(countSymbol)){
+								let userScore = uni.getStorageSync('userScore') + countNumber
+								uni.setStorageSync('userScore', userScore)
+							}else{
+								let userScore = uni.getStorageSync('userScore') - countNumber
+								uni.setStorageSync('userScore', userScore)
+							}
+							this.chooseTipsShowFlag = false
+							this.chooseTipsMaskFlag = false
+							this.initPlayData(this.childs[index])
+						}else{
+							this.chooseTipsShowFlag = false
+							this.chooseTipsMaskFlag = false
+							this.initPlayData(this.childs[index])
+						}
 						break;
 					}
 					case 1: {
 						this.background.splice(index,1,"");
-						this.chooseTipsShowFlag = false
-						this.chooseTipsMaskFlag = false
-						this.initPlayData(this.childs[index])
+						if(this.isNUmberSelect == 1){
+							let countSymbol = this.advancedList[index].change
+							let countNumber = this.advancedList[index].changeValue
+							if('+'.equals(countSymbol)){
+								let userScore = uni.getStorageSync('userScore') + countNumber
+								uni.setStorageSync('userScore', userScore)
+							}else{
+								let userScore = uni.getStorageSync('userScore') - countNumber
+								uni.setStorageSync('userScore', userScore)
+							}
+							this.chooseTipsShowFlag = false
+							this.chooseTipsMaskFlag = false
+							this.initPlayData(this.childs[index])
+						}else{
+							this.chooseTipsShowFlag = false
+							this.chooseTipsMaskFlag = false
+							this.initPlayData(this.childs[index])
+						}
 						break;
 					}
 					case 2: {
 						this.background.splice(index,1,"");
-						this.chooseTipsShowFlag = false
-						this.chooseTipsMaskFlag = false
-						this.initPlayData(this.childs[index])
+						if(this.isNUmberSelect == 1){
+							let countSymbol = this.advancedList[index].change
+							let countNumber = this.advancedList[index].changeValue
+							if('+'.equals(countSymbol)){
+								let userScore = uni.getStorageSync('userScore') + countNumber
+								uni.setStorageSync('userScore', userScore)
+							}else{
+								let userScore = uni.getStorageSync('userScore') - countNumber
+								uni.setStorageSync('userScore', userScore)
+							}
+							this.chooseTipsShowFlag = false
+							this.chooseTipsMaskFlag = false
+							this.initPlayData(this.childs[index])
+						}else{
+							this.chooseTipsShowFlag = false
+							this.chooseTipsMaskFlag = false
+							this.initPlayData(this.childs[index])
+						}
 						break;
 					}
 					case 3: {
 						this.background.splice(index,1,"");
-						this.chooseTipsShowFlag = false
-						this.chooseTipsMaskFlag = false
-						this.initPlayData(this.childs[index])
+						if(this.isNUmberSelect == 1){
+							let countSymbol = this.advancedList[index].change
+							let countNumber = this.advancedList[index].changeValue
+							if('+'.equals(countSymbol)){
+								let userScore = uni.getStorageSync('userScore') + countNumber
+								uni.setStorageSync('userScore', userScore)
+							}else{
+								let userScore = uni.getStorageSync('userScore') - countNumber
+								uni.setStorageSync('userScore', userScore)
+							}
+							this.chooseTipsShowFlag = false
+							this.chooseTipsMaskFlag = false
+							this.initPlayData(this.childs[index])
+						}else{
+							this.chooseTipsShowFlag = false
+							this.chooseTipsMaskFlag = false
+							this.initPlayData(this.childs[index])
+						}
 						break;
 					}
 				}
 			},
-			//关闭按钮触发事件
+			//点击选项关闭按钮触发事件
 			closeChooseTips(){
 				this.chooseTipsShowFlag = false
 				this.chooseTipsMaskFlag = false
 				const videoContext = uni.createVideoContext('myVideo')
 				videoContext.play()
 			},
+			//点击故事线按钮出发事件
 			closeStoryLineContent(){
 				this.storyLineContentFlag = false
 				const videoContext = uni.createVideoContext('myVideo')
 				videoContext.play()
 			},
+			//点击举报按钮出发事件
 			closeReportContent(){
 				this.reportContentFlag = false
 				const videoContext = uni.createVideoContext('myVideo')
 				videoContext.play()
 			},
-			tapHandler() {
-			  console.log('你点击了 rect')
-			},
+			//初始化canvas画布
 			initCanvas(){
 				this.rectArray = []
 				const ctx = uni.createCanvasContext('myCanvas')
@@ -899,26 +991,78 @@
 			// canvas的touchEnd事件
 			accordingRectTodo(){
 				if(this.touchRectNum == 0){
-					console.log("第一个选项被触发了")
-					this.showCanvasFlag = false
-					this.initPlayData(this.childs[this.touchRectNum])
+					if(this.isNUmberSelect == 1){
+						let countSymbol = this.advancedList[this.touchRectNum].change
+						let countNumber = this.advancedList[this.touchRectNum].changeValue
+						if('+'.equals(countSymbol)){
+							let userScore = uni.getStorageSync('userScore') + countNumber
+							uni.setStorageSync('userScore', userScore)
+						}else{
+							let userScore = uni.getStorageSync('userScore') - countNumber
+							uni.setStorageSync('userScore', userScore)
+						}
+						this.showCanvasFlag = false
+						this.initPlayData(this.childs[this.touchRectNum])
+					}else{
+						this.showCanvasFlag = false
+						this.initPlayData(this.childs[this.touchRectNum])
+					}
 				}else if(this.touchRectNum == 1){
-					console.log("第二个选项被触发了")
-					this.showCanvasFlag = false
-					this.initPlayData(this.childs[this.touchRectNum])
+					if(this.isNUmberSelect == 1){
+						let countSymbol = this.advancedList[this.touchRectNum].change
+						let countNumber = this.advancedList[this.touchRectNum].changeValue
+						if('+'.equals(countSymbol)){
+							let userScore = uni.getStorageSync('userScore') + countNumber
+							uni.setStorageSync('userScore', userScore)
+						}else{
+							let userScore = uni.getStorageSync('userScore') - countNumber
+							uni.setStorageSync('userScore', userScore)
+						}
+						this.showCanvasFlag = false
+						this.initPlayData(this.childs[this.touchRectNum])
+					}else{
+						this.showCanvasFlag = false
+						this.initPlayData(this.childs[this.touchRectNum])
+					}
 				}else if(this.touchRectNum == 2){
-					console.log("第三个选项被触发了")
-					this.showCanvasFlag = false
-					this.initPlayData(this.childs[this.touchRectNum])
+					if(this.isNUmberSelect == 1){
+						let countSymbol = this.advancedList[this.touchRectNum].change
+						let countNumber = this.advancedList[this.touchRectNum].changeValue
+						if('+'.equals(countSymbol)){
+							let userScore = uni.getStorageSync('userScore') + countNumber
+							uni.setStorageSync('userScore', userScore)
+						}else{
+							let userScore = uni.getStorageSync('userScore') - countNumber
+							uni.setStorageSync('userScore', userScore)
+						}
+						this.showCanvasFlag = false
+						this.initPlayData(this.childs[this.touchRectNum])
+					}else{
+						this.showCanvasFlag = false
+						this.initPlayData(this.childs[this.touchRectNum])
+					}
 				}else if(this.touchRectNum == 3){
-					console.log("第四个选项被触发了")
-					this.showCanvasFlag = false
-					this.initPlayData(this.childs[this.touchRectNum])
+					if(this.isNUmberSelect == 1){
+						let countSymbol = this.advancedList[this.touchRectNum].change
+						let countNumber = this.advancedList[this.touchRectNum].changeValue
+						if('+'.equals(countSymbol)){
+							let userScore = uni.getStorageSync('userScore') + countNumber
+							uni.setStorageSync('userScore', userScore)
+						}else{
+							let userScore = uni.getStorageSync('userScore') - countNumber
+							uni.setStorageSync('userScore', userScore)
+						}
+						this.showCanvasFlag = false
+						this.initPlayData(this.childs[this.touchRectNum])
+					}else{
+						this.showCanvasFlag = false
+						this.initPlayData(this.childs[this.touchRectNum])
+					}
 				}
 				//回到默认值
 				this.touchRectNum = 5
 			},
-			// 校正黑边
+			// 校正视频播放的黑边
 			validateBlackSide(windowWidth, windowHeight){
 				if(windowHeight/windowWidth>16/9){
 					//高度变高了出现上下黑边
