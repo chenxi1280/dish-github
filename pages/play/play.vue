@@ -2,7 +2,7 @@
 	<view class="playBox">
 		<view class="play">
 			<view class="container"  v-if="showCanvasFlag">
-			  <canvas canvas-id="myCanvas" @touchstart="getTouchPosition" @touchend="accordingRectTodo" :style="{'width': windowWidth+'rpx', 'height': windowHeight+'rpx'}"></canvas>
+			  <canvas canvas-id="myCanvas" @touchstart="getTouchPosition" @touchend="canvasTouchendEvent" :style="{'width': windowWidth+'rpx', 'height': windowHeight+'rpx'}"></canvas>
 			</view>
 			<!-- 播放主体   @click="showButton"-->
 			<view class="videoBox">
@@ -107,8 +107,6 @@
 				isNUmberSelect: 0,
 				//定位选项数据
 				nodeLocationList: [],
-				//数值选项数据
-				advancedList: [],
 				//视频黑边像素 (单边的 height)
 				hblackSideNum: 0,
 				//视频黑边像素 (单边的 width)
@@ -225,6 +223,7 @@
 			}
 			// 故事线跳转进来的地方 会带上pkArtworkId and pkDetailId
 			this.pkDetailId = option.pkDetailId
+			console.log(this.userScoreArray)
 			// 每次的故事线跳转都要重置当前播放节点
 			for(let i=0; i<this.userScoreArray.length; i++){
 				let targetDetailId = this.userScoreArray[i].detailId
@@ -246,7 +245,7 @@
 			this.validateBlackSide(windowWidth, windowHeight)
 			this.windowWidth = windowWidth*2
 			this.windowHeight = windowHeight*2
-			uni.setStorageSync('userScore',0)
+			uni.setStorageSync('userScore',[])
 			//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
 			this.endFlag = true;
 			if(this.pkDetailId != null){
@@ -417,6 +416,8 @@
 				const uuid = Math.random().toString(36).substring(2)
 				this.videoUrl = artworkTree.videoUrl+'?uuid='+uuid
 				this.detailId = artworkTree.pkDetailId
+				// 将选项置空 避免选项中出现上一次选项的情况
+				this.option = []
 				//是否是定位选项的标志 1是定位选项 其他是普通选项
 				this.isPosition = artworkTree.isPosition
 				//是否是数值选项的标志 1是数值选项 其它是普通选项
@@ -429,15 +430,12 @@
 					if(this.isNUmberSelect == 1){
 						//定位选项中的数值选项
 						//获取定位选项数据
-						this.userScoreArray.push({
-							'detailId': this.detailId,
-							'userScore': uni.getStorageSync('userScore')
-						})
 						this.nodeLocationList = artworkTree.nodeLocationList
 						//初始化画布
 						this.initCanvas();
 						//获取数值选项参数
 						this.calculateSelectOptionScore(artworkTree)
+						this.savaUserScoreOfNumericalOption()
 					}else{
 						//定位选项中的普通选项
 						this.nodeLocationList = artworkTree.nodeLocationList
@@ -449,11 +447,8 @@
 				}else{
 					if(this.isNUmberSelect == 1){
 						//普通选项中的数值选项
-						this.userScoreArray.push({
-							'detailId': this.detailId,
-							'userScore': uni.getStorageSync('userScore')
-						})
 						this.calculateSelectOptionScore(artworkTree)
+						this.savaUserScoreOfNumericalOption()
 					}else{
 						//常规选项
 						//获取每个子节点信息 并判断子节点中是否有跳转节点
@@ -462,38 +457,61 @@
 				}
 
 			},
+			//保存每个节点对应的数值选项数据
+			savaUserScoreOfNumericalOption(){
+				this.userScoreArray.push({
+					'detailId': this.detailId,
+					'userScore': uni.getStorageSync('userScore')
+				})
+			},
 			// 计算获取需要展示的数值选项的内容
 			calculateSelectOptionScore(artworkTree){
-				let childs = artworkTree.childs;
-				//获取数值选项参数
-				this.advancedList = artworkTree.onAdvancedList
+				let childs = artworkTree.childs
 				// 要根据advancedList里面的条件进行判断是否显示childs的选项 还要根据点击事件去做相应的扣分
 				//不显示选项的方法是 把childs.length值减掉 这样选项数量就减少了
 				if(childs){
-					for(let i = 0;i < childs.length;i++){
-						this.childs.splice(i,1,childs[i]);
+					for(let i = 0; i < childs.length; i++){
+						this.childs.splice(i,1,childs[i])
 						//选项是否显示的标志
-						let conditionSymbol = this.advancedList[i].appear;
-						let conditionNumber = this.advancedList[i].appearValue - 0;
-						let userScore = uni.getStorageSync('userScore');
-						if('>' === conditionSymbol){
-							if(userScore > conditionNumber){
-								this.option.push(childs[i].selectTitle);
-							}else{
-								continue;
+						//获取数值选项参数
+						let advancedList = childs[i].onAdvancedList
+						let userScore = uni.getStorageSync('userScore')
+						// 初始化用户数值选项的分数
+						if(userScore == null || userScore.length == 0){
+							for(let k = 0; k < advancedList.length; k++){
+								userScore.push(0);
 							}
-						}else if('<' === conditionSymbol){
-							if(userScore < conditionNumber){
-								this.option.push(childs[i].selectTitle);
-							}else{
-								continue;
+						}
+						uni.setStorageSync('userScore',userScore)
+						// 是否显示选项的开关
+						let optionFlag = true
+						for(let j = 0; j < advancedList.length; j++){
+							let conditionSymbol = advancedList[j].appear
+							let conditionNumber = advancedList[j].appearValue - 0
+							if('>' === conditionSymbol){
+								if(userScore[j] > conditionNumber){
+									optionFlag = optionFlag && true
+								}else{
+									optionFlag = optionFlag && false
+								}
+							}else if('<' === conditionSymbol){
+								if(userScore[j] < conditionNumber){
+									optionFlag = optionFlag && true
+								}else{
+									optionFlag = optionFlag && false
+								}
+							}else if('=' === conditionSymbol){
+								if(userScore[j] == conditionNumber){
+									optionFlag = optionFlag && true
+								}else{
+									optionFlag = optionFlag && false
+								}
 							}
-						}else if('=' === conditionSymbol){
-							if(userScore == conditionNumber){
-								this.option.push(childs[i].selectTitle);
-							}else{
-								continue;
-							}
+						}
+						if(optionFlag){
+							this.option.push(childs[i].selectTitle)
+						}else{
+							continue
 						}
 					}
 					this.tipsArray.length = this.option.length;
@@ -644,7 +662,7 @@
 					this.chooseTipsShowFlag = false;
 					this.chooseTipsMaskFlag = false;
 					this.showCanvasFlag = false;
-					uni.setStorageSync('userScore',0)
+					uni.setStorageSync('userScore',[])
 				}
 			},
 			//视屏暂停操作
@@ -667,7 +685,7 @@
 				const videoContext = uni.createVideoContext('myVideo')
 				videoContext.pause()
 			},
-			//触摸选项start事件
+			//触摸选项touchstart事件
 			changeBackground(index){
 				switch(index){
 					case 0: {
@@ -688,98 +706,54 @@
 					}
 				}
 			},
-			//触摸选项end事件
+			//触摸选项touchend事件
 			rebackBackground(index){
 				switch(index){
 					case 0: {
 						// splice替换数组元素
-						this.background.splice(index,1,"");
-						if(this.isNUmberSelect == 1){
-							let countSymbol = this.advancedList[index].change
-							let countNumber = this.advancedList[index].changeValue
-							if('+' === countSymbol){
-								let userScore = uni.getStorageSync('userScore') + countNumber
-								uni.setStorageSync('userScore', userScore)
-							}else{
-								let userScore = uni.getStorageSync('userScore') - countNumber
-								uni.setStorageSync('userScore', userScore)
-							}
-							this.chooseTipsShowFlag = false
-							this.chooseTipsMaskFlag = false
-							this.initPlayData(this.childs[index])
-						}else{
-							this.chooseTipsShowFlag = false
-							this.chooseTipsMaskFlag = false
-							this.initPlayData(this.childs[index])
-						}
+						this.background.splice(index,1,"")
+						this.optionTouchendTodo(index)
 						break;
 					}
 					case 1: {
-						this.background.splice(index,1,"");
-						if(this.isNUmberSelect == 1){
-							let countSymbol = this.advancedList[index].change
-							let countNumber = this.advancedList[index].changeValue
-							if('+' === countSymbol){
-								let userScore = uni.getStorageSync('userScore') + countNumber
-								uni.setStorageSync('userScore', userScore)
-							}else{
-								let userScore = uni.getStorageSync('userScore') - countNumber
-								uni.setStorageSync('userScore', userScore)
-							}
-							this.chooseTipsShowFlag = false
-							this.chooseTipsMaskFlag = false
-							this.initPlayData(this.childs[index])
-						}else{
-							this.chooseTipsShowFlag = false
-							this.chooseTipsMaskFlag = false
-							this.initPlayData(this.childs[index])
-						}
+						this.background.splice(index,1,"")
+						this.optionTouchendTodo(index)
 						break;
 					}
 					case 2: {
-						this.background.splice(index,1,"");
-						if(this.isNUmberSelect == 1){
-							let countSymbol = this.advancedList[index].change
-							let countNumber = this.advancedList[index].changeValue
-							if('+' === countSymbol){
-								let userScore = uni.getStorageSync('userScore') + countNumber
-								uni.setStorageSync('userScore', userScore)
-							}else{
-								let userScore = uni.getStorageSync('userScore') - countNumber
-								uni.setStorageSync('userScore', userScore)
-							}
-							this.chooseTipsShowFlag = false
-							this.chooseTipsMaskFlag = false
-							this.initPlayData(this.childs[index])
-						}else{
-							this.chooseTipsShowFlag = false
-							this.chooseTipsMaskFlag = false
-							this.initPlayData(this.childs[index])
-						}
+						this.background.splice(index,1,"")
+						this.optionTouchendTodo(index)
 						break;
 					}
 					case 3: {
-						this.background.splice(index,1,"");
-						if(this.isNUmberSelect == 1){
-							let countSymbol = this.advancedList[index].change
-							let countNumber = this.advancedList[index].changeValue
-							if('+' === countSymbol){
-								let userScore = uni.getStorageSync('userScore') + countNumber
-								uni.setStorageSync('userScore', userScore)
-							}else{
-								let userScore = uni.getStorageSync('userScore') - countNumber
-								uni.setStorageSync('userScore', userScore)
-							}
-							this.chooseTipsShowFlag = false
-							this.chooseTipsMaskFlag = false
-							this.initPlayData(this.childs[index])
-						}else{
-							this.chooseTipsShowFlag = false
-							this.chooseTipsMaskFlag = false
-							this.initPlayData(this.childs[index])
-						}
+						this.background.splice(index,1,"")
+						this.optionTouchendTodo(index)
 						break;
 					}
+				}
+			},
+			// 选项touchend事件触发时所做的操作
+			optionTouchendTodo(index){
+				let advancedList = this.childs[index].onAdvancedList
+				let userScore = uni.getStorageSync('userScore')
+				if(this.isNUmberSelect == 1){
+					for(let i = 0; i< advancedList.length; i++){
+						let countSymbol = advancedList[i].change
+						let countNumber = advancedList[i].changeValue - 0
+						if('+' === countSymbol){
+							userScore[i] =  userScore[i] + countNumber
+						}else{
+							userScore[i] =  userScore[i] - countNumber
+						}
+					}
+					this.chooseTipsShowFlag = false
+					this.chooseTipsMaskFlag = false
+					uni.setStorageSync('userScore', userScore)
+					this.initPlayData(this.childs[index])
+				}else{
+					this.chooseTipsShowFlag = false
+					this.chooseTipsMaskFlag = false
+					this.initPlayData(this.childs[index])
 				}
 			},
 			//点击选项关闭按钮触发事件
@@ -1012,78 +986,40 @@
 				}
 			},
 			// canvas的touchEnd事件
-			accordingRectTodo(){
+			canvasTouchendEvent(){
 				if(this.touchRectNum == 0){
-					if(this.isNUmberSelect == 1){
-						let countSymbol = this.advancedList[this.touchRectNum].change
-						let countNumber = this.advancedList[this.touchRectNum].changeValue
-						if('+' === countSymbol){
-							let userScore = uni.getStorageSync('userScore') + countNumber
-							uni.setStorageSync('userScore', userScore)
-						}else{
-							let userScore = uni.getStorageSync('userScore') - countNumber
-							uni.setStorageSync('userScore', userScore)
-						}
-						this.showCanvasFlag = false
-						this.initPlayData(this.childs[this.touchRectNum])
-					}else{
-						this.showCanvasFlag = false
-						this.initPlayData(this.childs[this.touchRectNum])
-					}
+					this.canvasTouchendEventTodo()
 				}else if(this.touchRectNum == 1){
-					if(this.isNUmberSelect == 1){
-						let countSymbol = this.advancedList[this.touchRectNum].change
-						let countNumber = this.advancedList[this.touchRectNum].changeValue
-						if('+' === countSymbol){
-							let userScore = uni.getStorageSync('userScore') + countNumber
-							uni.setStorageSync('userScore', userScore)
-						}else{
-							let userScore = uni.getStorageSync('userScore') - countNumber
-							uni.setStorageSync('userScore', userScore)
-						}
-						this.showCanvasFlag = false
-						this.initPlayData(this.childs[this.touchRectNum])
-					}else{
-						this.showCanvasFlag = false
-						this.initPlayData(this.childs[this.touchRectNum])
-					}
+					this.canvasTouchendEventTodo()
 				}else if(this.touchRectNum == 2){
-					if(this.isNUmberSelect == 1){
-						let countSymbol = this.advancedList[this.touchRectNum].change
-						let countNumber = this.advancedList[this.touchRectNum].changeValue
-						if('+' === countSymbol){
-							let userScore = uni.getStorageSync('userScore') + countNumber
-							uni.setStorageSync('userScore', userScore)
-						}else{
-							let userScore = uni.getStorageSync('userScore') - countNumber
-							uni.setStorageSync('userScore', userScore)
-						}
-						this.showCanvasFlag = false
-						this.initPlayData(this.childs[this.touchRectNum])
-					}else{
-						this.showCanvasFlag = false
-						this.initPlayData(this.childs[this.touchRectNum])
-					}
+					this.canvasTouchendEventTodo()
 				}else if(this.touchRectNum == 3){
-					if(this.isNUmberSelect == 1){
-						let countSymbol = this.advancedList[this.touchRectNum].change
-						let countNumber = this.advancedList[this.touchRectNum].changeValue
-						if('+' === countSymbol){
-							let userScore = uni.getStorageSync('userScore') + countNumber
-							uni.setStorageSync('userScore', userScore)
-						}else{
-							let userScore = uni.getStorageSync('userScore') - countNumber
-							uni.setStorageSync('userScore', userScore)
-						}
-						this.showCanvasFlag = false
-						this.initPlayData(this.childs[this.touchRectNum])
-					}else{
-						this.showCanvasFlag = false
-						this.initPlayData(this.childs[this.touchRectNum])
-					}
+					this.canvasTouchendEventTodo()
 				}
 				//回到默认值
 				this.touchRectNum = 5
+			},
+			// canvas的touchEnd事件触发时的操作
+			canvasTouchendEventTodo(){
+				let advancedList = this.childs[this.touchRectNum].onAdvancedList
+				let userScore = uni.getStorageSync('userScore')
+				if(this.isNUmberSelect == 1){
+					for(let i = 0; i< advancedList.length; i++){
+						let countSymbol = advancedList[i].change
+						let countNumber = advancedList[i].changeValue - 0
+						if('+' === countSymbol){
+							userScore[i] =  userScore[i] + countNumber
+						}else{
+							userScore[i] =  userScore[i] - countNumber
+						}
+					}
+					this.showCanvasFlag = false
+					uni.setStorageSync('userScore', userScore)
+					this.initPlayData(this.childs[this.touchRectNum])
+				}else{
+					this.showCanvasFlag = false
+					this.initPlayData(this.childs[this.touchRectNum])
+				}
 			},
 			// 校正视频播放的黑边
 			validateBlackSide(windowWidth, windowHeight){
