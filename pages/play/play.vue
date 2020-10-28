@@ -225,7 +225,7 @@
 		},
 		onReady(){
 			//test
-			this.artworkId = 321;
+			// this.artworkId = 321;
 			//初始化定位选项画布
 			//获取手机屏幕尺寸 单位是px
 			const {windowWidth, windowHeight} = uni.getSystemInfoSync()
