@@ -1,7 +1,7 @@
 <template>
 	<view class="playBox">
 		<view class="play">
-			<view class="container"  v-if="showCanvasFlag">
+			<view class="container"  v-show="showCanvasFlag">
 			  <canvas canvas-id="myCanvas" @touchstart="getTouchPosition" @touchend="canvasTouchendEvent" :style="{'width': windowWidth+'rpx', 'height': windowHeight+'rpx'}"></canvas>
 			</view>
 			<!-- 播放主体   @click="showButton"-->
@@ -103,8 +103,6 @@
 			return {
 				//定位选项标志
 				isPosition: 0,
-				//数值选项标志
-				isNUmberSelect: 0,
 				//定位选项数据
 				nodeLocationList: [],
 				//视频黑边像素 (单边的 height)
@@ -147,8 +145,6 @@
 				childs: [],
 				//通过tipsArray数组长度控制选项个数
 				tipsArray: [],
-				//数值选项 用户分数记录容器
-				userScoreArray: [],
 				//举报类型
 				reportType: "",
 				//举报内容
@@ -173,9 +169,9 @@
 						name: '其它'
 					}
 				],
-				//窗口宽度
-				windowWidth: '600rpx',
-				//窗口高度（不包括手机通知栏、小程序标题栏和tabBar）
+				//由于设置canvas画布宽度
+				windowWidth: '750rpx',
+				//由于设置canvas画布高度（不包括手机通知栏、小程序标题栏和tabBar）
 				windowHeight: '300rpx',
 				//矩形框数据数组
 				rectArray: [],
@@ -223,28 +219,26 @@
 			}
 			// 故事线跳转进来的地方 会带上pkArtworkId and pkDetailId
 			this.pkDetailId = option.pkDetailId
-			console.log(this.userScoreArray)
 			// 每次的故事线跳转都要重置当前播放节点
-			for(let i=0; i<this.userScoreArray.length; i++){
-				let targetDetailId = this.userScoreArray[i].detailId
-				if(targetDetailId == this.pkDetailId){
-					let userScore = this.userScoreArray[i].userScore
-					uni.setStorageSync('userScore',userScore)
-					break
-				}
-			}
 			this.detailId = null;
 			uni.setStorageSync("detailId",this.detailId);
 		},
 		onReady(){
 			//test
-			this.artworkId = 317;
+			this.artworkId = 321;
 			//初始化定位选项画布
 			//获取手机屏幕尺寸 单位是px
 			const {windowWidth, windowHeight} = uni.getSystemInfoSync()
+			let windowSizeArray = {
+				'windowWidth': windowWidth,
+				'windowHeight': windowHeight
+			}
+			uni.setStorageSync('windowSizeArray',windowSizeArray)
 			this.validateBlackSide(windowWidth, windowHeight)
-			this.windowWidth = windowWidth*2
-			this.windowHeight = windowHeight*2
+			//小程序将所有设备的宽都等分成750等份即750rpx
+			this.windowWidth = 750
+			//宽高是等比的 单位rpx
+			this.windowHeight = windowHeight*750/windowWidth
 			uni.setStorageSync('userScore',[])
 			//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
 			this.endFlag = true;
@@ -253,6 +247,33 @@
 				this.getArtworkTreeByArtworkId();
 				this.getArtworkTreeByDetailId();
 				this.playedHistoryArray = uni.getStorageSync("pkDetailIds")
+				let isNumericalOptions = uni.getStorageSync('isNumericalOptions')
+				let appearConditionMap = uni.getStorageSync('appearConditionMap')
+				if(isNumericalOptions == 1){
+					//计算跳转到的目标节点时此时用户的得分 所使用的临时数组变量 因为跳转过来没有当前节点的分数计算情况
+					let currentArray = this.deepCopy(this.playedHistoryArray)
+					//如果此时的currentArray 是空的话则说明是跳转的根节点不做操作
+					if(currentArray.length != 0){
+						currentArray.push(this.pkDetailId)
+						//需要的是计算过了当前节点的分数
+						console.log('播放记录：'+currentArray)
+						//初始化userScore数组 currentArray第一个元素是根节点没有 changeConditionValue
+						let index = ''+currentArray[1]
+						let len = appearConditionMap[index].length
+						let userScore = uni.getStorageSync('userScore')
+						for(let k = 0; k < len; k++){
+							userScore.push(0);
+						}
+						for(let i = 1; i < currentArray.length; i++){
+							let key = ''+currentArray[i]
+							let value = appearConditionMap[key]
+							for(let j = 0; j < value.length; j++){
+								userScore[j] += value[j].changeConditionValue
+							}
+						}
+						uni.setStorageSync('userScore', userScore)
+					}
+				}
 			}else{
 				//存一棵主树
 				this.getArtworkTreeByArtworkId();
@@ -267,8 +288,10 @@
 				animationDuration: 10,
 				animationType: null
 			});
-			// 退出播放页面 重置用户存储的用户分数数组，以便于下次故事线跳转时的分数查找
-			this.userScoreArray = [];
+			//关闭页面时重置选项类型为默认
+			uni.setStorageSync('isNumericalOptions',0)
+			//关闭页面时重置节点分数容器
+			uni.setStorageSync('appearConditionMap',{})
 		},
 		methods: {
 			// 举报页面上传截图到腾讯云
@@ -416,39 +439,44 @@
 				const uuid = Math.random().toString(36).substring(2)
 				this.videoUrl = artworkTree.videoUrl+'?uuid='+uuid
 				this.detailId = artworkTree.pkDetailId
+				//如果是根节点初始化存储节点分值的容器
+				if(artworkTree.parentId === 0){
+					//存进缓存是防止故事线进入时重置了data里面的数据
+					uni.setStorageSync('appearConditionMap', artworkTree.appearConditionMap)
+				}
 				// 将选项置空 避免选项中出现上一次选项的情况
 				this.option = []
 				//是否是定位选项的标志 1是定位选项 其他是普通选项
 				this.isPosition = artworkTree.isPosition
 				//是否是数值选项的标志 1是数值选项 其它是普通选项
-				this.isNUmberSelect = artworkTree.isNUmberSelect
+				let isNumericalOptions = artworkTree.isNumberSelect
+				//存到storage里面保证故事线跳转时能拿到此标志
+				uni.setStorageSync('isNumericalOptions', isNumericalOptions)
 				//将当前播放的作品的detailId保存在缓存用于举报时确定是哪个具体的作品
 				uni.setStorageSync("detailId",this.detailId)
 				//保存播放过的作品的id
 				this.savaPlayRecord();
 				if(this.isPosition == 1){
-					if(this.isNUmberSelect == 1){
+					if(isNumericalOptions == 1){
 						//定位选项中的数值选项
 						//获取定位选项数据
 						this.nodeLocationList = artworkTree.nodeLocationList
-						//初始化画布
-						this.initCanvas();
 						//获取数值选项参数
 						this.calculateSelectOptionScore(artworkTree)
-						this.savaUserScoreOfNumericalOption()
+						//初始化画布
+						this.initCanvas();
 					}else{
 						//定位选项中的普通选项
 						this.nodeLocationList = artworkTree.nodeLocationList
-						//初始化画布
-						this.initCanvas();
 						//获取每个子节点信息 并判断子节点中是否有跳转节点
 						this.getSelectTextAndJudgeIsLink(artworkTree)
+						//初始化画布
+						this.initCanvas();
 					}
 				}else{
-					if(this.isNUmberSelect == 1){
+					if(isNumericalOptions == 1){
 						//普通选项中的数值选项
 						this.calculateSelectOptionScore(artworkTree)
-						this.savaUserScoreOfNumericalOption()
 					}else{
 						//常规选项
 						//获取每个子节点信息 并判断子节点中是否有跳转节点
@@ -456,13 +484,6 @@
 					}
 				}
 
-			},
-			//保存每个节点对应的数值选项数据
-			savaUserScoreOfNumericalOption(){
-				this.userScoreArray.push({
-					'detailId': this.detailId,
-					'userScore': uni.getStorageSync('userScore')
-				})
 			},
 			// 计算获取需要展示的数值选项的内容
 			calculateSelectOptionScore(artworkTree){
@@ -736,7 +757,8 @@
 			optionTouchendTodo(index){
 				let advancedList = this.childs[index].onAdvancedList
 				let userScore = uni.getStorageSync('userScore')
-				if(this.isNUmberSelect == 1){
+				let isNumericalOptions = uni.getStorageSync('isNumericalOptions')
+				if(isNumericalOptions == 1){
 					for(let i = 0; i< advancedList.length; i++){
 						let countSymbol = advancedList[i].change
 						let countNumber = advancedList[i].changeValue - 0
@@ -779,14 +801,16 @@
 			initCanvas(){
 				this.rectArray = []
 				const ctx = uni.createCanvasContext('myCanvas')
-				ctx.clearRect(0 , 0 , this.windowWidth/2, this.windowHeight/2)
+				let windowSizeArray = uni.getStorageSync('windowSizeArray');
+				let windowWidth = windowSizeArray.windowWidth
+				let windowHeight = windowSizeArray.windowHeight
+				ctx.clearRect(0 , 0 , windowWidth, windowHeight)
 				for(let i = 0; i < this.nodeLocationList.length; i++){
 					if(this.nodeLocationList[i].isHide == 1){
 						console.log(1)
 						//矩形左上角点的坐标(X,Y)
-						//rpx转px 故(this.windowWidth)/2 算总长度时应该减去黑边
-						let rectX = Math.ceil((this.nodeLocationList[i].textRectX+0)*(this.windowWidth-this.wblackSideNum)/2)
-						let rectY = Math.ceil((this.nodeLocationList[i].textRectY+0)*(this.windowHeight-this.hblackSideNum)/2)
+						let rectX = parseInt(((this.nodeLocationList[i].textRectX+0)*(windowWidth-this.hblackSideNum*2)).toFixed(0))
+						let rectY = parseInt(((this.nodeLocationList[i].textRectY+0)*(windowHeight-this.hblackSideNum*2)).toFixed(0)) 
 						//文字距离左右两个边框的间距
 						let marginLeftAndRightSides = 8
 						//矩形框高度
@@ -796,34 +820,38 @@
 						//文字距离矩形框下边框边距
 						let marginBottom = 10
 						//文本内容
-						let btnOneText = this.option[i]
+						let textContent = this.option[i]
 						//测量之前要先确定字体大小 因为矩形宽是根据字体的长度来绘画的 不设置会影响测量
 						ctx.setFontSize(fontSize)
 						//测量文本宽度
-						let metrics = ctx.measureText(btnOneText)
+						let metrics = ctx.measureText(textContent)
 						//宽度取整 Math.ceil向上取整即省去小数再加1 宽度由文本的宽度加边距组成
-						let rectW = Math.ceil(metrics.width)+marginLeftAndRightSides;
+						let rectW = parseInt((metrics.width).toFixed(0))+marginLeftAndRightSides;
 						//末尾小圆圈的横纵坐标 算总长度时应该减去黑边
-						let cX = Math.ceil((this.nodeLocationList[i].circleX+0)*(this.windowWidth-this.wblackSideNum)/2)
-						let cY = Math.ceil((this.nodeLocationList[i].circleY+0)*(this.windowHeight-this.hblackSideNum)/2)
+						let cX = parseInt(((this.nodeLocationList[i].circleX+0)*(windowWidth-this.wblackSideNum*2)).toFixed(0))
+						let cY = parseInt(((this.nodeLocationList[i].circleY+0)*(windowHeight-this.hblackSideNum*2)).toFixed(0))
 						
 						//画线 连线到小圆心
-						let cr = 4
+						let cr = 2
 						ctx.moveTo(cX+this.wblackSideNum,cY+this.hblackSideNum)
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
-						ctx.lineTo((Math.ceil(rectW/2)+rectX)-(rectW/2),(Math.ceil(rectH/2)+rectY)-(rectH/2))
+						ctx.lineTo(rectX+this.wblackSideNum, rectY+this.hblackSideNum)
 						ctx.setStrokeStyle('white')
 						ctx.stroke()
 						
 						//画末尾小圆圈
 						//x,y,r,sAngle（起始弧度,单位弧度（在3点钟方向）），eAngle（终止弧度）counterclockwise可选，默认是false 标识顺时针 
 						//让起始点转到12点就需要倒退0.5* Math.PI 但整圆是2 * Math.PI 故终止弧度加0.5* Math.PI
+						//外圈
 						ctx.beginPath()
-						ctx.arc(cX+this.wblackSideNum, cY+this.hblackSideNum, cr, 0, 2 * Math.PI)
-						ctx.setStrokeStyle('black')
+						ctx.arc(cX+this.wblackSideNum,cY+this.hblackSideNum, cr*3, 0, 2 * Math.PI)
+						ctx.setFillStyle('#87CEEB')
+						ctx.fill()
+						//内圈
+						ctx.beginPath()
+						ctx.arc(cX+this.wblackSideNum,cY+this.hblackSideNum, cr, 0, 2 * Math.PI)
 						ctx.setFillStyle('#E3E3E3')
 						ctx.fill()
-						ctx.stroke()
 						
 						//画矩形
 						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
@@ -831,13 +859,13 @@
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
 						this.drawRect(ctx, rectX-(rectW/2)+this.wblackSideNum, rectY-(rectH/2)+this.hblackSideNum, rectW, rectH, 4)
 						//将坐标收纳成对象保存到数组，为绑定事件做准备
-						let rectOne={
+						let rect={
 							x: rectX-(rectW/2)+this.wblackSideNum,
 							y: rectY-(rectH/2)+this.hblackSideNum,
 							w: rectW,
 							h: rectH
 						}
-						this.rectArray.push(rectOne)
+						this.rectArray.push(rect)
 						if(this.isClickFlag){
 							if(this.touchRectNum == i){
 									//矩形边框颜色
@@ -863,7 +891,7 @@
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
 						let textX = (rectX+(marginLeftAndRightSides/2))-(rectW/2)+this.wblackSideNum
 						let textY = (rectH+rectY-marginBottom)-(rectH/2)+this.hblackSideNum
-						ctx.fillText(btnOneText, textX, textY)
+						ctx.fillText(textContent, textX, textY)
 						//开始描绘
 						ctx.stroke()
 						ctx.draw(true)
@@ -871,38 +899,34 @@
 						console.log(0)
 						//矩形左上角点的坐标(X,Y)
 						//rpx转px 故(this.windowWidth)/2 计算总长度时要减去黑边
-						let rectX = Math.ceil((this.nodeLocationList[i].textRectX+0)*(this.windowWidth-this.wblackSideNum)/2)
-						let rectY = Math.ceil((this.nodeLocationList[i].textRectY+0)*(this.windowHeight-this.hblackSideNum)/2)
-						//文字距离左右两个边框的间距
-						let marginLeftAndRightSides = 0
+						let rectX = parseInt(((this.nodeLocationList[i].textRectX+0)*(windowWidth-this.wblackSideNum*2)).toFixed(0))
+						let rectY = parseInt(((this.nodeLocationList[i].textRectY+0)*(windowHeight-this.hblackSideNum*2)).toFixed(0))
 						//矩形框高度
 						let rectH = 22
 						//字体大小
 						let fontSize = 15
-						//文字距离矩形框下边框边距
-						let marginBottom = 10
 						//文本内容
-						let btnOneText = '未命名选项'
+						let textContent = this.option[i]
 						//测量之前要先确定字体大小 因为矩形宽是根据字体的长度来绘画的 不设置会影响测量
 						ctx.setFontSize(fontSize)
 						//测量文本宽度
-						let metrics = ctx.measureText(btnOneText)
+						let metrics = ctx.measureText(textContent)
 						//宽度取整 Math.ceil向上取整即省去小数再加1 宽度由文本的宽度加边距组成
-						let rectW = Math.ceil(metrics.width)+marginLeftAndRightSides;
+						let rectW = parseInt(metrics.width.toFixed(0));
 						
 						//画矩形
 						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
 						ctx.beginPath()
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
-						this.drawRect(ctx, rectX+this.wblackSideNum, rectY+this.hblackSideNum, rectW, rectH, 3)
+						this.drawRect(ctx, rectX+this.wblackSideNum, rectY+this.hblackSideNum, rectW, rectH, 4)
 						//将坐标收纳成对象保存到数组，为绑定事件做准备
-						let rectOne={
+						let rect={
 							x: rectX+this.wblackSideNum,
 							y: rectY+this.hblackSideNum,
 							w: rectW,
 							h: rectH
 						}
-						this.rectArray.push(rectOne)
+						this.rectArray.push(rect)
 						if(this.isClickFlag){
 							if(this.touchRectNum == i){
 									//矩形边框颜色
@@ -1003,7 +1027,8 @@
 			canvasTouchendEventTodo(){
 				let advancedList = this.childs[this.touchRectNum].onAdvancedList
 				let userScore = uni.getStorageSync('userScore')
-				if(this.isNUmberSelect == 1){
+				let isNumericalOptions = uni.getStorageSync('isNumericalOptions')
+				if(isNumericalOptions == 1){
 					for(let i = 0; i< advancedList.length; i++){
 						let countSymbol = advancedList[i].change
 						let countNumber = advancedList[i].changeValue - 0
@@ -1021,16 +1046,20 @@
 					this.initPlayData(this.childs[this.touchRectNum])
 				}
 			},
-			// 校正视频播放的黑边
+			// 校正视频播放的黑边 单位px
 			validateBlackSide(windowWidth, windowHeight){
 				if(windowHeight/windowWidth>16/9){
 					//高度变高了出现上下黑边
-					this.hblackSideNum = Math.ceil((windowHeight-(16/9)*windowWidth)/2)
+					this.hblackSideNum = parseInt(((windowHeight-(16/9)*windowWidth)/2).toFixed(0))
 				}else{
 					//宽度变宽了出现左右黑边
-					this.wblackSideNum = Math.ceil((windowWidth-(9/16)*windowHeight)/2)
+					this.wblackSideNum = parseInt(((windowWidth-(9/16)*windowHeight)/2).toFixed(0))
 				}
 				console.log("黑边的高："+this.hblackSideNum+"黑边的宽："+this.wblackSideNum)
+			},
+			// 深拷贝 方法
+			deepCopy(o) {
+				return JSON.parse(JSON.stringify(o))
 			}
 		}
 	}
