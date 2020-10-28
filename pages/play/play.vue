@@ -247,14 +247,18 @@
 				this.getArtworkTreeByArtworkId();
 				this.getArtworkTreeByDetailId();
 				this.playedHistoryArray = uni.getStorageSync("pkDetailIds")
-				let isNumericalOptions = uni.getStorageSync('isNumericalOptions')
 				let appearConditionMap = uni.getStorageSync('appearConditionMap')
-				if(isNumericalOptions == 1){
+				//根据当前节点 在节点分值容器中是否有值来判断是否是数值节点
+				let symbolIndex = this.pkDetailId+''
+				let symbol = appearConditionMap[symbolIndex]
+				console.log('symbol:'+symbol)
+				if(typeof(symbol) != 'undefined' && symbol.length != 0){
 					//计算跳转到的目标节点时此时用户的得分 所使用的临时数组变量 因为跳转过来没有当前节点的分数计算情况
 					let currentArray = this.deepCopy(this.playedHistoryArray)
 					//如果此时的currentArray 是空的话则说明是跳转的根节点不做操作
 					if(currentArray.length != 0){
-						currentArray.push(this.pkDetailId)
+						//前面为了判断是否是数值选项被设置形成了String 故+0转化回来
+						currentArray.push(parseInt(this.pkDetailId))
 						//需要的是计算过了当前节点的分数
 						console.log('播放记录：'+currentArray)
 						//初始化userScore数组 currentArray第一个元素是根节点没有 changeConditionValue
@@ -446,96 +450,33 @@
 				}
 				// 将选项置空 避免选项中出现上一次选项的情况
 				this.option = []
-				//是否是定位选项的标志 1是定位选项 其他是普通选项
-				this.isPosition = artworkTree.isPosition
-				//是否是数值选项的标志 1是数值选项 其它是普通选项
-				let isNumericalOptions = artworkTree.isNumberSelect
-				//存到storage里面保证故事线跳转时能拿到此标志
-				uni.setStorageSync('isNumericalOptions', isNumericalOptions)
 				//将当前播放的作品的detailId保存在缓存用于举报时确定是哪个具体的作品
 				uni.setStorageSync("detailId",this.detailId)
 				//保存播放过的作品的id
 				this.savaPlayRecord();
-				if(this.isPosition == 1){
-					if(isNumericalOptions == 1){
-						//定位选项中的数值选项
-						//获取定位选项数据
-						this.nodeLocationList = artworkTree.nodeLocationList
-						//获取数值选项参数
-						this.calculateSelectOptionScore(artworkTree)
-						//初始化画布
-						this.initCanvas();
-					}else{
-						//定位选项中的普通选项
-						this.nodeLocationList = artworkTree.nodeLocationList
-						//获取每个子节点信息 并判断子节点中是否有跳转节点
-						this.getSelectTextAndJudgeIsLink(artworkTree)
-						//初始化画布
-						this.initCanvas();
-					}
-				}else{
-					if(isNumericalOptions == 1){
-						//普通选项中的数值选项
-						this.calculateSelectOptionScore(artworkTree)
-					}else{
-						//常规选项
-						//获取每个子节点信息 并判断子节点中是否有跳转节点
-						this.getSelectTextAndJudgeIsLink(artworkTree)
-					}
-				}
-
-			},
-			// 计算获取需要展示的数值选项的内容
-			calculateSelectOptionScore(artworkTree){
-				let childs = artworkTree.childs
-				// 要根据advancedList里面的条件进行判断是否显示childs的选项 还要根据点击事件去做相应的扣分
-				//不显示选项的方法是 把childs.length值减掉 这样选项数量就减少了
+				//是否是定位选项的标志 1是定位选项 其他是普通选项
+				this.isPosition = artworkTree.isPosition
+				let childs = artworkTree.childs;
 				if(childs){
-					for(let i = 0; i < childs.length; i++){
-						this.childs.splice(i,1,childs[i])
-						//选项是否显示的标志
-						//获取数值选项参数
-						let advancedList = childs[i].onAdvancedList
-						let userScore = uni.getStorageSync('userScore')
-						// 初始化用户数值选项的分数
-						if(userScore == null || userScore.length == 0){
-							for(let k = 0; k < advancedList.length; k++){
-								userScore.push(0);
-							}
-						}
-						uni.setStorageSync('userScore',userScore)
-						// 是否显示选项的开关
-						let optionFlag = true
-						for(let j = 0; j < advancedList.length; j++){
-							let conditionSymbol = advancedList[j].appear
-							let conditionNumber = advancedList[j].appearValue - 0
-							if('>' === conditionSymbol){
-								if(userScore[j] > conditionNumber){
-									optionFlag = optionFlag && true
-								}else{
-									optionFlag = optionFlag && false
-								}
-							}else if('<' === conditionSymbol){
-								if(userScore[j] < conditionNumber){
-									optionFlag = optionFlag && true
-								}else{
-									optionFlag = optionFlag && false
-								}
-							}else if('=' === conditionSymbol){
-								if(userScore[j] == conditionNumber){
-									optionFlag = optionFlag && true
-								}else{
-									optionFlag = optionFlag && false
-								}
-							}
-						}
-						if(optionFlag){
-							this.option.push(childs[i].selectTitle)
+					for(let i = 0;i < childs.length;i++){
+						this.childs.splice(i,1,childs[i]);
+						//是否是数值选项的标志 1是数值选项 其它是普通选项
+						let isNumericalOptions = childs[i].isNumberSelect
+						if(isNumericalOptions == 1){
+							//普通选项中的数值选项
+							this.calculateOptionScore(childs[i])
 						}else{
-							continue
+							//常规选项
+							this.option.push(childs[i].selectTitle)
 						}
 					}
 					this.tipsArray.length = this.option.length;
+					if(this.isPosition == 1){
+						//获取定位选项位置数据
+						this.nodeLocationList = artworkTree.nodeLocationList
+						//初始化画布
+						this.initCanvas();
+					}
 				}else{
 					//islink不是null且值为1说明该节点是跳转节点
 					if(artworkTree.isLink != null && artworkTree.isLink === 1){
@@ -560,37 +501,52 @@
 					this.linkNodeId = null
 				}
 			},
-			//获取非数值选项的选项内容和判断是否是跳转节点
-			getSelectTextAndJudgeIsLink(artworkTree){
-				let childs = artworkTree.childs;
-				if(childs){
-					this.tipsArray.length = childs.length;
-					for(let i = 0;i < childs.length;i++){
-						this.childs.splice(i,1,childs[i]);
-						this.option[i] = childs[i].selectTitle;
+			// 计算选项分数判断是否显示
+			calculateOptionScore(child){
+				//选项是否显示的标志
+				//获取数值选项参数
+				let advancedList = child.onAdvancedList
+				let userScore = uni.getStorageSync('userScore')
+				// 初始化用户数值选项的分数
+				if(userScore == null || userScore.length == 0){
+					for(let k = 0; k < advancedList.length; k++){
+						userScore.push(0);
 					}
-				}else{
-					//islink不是null且值为1说明该节点是跳转节点
-					if(artworkTree.isLink != null && artworkTree.isLink === 1){
-						//从缓存中拿到主树
-						const linkId = artworkTree.linkUrl;
-						//存储跳转目标节点的detailId
-						this.linkNodeId = linkId
-						const mainTree = uni.getStorageSync("mainArtworkTree");
-						this.playedHistoryArray.push(artworkTree.pkDetailId);
-						this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray));
-						uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
-						this.getTargetTree(mainTree,linkId)
-					}else{
-						//是不是最后一个视频标志 最后一个视频不需要弹窗
-						this.endFlag = false;
+					uni.setStorageSync('userScore',userScore)
+				}
+				// 是否显示选项的开关
+				let optionFlag = true
+				for(let j = 0; j < advancedList.length; j++){
+					let conditionSymbol = advancedList[j].appear
+					let conditionNumber = advancedList[j].appearValue - 0
+					if('>' === conditionSymbol){
+						if(userScore[j] > conditionNumber){
+							optionFlag = optionFlag && true
+						}else{
+							optionFlag = optionFlag && false
+						}
+					}else if('<' === conditionSymbol){
+						if(userScore[j] < conditionNumber){
+							optionFlag = optionFlag && true
+						}else{
+							optionFlag = optionFlag && false
+						}
+					}else if('=' === conditionSymbol){
+						if(userScore[j] == conditionNumber){
+							optionFlag = optionFlag && true
+						}else{
+							optionFlag = optionFlag && false
+						}
 					}
 				}
-				if (this.linkNodeId != this.detailId) {
-					this.playedHistoryArray.push(artworkTree.pkDetailId);
-					this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray));
-					uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
-					this.linkNodeId = null
+				if(optionFlag){
+					this.option.push(child.selectTitle)
+				}else{
+					for(let i = 0; i < this.nodeLocationList.length; i++){
+						if(this.nodeLocationList[i].pkDetailId == child.pkDetailId){
+							this.nodeLocationList.splice(i,1)
+						}
+					}
 				}
 			},
 			// 递归获取跳转节点对应的目标节点的detailId并拿到对应子树再重新初始化数据
@@ -757,7 +713,7 @@
 			optionTouchendTodo(index){
 				let advancedList = this.childs[index].onAdvancedList
 				let userScore = uni.getStorageSync('userScore')
-				let isNumericalOptions = uni.getStorageSync('isNumericalOptions')
+				let isNumericalOptions = this.childs[index].isNumberSelect
 				if(isNumericalOptions == 1){
 					for(let i = 0; i< advancedList.length; i++){
 						let countSymbol = advancedList[i].change
@@ -935,12 +891,12 @@
 									ctx.setFillStyle('#96CDCD')
 									this.isClickFlag = false
 								}else{
-									ctx.setStrokeStyle('rgba(255, 255, 255, 0.1)')
-									ctx.setFillStyle('rgba(255, 255, 255, 0.1)')
+									ctx.setStrokeStyle('rgba(255, 255, 255, 0.3)')
+									ctx.setFillStyle('rgba(255, 255, 255, 0.3)')
 								}
 						}else{
-							ctx.setStrokeStyle('rgba(255, 255, 255, 0.1)')
-							ctx.setFillStyle('rgba(255, 255, 255, 0.1)')
+							ctx.setStrokeStyle('rgba(255, 255, 255, 0.3)')
+							ctx.setFillStyle('rgba(255, 255, 255, 0.3)')
 						}
 						ctx.fill()
 						//开始描绘
@@ -1027,7 +983,7 @@
 			canvasTouchendEventTodo(){
 				let advancedList = this.childs[this.touchRectNum].onAdvancedList
 				let userScore = uni.getStorageSync('userScore')
-				let isNumericalOptions = uni.getStorageSync('isNumericalOptions')
+				let isNumericalOptions = this.childs[this.touchRectNum].isNumberSelect
 				if(isNumericalOptions == 1){
 					for(let i = 0; i< advancedList.length; i++){
 						let countSymbol = advancedList[i].change
