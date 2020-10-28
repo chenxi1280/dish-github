@@ -456,6 +456,10 @@
 				this.savaPlayRecord();
 				//是否是定位选项的标志 1是定位选项 其他是普通选项
 				this.isPosition = artworkTree.isPosition
+				if(this.isPosition == 1){
+					//获取定位选项位置数据
+					this.nodeLocationList = artworkTree.nodeLocationList
+				}
 				let childs = artworkTree.childs;
 				if(childs){
 					for(let i = 0;i < childs.length;i++){
@@ -471,9 +475,8 @@
 						}
 					}
 					this.tipsArray.length = this.option.length;
+					//初始画布必须等到选项数据先初始化完才能进行
 					if(this.isPosition == 1){
-						//获取定位选项位置数据
-						this.nodeLocationList = artworkTree.nodeLocationList
 						//初始化画布
 						this.initCanvas();
 					}
