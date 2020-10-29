@@ -202,10 +202,10 @@
 							b.splice(i)
 						}
 					}
-					if (a.isLink == 1){
-						a.pkDetailId = a.linkUrl
+					// if (a.isLink == 1){
+					// 	a.pkDetailId = a.linkUrl
 						
-					}
+					// }
 					uni.setStorageSync("pkDetailIds", b);
 					this.$refs.uToast.show({
 						title: '选中跳转到' + a.selectTitle ,
