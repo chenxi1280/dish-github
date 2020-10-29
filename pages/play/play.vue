@@ -271,8 +271,10 @@
 						for(let i = 1; i < currentArray.length; i++){
 							let key = ''+currentArray[i]
 							let value = appearConditionMap[key]
-							for(let j = 0; j < value.length; j++){
-								userScore[j] += value[j].changeConditionValue
+							if(typeof(value) != 'undefined' && value.length != 0 ){
+								for(let j = 0; j < value.length; j++){
+									userScore[j] += value[j].changeConditionValue
+								}
 							}
 						}
 						uni.setStorageSync('userScore', userScore)
@@ -481,7 +483,7 @@
 						this.initCanvas();
 					}
 				}else{
-					//islink不是null且值为1说明该节点是跳转节点
+					//islink不是null且值为1说明该节点是跳转节点 需要注意叶子节点的孩子也是空的可能会走进else故要考虑过是否是叶子节点
 					if(artworkTree.isLink != null && artworkTree.isLink === 1){
 						//从缓存中拿到主树
 						const linkId = artworkTree.linkUrl;
@@ -489,7 +491,8 @@
 						this.linkNodeId = linkId
 						const mainTree = uni.getStorageSync("mainArtworkTree");
 						this.playedHistoryArray.push(artworkTree.pkDetailId);
-						this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray));
+						/* //不需要去重 记录故事线走向方便数值选项分数计算
+						this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray)); */
 						uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
 						this.getTargetTree(mainTree,linkId)
 					}else{
@@ -497,9 +500,11 @@
 						this.endFlag = false;
 					}
 				}
+				//非跳转节点存播放记录
 				if (this.linkNodeId != this.detailId) {
 					this.playedHistoryArray.push(artworkTree.pkDetailId);
-					this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray));
+					/* //不需要去重 记录故事线走向方便数值选项分数计算
+					this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray)); */
 					uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
 					this.linkNodeId = null
 				}
