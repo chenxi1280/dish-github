@@ -4,7 +4,7 @@
 			<view class="login_redirect_btn">登录
 				<view>Welcome</view>
 			</view>
-			<view class="signin_redirect_btn" @click="toSigninPage">注册</view>
+			<!-- <view class="signin_redirect_btn" @click="toSigninPage">注册</view> -->
 		</view>
 		 <!-- #ifdef MP-WEIXIN -->
 		<view class="bottom">
