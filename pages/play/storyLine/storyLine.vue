@@ -37,12 +37,14 @@
 		},
 		data() {
 			return {
+				// 当前数据
 				list: [],
 				floorList: [],
 				onfloor: 5, // 当前楼
 				oncolumn: 0, // 当前列
 				lockFloor: 0, // 锁定楼层
-				lockColumn: 0 // 锁定列
+				lockColumn: 0 ,// 锁定列
+				isNumberFlag:false
 
 			}
 		},
@@ -62,9 +64,19 @@
 					res.data.data.forEach(node => {
 						this.pkDetailIds.forEach( v => {
 							if (v === node.pkDetailId) {
-								this.setNode(node.brotherNode, v)
-								this.list.push(node.brotherNode)
-								this.floorList.push(node.brotherNode)
+								if (node.isLink) {
+									res.data.data.forEach( item => {
+										if (node.linkUrl === item.pkDetailId) {
+											this.setNode(item.brotherNode, v)
+											this.list.push(item.brotherNode)
+											this.floorList.push(item.brotherNode)
+										}
+									})
+								}else {
+									this.setNode(node.brotherNode, v)
+									this.list.push(node.brotherNode)
+									this.floorList.push(node.brotherNode)
+								}
 							}
 						})
 					})
@@ -73,13 +85,15 @@
 			})
 		},
 		methods: {
-			setNode(data, pkNodeId) {
+			// 换位置，并 修改title img 
+			setNode(data, pkNodeId,item) {
 				for (let i = 0; i < data.length; i++) {
 					data[i].title = data[i].selectTitle
 					data[i].image = data[i].nodeImgUrl
-					data[i].isWatch = false
 					if (pkNodeId === data[i].pkDetailId) {
-						data[i].isWatch = true
+						if (item!=null) {
+							data[i].image = item.image
+						}
 						data.unshift(data[i])
 						data.splice(i + 1, 1)
 					}
@@ -164,9 +178,23 @@
 			},
 			goPlay(index, nowFloor) {
 				if (nowFloor == this.onfloor && index == this.oncolumn) {
-					let b = uni.getStorageSync("pkDetailIds")
 					let a = this.floorList[nowFloor][index]
+					let b = uni.getStorageSync("pkDetailIds")
+					// 当前选中楼层的 播放历史
 					let c = this.floorList[nowFloor][0]
+					console.log(a)
+					
+					if (a.isNumberSelect !=null ) {
+							this.isNumberFlag = a.isNumberSelect == 1
+					}
+					
+					if (this.isNumberFlag) {
+						if (index != 0 ) {
+							this.showToast('本选项数值选项，无法直接跳转，请在上级进行跳转')
+							return 
+						}
+					}
+					
 					// 父节点跳转
 					for (let i = 0; i < b.length; i++) {
 						if (b[i] == c.pkDetailId) {
@@ -187,12 +215,12 @@
 						url: "../play/play?pkArtworkId=" + this.pkArtworkId + "&pkDetailId=" + a.pkDetailId,
 					})
 				} else {
-					this.showToast()
+					this.showToast('请滑动至选择中心位进行跳转')
 				}
 			},
-			showToast() {
+			showToast(msg) {
 				this.$refs.uToast.show({
-					title: '请滑动至选择中心位进行跳转',
+					title: msg,
 					type: 'error',
 				})
 			},
