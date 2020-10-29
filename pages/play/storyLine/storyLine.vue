@@ -61,25 +61,25 @@
 				},
 				success: res => {
 					console.log(res.data.data)
-					res.data.data.forEach(node => {
-						this.pkDetailIds.forEach( v => {
+					this.pkDetailIds.forEach( v => {
+						res.data.data.forEach(node => {
 							if (v === node.pkDetailId) {
 								if (node.isLink == 1) {
 									res.data.data.forEach( item => {
 										if (node.linkUrl == item.pkDetailId) {
 											this.setNode(node.brotherNode, v,item)
-											this.list.push(node.brotherNode)
-											this.floorList.push(node.brotherNode)
 										}
 									})
 								}else {
 									this.setNode(node.brotherNode, v)
-									this.list.push(node.brotherNode)
-									this.floorList.push(node.brotherNode)
 								}
 							}
+							this.list.push(node.brotherNode)
+							this.floorList.push(node.brotherNode)
 						})
 					})
+					console.log(this.list)
+					console.log(this.floorList)
 					this.clearnBrother()
 				}
 			})
@@ -194,18 +194,17 @@
 							this.showToast('本选项数值选项，无法直接跳转，请在上级进行跳转')
 							return 
 						}
-					}
-					
+					}				
 					// 父节点跳转
 					for (let i = 0; i < b.length; i++) {
 						if (b[i] == c.pkDetailId) {
 							b.splice(i)
 						}
 					}
-					if (a.isLink == 1){
-						a.pkDetailId = a.linkUrl
+					// if (a.isLink == 1){
+					// 	a.pkDetailId = a.linkUrl
 						
-					}
+					// }
 					uni.setStorageSync("pkDetailIds", b);
 					this.$refs.uToast.show({
 						title: '选中跳转到' + a.selectTitle ,
