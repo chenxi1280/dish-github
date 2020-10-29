@@ -61,8 +61,8 @@
 				},
 				success: res => {
 					console.log(res.data.data)
-					res.data.data.forEach(node => {
-						this.pkDetailIds.forEach( v => {
+					this.pkDetailIds.forEach( v => {
+						res.data.data.forEach(node => {
 							if (v === node.pkDetailId) {
 								if (node.isLink == 1) {
 									res.data.data.forEach( item => {
