@@ -64,12 +64,12 @@
 					res.data.data.forEach(node => {
 						this.pkDetailIds.forEach( v => {
 							if (v === node.pkDetailId) {
-								if (node.isLink) {
+								if (node.isLink == 1) {
 									res.data.data.forEach( item => {
-										if (node.linkUrl === item.pkDetailId) {
-											this.setNode(item.brotherNode, v)
-											this.list.push(item.brotherNode)
-											this.floorList.push(item.brotherNode)
+										if (node.linkUrl == item.pkDetailId) {
+											this.setNode(node.brotherNode, v,item)
+											this.list.push(node.brotherNode)
+											this.floorList.push(node.brotherNode)
 										}
 									})
 								}else {
@@ -90,10 +90,11 @@
 				for (let i = 0; i < data.length; i++) {
 					data[i].title = data[i].selectTitle
 					data[i].image = data[i].nodeImgUrl
+					//是否展示问号
+					data[i].isWatch = false
 					if (pkNodeId === data[i].pkDetailId) {
-						if (item!=null) {
-							data[i].image = item.image
-						}
+						if (item != null )  data[i].image = item.nodeImgUrl
+						data[i].isWatch = true
 						data.unshift(data[i])
 						data.splice(i + 1, 1)
 					}
@@ -202,7 +203,6 @@
 						}
 					}
 					if (a.isLink == 1){
-						
 						a.pkDetailId = a.linkUrl
 						
 					}
