@@ -225,7 +225,7 @@
 		},
 		onReady(){
 			//test
-			// this.artworkId = 317;
+			// this.artworkId = 365;
 			//初始化定位选项画布
 			//获取手机屏幕尺寸 单位是px
 			const {windowWidth, windowHeight} = uni.getSystemInfoSync()
@@ -244,8 +244,8 @@
 			this.endFlag = true;
 			if(this.pkDetailId != null){
 				//故事线跳转过来存一棵主树 跳转用
-				this.getArtworkTreeByArtworkId();
-				this.getArtworkTreeByDetailId();
+				this.getArtworkTreeByArtworkId()
+				this.getArtworkTreeByDetailId()
 				this.playedHistoryArray = uni.getStorageSync("pkDetailIds")
 				let appearConditionMap = uni.getStorageSync('appearConditionMap')
 				//根据当前节点 在节点分值容器中是否有值来判断是否是数值节点
@@ -261,9 +261,13 @@
 						currentArray.push(parseInt(this.pkDetailId))
 						//需要的是计算过了当前节点的分数
 						console.log('播放记录：'+currentArray)
-						//初始化userScore数组 currentArray第一个元素是根节点没有 changeConditionValue
-						let index = ''+currentArray[1]
-						let len = appearConditionMap[index].length
+						//初始化用户分数数组
+						let len = 0
+						for(let item in appearConditionMap){
+							len = appearConditionMap[item].length
+							break;
+						}
+						console.log('节点条件数组的长度：',len)
 						let userScore = uni.getStorageSync('userScore')
 						for(let k = 0; k < len; k++){
 							userScore.push(0);
@@ -454,6 +458,8 @@
 				}
 				// 将选项置空 避免选项中出现上一次选项的情况
 				this.option = []
+				//将孩子节点容器置空 避免视频一直循环播放
+				this.childs = []
 				//将当前播放的作品的detailId保存在缓存用于举报时确定是哪个具体的作品
 				uni.setStorageSync("detailId",this.detailId)
 				//保存播放过的作品的id
@@ -467,7 +473,6 @@
 				let childs = artworkTree.childs;
 				if(childs){
 					for(let i = 0;i < childs.length;i++){
-						this.childs.splice(i,1,childs[i]);
 						//是否是数值选项的标志 1是数值选项 其它是普通选项
 						let isNumericalOptions = childs[i].isNumberSelect
 						if(isNumericalOptions == 1){
@@ -476,6 +481,7 @@
 						}else{
 							//常规选项
 							this.option.push(childs[i].selectTitle)
+							this.childs.push(childs[i])
 						}
 					}
 					this.tipsArray.length = this.option.length;
@@ -552,6 +558,7 @@
 					}
 				}
 				if(optionFlag){
+					this.childs.push(child)
 					this.option.push(child.selectTitle)
 				}else{
 					for(let i = 0; i < this.nodeLocationList.length; i++){
