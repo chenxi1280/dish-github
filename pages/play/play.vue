@@ -225,7 +225,7 @@
 		},
 		onReady(){
 			//test
-			// this.artworkId = 350;
+			// this.artworkId = 317;
 			//初始化定位选项画布
 			//获取手机屏幕尺寸 单位是px
 			const {windowWidth, windowHeight} = uni.getSystemInfoSync()
@@ -273,7 +273,9 @@
 							let value = appearConditionMap[key]
 							if(typeof(value) != 'undefined' && value.length != 0 ){
 								for(let j = 0; j < value.length; j++){
-									userScore[j] += value[j].changeConditionValue
+									if( value[j].changeFlag == 1){
+										userScore[j] += value[j].changeConditionValue
+									}
 								}
 							}
 						}
@@ -525,25 +527,27 @@
 				// 是否显示选项的开关
 				let optionFlag = true
 				for(let j = 0; j < advancedList.length; j++){
-					let conditionSymbol = advancedList[j].appear
-					let conditionNumber = advancedList[j].appearValue - 0
-					if('>' === conditionSymbol){
-						if(userScore[j] > conditionNumber){
-							optionFlag = optionFlag && true
-						}else{
-							optionFlag = optionFlag && false
-						}
-					}else if('<' === conditionSymbol){
-						if(userScore[j] < conditionNumber){
-							optionFlag = optionFlag && true
-						}else{
-							optionFlag = optionFlag && false
-						}
-					}else if('=' === conditionSymbol){
-						if(userScore[j] == conditionNumber){
-							optionFlag = optionFlag && true
-						}else{
-							optionFlag = optionFlag && false
+					if(advancedList[j].appearFlag == 1){
+						let conditionSymbol = advancedList[j].appear
+						let conditionNumber = advancedList[j].appearValue - 0
+						if('>' === conditionSymbol){
+							if(userScore[j] > conditionNumber){
+								optionFlag = optionFlag && true
+							}else{
+								optionFlag = optionFlag && false
+							}
+						}else if('<' === conditionSymbol){
+							if(userScore[j] < conditionNumber){
+								optionFlag = optionFlag && true
+							}else{
+								optionFlag = optionFlag && false
+							}
+						}else if('=' === conditionSymbol){
+							if(userScore[j] == conditionNumber){
+								optionFlag = optionFlag && true
+							}else{
+								optionFlag = optionFlag && false
+							}
 						}
 					}
 				}
@@ -724,12 +728,14 @@
 				let isNumericalOptions = this.childs[index].isNumberSelect
 				if(isNumericalOptions == 1){
 					for(let i = 0; i< advancedList.length; i++){
-						let countSymbol = advancedList[i].change
-						let countNumber = advancedList[i].changeValue - 0
-						if('+' === countSymbol){
-							userScore[i] =  userScore[i] + countNumber
-						}else{
-							userScore[i] =  userScore[i] - countNumber
+						if(advancedList[i].changeFlag == 1){
+							let countSymbol = advancedList[i].change
+							let countNumber = advancedList[i].changeValue - 0
+							if('+' === countSymbol){
+								userScore[i] =  userScore[i] + countNumber
+							}else{
+								userScore[i] =  userScore[i] - countNumber
+							}
 						}
 					}
 					this.chooseTipsShowFlag = false
@@ -994,12 +1000,14 @@
 				let isNumericalOptions = this.childs[this.touchRectNum].isNumberSelect
 				if(isNumericalOptions == 1){
 					for(let i = 0; i< advancedList.length; i++){
-						let countSymbol = advancedList[i].change
-						let countNumber = advancedList[i].changeValue - 0
-						if('+' === countSymbol){
-							userScore[i] =  userScore[i] + countNumber
-						}else{
-							userScore[i] =  userScore[i] - countNumber
+						if(advancedList[i].changeFlag == 1){
+							let countSymbol = advancedList[i].change
+							let countNumber = advancedList[i].changeValue - 0
+							if('+' === countSymbol){
+								userScore[i] =  userScore[i] + countNumber
+							}else{
+								userScore[i] =  userScore[i] - countNumber
+							}
 						}
 					}
 					this.showCanvasFlag = false
