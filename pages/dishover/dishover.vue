@@ -88,11 +88,14 @@
 				queryType: "爱情",
 				limit: 10,
 				loadStatus: "loadmore",
+				// 底部状态
+				hotLoadStatus: 'loadmore',
 				hotList: [],
 				sortList: [],
+				//热门页数
 				pageHot: 0,
+				//分类页数
 				pageSort: 0,
-				hotLoadStatus: "loadmore",
 				sortList0: [],
 				sortList1: [],
 				sortList2: [],
@@ -106,12 +109,16 @@
 				swiperCurrent: 0
 			}
 		},
-		onShow() {
+		// onShow() {
+		// 	this.addRandomDataHot()
+		// },
+		onLoad() {
 			this.addRandomDataHot()
 		},
 		onReachBottom(e) {
+			console.log('我去加载了')
 			if (this.current == 0) {
-				if (this.hotLoadStatus == "loadmore") {
+				if (this.hotLoadStatus === 'loadmore') {
 					this.addRandomDataHot()
 				}
 			} else if (this.current == 1) {
@@ -133,6 +140,7 @@
 			},
 			sectionChange(index) {
 				this.current = index;
+				console.log(this.current)
 				if (this.current == 1) {
 					this.addRandomDataSort();
 				}
@@ -152,32 +160,40 @@
 			addRandomDataHot() {
 				if (this.current == 0) {
 					this.pageHot = this.pageHot + 1
-
+					console.log(this.pageHot)
 					uni.request({
 						url: 'https://wanxiangchengzhen.com/bpi/Ecmartwork/getFindArtWorks',
+						// url: 'http://localhost:8008/Ecmartwork/getFindArtWorks',
 						method: 'POST',
 						data: {
 							page: this.pageHot,
 							limit: this.limit
 						},
 						success: res => {
-							if (res.data.data != null) {
-								res.data.data.forEach(v => {
+							console.log(res)
+							if (res.data.data.list != null) {
+								res.data.data.list.forEach(v => {
 									v.high = 287.1
 									v.logoPath = v.logoPath + '/common'
 									this.hotList.push(v)
 								})
-								if (res.data.data.length < this.limit) {
+								console.log(this.limit)
+								console.log(res.data.data.length )
+								
+								if (res.data.data.loadStatus != null ) {
 									this.hotLoadStatus = 'nomore'
 								}
 								// uni.setStorageSync( 'isHot' , true )
 
 							} else {
+								console.log('没有更多数据了')
 								this.hotLoadStatus = 'nomore'
 							}
 						}
 					})
+					console.log(this.hotLoadStatus)
 				}
+				
 
 			},
 			addRandomDataSort() {
@@ -211,15 +227,12 @@
 			},
 			swiperchange(e) {
 				let a = e.detail.current;
-
 				this.currentsort = a;
 				this.pageSort = 0
 				this.swiperCurrent = a;
 				this.queryType = this.list[a].name
 				this['sortList' + this.currentsort]
-
 				this.judgesortData()
-
 			},
 			judgesortData() {
 				if (this['sortList' + this.currentsort].length == 0 && this['pageSort' + this.currentsort] == 0) {

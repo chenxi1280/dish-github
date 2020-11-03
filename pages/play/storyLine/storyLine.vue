@@ -66,16 +66,18 @@
 							if (v === node.pkDetailId) {
 								if (node.isLink == 1) {
 									res.data.data.forEach( item => {
-										if (node.linkUrl == item.pkDetailId) {
+										if (node.linkUrl == item.pkDetailId) {		
 											this.setNode(node.brotherNode, v,item)
+											this.list.push(node.brotherNode)
+											this.floorList.push(node.brotherNode)
 										}
 									})
 								}else {
 									this.setNode(node.brotherNode, v)
+									this.list.push(node.brotherNode)
+									this.floorList.push(node.brotherNode)
 								}
 							}
-							this.list.push(node.brotherNode)
-							this.floorList.push(node.brotherNode)
 						})
 					})
 					console.log(this.list)
