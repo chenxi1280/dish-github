@@ -6,8 +6,10 @@
 			</view>
 			<!-- 播放主体   @click="showButton"-->
 			<view class="videoBox">
-				<video :src="videoUrl" :autoplay="true" direction="0" :show-mute-btn="true" :show-fullscreen-btn="false" id="myVideo"
-				 :enable-play-gesture="true" @ended="videoEnd" @pause="videoPause"></video>
+				
+				<video :src="videoUrl" :autoplay="autopalyFlag" direction="0" :show-mute-btn="true" :show-fullscreen-btn="false" id="myVideo"
+				 :enable-play-gesture="gestureFlag" @ended="videoEnd" @pause="videoPause" @timeupdate="videoTimeupdate" 
+				 @loadedmetadata="loadeddata"></video>
 			</view>
 			<!-- 选项 -->
 			<view class="chooseTipsMask15"  v-if="chooseTipsMaskFlag">
@@ -178,7 +180,15 @@
 				//默认是个不会被触发的数字 
 				touchRectNum: 5,
 				//是否被点击的标志
-				isClickFlag: false
+				isClickFlag: false,
+				//视频播放的信息
+				videoPlayInfo: null,
+				//是否自动播放标志
+				autopalyFlag: true,
+				//是否开启手势标志
+				gestureFlag: true,
+				//视频结束事件标志
+				endEventFlag: true
 			}
 		},
 		onLoad(option) {
@@ -225,10 +235,13 @@
 		},
 		onReady(){
 			//test
-			// this.artworkId = 365;
-			//初始化定位选项画布
+			this.artworkId = 461;
+			//监听快进手势
 			//获取手机屏幕尺寸 单位是px
-			const {windowWidth, windowHeight} = uni.getSystemInfoSync()
+			this.autopalyFlag = true
+			this.gestureFlag = true
+			this.endEventFlag = true
+			const {windowWidth, windowHeight, brand, model} = uni.getSystemInfoSync()
 			let windowSizeArray = {
 				'windowWidth': windowWidth,
 				'windowHeight': windowHeight
@@ -239,29 +252,29 @@
 			this.windowWidth = 750
 			//宽高是等比的 单位rpx
 			this.windowHeight = windowHeight*750/windowWidth
-			uni.setStorageSync('userScore',[])
 			//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
 			this.endFlag = true;
+			//重置用户选项分数
+			uni.setStorageSync('userScore',[])
 			if(this.pkDetailId != null){
 				//故事线跳转过来存一棵主树 跳转用
 				this.getArtworkTreeByArtworkId()
 				this.getArtworkTreeByDetailId()
 				this.playedHistoryArray = uni.getStorageSync("pkDetailIds")
 				let appearConditionMap = uni.getStorageSync('appearConditionMap')
-				//根据当前节点 在节点分值容器中是否有值来判断是否是数值节点
-				let symbolIndex = this.pkDetailId+''
-				let symbol = appearConditionMap[symbolIndex]
-				console.log('symbol:'+symbol)
-				if(typeof(symbol) != 'undefined' && symbol.length != 0){
-					//计算跳转到的目标节点时此时用户的得分 所使用的临时数组变量 因为跳转过来没有当前节点的分数计算情况
+				//根据当前节点 在节点分值容器中是否有值来判断是否是数值节点 
+				//不能判断是普通选项的跳转还是数值选项的跳转了 因为数值选项中也可能存在普通选项会导致误判
+				//所以不管是普通选项还是数值选项都要做一次分数的重新计算
+				//appearConditionMap != null 说明一定是数值选项的跳转 appearConditionMap == nul 说明是最普通的选项
+				if(appearConditionMap != null){
 					let currentArray = this.deepCopy(this.playedHistoryArray)
 					//如果此时的currentArray 是空的话则说明是跳转的根节点不做操作
 					if(currentArray.length != 0){
-						//前面为了判断是否是数值选项被设置形成了String 故+0转化回来
-						currentArray.push(parseInt(this.pkDetailId))
+						//计算跳转到的目标节点时此时用户的得分 所使用的临时数组变量 因为跳转过来没有当前节点的detailId
+						currentArray.push(this.pkDetailId)
 						//需要的是计算过了当前节点的分数
-						console.log('播放记录：'+currentArray)
-						//初始化用户分数数组
+						// console.log('播放记录：'+currentArray)
+						//根据appearConditionMap里面的元素长度初始化用户分数数组
 						let len = 0
 						for(let item in appearConditionMap){
 							len = appearConditionMap[item].length
@@ -303,7 +316,7 @@
 			//关闭页面时重置选项类型为默认
 			uni.setStorageSync('isNumericalOptions',0)
 			//关闭页面时重置节点分数容器
-			uni.setStorageSync('appearConditionMap',{})
+			uni.setStorageSync('appearConditionMap',null)
 		},
 		methods: {
 			// 举报页面上传截图到腾讯云
@@ -534,26 +547,12 @@
 				let optionFlag = true
 				for(let j = 0; j < advancedList.length; j++){
 					if(advancedList[j].appearFlag == 1){
-						let conditionSymbol = advancedList[j].appear
-						let conditionNumber = advancedList[j].appearValue - 0
-						if('>' === conditionSymbol){
-							if(userScore[j] > conditionNumber){
-								optionFlag = optionFlag && true
-							}else{
-								optionFlag = optionFlag && false
-							}
-						}else if('<' === conditionSymbol){
-							if(userScore[j] < conditionNumber){
-								optionFlag = optionFlag && true
-							}else{
-								optionFlag = optionFlag && false
-							}
-						}else if('=' === conditionSymbol){
-							if(userScore[j] == conditionNumber){
-								optionFlag = optionFlag && true
-							}else{
-								optionFlag = optionFlag && false
-							}
+						let appearValueMin = advancedList[j].appearValueMin - 0
+						let appearValueMax = advancedList[j].appearValueMax - 0
+						if(userScore[j] >= appearValueMin && userScore[j] <= appearValueMax){
+							optionFlag = optionFlag && true
+						}else{
+							optionFlag = optionFlag && false
 						}
 					}
 				}
@@ -593,7 +592,7 @@
 					},
 					success: res=> {
 						if(res.data.status == 200){
-							console.log(res.data.data)
+							// console.log(res.data.data)
 							uni.setStorageSync("mainArtworkTree",res.data.data);
 							//传到播放页面带pkDetailId参数 说明故事线跳转，只需要存一棵主树跳转节点用不用去播放视频
 							if(this.pkDetailId != null) return;
@@ -615,7 +614,7 @@
 					},
 					success: res=> {
 						if(res.data.status == 200){
-							console.log(res.data.data)
+							// console.log(res.data.data)
 							uni.setStorageSync("artworkTree",res.data.data);
 							this.initPlayData(res.data.data);
 						}
@@ -635,7 +634,7 @@
 					},
 					success: res=> {
 						if(res.data.status == 200){
-							console.log("我去存数据"+this.detailId+":"+ this.artworkId)
+							// console.log("我去存数据"+this.detailId+":"+ this.artworkId)
 						}
 					}
 				})
@@ -648,6 +647,7 @@
 						this.chooseTipsShowFlag = false;
 						this.chooseTipsMaskFlag = false;
 						this.showCanvasFlag = true;
+						this.endEventTodo();
 					}else{
 						this.showCanvasFlag = false;
 						this.chooseTipsShowFlag = true;
@@ -661,10 +661,40 @@
 					uni.setStorageSync('userScore',[])
 				}
 			},
+			endEventTodo(){
+				if(this.endEventFlag){
+					const videoContext = uni.createVideoContext('myVideo')
+					this.autopalyFlag = false
+					this.gestureFlag = false
+					let duration = this.videoPlayInfo.duration
+					videoContext.pause()
+					// console.log('duration:' + Math.floor(duration))
+					videoContext.seek(Math.floor(duration))
+					videoContext.pause()
+					videoContext.play()
+					this.endEventFlag = false
+					console.log('this.autoplay:'+this.autopalyFlag)
+				}
+			},
 			//视屏暂停操作
 			videoPause(){
-				console.log('我暂停了')
-				this.hiddenBtnFlag = true;
+				// console.log('我暂停了')
+				this.hiddenBtnFlag = true
+			},
+			//视频获取是视频播放进度
+			videoTimeupdate(e){
+				const videoContext = uni.createVideoContext('myVideo')
+				let currentTime = e.detail.currentTime
+				let duration = e.detail.duration
+				if(!this.endEventFlag){
+					if(currentTime/duration<0.5){
+						videoContext.seek(Math.floor(duration))
+					}
+				}
+				this.videoPlayInfo = {
+					'currentTime': currentTime,
+					'duration': duration
+				}
 			},
 			//展示故事线内容的时候暂停视频
 			showStoryLineContent(){
@@ -707,21 +737,33 @@
 				switch(index){
 					case 0: {
 						// splice替换数组元素
+						this.autopalyFlag = true
+						this.gestureFlag = true
+						this.endEventFlag = true
 						this.background.splice(index,1,"")
 						this.optionTouchendTodo(index)
 						break;
 					}
 					case 1: {
+						this.autopalyFlag = true
+						this.gestureFlag = true
+						this.endEventFlag = true
 						this.background.splice(index,1,"")
 						this.optionTouchendTodo(index)
 						break;
 					}
 					case 2: {
+						this.autopalyFlag = true
+						this.gestureFlag = true
+						this.endEventFlag = true
 						this.background.splice(index,1,"")
 						this.optionTouchendTodo(index)
 						break;
 					}
 					case 3: {
+						this.autopalyFlag = true
+						this.gestureFlag = true
+						this.endEventFlag = true
 						this.background.splice(index,1,"")
 						this.optionTouchendTodo(index)
 						break;
@@ -784,7 +826,7 @@
 				ctx.clearRect(0 , 0 , windowWidth, windowHeight)
 				for(let i = 0; i < this.nodeLocationList.length; i++){
 					if(this.nodeLocationList[i].isHide == 1){
-						console.log(1)
+						// console.log(1)
 						//矩形左上角点的坐标(X,Y)
 						let rectX = parseInt(((this.nodeLocationList[i].textRectX+0)*(windowWidth-this.hblackSideNum*2)).toFixed(0))
 						let rectY = parseInt(((this.nodeLocationList[i].textRectY+0)*(windowHeight-this.hblackSideNum*2)).toFixed(0)) 
@@ -873,7 +915,7 @@
 						ctx.stroke()
 						ctx.draw(true)
 					}else{
-						console.log(0)
+						// console.log(0)
 						//矩形左上角点的坐标(X,Y)
 						//rpx转px 故(this.windowWidth)/2 计算总长度时要减去黑边
 						let rectX = parseInt(((this.nodeLocationList[i].textRectX+0)*(windowWidth-this.wblackSideNum*2)).toFixed(0))
@@ -943,7 +985,7 @@
 			drawText(t,x,y,w){
 				//参数t是文本 w是屏幕宽度,
 				var chr = t.split("");
-				var temp = "";				
+				var temp = "";
 				var row = [];
 				
 				context.font = "20px Arial";
@@ -989,12 +1031,24 @@
 			// canvas的touchEnd事件
 			canvasTouchendEvent(){
 				if(this.touchRectNum == 0){
+					this.autopalyFlag = true
+					this.gestureFlag = true
+					this.endEventFlag = true
 					this.canvasTouchendEventTodo()
 				}else if(this.touchRectNum == 1){
+					this.autopalyFlag = true
+					this.gestureFlag = true
+					this.endEventFlag = true
 					this.canvasTouchendEventTodo()
 				}else if(this.touchRectNum == 2){
+					this.autopalyFlag = true
+					this.gestureFlag = true
+					this.endEventFlag = true
 					this.canvasTouchendEventTodo()
 				}else if(this.touchRectNum == 3){
+					this.autopalyFlag = true
+					this.gestureFlag = true
+					this.endEventFlag = true
 					this.canvasTouchendEventTodo()
 				}
 				//回到默认值
@@ -1027,18 +1081,28 @@
 			},
 			// 校正视频播放的黑边 单位px
 			validateBlackSide(windowWidth, windowHeight){
-				if(windowHeight/windowWidth>16/9){
+				let videoHeight = uni.getStorageSync('videoHeight')
+				let videoWidth = uni.getStorageSync('videoWidth')
+				let rate =	videoHeight/videoWidth
+				console.log(rate)
+				if(windowHeight/windowWidth>videoHeight/videoWidth){
 					//高度变高了出现上下黑边
-					this.hblackSideNum = parseInt(((windowHeight-(16/9)*windowWidth)/2).toFixed(0))
+					this.hblackSideNum = parseInt(((windowHeight-(videoHeight/videoWidth)*windowWidth)/2).toFixed(0))
 				}else{
 					//宽度变宽了出现左右黑边
-					this.wblackSideNum = parseInt(((windowWidth-(9/16)*windowHeight)/2).toFixed(0))
+					this.wblackSideNum = parseInt(((windowWidth-(videoWidth/videoHeight)*windowHeight)/2).toFixed(0))
 				}
 				console.log("黑边的高："+this.hblackSideNum+"黑边的宽："+this.wblackSideNum)
 			},
 			// 深拷贝 方法
 			deepCopy(o) {
 				return JSON.parse(JSON.stringify(o))
+			},
+			loadeddata(e){
+				uni.setStorageSync({
+					videoHeight: e.detail.height,
+					videoWidth: e.detail.width
+				})
 			}
 		}
 	}
