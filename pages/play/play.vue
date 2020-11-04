@@ -1,14 +1,13 @@
 <template>
 	<view class="playBox">
-		<view class="play">
-			<view class="container"  v-show="showCanvasFlag">
-			  <canvas canvas-id="myCanvas" @touchstart="getTouchPosition" @touchend="canvasTouchendEvent" :style="{'width': windowWidth+'rpx', 'height': windowHeight+'rpx'}"></canvas>
+		<view class="play" :style="{'width': mobilePhoneWidth+'px', 'height': mobilePhoneHeight+'px'}">
+			<view class="container"  v-show="showCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px'}">
+			  <canvas canvas-id="myCanvas" @touchstart="getTouchPosition" @touchend="canvasTouchendEvent"></canvas>
 			</view>
 			<!-- 播放主体   @click="showButton"-->
-			<view class="videoBox">
-				
+			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px'}">
 				<video :src="videoUrl" :autoplay="autopalyFlag" direction="0" :show-mute-btn="true" :show-fullscreen-btn="false" id="myVideo"
-				 :enable-play-gesture="gestureFlag" @ended="videoEnd" @pause="videoPause" @timeupdate="videoTimeupdate" 
+				 :enable-play-gesture="gestureFlag" @ended="videoEnd" @pause="videoPause" @timeupdate="videoTimeupdate"
 				 @loadedmetadata="loadeddata"></video>
 			</view>
 			<!-- 选项 -->
@@ -107,10 +106,6 @@
 				isPosition: 0,
 				//定位选项数据
 				nodeLocationList: [],
-				//视频黑边像素 (单边的 height)
-				hblackSideNum: 0,
-				//视频黑边像素 (单边的 width)
-				wblackSideNum: 0,
 				//视频路径
 				videoUrl: "",
 				//选项参数
@@ -131,7 +126,7 @@
 				uploadImageFlag:false,
 				//是否显示上传图片按钮开关
 				uploadBtnFlag: true,
-				//视屏是否播放结束标志 true是未播放结束
+				//是否播放到叶子视频 true是未播放结束
 				endFlag: true,
 				//展示画布开关
 				showCanvasFlag: false,
@@ -171,10 +166,18 @@
 						name: '其它'
 					}
 				],
-				//由于设置canvas画布宽度
-				windowWidth: '750rpx',
-				//由于设置canvas画布高度（不包括手机通知栏、小程序标题栏和tabBar）
-				windowHeight: '300rpx',
+				//canvas画布的宽度
+				canvasWidth: 0,
+				//canvas画布的高度
+				canvasHeight: 0,
+				//video的宽度
+				videoWidth: 0,
+				//video的高度
+				videoHeight: 0,
+				//用户手机的高度
+				mobilePhoneHeight: 0,
+				//用户手机宽度
+				mobilePhoneWidth: 0,
 				//矩形框数据数组
 				rectArray: [],
 				//默认是个不会被触发的数字 
@@ -187,7 +190,7 @@
 				autopalyFlag: true,
 				//是否开启手势标志
 				gestureFlag: true,
-				//视频结束事件标志
+				//视频结束触发拖动事件校正标志
 				endEventFlag: true
 			}
 		},
@@ -235,23 +238,19 @@
 		},
 		onReady(){
 			//test
-			this.artworkId = 461;
+			// this.artworkId = 461;
 			//监听快进手势
-			//获取手机屏幕尺寸 单位是px
 			this.autopalyFlag = true
 			this.gestureFlag = true
 			this.endEventFlag = true
+			//获取手机屏幕尺寸 单位是px
 			const {windowWidth, windowHeight, brand, model} = uni.getSystemInfoSync()
-			let windowSizeArray = {
+			uni.setStorageSync('windowSize',{
 				'windowWidth': windowWidth,
 				'windowHeight': windowHeight
-			}
-			uni.setStorageSync('windowSizeArray',windowSizeArray)
-			this.validateBlackSide(windowWidth, windowHeight)
-			//小程序将所有设备的宽都等分成750等份即750rpx
-			this.windowWidth = 750
-			//宽高是等比的 单位rpx
-			this.windowHeight = windowHeight*750/windowWidth
+			})
+			this.mobilePhoneHeight = windowHeight
+			this.mobilePhoneWidth = windowWidth
 			//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
 			this.endFlag = true;
 			//重置用户选项分数
@@ -460,6 +459,12 @@
 			//视频播放初始化保存播放记录  将作品detailId留存提供给故事线
 			initPlayData(artworkTree){
 				//初始化视频及选项
+				//是否是定位选项的标志 1是定位选项 其他是普通选项
+				this.isPosition = artworkTree.isPosition
+				if(this.isPosition == 1){
+					//获取定位选项位置数据
+					this.nodeLocationList = artworkTree.nodeLocationList
+				}
 				//随机数 
 				const uuid = Math.random().toString(36).substring(2)
 				this.videoUrl = artworkTree.videoUrl+'?uuid='+uuid
@@ -477,12 +482,6 @@
 				uni.setStorageSync("detailId",this.detailId)
 				//保存播放过的作品的id
 				this.savaPlayRecord();
-				//是否是定位选项的标志 1是定位选项 其他是普通选项
-				this.isPosition = artworkTree.isPosition
-				if(this.isPosition == 1){
-					//获取定位选项位置数据
-					this.nodeLocationList = artworkTree.nodeLocationList
-				}
 				let childs = artworkTree.childs;
 				if(childs){
 					for(let i = 0;i < childs.length;i++){
@@ -498,11 +497,6 @@
 						}
 					}
 					this.tipsArray.length = this.option.length;
-					//初始画布必须等到选项数据先初始化完才能进行
-					if(this.isPosition == 1){
-						//初始化画布
-						this.initCanvas();
-					}
 				}else{
 					//islink不是null且值为1说明该节点是跳转节点 需要注意叶子节点的孩子也是空的可能会走进else故要考虑过是否是叶子节点
 					if(artworkTree.isLink != null && artworkTree.isLink === 1){
@@ -652,6 +646,7 @@
 						this.showCanvasFlag = false;
 						this.chooseTipsShowFlag = true;
 						this.chooseTipsMaskFlag = true;
+						// this.endEventTodo();
 					}
 				}else{
 					this.storyLineContentFlag = true
@@ -820,41 +815,44 @@
 			initCanvas(){
 				this.rectArray = []
 				const ctx = uni.createCanvasContext('myCanvas')
-				let windowSizeArray = uni.getStorageSync('windowSizeArray');
-				let windowWidth = windowSizeArray.windowWidth
-				let windowHeight = windowSizeArray.windowHeight
-				ctx.clearRect(0 , 0 , windowWidth, windowHeight)
+				console.log( this.nodeLocationList)
+				ctx.clearRect(0 , 0 , this.canvasWidth, this.canvasWidth)
 				for(let i = 0; i < this.nodeLocationList.length; i++){
 					if(this.nodeLocationList[i].isHide == 1){
 						// console.log(1)
 						//矩形左上角点的坐标(X,Y)
-						let rectX = parseInt(((this.nodeLocationList[i].textRectX+0)*(windowWidth-this.hblackSideNum*2)).toFixed(0))
-						let rectY = parseInt(((this.nodeLocationList[i].textRectY+0)*(windowHeight-this.hblackSideNum*2)).toFixed(0)) 
+						//toFixed(0) 四舍五入保留设置的位数 返回一个字符串
+						let rectX = parseInt(((this.nodeLocationList[i].textRectX+0)*this.canvasWidth).toFixed(0))
+						let rectY = parseInt(((this.nodeLocationList[i].textRectY+0)*this.canvasHeight).toFixed(0))
+						// console.log("web端比值计算后的矩形框横坐标:"+rectX)
+						// console.log("web端比值计算后的矩形框纵坐标:"+rectY)
 						//文字距离左右两个边框的间距
 						let marginLeftAndRightSides = 8
 						//矩形框高度
-						let rectH = 30 
+						let rectH = 30
 						//字体大小
 						let fontSize = 15
 						//文字距离矩形框下边框边距
 						let marginBottom = 10
 						//文本内容
 						let textContent = this.option[i]
+						// console.log("显示定位选项的内容:"+textContent)
 						//测量之前要先确定字体大小 因为矩形宽是根据字体的长度来绘画的 不设置会影响测量
 						ctx.setFontSize(fontSize)
 						//测量文本宽度
 						let metrics = ctx.measureText(textContent)
 						//宽度取整 Math.ceil向上取整即省去小数再加1 宽度由文本的宽度加边距组成
-						let rectW = parseInt((metrics.width).toFixed(0))+marginLeftAndRightSides;
+						let rectW = parseInt(metrics.width.toFixed(0))+marginLeftAndRightSides;
+						console.log('根据文字算出的矩形框的宽:'+rectW)
 						//末尾小圆圈的横纵坐标 算总长度时应该减去黑边
-						let cX = parseInt(((this.nodeLocationList[i].circleX+0)*(windowWidth-this.wblackSideNum*2)).toFixed(0))
-						let cY = parseInt(((this.nodeLocationList[i].circleY+0)*(windowHeight-this.hblackSideNum*2)).toFixed(0))
+						let cX = parseInt(((this.nodeLocationList[i].circleX+0)*this.canvasWidth).toFixed(0))
+						let cY = parseInt(((this.nodeLocationList[i].circleY+0)*this.canvasHeight).toFixed(0))
 						
 						//画线 连线到小圆心
 						let cr = 2
-						ctx.moveTo(cX+this.wblackSideNum,cY+this.hblackSideNum)
+						ctx.moveTo(cX, cY)
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
-						ctx.lineTo(rectX+this.wblackSideNum, rectY+this.hblackSideNum)
+						ctx.lineTo(rectX, rectY)
 						ctx.setStrokeStyle('white')
 						ctx.stroke()
 						
@@ -863,12 +861,12 @@
 						//让起始点转到12点就需要倒退0.5* Math.PI 但整圆是2 * Math.PI 故终止弧度加0.5* Math.PI
 						//外圈
 						ctx.beginPath()
-						ctx.arc(cX+this.wblackSideNum,cY+this.hblackSideNum, cr*3, 0, 2 * Math.PI)
+						ctx.arc(cX, cY, cr*3, 0, 2 * Math.PI)
 						ctx.setFillStyle('#87CEEB')
 						ctx.fill()
 						//内圈
 						ctx.beginPath()
-						ctx.arc(cX+this.wblackSideNum,cY+this.hblackSideNum, cr, 0, 2 * Math.PI)
+						ctx.arc(cX, cY, cr, 0, 2 * Math.PI)
 						ctx.setFillStyle('#E3E3E3')
 						ctx.fill()
 						
@@ -876,11 +874,13 @@
 						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
 						ctx.beginPath()
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
-						this.drawRect(ctx, rectX-(rectW/2)+this.wblackSideNum, rectY-(rectH/2)+this.hblackSideNum, rectW, rectH, 4)
+						console.log('矩形框起始点横坐标:'+parseInt((rectX-(rectW/2)).toFixed(0)))
+						console.log('矩形框起始点纵坐标:'+parseInt((rectY-(rectH/2)).toFixed(0)))
+						this.drawRect(ctx, parseInt((rectX-(rectW/2)).toFixed(0)), parseInt((rectY-(rectH/2)).toFixed(0)), rectW, rectH, 4)
 						//将坐标收纳成对象保存到数组，为绑定事件做准备
 						let rect={
-							x: rectX-(rectW/2)+this.wblackSideNum,
-							y: rectY-(rectH/2)+this.hblackSideNum,
+							x: parseInt((rectX-(rectW/2)).toFixed(0)),
+							y: parseInt((rectY-(rectH/2)).toFixed(0)),
 							w: rectW,
 							h: rectH
 						}
@@ -908,8 +908,8 @@
 						//设置字体颜色
 						ctx.setFillStyle('white')
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
-						let textX = (rectX+(marginLeftAndRightSides/2))-(rectW/2)+this.wblackSideNum
-						let textY = (rectH+rectY-marginBottom)-(rectH/2)+this.hblackSideNum
+						let textX = parseInt(((rectX+(marginLeftAndRightSides/2))-(rectW/2)).toFixed(0))
+						let textY =  parseInt(((rectH+rectY-marginBottom)-(rectH/2)).toFixed(0))
 						ctx.fillText(textContent, textX, textY)
 						//开始描绘
 						ctx.stroke()
@@ -918,14 +918,15 @@
 						// console.log(0)
 						//矩形左上角点的坐标(X,Y)
 						//rpx转px 故(this.windowWidth)/2 计算总长度时要减去黑边
-						let rectX = parseInt(((this.nodeLocationList[i].textRectX+0)*(windowWidth-this.wblackSideNum*2)).toFixed(0))
-						let rectY = parseInt(((this.nodeLocationList[i].textRectY+0)*(windowHeight-this.hblackSideNum*2)).toFixed(0))
+						let rectX = parseInt(((this.nodeLocationList[i].textRectX+0)*this.canvasWidth).toFixed(0))
+						let rectY = parseInt(((this.nodeLocationList[i].textRectY+0)*this.canvasHeight).toFixed(0))
 						//矩形框高度
 						let rectH = 22
 						//字体大小
 						let fontSize = 15
 						//文本内容
 						let textContent = this.option[i]
+						console.log('隐藏选项定位的内容:'+textContent)
 						//测量之前要先确定字体大小 因为矩形宽是根据字体的长度来绘画的 不设置会影响测量
 						ctx.setFontSize(fontSize)
 						//测量文本宽度
@@ -937,11 +938,11 @@
 						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
 						ctx.beginPath()
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
-						this.drawRect(ctx, rectX+this.wblackSideNum, rectY+this.hblackSideNum, rectW, rectH, 4)
+						this.drawRect(ctx, rectX, rectY, rectW, rectH, 4)
 						//将坐标收纳成对象保存到数组，为绑定事件做准备
 						let rect={
-							x: rectX+this.wblackSideNum,
-							y: rectY+this.hblackSideNum,
+							x: rectX,
+							y: rectY,
 							w: rectW,
 							h: rectH
 						}
@@ -1014,12 +1015,17 @@
 						let touchX = e.changedTouches[0].x;
 						let touchY = e.changedTouches[0].y;
 						let xLowLimit = this.rectArray[i].x;
+						console.log('xLowLimit:'+xLowLimit)
 						let yLowLimit = this.rectArray[i].y;
+						console.log('yLowLimit: '+yLowLimit)
 						let xUpperLimit = this.rectArray[i].x+this.rectArray[i].w;
+						console.log('xUpperLimit: '+xUpperLimit)
 						let yUpperLimit = this.rectArray[i].y+this.rectArray[i].h;
+						console.log('yUpperLimit: '+yUpperLimit)
 						//判断边界办法
 						if(touchX > xLowLimit && touchX < xUpperLimit && touchY > yLowLimit && touchY < yUpperLimit){
 							this.touchRectNum = i;
+							console.log('this.touchRectNum: '+this.touchRectNum)
 						}
 					}
 					if(this.touchRectNum < 4){
@@ -1030,6 +1036,7 @@
 			},
 			// canvas的touchEnd事件
 			canvasTouchendEvent(){
+				console.log('this.touchRectNum: '+this.touchRectNum)
 				if(this.touchRectNum == 0){
 					this.autopalyFlag = true
 					this.gestureFlag = true
@@ -1074,178 +1081,209 @@
 					this.showCanvasFlag = false
 					uni.setStorageSync('userScore', userScore)
 					this.initPlayData(this.childs[this.touchRectNum])
+					console.log('我去初始化数据')
 				}else{
 					this.showCanvasFlag = false
 					this.initPlayData(this.childs[this.touchRectNum])
+					console.log('我去初始化数据')
 				}
 			},
 			// 校正视频播放的黑边 单位px
-			validateBlackSide(windowWidth, windowHeight){
-				let videoHeight = uni.getStorageSync('videoHeight')
-				let videoWidth = uni.getStorageSync('videoWidth')
-				let rate =	videoHeight/videoWidth
-				console.log(rate)
-				if(windowHeight/windowWidth>videoHeight/videoWidth){
+			validateWindowSize(){
+				let videoInfo = uni.getStorageSync('videoSize')
+				let windowSize = uni.getStorageSync('windowSize')
+				let videoHeight = videoInfo.videoHeight+0
+				let videoWidth = videoInfo.videoWidth+0
+				let videoRate = videoWidth/videoHeight
+				//dh dw canvas宽高 
+				let vh, vw, dh, dw, ch, cw
+				let flag = !1
+				ch = windowSize.windowHeight+0
+				cw = windowSize.windowWidth+0
+				if(!flag ) {
+					dh = ch
+					dw = dh * (9 / 16)
+					vh = dh
+					vw = vh * videoRate
+					if (cw > dw && dw > vw) {
+						this.canvasHeight = dh.toFixed(0)
+						this.canvasWidth = dw.toFixed(0)
+						this.videoHeight = vh.toFixed(0)
+						this.videoWidth = vw.toFixed(0)
+						flag = !0
+					}
+				}
+
+				if(!flag ) {
+					 dw = cw
+					 dh = dw * (16 / 9)
+					 vw = dw
+					 vh = vw / videoRate
+					if (dh > ch && ch > vh ) {
+						this.canvasHeight = dh.toFixed(0)
+						this.canvasWidth = dw.toFixed(0)
+						this.videoHeight = vh.toFixed(0)
+						this.videoWidth = vw.toFixed(0)
+						flag = !0
+					}
+				}
+				
+				if(!flag ) {
+					 dw = cw
+					 dh = dw * (16 / 9)
+					 vw = dw
+					 vh = vw / videoRate
+					if (ch > dh && dh > vh ) {
+						this.canvasHeight = dh.toFixed(0)
+						this.canvasWidth = dw.toFixed(0)
+						this.videoHeight = vh.toFixed(0)
+						this.videoWidth = vw.toFixed(0)
+						flag = !0
+					}	
+				}
+				
+				if(!flag ) {
+					 vh = ch
+					 vw = vh * videoRate
+					 dw = vw
+					 vh = vw / videoRate
+					if (cw > dw && dh > vh ) {
+						this.canvasHeight = dh.toFixed(0)
+						this.canvasWidth = dw.toFixed(0)
+						this.videoHeight = vh.toFixed(0)
+						this.videoWidth = vw.toFixed(0)
+						flag = !0
+					}	
+				}
+				
+				if(!flag ) {
+					 vw = cw
+					 vh = vw / videoRate
+					 dh = vh
+					if (cw < dw && ch > dh ) {
+						this.canvasHeight = dh.toFixed(0)
+						this.canvasWidth = dw.toFixed(0)
+						this.videoHeight = vh.toFixed(0)
+						this.videoWidth = vw.toFixed(0)
+						flag = !0
+					}	
+				}
+				
+				if(!flag ) {
+					 vh = ch
+					 dh = vh
+					 vw = vh * videoRate
+					 dw = dh * (9 / 16)
+					if (cw < dw && cw > vw ) {
+						this.canvasHeight = dh.toFixed(0)
+						this.canvasWidth = dw.toFixed(0)
+						this.videoHeight = vh.toFixed(0)
+						this.videoWidth = vw.toFixed(0)
+						flag = !0
+					}	
+				}
+				/* if(windowHeight/windowWidth>16/9){
 					//高度变高了出现上下黑边
-					this.hblackSideNum = parseInt(((windowHeight-(videoHeight/videoWidth)*windowWidth)/2).toFixed(0))
+					this.windowHeight = parseInt((16/9)*windowWidth)
+					this.windowWidth = windowWidth
+					let sideDistance = parseInt((windowHeight-this.windowHeight)/2)
+					this.windowMargin = sideDistance+'px 0 0 0'
 				}else{
 					//宽度变宽了出现左右黑边
-					this.wblackSideNum = parseInt(((windowWidth-(videoWidth/videoHeight)*windowHeight)/2).toFixed(0))
-				}
-				console.log("黑边的高："+this.hblackSideNum+"黑边的宽："+this.wblackSideNum)
+					this.windowWidth = parseInt((9/16)*windowHeight)
+					this.windowHeight = windowHeight
+					this.windowMargin = '0 auto'
+				} */
+				// console.log("9比16视频的实际的高："+this.windowHeight+"9比16视频的实际的宽："+this.windowWidth)
 			},
 			// 深拷贝 方法
 			deepCopy(o) {
 				return JSON.parse(JSON.stringify(o))
 			},
 			loadeddata(e){
-				uni.setStorageSync({
+				// console.log(8)
+				uni.setStorageSync('videoSize',{
 					videoHeight: e.detail.height,
 					videoWidth: e.detail.width
 				})
+				//加载完视频加载视频的尺寸
+				this.validateWindowSize()
+				//初始画布必须等到选项数据先初始化完才能进行
+				if(this.isPosition == 1){
+					//初始化画布
+					this.initCanvas();
+				}
 			}
 		}
 	}
 </script>
 
 <style lang="scss" >
-	page{
+	.playBox{
 		width: 100%;
 		height: 100%;
-		.playBox{
-			width: 100%;
-			height: 100%;
-			.play{
+		.play{
+			.container{
+				position: fixed;
+				left: 50%;
+				top: 50%;
+				transform: translate(-50%, -50%);
+				margin: 0 auto;
+				z-index: 17;
+				canvas{
+					width: 100%;
+					height: 100%;
+				}
+			}
+			.videoBox{
+				position: fixed;
+				left: 50%;
+				top: 50%;
+				transform: translate(-50%, -50%);
+				video{
+					width: 100%;
+					height: 100%;
+				}
+			}
+			.chooseTipsMask15{
+				background-color: rgba(0, 0, 0, .1);
+				position: fixed;
+				left: 0;
+				top: 0;
 				width: 100%;
 				height: 100%;
-				.container{
-					width: 100%;
-					height: 100%;
+				z-index: 15;
+				.chooseTipsMask16{
+					background-color: rgba(255,255,255,.9);
 					position: fixed;
 					left: 0;
-					top: 0;
-					z-index: 17;
-					// background: url(https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/1600828961029) no-repeat center;
-					// background-size: 100% 100%;
-				}
-				.videoBox{
+					top: 50%;
+					transform: translateY(-50%);
 					width: 100%;
-					height: 100%;
-					video{
+					height: 38%;
+					z-index: 16;
+					.chooseTips{
 						width: 100%;
 						height: 100%;
-					}
-				}
-				.chooseTipsMask15{
-					background-color: rgba(0, 0, 0, .1);
-					position: fixed;
-					left: 0;
-					top: 0;
-					width: 100%;
-					height: 100%;
-					z-index: 15;
-					.chooseTipsMask16{
-						background-color: rgba(255,255,255,.9);
-						position: fixed;
-						left: 0;
-						top: 50%;
-						transform: translateY(-50%);
-						width: 100%;
-						height: 38%;
-						z-index: 16;
-						.chooseTips{
-							width: 100%;
-							height: 100%;
-							z-index: 25;
-							background-color: rgba(0,0,0,.3);
-							.closeBox{
-								position: absolute;
-								width: 46rpx;
-								height: 46rpx;
-								right: 20rpx;
-								top: 20rpx;
-								.closeIcon{
-									width: 100%;
-									height: 100%;
-									background: url(../../static/icon/close.png) no-repeat center;
-									background-size: 46rpx;
-								}
-							}
-							.title{
-								text-align: center;
-								color: white;
-								font-size: 36rpx;
-								line-height: 100rpx;
-							}
-							.splitLine{
-								border: 2rpx solid #D3D3D3;
-								width: 80%;
-								margin: 0 auto;
-							}
-							.tips{
-								.optionBox{
-									width: 100%;
-									margin: 0 auto;
-									line-height: 80rpx;
-									display: flex;
-									justify-content: space-between;
-									.option{
-										color: white;
-										padding-left: 20rpx;
-									}
-								}
+						z-index: 25;
+						background-color: rgba(0,0,0,.3);
+						.closeBox{
+							position: absolute;
+							width: 46rpx;
+							height: 46rpx;
+							right: 20rpx;
+							top: 20rpx;
+							.closeIcon{
+								width: 100%;
+								height: 100%;
+								background: url(../../static/icon/close.png) no-repeat center;
+								background-size: 46rpx;
 							}
 						}
-					}
-				}
-				
-				.storyLineBox{
-					position: fixed;
-					right: 6%;
-					top: 6%;
-					height: 80rpx;
-					width: 120rpx;
-					z-index: 15;
-					background-color: rgba(255,255,255,.5);
-					border-radius: 50%;
-					.storyLine{
-						color: white;
-						line-height: 80rpx;
-						padding-left: 18rpx;
-					}
-				}
-				.reportBox{
-					position: fixed;
-					left: 6%;
-					top: 6%;
-					height: 80rpx;
-					width: 120rpx;
-					z-index: 15;
-					background-color: rgba(255,255,255,.5);
-					border-radius: 50%;
-					.report{
-						color: white;
-						line-height: 80rpx;
-						padding-left: 32rpx;
-					}
-				}
-				.storyLineContentMask16{
-					position: fixed;
-					z-index: 16;
-					left: 0;
-					top: 0;
-					width: 100%;
-					height: 100%;
-					background-color: rgba(255,255,255,.9);
-					.storyLineContentBox{
-						width: 100%;
-						height: 100%;
-						z-index: 17;
-						background-color: rgba(0,0,0,.3);
 						.title{
 							text-align: center;
-							font-size: 36rpx;
 							color: white;
+							font-size: 36rpx;
 							line-height: 100rpx;
 						}
 						.splitLine{
@@ -1253,126 +1291,196 @@
 							width: 80%;
 							margin: 0 auto;
 						}
-						.closeBox{
-							position: absolute;
-							width: 46rpx;
-							height: 46rpx;
-							right: 20rpx;
-							top: 20rpx;
-							.closeIcon{
+						.tips{
+							.optionBox{
 								width: 100%;
-								height: 100%;
-								background: url(../../static/icon/close.png) no-repeat center;
-								background-size: 46rpx;
+								margin: 0 auto;
+								line-height: 80rpx;
+								display: flex;
+								justify-content: space-between;
+								.option{
+									color: white;
+									padding-left: 20rpx;
+								}
 							}
 						}
 					}
 				}
-				.reportContentMask16{
-					position: fixed;
-					z-index: 16;
-					left: 0;
-					top: 0;
+			}
+			
+			.storyLineBox{
+				position: fixed;
+				right: 6%;
+				top: 6%;
+				height: 80rpx;
+				width: 120rpx;
+				z-index: 15;
+				background-color: rgba(255,255,255,.5);
+				border-radius: 50%;
+				.storyLine{
+					color: white;
+					line-height: 80rpx;
+					padding-left: 18rpx;
+				}
+			}
+			.reportBox{
+				position: fixed;
+				left: 6%;
+				top: 6%;
+				height: 80rpx;
+				width: 120rpx;
+				z-index: 15;
+				background-color: rgba(255,255,255,.5);
+				border-radius: 50%;
+				.report{
+					color: white;
+					line-height: 80rpx;
+					padding-left: 32rpx;
+				}
+			}
+			.storyLineContentMask16{
+				position: fixed;
+				z-index: 16;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(255,255,255,.9);
+				.storyLineContentBox{
 					width: 100%;
 					height: 100%;
-					background-color: rgba(255,255,255,.9);
-					.reportContentBox{
-						width: 100%;
-						height: 100%;
-						z-index: 17;
-						background-color: rgba(0,0,0,.3);
-						.title{
-							text-align: center;
-							font-size: 36rpx;
-							color: white;
-							line-height: 100rpx;
-						}
-						.splitLine{
-							border: 2rpx solid #D3D3D3;
+					z-index: 17;
+					background-color: rgba(0,0,0,.3);
+					.title{
+						text-align: center;
+						font-size: 36rpx;
+						color: white;
+						line-height: 100rpx;
+					}
+					.splitLine{
+						border: 2rpx solid #D3D3D3;
+						width: 80%;
+						margin: 0 auto;
+					}
+					.closeBox{
+						position: absolute;
+						width: 46rpx;
+						height: 46rpx;
+						right: 20rpx;
+						top: 20rpx;
+						.closeIcon{
 							width: 100%;
-							margin: 0 auto;
+							height: 100%;
+							background: url(../../static/icon/close.png) no-repeat center;
+							background-size: 46rpx;
 						}
-						.subTitle{
-							color: white;
-							margin: 10rpx 0 0 10rpx;
-							font-size: 30rpx;
+					}
+				}
+			}
+			.reportContentMask16{
+				position: fixed;
+				z-index: 16;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(255,255,255,.9);
+				.reportContentBox{
+					width: 100%;
+					height: 100%;
+					z-index: 17;
+					background-color: rgba(0,0,0,.3);
+					.title{
+						text-align: center;
+						font-size: 36rpx;
+						color: white;
+						line-height: 100rpx;
+					}
+					.splitLine{
+						border: 2rpx solid #D3D3D3;
+						width: 100%;
+						margin: 0 auto;
+					}
+					.subTitle{
+						color: white;
+						margin: 10rpx 0 0 10rpx;
+						font-size: 30rpx;
+					}
+					.closeBox{
+						position: absolute;
+						width: 46rpx;
+						height: 46rpx;
+						right: 20rpx;
+						top: 20rpx;
+						.closeIcon{
+							width: 100%;
+							height: 100%;
+							background: url(../../static/icon/close.png) no-repeat center;
+							background-size: 46rpx;
 						}
-						.closeBox{
-							position: absolute;
-							width: 46rpx;
-							height: 46rpx;
-							right: 20rpx;
-							top: 20rpx;
-							.closeIcon{
-								width: 100%;
-								height: 100%;
-								background: url(../../static/icon/close.png) no-repeat center;
-								background-size: 46rpx;
-							}
-						}
-						.reportContent{
-							.uni-list{
-								.checkBox{
-									margin: 30rpx 0 0 30rpx;
-									display: flex;
-									justify-content: flex-start;
-									.nameBox{
-										height: 48rpx;
-										.name{
-											line-height: 48rpx;
-											color: white;
-										}
+					}
+					.reportContent{
+						.uni-list{
+							.checkBox{
+								margin: 30rpx 0 0 30rpx;
+								display: flex;
+								justify-content: flex-start;
+								.nameBox{
+									height: 48rpx;
+									.name{
+										line-height: 48rpx;
+										color: white;
 									}
 								}
 							}
-							.uni-textarea{
-								margin: 30rpx 0 0 30rpx;
-								textarea{
-									background: white;
-								}
+						}
+						.uni-textarea{
+							margin: 30rpx 0 0 30rpx;
+							textarea{
+								background: white;
 							}
-							.uploadBox{
-								margin: 30rpx 0 0 0;
-								.subTitle{
-									color: white;
-									font-size: 30rpx;
-								}
-								.uploadBtnBox{
-									margin: 30rpx 0 0 30rpx;
-									border: 2rpx solid white;
-									width: 200rpx;
-									height: 300rpx;
-									icon {
-										width: 100%;
-										height: 100%;
-										background: url(../../static/icon/add.png) no-repeat center;
-										background-size: 200rpx 200rpx;
-									};
-								}
-								.uploadImageBox{
-									margin: 30rpx 0 0 30rpx;
-									border: 2rpx solid red;
-									width: 200rpx;
-									height: 300rpx;
-									border: 2rpx solid white;
-									image {
-										width: 100%;
-										height: 100%;
-									};
-								}
-							}
-							.submitBtnBox{
-								margin: 0 auto;
-								margin-top: 20rpx;
-								font-size: 30rpx;
-								width: 150rpx;
-								height: 60rpx;
+						}
+						.uploadBox{
+							margin: 30rpx 0 0 0;
+							.subTitle{
 								color: white;
+								font-size: 30rpx;
+							}
+							.uploadBtnBox{
+								margin: 30rpx 0 0 30rpx;
 								border: 2rpx solid white;
-								.btnText{
-									line-height: 60rpx;
-									text-align: center;
-								}
+								width: 200rpx;
+								height: 300rpx;
+								icon {
+									width: 100%;
+									height: 100%;
+									background: url(../../static/icon/add.png) no-repeat center;
+									background-size: 200rpx 200rpx;
+								};
+							}
+							.uploadImageBox{
+								margin: 30rpx 0 0 30rpx;
+								border: 2rpx solid red;
+								width: 200rpx;
+								height: 300rpx;
+								border: 2rpx solid white;
+								image {
+									width: 100%;
+									height: 100%;
+								};
+							}
+						}
+						.submitBtnBox{
+							margin: 0 auto;
+							margin-top: 20rpx;
+							font-size: 30rpx;
+							width: 150rpx;
+							height: 60rpx;
+							color: white;
+							border: 2rpx solid white;
+							.btnText{
+								line-height: 60rpx;
+								text-align: center;
 							}
 						}
 					}
@@ -1380,6 +1488,8 @@
 			}
 		}
 	}
-	
-	
+	page{
+		width: 100%;
+		height: 100%;
+	}
 </style>
