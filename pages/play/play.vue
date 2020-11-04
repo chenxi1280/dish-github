@@ -646,7 +646,7 @@
 						this.showCanvasFlag = false;
 						this.chooseTipsShowFlag = true;
 						this.chooseTipsMaskFlag = true;
-						// this.endEventTodo();
+						this.endEventTodo();
 					}
 				}else{
 					this.storyLineContentFlag = true
@@ -794,19 +794,28 @@
 			},
 			//点击选项关闭按钮触发事件
 			closeChooseTips(){
+				this.autopalyFlag = true
+				this.gestureFlag = true
+				this.endEventFlag = true
 				this.chooseTipsShowFlag = false
 				this.chooseTipsMaskFlag = false
 				const videoContext = uni.createVideoContext('myVideo')
 				videoContext.play()
 			},
-			//点击故事线按钮出发事件
+			//点击故事线关闭按钮触发事件
 			closeStoryLineContent(){
+				this.autopalyFlag = true
+				this.gestureFlag = true
+				this.endEventFlag = true
 				this.storyLineContentFlag = false
 				const videoContext = uni.createVideoContext('myVideo')
 				videoContext.play()
 			},
-			//点击举报按钮出发事件
+			//点击举报关闭按钮触发事件
 			closeReportContent(){
+				this.autopalyFlag = true
+				this.gestureFlag = true
+				this.endEventFlag = true
 				this.reportContentFlag = false
 				const videoContext = uni.createVideoContext('myVideo')
 				videoContext.play()
@@ -815,8 +824,9 @@
 			initCanvas(){
 				this.rectArray = []
 				const ctx = uni.createCanvasContext('myCanvas')
-				console.log( this.nodeLocationList)
-				ctx.clearRect(0 , 0 , this.canvasWidth, this.canvasWidth)
+				console.log('画布的宽:'+this.canvasWidth)
+				console.log('画布的高:'+this.canvasHeight)
+				ctx.clearRect(0 , 0 , this.canvasWidth, this.canvasHeight)
 				for(let i = 0; i < this.nodeLocationList.length; i++){
 					if(this.nodeLocationList[i].isHide == 1){
 						// console.log(1)
@@ -824,16 +834,16 @@
 						//toFixed(0) 四舍五入保留设置的位数 返回一个字符串
 						let rectX = parseInt(((this.nodeLocationList[i].textRectX+0)*this.canvasWidth).toFixed(0))
 						let rectY = parseInt(((this.nodeLocationList[i].textRectY+0)*this.canvasHeight).toFixed(0))
-						// console.log("web端比值计算后的矩形框横坐标:"+rectX)
-						// console.log("web端比值计算后的矩形框纵坐标:"+rectY)
+						console.log("web端比值计算后的矩形框横坐标:"+rectX)
+						console.log("web端比值计算后的矩形框纵坐标:"+rectY)
 						//文字距离左右两个边框的间距
 						let marginLeftAndRightSides = 8
 						//矩形框高度
-						let rectH = 30
+						let rectH = 22
 						//字体大小
-						let fontSize = 15
+						let fontSize = 16
 						//文字距离矩形框下边框边距
-						let marginBottom = 10
+						let marginBottom = 6
 						//文本内容
 						let textContent = this.option[i]
 						// console.log("显示定位选项的内容:"+textContent)
@@ -874,9 +884,12 @@
 						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
 						ctx.beginPath()
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
-						console.log('矩形框起始点横坐标:'+parseInt((rectX-(rectW/2)).toFixed(0)))
-						console.log('矩形框起始点纵坐标:'+parseInt((rectY-(rectH/2)).toFixed(0)))
-						this.drawRect(ctx, parseInt((rectX-(rectW/2)).toFixed(0)), parseInt((rectY-(rectH/2)).toFixed(0)), rectW, rectH, 4)
+						// ctx.rect(parseInt((rectX-(rectW/2)).toFixed(0)), parseInt((rectY-(rectH/2)).toFixed(0)), rectW, rectH)
+						ctx.rect(parseInt(((this.nodeLocationList[i].textRectX+0)*this.canvasWidth-(rectW/2)).toFixed(0)), 
+						parseInt(((this.nodeLocationList[i].textRectY+0)*this.canvasHeight-(rectH/2)).toFixed(0)), rectW, rectH)
+						
+						console.log('矩形框起始点横坐标:'+parseInt(((this.nodeLocationList[i].textRectX+0)*this.canvasWidth-(rectW/2)).toFixed(0)))
+						console.log('矩形框起始点纵坐标:'+parseInt(((this.nodeLocationList[i].textRectY+0)*this.canvasHeight-(rectH/2)).toFixed(0)))
 						//将坐标收纳成对象保存到数组，为绑定事件做准备
 						let rect={
 							x: parseInt((rectX-(rectW/2)).toFixed(0)),
@@ -885,6 +898,7 @@
 							h: rectH
 						}
 						this.rectArray.push(rect)
+						//rgba(255, 255, 255, 0.5)
 						if(this.isClickFlag){
 							if(this.touchRectNum == i){
 									//矩形边框颜色
@@ -893,12 +907,12 @@
 									ctx.setFillStyle('#96CDCD')
 									this.isClickFlag = false
 								}else{
-									ctx.setStrokeStyle('rgba(255, 255, 255, 0.5)')
-									ctx.setFillStyle('rgba(255, 255, 255, 0.5)')
+									ctx.setStrokeStyle('#C0C0C0')
+									ctx.setFillStyle('#C0C0C0')
 								}
 						}else{
-							ctx.setStrokeStyle('rgba(255, 255, 255, 0.5)')
-							ctx.setFillStyle('rgba(255, 255, 255, 0.5)')
+							ctx.setStrokeStyle('#C0C0C0')
+							ctx.setFillStyle('#C0C0C0')
 						}
 						ctx.fill()
 						//开始描绘
@@ -926,7 +940,7 @@
 						let fontSize = 15
 						//文本内容
 						let textContent = this.option[i]
-						console.log('隐藏选项定位的内容:'+textContent)
+						// console.log('隐藏选项定位的内容:'+textContent)
 						//测量之前要先确定字体大小 因为矩形宽是根据字体的长度来绘画的 不设置会影响测量
 						ctx.setFontSize(fontSize)
 						//测量文本宽度
@@ -938,7 +952,7 @@
 						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
 						ctx.beginPath()
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
-						this.drawRect(ctx, rectX, rectY, rectW, rectH, 4)
+						ctx.rect(rectX, rectY, rectW, rectH)
 						//将坐标收纳成对象保存到数组，为绑定事件做准备
 						let rect={
 							x: rectX,
@@ -1015,13 +1029,10 @@
 						let touchX = e.changedTouches[0].x;
 						let touchY = e.changedTouches[0].y;
 						let xLowLimit = this.rectArray[i].x;
-						console.log('xLowLimit:'+xLowLimit)
+						// console.log('xLowLimit:'+xLowLimit)
 						let yLowLimit = this.rectArray[i].y;
-						console.log('yLowLimit: '+yLowLimit)
 						let xUpperLimit = this.rectArray[i].x+this.rectArray[i].w;
-						console.log('xUpperLimit: '+xUpperLimit)
 						let yUpperLimit = this.rectArray[i].y+this.rectArray[i].h;
-						console.log('yUpperLimit: '+yUpperLimit)
 						//判断边界办法
 						if(touchX > xLowLimit && touchX < xUpperLimit && touchY > yLowLimit && touchY < yUpperLimit){
 							this.touchRectNum = i;
@@ -1081,11 +1092,9 @@
 					this.showCanvasFlag = false
 					uni.setStorageSync('userScore', userScore)
 					this.initPlayData(this.childs[this.touchRectNum])
-					console.log('我去初始化数据')
 				}else{
 					this.showCanvasFlag = false
 					this.initPlayData(this.childs[this.touchRectNum])
-					console.log('我去初始化数据')
 				}
 			},
 			// 校正视频播放的黑边 单位px
@@ -1101,12 +1110,14 @@
 				ch = windowSize.windowHeight+0
 				cw = windowSize.windowWidth+0
 				if(!flag ) {
+					// console.log(1)
 					dh = ch
 					dw = dh * (9 / 16)
 					vh = dh
 					vw = vh * videoRate
-					if (cw > dw && dw > vw) {
+					if (cw >= dw && dw >= vw) {
 						this.canvasHeight = dh.toFixed(0)
+						// console.log("dh: " + dh.toFixed(0))
 						this.canvasWidth = dw.toFixed(0)
 						this.videoHeight = vh.toFixed(0)
 						this.videoWidth = vw.toFixed(0)
@@ -1119,7 +1130,7 @@
 					 dh = dw * (16 / 9)
 					 vw = dw
 					 vh = vw / videoRate
-					if (dh > ch && ch > vh ) {
+					if (dh >= ch && ch >= vh ) {
 						this.canvasHeight = dh.toFixed(0)
 						this.canvasWidth = dw.toFixed(0)
 						this.videoHeight = vh.toFixed(0)
@@ -1133,7 +1144,7 @@
 					 dh = dw * (16 / 9)
 					 vw = dw
 					 vh = vw / videoRate
-					if (ch > dh && dh > vh ) {
+					if (ch >= dh && dh >= vh ) {
 						this.canvasHeight = dh.toFixed(0)
 						this.canvasWidth = dw.toFixed(0)
 						this.videoHeight = vh.toFixed(0)
@@ -1146,8 +1157,8 @@
 					 vh = ch
 					 vw = vh * videoRate
 					 dw = vw
-					 vh = vw / videoRate
-					if (cw > dw && dh > vh ) {
+					 dh = dw * (16 / 9)
+					if (cw >= dw && dh >= vh ) {
 						this.canvasHeight = dh.toFixed(0)
 						this.canvasWidth = dw.toFixed(0)
 						this.videoHeight = vh.toFixed(0)
@@ -1160,7 +1171,8 @@
 					 vw = cw
 					 vh = vw / videoRate
 					 dh = vh
-					if (cw < dw && ch > dh ) {
+					 dw = dh * ( 9 / 16)
+					if (cw <= dw && ch >= dh ) {
 						this.canvasHeight = dh.toFixed(0)
 						this.canvasWidth = dw.toFixed(0)
 						this.videoHeight = vh.toFixed(0)
@@ -1174,7 +1186,7 @@
 					 dh = vh
 					 vw = vh * videoRate
 					 dw = dh * (9 / 16)
-					if (cw < dw && cw > vw ) {
+					if (cw <= dw && cw >= vw ) {
 						this.canvasHeight = dh.toFixed(0)
 						this.canvasWidth = dw.toFixed(0)
 						this.videoHeight = vh.toFixed(0)
@@ -1194,7 +1206,6 @@
 					this.windowHeight = windowHeight
 					this.windowMargin = '0 auto'
 				} */
-				// console.log("9比16视频的实际的高："+this.windowHeight+"9比16视频的实际的宽："+this.windowWidth)
 			},
 			// 深拷贝 方法
 			deepCopy(o) {
@@ -1223,6 +1234,7 @@
 		width: 100%;
 		height: 100%;
 		.play{
+			background-color: black;
 			.container{
 				position: fixed;
 				left: 50%;
