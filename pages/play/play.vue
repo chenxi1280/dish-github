@@ -8,7 +8,7 @@
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px'}">
 				<video :src="videoUrl" :autoplay="autopalyFlag" direction="0" :show-mute-btn="true" :show-fullscreen-btn="false" id="myVideo"
 				 :enable-play-gesture="gestureFlag" @ended="videoEnd" @pause="videoPause" @timeupdate="videoTimeupdate"
-				 @loadedmetadata="loadeddata"></video>
+				 @loadedmetadata="loadeddata" @touchend="gestureTouchend" @touchstart="gestureTouchstart"></video>
 			</view>
 			<!-- 选项 -->
 			<view class="chooseTipsMask15"  v-if="chooseTipsMaskFlag">
@@ -185,17 +185,23 @@
 				//是否被点击的标志
 				isClickFlag: false,
 				//视频播放的信息
-				videoPlayInfo: null,
+				duration: null,
 				//是否自动播放标志
 				autopalyFlag: true,
 				//是否开启手势标志
 				gestureFlag: true,
 				//视频结束触发拖动事件校正标志
-				endEventFlag: true
+				endEventFlag: true,
+				//touchstart 横轴坐标
+				tsx: 0,
+				//touchstart纵轴坐标
+				tsy: 0,
+				//是否进行强制回拉视频操作标志
+				forceControlProgressFlag: false
 			}
 		},
 		onLoad(option) {
-			//option.scene 不为空说明是扫码跳转过来播放的
+			//option.scene 不为空说明是二维码跳转
 			if(option.scene){
 				let scene = decodeURIComponent(option.scene);
 				var arr = scene.split('=')
@@ -230,21 +236,22 @@
 			}else{
 				this.artworkId = option.pkArtworkId
 			}
-			// 故事线跳转进来的地方 会带上pkArtworkId and pkDetailId
+			//故事线跳转进来的地方 会带上pkArtworkId and pkDetailId 
+			//pkDetailId变量存在this里面的 没有在data中声明
 			this.pkDetailId = option.pkDetailId
 			// 每次的故事线跳转都要重置当前播放节点
 			this.detailId = null;
 			uni.setStorageSync("detailId",this.detailId);
 		},
 		onReady(){
-			//test
-			// this.artworkId = 461;
-			//监听快进手势
+			//初始化video标签属性
 			this.autopalyFlag = true
 			this.gestureFlag = true
 			this.endEventFlag = true
+			this.forceControlProgressFlag = false
 			//获取手机屏幕尺寸 单位是px
 			const {windowWidth, windowHeight, brand, model} = uni.getSystemInfoSync()
+			//将尺寸记录方便在方法中调用
 			uni.setStorageSync('windowSize',{
 				'windowWidth': windowWidth,
 				'windowHeight': windowHeight
@@ -261,19 +268,18 @@
 				this.getArtworkTreeByDetailId()
 				this.playedHistoryArray = uni.getStorageSync("pkDetailIds")
 				let appearConditionMap = uni.getStorageSync('appearConditionMap')
-				//根据当前节点 在节点分值容器中是否有值来判断是否是数值节点 
 				//不能判断是普通选项的跳转还是数值选项的跳转了 因为数值选项中也可能存在普通选项会导致误判
 				//所以不管是普通选项还是数值选项都要做一次分数的重新计算
-				//appearConditionMap != null 说明一定是数值选项的跳转 appearConditionMap == nul 说明是最普通的选项
+				//appearConditionMap != null 说明一定是树中含有数值选项的跳转 appearConditionMap == nul 说明所有节点都是普通选项的跳转
 				if(appearConditionMap != null){
 					let currentArray = this.deepCopy(this.playedHistoryArray)
 					//如果此时的currentArray 是空的话则说明是跳转的根节点不做操作
 					if(currentArray.length != 0){
 						//计算跳转到的目标节点时此时用户的得分 所使用的临时数组变量 因为跳转过来没有当前节点的detailId
+						//但是计算计算时得到的分数是包括当前节点的分数 因此将当前节点加入临时的数组变量中
 						currentArray.push(this.pkDetailId)
-						//需要的是计算过了当前节点的分数
 						// console.log('播放记录：'+currentArray)
-						//根据appearConditionMap里面的元素长度初始化用户分数数组
+						//根据appearConditionMap里面的元素长度初始化用户分数数组 只需一个元素长度便可
 						let len = 0
 						for(let item in appearConditionMap){
 							len = appearConditionMap[item].length
@@ -289,6 +295,7 @@
 							let value = appearConditionMap[key]
 							if(typeof(value) != 'undefined' && value.length != 0 ){
 								for(let j = 0; j < value.length; j++){
+									//根据开关判断是否进行数值判断
 									if( value[j].changeFlag == 1){
 										userScore[j] += value[j].changeConditionValue
 									}
@@ -407,7 +414,7 @@
 						title: '请选择举报类型'
 					})
 				}
-				const regPhone = /[\u4e00-\u9fa5]{8,}/.test(this.textareaContent);
+				const regPhone = /([\u4e00-\u9fa5]|[\（\）\《\》\——\；\，\。\“\”\<\>\！\？]){8}/.test(this.textareaContent);
 				if(!regPhone){
 					return uni.showToast({
 						icon: 'none',
@@ -433,7 +440,28 @@
 								title: "举报成功,待管理员审核",
 								position: 'center'
 							})
-							this.reportContentFlag = false;
+							this.reportContentFlag = false
+							//举报提交之后接着播放
+							const videoContext = uni.createVideoContext('myVideo')
+							videoContext.play()
+							this.items =  [
+								{
+									value: 1,
+									name: '侵犯版权',
+									checked: false
+								},
+								{
+									value: 2,
+									name: '出现违规内容',
+									checked: false
+								},
+								{
+									value: 3,
+									name: '其它',
+									checked: false
+								}
+							]
+							this.textareaContent = ''
 						}
 					}
 				})
@@ -441,7 +469,7 @@
 			//举报页面复选框
 			checkboxChange(e) {
 				var items = this.items,
-					values = e.detail.value;
+				values = e.detail.value;
 				//那用户最后点击的那个checkbox 实现单选
 				const value = values[values.length-1];
 				//避免用户单次数的点击导致values为空
@@ -456,9 +484,8 @@
 					}
 				}
 			},
-			//视频播放初始化保存播放记录  将作品detailId留存提供给故事线
+			//对节点播放数据进行筛选和提取
 			initPlayData(artworkTree){
-				//初始化视频及选项
 				//是否是定位选项的标志 1是定位选项 其他是普通选项
 				this.isPosition = artworkTree.isPosition
 				if(this.isPosition == 1){
@@ -467,6 +494,7 @@
 				}
 				//随机数 
 				const uuid = Math.random().toString(36).substring(2)
+				//初始化视频及选项
 				this.videoUrl = artworkTree.videoUrl+'?uuid='+uuid
 				this.detailId = artworkTree.pkDetailId
 				//如果是根节点初始化存储节点分值的容器
@@ -491,7 +519,7 @@
 							//普通选项中的数值选项
 							this.calculateOptionScore(childs[i])
 						}else{
-							//常规选项
+							//普通选项
 							this.option.push(childs[i].selectTitle)
 							this.childs.push(childs[i])
 						}
@@ -517,6 +545,7 @@
 				}
 				//非跳转节点存播放记录
 				if (this.linkNodeId != this.detailId) {
+					// 将作品detailId留存提供给故事线
 					this.playedHistoryArray.push(artworkTree.pkDetailId);
 					/* //不需要去重 记录故事线走向方便数值选项分数计算
 					this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray)); */
@@ -526,7 +555,6 @@
 			},
 			// 计算选项分数判断是否显示
 			calculateOptionScore(child){
-				//选项是否显示的标志
 				//获取数值选项参数
 				let advancedList = child.onAdvancedList
 				let userScore = uni.getStorageSync('userScore')
@@ -551,9 +579,11 @@
 					}
 				}
 				if(optionFlag){
+					//分值检测通过将数据装入容器待展示
 					this.childs.push(child)
 					this.option.push(child.selectTitle)
 				}else{
+					//定位选项中的数值选项如果不显示的话 那么也要将对应的坐标位置根据pkDetailId在nodeLocationList中删除，
 					for(let i = 0; i < this.nodeLocationList.length; i++){
 						if(this.nodeLocationList[i].pkDetailId == child.pkDetailId){
 							this.nodeLocationList.splice(i,1)
@@ -641,12 +671,16 @@
 						this.chooseTipsShowFlag = false;
 						this.chooseTipsMaskFlag = false;
 						this.showCanvasFlag = true;
-						this.endEventTodo();
+						if(this.forceControlProgressFlag){
+							this.endEventTodo();
+						}
 					}else{
 						this.showCanvasFlag = false;
 						this.chooseTipsShowFlag = true;
 						this.chooseTipsMaskFlag = true;
-						this.endEventTodo();
+						if(this.forceControlProgressFlag){
+							this.endEventTodo();
+						}
 					}
 				}else{
 					this.storyLineContentFlag = true
@@ -656,15 +690,16 @@
 					uni.setStorageSync('userScore',[])
 				}
 			},
+			//video结束事件触发后检测是否是手势速滑触发的
+			//如果是手势速滑触发那就关闭手势开关 关闭自动播放开关 关闭当前方法检测开关
 			endEventTodo(){
 				if(this.endEventFlag){
 					const videoContext = uni.createVideoContext('myVideo')
 					this.autopalyFlag = false
 					this.gestureFlag = false
-					let duration = this.videoPlayInfo.duration
 					videoContext.pause()
 					// console.log('duration:' + Math.floor(duration))
-					videoContext.seek(Math.floor(duration))
+					videoContext.seek(Math.floor(this.duration))
 					videoContext.pause()
 					videoContext.play()
 					this.endEventFlag = false
@@ -673,7 +708,6 @@
 			},
 			//视屏暂停操作
 			videoPause(){
-				// console.log('我暂停了')
 				this.hiddenBtnFlag = true
 			},
 			//视频获取是视频播放进度
@@ -681,14 +715,12 @@
 				const videoContext = uni.createVideoContext('myVideo')
 				let currentTime = e.detail.currentTime
 				let duration = e.detail.duration
+				//根据是否到视频结尾的标志 来检测是视频是否因为手势速滑导致重新播放，若小于50%则表示重新播放了
+				//避免其重新播放的bug将视频强行拖拽至结局
 				if(!this.endEventFlag){
 					if(currentTime/duration<0.5){
 						videoContext.seek(Math.floor(duration))
 					}
-				}
-				this.videoPlayInfo = {
-					'currentTime': currentTime,
-					'duration': duration
 				}
 			},
 			//展示故事线内容的时候暂停视频
@@ -735,6 +767,7 @@
 						this.autopalyFlag = true
 						this.gestureFlag = true
 						this.endEventFlag = true
+						this.forceControlProgressFlag = false
 						this.background.splice(index,1,"")
 						this.optionTouchendTodo(index)
 						break;
@@ -743,6 +776,7 @@
 						this.autopalyFlag = true
 						this.gestureFlag = true
 						this.endEventFlag = true
+						this.forceControlProgressFlag = false
 						this.background.splice(index,1,"")
 						this.optionTouchendTodo(index)
 						break;
@@ -751,6 +785,7 @@
 						this.autopalyFlag = true
 						this.gestureFlag = true
 						this.endEventFlag = true
+						this.forceControlProgressFlag = false
 						this.background.splice(index,1,"")
 						this.optionTouchendTodo(index)
 						break;
@@ -759,6 +794,7 @@
 						this.autopalyFlag = true
 						this.gestureFlag = true
 						this.endEventFlag = true
+						this.forceControlProgressFlag = false
 						this.background.splice(index,1,"")
 						this.optionTouchendTodo(index)
 						break;
@@ -799,6 +835,7 @@
 				this.endEventFlag = true
 				this.chooseTipsShowFlag = false
 				this.chooseTipsMaskFlag = false
+				this.forceControlProgressFlag = false
 				const videoContext = uni.createVideoContext('myVideo')
 				videoContext.play()
 			},
@@ -808,6 +845,7 @@
 				this.gestureFlag = true
 				this.endEventFlag = true
 				this.storyLineContentFlag = false
+				this.forceControlProgressFlag = false
 				const videoContext = uni.createVideoContext('myVideo')
 				videoContext.play()
 			},
@@ -817,6 +855,25 @@
 				this.gestureFlag = true
 				this.endEventFlag = true
 				this.reportContentFlag = false
+				this.forceControlProgressFlag = false
+				this.items =  [
+					{
+						value: 1,
+						name: '侵犯版权',
+						checked: false
+					},
+					{
+						value: 2,
+						name: '出现违规内容',
+						checked: false
+					},
+					{
+						value: 3,
+						name: '其它',
+						checked: false
+					}
+				]
+				this.textareaContent = ''
 				const videoContext = uni.createVideoContext('myVideo')
 				videoContext.play()
 			},
@@ -1052,21 +1109,25 @@
 					this.autopalyFlag = true
 					this.gestureFlag = true
 					this.endEventFlag = true
+					this.forceControlProgressFlag = false
 					this.canvasTouchendEventTodo()
 				}else if(this.touchRectNum == 1){
 					this.autopalyFlag = true
 					this.gestureFlag = true
 					this.endEventFlag = true
+					this.forceControlProgressFlag = false
 					this.canvasTouchendEventTodo()
 				}else if(this.touchRectNum == 2){
 					this.autopalyFlag = true
 					this.gestureFlag = true
 					this.endEventFlag = true
+					this.forceControlProgressFlag = false
 					this.canvasTouchendEventTodo()
 				}else if(this.touchRectNum == 3){
 					this.autopalyFlag = true
 					this.gestureFlag = true
 					this.endEventFlag = true
+					this.forceControlProgressFlag = false
 					this.canvasTouchendEventTodo()
 				}
 				//回到默认值
@@ -1212,7 +1273,7 @@
 				return JSON.parse(JSON.stringify(o))
 			},
 			loadeddata(e){
-				// console.log(8)
+				this.duration = e.detail.duration
 				uni.setStorageSync('videoSize',{
 					videoHeight: e.detail.height,
 					videoWidth: e.detail.width
@@ -1223,6 +1284,15 @@
 				if(this.isPosition == 1){
 					//初始化画布
 					this.initCanvas();
+				}
+			},
+			gestureTouchstart(e){
+				this.tsx = e.changedTouches[0].clientX
+				this.tsy = e.changedTouches[0].clientY
+			},
+			gestureTouchend(e){
+				if(e.changedTouches[0].clientX - this.tsx > 2 || e.changedTouches[0].clientY - this.tsy > 2){
+					this.forceControlProgressFlag = true
 				}
 			}
 		}
