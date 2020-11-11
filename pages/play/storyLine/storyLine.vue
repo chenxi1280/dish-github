@@ -17,7 +17,9 @@
 
 <script>
 	import mswiper from '../../../components/m-swiper/m-swiper'
-
+	import {
+		baseURL
+	} from '../../login/config/config.js'
 	export default {
 		props: {
 			//需要传递的2个值pkArtworkId 作品id ，pkDetailIds 播放过的节点id数组
@@ -53,14 +55,14 @@
 			
 			this.onfloor = this.pkDetailIds.length - 1
 			uni.request({
-				url: 'https://wanxiangchengzhen.com/bpi/Ecmartwork/getArtWorkNodes',
+				url:  baseURL + '/Ecmartwork/getArtWorkNodes',
 				// url: 'http://192.168.1.15:8008/Ecmartwork/getArtWorkNodes',
 				method: 'POST',
 				data: {
 					pkArtworkId: this.pkArtworkId
 				},
 				success: res => {
-					console.log(res.data.data)
+					// console.log(res.data.data)
 					this.pkDetailIds.forEach( v => {
 						res.data.data.forEach(node => {
 							if (v === node.pkDetailId) {
@@ -80,8 +82,8 @@
 							}
 						})
 					})
-					console.log(this.list)
-					console.log(this.floorList)
+					// console.log(this.list)
+					// console.log(this.floorList)
 					this.clearnBrother()
 				}
 			})
@@ -185,7 +187,7 @@
 					let b = uni.getStorageSync("pkDetailIds")
 					// 当前选中楼层的 播放历史
 					let c = this.floorList[nowFloor][0]
-					console.log(a)
+					// console.log(a)
 					
 					if (a.isNumberSelect !=null ) {
 							this.isNumberFlag = a.isNumberSelect == 1

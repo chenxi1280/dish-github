@@ -30,7 +30,7 @@
 			</view> -->
 		</view>
 		<view class="component">
-			<my-dialog message= '修改密码请前往四刻互动专业版web端进行操作\n\n网站地址：https://wanxiangchengzhen.com/ivetool/#/login/password'
+			<my-dialog message= '修改密码请前往灵巫互动专业版web端进行操作\n\n网站地址：https://wanxiangchengzhen.com/ivetool/#/login/password'
 					  confirmContext="复制"
 					  concelContext="取消"
 					  @confirm="confirm" ></my-dialog>

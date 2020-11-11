@@ -4,11 +4,13 @@
 			<view class="container"  v-show="showCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px'}">
 			  <canvas canvas-id="myCanvas" @touchstart="getTouchPosition" @touchend="canvasTouchendEvent"></canvas>
 			</view>
-			<!-- 播放主体   @click="showButton"-->
+			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" -->
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px'}">
 				<video :src="videoUrl" :autoplay="autopalyFlag" direction="0" :show-mute-btn="true" :show-fullscreen-btn="false" id="myVideo"
-				 :enable-play-gesture="gestureFlag" @ended="videoEnd" @pause="videoPause" @timeupdate="videoTimeupdate"
-				 @loadedmetadata="loadeddata" @touchend="gestureTouchend" @touchstart="gestureTouchstart"></video>
+				:enable-play-gesture="gestureFlag" @ended="videoEnd" @pause="videoPause"  @loadedmetadata="loadeddata"
+				@touchend="gestureTouchend" @touchstart="gestureTouchstart" v-if="videoShowFlag"></video>
+				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
+				'background-repeat':'no-repeat', backgroundSize:'100% 100%'}"></view>
 			</view>
 			<!-- 选项 -->
 			<view class="chooseTipsMask15"  v-if="chooseTipsMaskFlag">
@@ -27,13 +29,37 @@
 					</view>
 				</view>
 			</view>
+			<!-- 好感度 -->
+			<!-- <view class="likabilityTips" v-if="likabilityFlag">
+				<view class="lbtips" v-for="(item, index) in likabilityArray" :key="index">
+					<view class="likabilityBox">
+						<view class="likability">{{option[index]}}</view>
+					</view>
+				</view>
+			</view> -->
+			<!-- 光 -->
+			<!-- <view class="lightBox">
+				<view class="lightIconBox">
+					<icon class="lightIcon"></icon>
+				</view>
+				<view class="lightText">{{'x'+lightNumber}}</view>
+				<view class="addLightIconBox">
+					<icon class="addLightIcon"></icon>
+				</view>
+			</view> -->
 			<!-- 故事线和举报 -->
 			<view v-if="hiddenBtnFlag">
 				<view class="reportBox" @click="showReportContent">
+					<view class="reportIconBox">
+						<icon class="reportIcon"></icon>
+					</view>
 					<view class="report">举报</view>
 				</view>
 			</view>
 			<view class="storyLineBox" @click="showStoryLineContent">
+				<view class="storyLineIconBox">
+					<icon class="storyLineIcon"></icon>
+				</view>
 				<view class="storyLine">故事线</view>
 			</view>
 			<!-- 故事线内容呈现在蒙板之上 -->
@@ -196,8 +222,13 @@
 				tsx: 0,
 				//touchstart纵轴坐标
 				tsy: 0,
-				//是否进行强制回拉视频操作标志
-				forceControlProgressFlag: false
+				//视屏播放完成显示截图的截图路径
+				imageSrc: '',
+				videoShowFlag: true,
+				screenshotShowFlag: false,
+				lightNumber: 25,
+				likabilityFlag: true,
+				likabilityArray: []
 			}
 		},
 		onLoad(option) {
@@ -244,11 +275,6 @@
 			uni.setStorageSync("detailId",this.detailId);
 		},
 		onReady(){
-			//初始化video标签属性
-			this.autopalyFlag = true
-			this.gestureFlag = true
-			this.endEventFlag = true
-			this.forceControlProgressFlag = false
 			//获取手机屏幕尺寸 单位是px
 			const {windowWidth, windowHeight, brand, model} = uni.getSystemInfoSync()
 			//将尺寸记录方便在方法中调用
@@ -285,7 +311,7 @@
 							len = appearConditionMap[item].length
 							break;
 						}
-						console.log('节点条件数组的长度：',len)
+						// console.log('节点条件数组的长度：',len)
 						let userScore = uni.getStorageSync('userScore')
 						for(let k = 0; k < len; k++){
 							userScore.push(0);
@@ -311,7 +337,7 @@
 			}
 		},
 		onBackPress(){
-			console.log(111)
+			// console.log(111)
 		},
 		onUnload(){
 			uni.navigateBack({
@@ -497,6 +523,7 @@
 				//初始化视频及选项
 				this.videoUrl = artworkTree.videoUrl+'?uuid='+uuid
 				this.detailId = artworkTree.pkDetailId
+				this.imageSrc = artworkTree.nodeLastImgUrl
 				//如果是根节点初始化存储节点分值的容器
 				if(artworkTree.parentId === 0){
 					//存进缓存是防止故事线进入时重置了data里面的数据
@@ -670,17 +697,14 @@
 					if(this.isPosition == 1){
 						this.chooseTipsShowFlag = false;
 						this.chooseTipsMaskFlag = false;
+						this.videoShowFlag = false
+						this.screenshotShowFlag = true
 						this.showCanvasFlag = true;
-						if(this.forceControlProgressFlag){
-							this.endEventTodo();
-						}
+						this.videoUrl = ''
 					}else{
 						this.showCanvasFlag = false;
 						this.chooseTipsShowFlag = true;
 						this.chooseTipsMaskFlag = true;
-						if(this.forceControlProgressFlag){
-							this.endEventTodo();
-						}
 					}
 				}else{
 					this.storyLineContentFlag = true
@@ -690,28 +714,12 @@
 					uni.setStorageSync('userScore',[])
 				}
 			},
-			//video结束事件触发后检测是否是手势速滑触发的
-			//如果是手势速滑触发那就关闭手势开关 关闭自动播放开关 关闭当前方法检测开关
-			endEventTodo(){
-				if(this.endEventFlag){
-					const videoContext = uni.createVideoContext('myVideo')
-					this.autopalyFlag = false
-					this.gestureFlag = false
-					videoContext.pause()
-					// console.log('duration:' + Math.floor(duration))
-					videoContext.seek(Math.floor(this.duration))
-					videoContext.pause()
-					videoContext.play()
-					this.endEventFlag = false
-					console.log('this.autoplay:'+this.autopalyFlag)
-				}
-			},
 			//视屏暂停操作
 			videoPause(){
 				this.hiddenBtnFlag = true
 			},
 			//视频获取是视频播放进度
-			videoTimeupdate(e){
+			/* videoTimeupdate(e){
 				const videoContext = uni.createVideoContext('myVideo')
 				let currentTime = e.detail.currentTime
 				let duration = e.detail.duration
@@ -722,7 +730,7 @@
 						videoContext.seek(Math.floor(duration))
 					}
 				}
-			},
+			}, */
 			//展示故事线内容的时候暂停视频
 			showStoryLineContent(){
 				this.storyLineContentFlag = true
@@ -764,37 +772,21 @@
 				switch(index){
 					case 0: {
 						// splice替换数组元素
-						this.autopalyFlag = true
-						this.gestureFlag = true
-						this.endEventFlag = true
-						this.forceControlProgressFlag = false
 						this.background.splice(index,1,"")
 						this.optionTouchendTodo(index)
 						break;
 					}
 					case 1: {
-						this.autopalyFlag = true
-						this.gestureFlag = true
-						this.endEventFlag = true
-						this.forceControlProgressFlag = false
 						this.background.splice(index,1,"")
 						this.optionTouchendTodo(index)
 						break;
 					}
 					case 2: {
-						this.autopalyFlag = true
-						this.gestureFlag = true
-						this.endEventFlag = true
-						this.forceControlProgressFlag = false
 						this.background.splice(index,1,"")
 						this.optionTouchendTodo(index)
 						break;
 					}
 					case 3: {
-						this.autopalyFlag = true
-						this.gestureFlag = true
-						this.endEventFlag = true
-						this.forceControlProgressFlag = false
 						this.background.splice(index,1,"")
 						this.optionTouchendTodo(index)
 						break;
@@ -830,32 +822,20 @@
 			},
 			//点击选项关闭按钮触发事件
 			closeChooseTips(){
-				this.autopalyFlag = true
-				this.gestureFlag = true
-				this.endEventFlag = true
 				this.chooseTipsShowFlag = false
 				this.chooseTipsMaskFlag = false
-				this.forceControlProgressFlag = false
 				const videoContext = uni.createVideoContext('myVideo')
 				videoContext.play()
 			},
 			//点击故事线关闭按钮触发事件
 			closeStoryLineContent(){
-				this.autopalyFlag = true
-				this.gestureFlag = true
-				this.endEventFlag = true
 				this.storyLineContentFlag = false
-				this.forceControlProgressFlag = false
 				const videoContext = uni.createVideoContext('myVideo')
 				videoContext.play()
 			},
 			//点击举报关闭按钮触发事件
 			closeReportContent(){
-				this.autopalyFlag = true
-				this.gestureFlag = true
-				this.endEventFlag = true
 				this.reportContentFlag = false
-				this.forceControlProgressFlag = false
 				this.items =  [
 					{
 						value: 1,
@@ -881,8 +861,8 @@
 			initCanvas(){
 				this.rectArray = []
 				const ctx = uni.createCanvasContext('myCanvas')
-				console.log('画布的宽:'+this.canvasWidth)
-				console.log('画布的高:'+this.canvasHeight)
+				// console.log('画布的宽:'+this.canvasWidth)
+				// console.log('画布的高:'+this.canvasHeight)
 				ctx.clearRect(0 , 0 , this.canvasWidth, this.canvasHeight)
 				for(let i = 0; i < this.nodeLocationList.length; i++){
 					if(this.nodeLocationList[i].isHide == 1){
@@ -891,12 +871,13 @@
 						//toFixed(0) 四舍五入保留设置的位数 返回一个字符串
 						let rectX = parseInt(((this.nodeLocationList[i].textRectX+0)*this.canvasWidth).toFixed(0))
 						let rectY = parseInt(((this.nodeLocationList[i].textRectY+0)*this.canvasHeight).toFixed(0))
-						console.log("web端比值计算后的矩形框横坐标:"+rectX)
-						console.log("web端比值计算后的矩形框纵坐标:"+rectY)
+						// console.log("矩形框横坐标:"+rectX)
+						// console.log("矩形框纵坐标:"+rectY)
 						//文字距离左右两个边框的间距
 						let marginLeftAndRightSides = 8
 						//矩形框高度
 						let rectH = 22
+						// console.log('矩形框的高:'+rectW)
 						//字体大小
 						let fontSize = 16
 						//文字距离矩形框下边框边距
@@ -910,7 +891,7 @@
 						let metrics = ctx.measureText(textContent)
 						//宽度取整 Math.ceil向上取整即省去小数再加1 宽度由文本的宽度加边距组成
 						let rectW = parseInt(metrics.width.toFixed(0))+marginLeftAndRightSides;
-						console.log('根据文字算出的矩形框的宽:'+rectW)
+						// console.log('矩形框的宽:'+rectW)
 						//末尾小圆圈的横纵坐标 算总长度时应该减去黑边
 						let cX = parseInt(((this.nodeLocationList[i].circleX+0)*this.canvasWidth).toFixed(0))
 						let cY = parseInt(((this.nodeLocationList[i].circleY+0)*this.canvasHeight).toFixed(0))
@@ -945,8 +926,8 @@
 						ctx.rect(parseInt(((this.nodeLocationList[i].textRectX+0)*this.canvasWidth-(rectW/2)).toFixed(0)), 
 						parseInt(((this.nodeLocationList[i].textRectY+0)*this.canvasHeight-(rectH/2)).toFixed(0)), rectW, rectH)
 						
-						console.log('矩形框起始点横坐标:'+parseInt(((this.nodeLocationList[i].textRectX+0)*this.canvasWidth-(rectW/2)).toFixed(0)))
-						console.log('矩形框起始点纵坐标:'+parseInt(((this.nodeLocationList[i].textRectY+0)*this.canvasHeight-(rectH/2)).toFixed(0)))
+						// console.log('矩形框起始点横坐标:'+parseInt(((this.nodeLocationList[i].textRectX+0)*this.canvasWidth-(rectW/2)).toFixed(0)))
+						// console.log('矩形框起始点纵坐标:'+parseInt(((this.nodeLocationList[i].textRectY+0)*this.canvasHeight-(rectH/2)).toFixed(0)))
 						//将坐标收纳成对象保存到数组，为绑定事件做准备
 						let rect={
 							x: parseInt((rectX-(rectW/2)).toFixed(0)),
@@ -992,19 +973,11 @@
 						let rectX = parseInt(((this.nodeLocationList[i].textRectX+0)*this.canvasWidth).toFixed(0))
 						let rectY = parseInt(((this.nodeLocationList[i].textRectY+0)*this.canvasHeight).toFixed(0))
 						//矩形框高度
-						let rectH = 22
-						//字体大小
-						let fontSize = 15
-						//文本内容
-						let textContent = this.option[i]
-						// console.log('隐藏选项定位的内容:'+textContent)
-						//测量之前要先确定字体大小 因为矩形宽是根据字体的长度来绘画的 不设置会影响测量
-						ctx.setFontSize(fontSize)
-						//测量文本宽度
-						let metrics = ctx.measureText(textContent)
-						//宽度取整 Math.ceil向上取整即省去小数再加1 宽度由文本的宽度加边距组成
-						let rectW = parseInt(metrics.width.toFixed(0));
-						
+						let rectH = parseInt(((this.nodeLocationList[i].hideHeightScale+0)*this.canvasHeight).toFixed(0))
+						// console.log('矩形框的高:'+rectH)
+						//矩形框宽度
+						let rectW = parseInt(((this.nodeLocationList[i].hideWidthScale+0)*this.canvasWidth).toFixed(0))
+						// console.log('矩形框的宽:'+rectW)
 						//画矩形
 						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
 						ctx.beginPath()
@@ -1093,7 +1066,7 @@
 						//判断边界办法
 						if(touchX > xLowLimit && touchX < xUpperLimit && touchY > yLowLimit && touchY < yUpperLimit){
 							this.touchRectNum = i;
-							console.log('this.touchRectNum: '+this.touchRectNum)
+							// console.log('this.touchRectNum: '+this.touchRectNum)
 						}
 					}
 					if(this.touchRectNum < 4){
@@ -1106,29 +1079,21 @@
 			canvasTouchendEvent(){
 				console.log('this.touchRectNum: '+this.touchRectNum)
 				if(this.touchRectNum == 0){
-					this.autopalyFlag = true
-					this.gestureFlag = true
-					this.endEventFlag = true
-					this.forceControlProgressFlag = false
 					this.canvasTouchendEventTodo()
+					this.videoShowFlag = true
+					this.screenshotShowFlag = false
 				}else if(this.touchRectNum == 1){
-					this.autopalyFlag = true
-					this.gestureFlag = true
-					this.endEventFlag = true
-					this.forceControlProgressFlag = false
 					this.canvasTouchendEventTodo()
+					this.videoShowFlag = true
+					this.screenshotShowFlag = false
 				}else if(this.touchRectNum == 2){
-					this.autopalyFlag = true
-					this.gestureFlag = true
-					this.endEventFlag = true
-					this.forceControlProgressFlag = false
 					this.canvasTouchendEventTodo()
+					this.videoShowFlag = true
+					this.screenshotShowFlag = false
 				}else if(this.touchRectNum == 3){
-					this.autopalyFlag = true
-					this.gestureFlag = true
-					this.endEventFlag = true
-					this.forceControlProgressFlag = false
 					this.canvasTouchendEventTodo()
+					this.videoShowFlag = true
+					this.screenshotShowFlag = false
 				}
 				//回到默认值
 				this.touchRectNum = 5
@@ -1255,18 +1220,6 @@
 						flag = !0
 					}	
 				}
-				/* if(windowHeight/windowWidth>16/9){
-					//高度变高了出现上下黑边
-					this.windowHeight = parseInt((16/9)*windowWidth)
-					this.windowWidth = windowWidth
-					let sideDistance = parseInt((windowHeight-this.windowHeight)/2)
-					this.windowMargin = sideDistance+'px 0 0 0'
-				}else{
-					//宽度变宽了出现左右黑边
-					this.windowWidth = parseInt((9/16)*windowHeight)
-					this.windowHeight = windowHeight
-					this.windowMargin = '0 auto'
-				} */
 			},
 			// 深拷贝 方法
 			deepCopy(o) {
@@ -1326,6 +1279,10 @@
 					width: 100%;
 					height: 100%;
 				}
+				.screenshot{
+					width: 100%;
+					height: 100%;
+				}
 			}
 			.chooseTipsMask15{
 				background-color: rgba(0, 0, 0, .1);
@@ -1334,7 +1291,7 @@
 				top: 0;
 				width: 100%;
 				height: 100%;
-				z-index: 15;
+				z-index: 17;
 				.chooseTipsMask16{
 					background-color: rgba(255,255,255,.9);
 					position: fixed;
@@ -1343,7 +1300,7 @@
 					transform: translateY(-50%);
 					width: 100%;
 					height: 38%;
-					z-index: 16;
+					z-index: 18;
 					.chooseTips{
 						width: 100%;
 						height: 100%;
@@ -1389,35 +1346,123 @@
 					}
 				}
 			}
-			
+			.likabilityTips{
+				position: fixed;
+				left: 6%;
+				top: 10%;
+				height: 600rpx;
+				width: 160rpx;
+				z-index: 15;
+				// background-color: rgba(255,255,255,.5);
+				.lbtips{
+					height: 40rpx;
+					width: 100%;
+					.likabilityBox{
+						margin-top: 10rpx;
+						width: 100%;
+						height: 40rpx;
+						background-color: rgba(255,255,255,.5);
+						text-align: center;
+						.likability{
+							color: white;
+							font-size: 20rpx;
+							line-height: 40rpx;
+						}
+					}
+				}
+			}
+			.lightBox{
+				position: fixed;
+				left: 6%;
+				top: 4%;
+				height: 40rpx;
+				width: 160rpx;
+				z-index: 15;
+				background-color: rgba(255,255,255,.5);
+				border-radius: 20rpx;
+				display: flex;
+				justify-content: flex-start;
+				.lightIconBox{
+					width: 40rpx;
+					height: 40rpx;
+					margin-left: 10rpx;
+					.lightIcon{
+						width: 100%;
+						height: 100%;
+						background: url(../../static/icon/hourglass.png) no-repeat center;
+						background-size: 40rpx;
+					}
+				}
+				.lightText{
+					font-size: 24rpx;
+					color: white;
+					line-height: 40rpx;
+					margin-left: 10rpx;
+				}
+				.addLightIconBox{
+					width: 40rpx;
+					height: 40rpx;
+					margin-left: 26rpx;
+					.addLightIcon{
+						width: 100%;
+						height: 100%;
+						background: url(../../static/icon/addofplay.png) no-repeat center;
+						background-size: 40rpx;
+					}
+				}
+			}
 			.storyLineBox{
 				position: fixed;
 				right: 6%;
-				top: 6%;
+				top: 40%;
 				height: 80rpx;
-				width: 120rpx;
+				width: 100rpx;
 				z-index: 15;
 				background-color: rgba(255,255,255,.5);
-				border-radius: 50%;
+				border-radius: 20rpx;
+				.storyLineIconBox{
+					width: 100rpx;
+					height: 50rpx;
+					text-align: center;
+					.storyLineIcon{
+						width: 50rpx;
+						height: 50rpx;
+						background: url(../../static/icon/fenzhi.png) no-repeat center;
+						background-size: 50rpx;
+					}
+				}
 				.storyLine{
+					text-align: center;
 					color: white;
-					line-height: 80rpx;
-					padding-left: 18rpx;
+					font-size: 20rpx;
+					line-height: 30rpx;
 				}
 			}
 			.reportBox{
 				position: fixed;
-				left: 6%;
-				top: 6%;
+				right: 6%;
+				top: 50%;
 				height: 80rpx;
-				width: 120rpx;
+				width: 100rpx;
 				z-index: 15;
 				background-color: rgba(255,255,255,.5);
-				border-radius: 50%;
+				border-radius: 20rpx;
+				.reportIconBox{
+					width: 100rpx;
+					height: 50rpx;
+					text-align: center;
+					.reportIcon{
+						width: 50rpx;
+						height: 50rpx;
+						background: url(../../static/icon/report.png) no-repeat center;
+						background-size: 50rpx;
+					}
+				}
 				.report{
+					text-align: center;
 					color: white;
-					line-height: 80rpx;
-					padding-left: 32rpx;
+					font-size: 20rpx;
+					line-height: 30rpx;
 				}
 			}
 			.storyLineContentMask16{

@@ -61,7 +61,7 @@
 <script>
 	import {
 		baseURL
-	} from './config/config.js'
+	} from '../login/config/config.js'
 
 	import search from '../search/search'
 	import waterfall from './waterfall_view/waterfall.vue'
@@ -140,7 +140,7 @@
 			},
 			sectionChange(index) {
 				this.current = index;
-				console.log(this.current)
+				// console.log(this.current)
 				if (this.current == 1) {
 					this.addRandomDataSort();
 				}
@@ -160,9 +160,9 @@
 			addRandomDataHot() {
 				if (this.current == 0) {
 					this.pageHot = this.pageHot + 1
-					console.log(this.pageHot)
+					// console.log(this.pageHot)
 					uni.request({
-						url: 'https://wanxiangchengzhen.com/bpi/Ecmartwork/getFindArtWorks',
+						url:  baseURL + '/Ecmartwork/getFindArtWorks',
 						// url: 'http://localhost:8008/Ecmartwork/getFindArtWorks',
 						method: 'POST',
 						data: {
@@ -170,15 +170,15 @@
 							limit: this.limit
 						},
 						success: res => {
-							console.log(res)
+							// console.log(res)
 							if (res.data.data.list != null) {
 								res.data.data.list.forEach(v => {
 									v.high = 287.1
 									v.logoPath = v.logoPath + '/common'
 									this.hotList.push(v)
 								})
-								console.log(this.limit)
-								console.log(res.data.data.length )
+								// console.log(this.limit)
+								// console.log(res.data.data.length )
 								
 								if (res.data.data.loadStatus != null ) {
 									this.hotLoadStatus = 'nomore'
@@ -186,12 +186,12 @@
 								// uni.setStorageSync( 'isHot' , true )
 
 							} else {
-								console.log('没有更多数据了')
+								// console.log('没有更多数据了')
 								this.hotLoadStatus = 'nomore'
 							}
 						}
 					})
-					console.log(this.hotLoadStatus)
+					// console.log(this.hotLoadStatus)
 				}
 				
 
@@ -200,7 +200,7 @@
 				if (this.current == 1) {
 					this['pageSort' + this.currentsort] = this['pageSort' + this.currentsort] + 1
 					uni.request({
-						url: 'https://wanxiangchengzhen.com/bpi/Ecmartwork/getFindSortArtWorks',
+						url:  baseURL + '/Ecmartwork/getFindSortArtWorks',
 						method: 'POST',
 						data: {
 							page: this['pageSort' + this.currentsort],
@@ -236,9 +236,9 @@
 			},
 			judgesortData() {
 				if (this['sortList' + this.currentsort].length == 0 && this['pageSort' + this.currentsort] == 0) {
-					console.log("111")
+					// console.log("111")
 					this.addRandomDataSort()
-					console.log(this['sortList' + this.currentsort])
+					// console.log(this['sortList' + this.currentsort])
 				}
 			},
 			onreachBottom() {
