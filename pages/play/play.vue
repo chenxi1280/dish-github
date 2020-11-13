@@ -247,6 +247,9 @@
 			}
 		},
 		onLoad(option) {
+			uni.showShareMenu({
+			  withShareTicket: true
+			})
 			//option.scene 不为空说明是二维码跳转
 			if(option.scene){
 				let scene = decodeURIComponent(option.scene);
@@ -288,6 +291,40 @@
 			// 每次的故事线跳转都要重置当前播放节点
 			this.detailId = null;
 			uni.setStorageSync("detailId",this.detailId);
+		},
+		onShareAppMessage: function (res) {
+		    return {
+				title: '灵巫互动',
+				path: 'pages/play/play?pkArtworkId='+this.artworkId,
+				success: function (shareTickets) {
+					console.log(shareTickets + '成功');
+					// 转发成功
+				},
+				fail: function (res) {
+					console.log(res + '失败');
+					// 转发失败
+				},
+				complete: function (res) {
+					// 不管成功失败都会执行
+				}
+		    }
+		},
+		onShareTimeline: (res) =>{
+			return {
+			  title: '灵巫互动',
+			  query: 'pages/play/play?pkArtworkId='+this.artworkId,
+			  success: function (shareTickets) {
+			    console.log(shareTickets + '成功');
+			    // 转发成功
+			  },
+			  fail: function (res) {
+			    console.log(res + '失败');
+			    // 转发失败
+			  },
+			  complete: function (res) {
+			    // 不管成功失败都会执行
+			  }
+			}
 		},
 		onReady(){
 			this.likabilityFlag = false

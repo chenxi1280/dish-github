@@ -87,6 +87,9 @@
 			'verfied': verfied
 		},
 		onLoad(options) {
+			uni.showShareMenu({
+			  withShareTicket: true
+			})
 			this.current = uni.getStorageSync("mine_current")
 			let token = uni.getStorageSync("token");
 			if(token != null && typeof(token) != "undefined" && token.length != 0){
@@ -96,6 +99,40 @@
 				this.getMineInfo();
 			}
 			uni.setStorageSync("mine_current",0)
+		},
+		onShareAppMessage: function (res) {
+		    return {
+		      title: '灵巫互动',
+		      path: 'pages/mine/mine',
+		      success: function (shareTickets) {
+		        console.log(shareTickets + '成功');
+		        // 转发成功
+		      },
+		      fail: function (res) {
+		        console.log(res + '失败');
+		        // 转发失败
+		      },
+		      complete: function (res) {
+		        // 不管成功失败都会执行
+		      }
+		    }
+		},
+		onShareTimeline: (res) =>{
+			return {
+			  title: '灵巫互动',
+			  query: 'pages/mine/mine',
+			  success: function (shareTickets) {
+			    console.log(shareTickets + '成功');
+			    // 转发成功
+			  },
+			  fail: function (res) {
+			    console.log(res + '失败');
+			    // 转发失败
+			  },
+			  complete: function (res) {
+			    // 不管成功失败都会执行
+			  }
+			}
 		},
 		onReachBottom() {
 			if(this.current == 0){

@@ -113,7 +113,44 @@
 		// 	this.addRandomDataHot()
 		// },
 		onLoad() {
+			uni.showShareMenu({
+			  withShareTicket: true
+			})
 			this.addRandomDataHot()
+		},
+		onShareAppMessage: function (res) {
+		    return {
+		      title: '灵巫互动',
+		      path: 'pages/dishover/dishover',
+		      success: function (shareTickets) {
+		        console.log(shareTickets + '成功');
+		        // 转发成功
+		      },
+		      fail: function (res) {
+		        console.log(res + '失败');
+		        // 转发失败
+		      },
+		      complete: function (res) {
+		        // 不管成功失败都会执行
+		      }
+		    }
+		},
+		onShareTimeline: (res) =>{
+			return {
+			  title: '灵巫互动',
+			  query: 'pages/dishover/dishover',
+			  success: function (shareTickets) {
+			    console.log(shareTickets + '成功');
+			    // 转发成功
+			  },
+			  fail: function (res) {
+			    console.log(res + '失败');
+			    // 转发失败
+			  },
+			  complete: function (res) {
+			    // 不管成功失败都会执行
+			  }
+			}
 		},
 		onReachBottom(e) {
 			console.log('我去加载了')
