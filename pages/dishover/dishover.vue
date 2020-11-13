@@ -24,7 +24,7 @@
 					<swiper :current="swiperCurrent" @change="swiperchange" style="height: 100%">
 
 						<swiper-item class="swiper-item">
-							<scroll-view scroll-y style="width: 100%;" @scrolltolower="onreachBottom">
+							<scroll-view scroll-y style="height: 100%;width: 100%;" @scrolltolower="onreachBottom">
 								<waterfall :flowList="sortList0" :status="loadStatus"></waterfall>
 							</scroll-view>
 						</swiper-item>
