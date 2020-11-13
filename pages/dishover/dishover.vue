@@ -85,7 +85,7 @@
 					name: '展示类'
 				}],
 				currentsort: 0,
-				queryType: "爱情",
+				queryType: "测试类",
 				limit: 10,
 				loadStatus: "loadmore",
 				// 底部状态
@@ -149,6 +149,7 @@
 				this.scrollTop = e.scrollTop;
 			},
 			changeSort(index) {
+				console.log(index)
 				this.currentsort = index;
 				this.pageSort = 0
 				this.swiperCurrent = index;
@@ -198,6 +199,7 @@
 			},
 			addRandomDataSort() {
 				if (this.current == 1) {
+					console.log(this.queryType)
 					this['pageSort' + this.currentsort] = this['pageSort' + this.currentsort] + 1
 					uni.request({
 						url:  baseURL + '/Ecmartwork/getFindSortArtWorks',
