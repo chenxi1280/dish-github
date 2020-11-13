@@ -171,8 +171,8 @@
 							limit: this.limit
 						},
 						success: res => {
-							// console.log(res)
-							if (res.data.data.list != null) {
+							console.log(res.data.data)
+							if (res.data.data.list.length != 0) {
 								res.data.data.list.forEach(v => {
 									v.high = 287.1
 									v.logoPath = v.logoPath + '/common'
