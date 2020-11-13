@@ -241,7 +241,9 @@
 				//好感度数值容器
 				likabilityArray: [],
 				//入场loading的开关
-				videoloadFlag: true
+				videoloadFlag: true,
+				//好感度延时函数
+				likabilityDelayFunction: Function,
 			}
 		},
 		onLoad(option) {
@@ -305,6 +307,7 @@
 			uni.setStorageSync('userScore',[])
 			if(this.pkDetailId != null){
 				//故事线跳转过来存一棵主树 跳转用
+				this.videoloadFlag = false
 				this.getArtworkTreeByArtworkId()
 				this.getArtworkTreeByDetailId()
 				this.playedHistoryArray = uni.getStorageSync("pkDetailIds")
@@ -792,6 +795,8 @@
 						this.background.splice(index,1,"")
 						this.likabilityFlag = false
 						this.hiddenBtnFlag = false
+						// 播放结束清楚延时函数
+						clearTimeout(this.likabilityDelayFunction)
 						this.optionTouchendTodo(index)
 						break;
 					}
@@ -800,6 +805,7 @@
 						this.background.splice(index,1,"")
 						this.likabilityFlag = false
 						this.hiddenBtnFlag = false
+						clearTimeout(this.likabilityDelayFunction)
 						this.optionTouchendTodo(index)
 						break;
 					}
@@ -808,6 +814,7 @@
 						this.background.splice(index,1,"")
 						this.likabilityFlag = false
 						this.hiddenBtnFlag = false
+						clearTimeout(this.likabilityDelayFunction)
 						this.optionTouchendTodo(index)
 						break;
 					}
@@ -816,6 +823,7 @@
 						this.background.splice(index,1,"")
 						this.likabilityFlag = false
 						this.hiddenBtnFlag = false
+						clearTimeout(this.likabilityDelayFunction)
 						this.optionTouchendTodo(index)
 						break;
 					}
@@ -1113,6 +1121,7 @@
 				console.log('this.touchRectNum: '+this.touchRectNum)
 				if(this.touchRectNum == 0){
 					this.likabilityArray = []
+					clearTimeout(this.likabilityDelayFunction)
 					this.canvasTouchendEventTodo()
 					this.videoShowFlag = true
 					this.screenshotShowFlag = false
@@ -1120,6 +1129,7 @@
 					this.hiddenBtnFlag = false
 				}else if(this.touchRectNum == 1){
 					this.likabilityArray = []
+					clearTimeout(this.likabilityDelayFunction)
 					this.canvasTouchendEventTodo()
 					this.videoShowFlag = true
 					this.screenshotShowFlag = false
@@ -1127,6 +1137,7 @@
 					this.hiddenBtnFlag = false
 				}else if(this.touchRectNum == 2){
 					this.likabilityArray = []
+					clearTimeout(this.likabilityDelayFunction)
 					this.canvasTouchendEventTodo()
 					this.videoShowFlag = true
 					this.screenshotShowFlag = false
@@ -1134,6 +1145,7 @@
 					this.hiddenBtnFlag = false
 				}else if(this.touchRectNum == 3){
 					this.likabilityArray = []
+					clearTimeout(this.likabilityDelayFunction)
 					this.canvasTouchendEventTodo()
 					this.videoShowFlag = true
 					this.screenshotShowFlag = false
@@ -1285,9 +1297,10 @@
 				//展示好感度
 				this.likabilityFlag = true
 				//视频清楚延时
-				setTimeout(()=>{
+				this.likabilityDelayFunction= setTimeout(()=>{
 					this.likabilityFlag = false
 				},5000)
+				console.log('延时函数对象: ',this.likabilityDelayFunction)
 				uni.setStorageSync('videoSize',{
 					videoHeight: e.detail.height,
 					videoWidth: e.detail.width
@@ -1431,7 +1444,7 @@
 						width: 100%;
 						height: 40rpx;
 						border-radius: 20rpx;
-						background-color: rgba(255,255,255,.5);
+						background-color: rgba(0,0,0,.3);
 						text-align: center;
 						.likability{
 							color: white;
@@ -1488,7 +1501,7 @@
 				height: 80rpx;
 				width: 100rpx;
 				z-index: 15;
-				background-color: rgba(255,255,255,.5);
+				background-color: rgba(0,0,0,.3);
 				border-radius: 20rpx;
 				.storyLineIconBox{
 					width: 100rpx;
@@ -1515,7 +1528,7 @@
 				height: 80rpx;
 				width: 100rpx;
 				z-index: 15;
-				background-color: rgba(255,255,255,.5);
+				background-color: rgba(0,0,0,.3);
 				border-radius: 20rpx;
 				.reportIconBox{
 					width: 100rpx;

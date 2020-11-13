@@ -24,11 +24,11 @@
 							<open-data type="userNickName" lang="zh_CN"></open-data>
 						</view>
 					</view>
-					<!-- <view>
+					<view>
 						<view class="problem" @click="customerService">
 							<icon class="headset"></icon>
 						</view>
-					</view> -->
+					</view>
 				</view>
 				<view class="mid">
 					<view class="loginBtn" v-if="unLoginedFlag">

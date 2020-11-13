@@ -267,7 +267,7 @@
 
 <style lang="scss">
 	page{
-		background-color: #F08080;
+		background-color: white;
 	}
 	.login {
 		.top{
@@ -276,7 +276,7 @@
 			height: 500rpx;
 			width: 750rpx;
 			.login_redirect_btn {
-				color: #FCFCFC;
+				color: black;
 				font-size: 50rpx;
 				font-weight: bold;
 				margin-left: 100rpx;
