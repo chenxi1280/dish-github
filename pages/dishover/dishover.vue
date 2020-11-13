@@ -85,7 +85,7 @@
 					name: '展示类'
 				}],
 				currentsort: 0,
-				queryType: "爱情",
+				queryType: "测试类",
 				limit: 10,
 				loadStatus: "loadmore",
 				// 底部状态
@@ -149,6 +149,7 @@
 				this.scrollTop = e.scrollTop;
 			},
 			changeSort(index) {
+				console.log(index)
 				this.currentsort = index;
 				this.pageSort = 0
 				this.swiperCurrent = index;
@@ -170,8 +171,8 @@
 							limit: this.limit
 						},
 						success: res => {
-							// console.log(res)
-							if (res.data.data.list != null) {
+							console.log(res.data.data)
+							if (res.data.data.list.length != 0) {
 								res.data.data.list.forEach(v => {
 									v.high = 287.1
 									v.logoPath = v.logoPath + '/common'
@@ -198,6 +199,7 @@
 			},
 			addRandomDataSort() {
 				if (this.current == 1) {
+					console.log(this.queryType)
 					this['pageSort' + this.currentsort] = this['pageSort' + this.currentsort] + 1
 					uni.request({
 						url:  baseURL + '/Ecmartwork/getFindSortArtWorks',
