@@ -17,6 +17,9 @@
 </template>
 
 <script>
+	import {
+		baseURL
+	} from '../login/config/config.js'
 	export default {
 		data() {
 			return {
@@ -28,7 +31,7 @@
 		onLoad(option) {
 
 			uni.request({
-				url: 'https://wanxiangchengzhen.com/bpi/Ecmartwork/getRankingArtWorks',
+				url:  baseURL +'/Ecmartwork/getRankingArtWorks',
 				method: 'POST',
 				data: {
 					page: 1,

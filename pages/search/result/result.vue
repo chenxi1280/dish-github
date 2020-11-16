@@ -8,6 +8,9 @@
 <script>
 
 	import waterfall from '../waterfall_view/waterfall.vue'
+	import {
+			baseURL
+		} from '../../login/config/config.js'
 	export default {
 		components: {
 
@@ -31,7 +34,7 @@
 			addRandomDataHot() {
 				this.page = this.page + 1
 				uni.request({
-					url: 'https://wanxiangchengzhen.com/bpi/Ecmartwork/search',
+					url: baseURL + '/Ecmartwork/search',
 					method: 'POST',
 					data: {
 						page: this.page,
