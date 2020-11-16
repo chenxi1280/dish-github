@@ -12,6 +12,10 @@
 				</view>
 				<view class="work_delete">
 					<button class="btn_delete" @click="deleteArtWorkCode">删除</button>
+					<view class="line"></view>
+				</view>
+				<view class="work_cancel">
+					<button class="btn_cancel" @click="closeTips">取消</button>
 				</view>
 			</view>
 			<view class="icon_box" @click="showTips">
@@ -80,7 +84,7 @@
 										'word-break': 'break-all',
 										'white-space': 'pre-line',
 										'text-align': 'center',
-										'margin': '20% 20%'}"
+										'margin': '20% 8%'}"
 						@confirm="codeLink">
 					<view class="slot-content">
 						<rich-text :nodes="codeContent"></rich-text>
@@ -107,12 +111,12 @@
 				publish_flag: false,
 				code_flag: false,
 				//弹窗开关及对应内容
-				publishContent: '发布的作品将展示在发现页面\n\n作品二维码和播放链接将会在点击确定后生成，可前往web端个人空间已发布中查看\n\n网站地址：https://wanxiangchengzhen.com/ivetool/#/login/password',
+				publishContent: '发布的作品将展示在发现页面\n\n作品二维码和播放链接将会在点击确定后生成，可前往web端个人空间已发布中查看\n\n网站地址：https://wanxiangchengzhen.com',
 				publishShow: false,
 				deleteContent: '确认删除？',
 				deleteShow: false,
 				codeShow: false,
-				codeContent: '播放链接获取网站地址：https://wanxiangchengzhen.com/ivetool/#/login/password\n\n'
+				codeContent: '播放链接获取网站地址：\n\nhttps://wanxiangchengzhen.com\n\n'
 			}
 		},
 		props: {
@@ -161,7 +165,7 @@
 			},
 			async publishLink(){
 				uni.setClipboardData({
-					data: 'https://wanxiangchengzhen.com/ivetool/#/login/password',
+					data: 'https://wanxiangchengzhen.com',
 					success: res=> {
 						uni.showToast({
 							icon: 'none',
@@ -200,7 +204,7 @@
 			},
 			codeLink(){
 				uni.setClipboardData({
-					data: 'https://wanxiangchengzhen.com/ivetool/#/login/password',
+					data: 'https://wanxiangchengzhen.com',
 					success: res=> {
 						uni.showToast({
 							icon: 'none',
@@ -264,6 +268,9 @@
 				console.log(this.status)
 				this.deleteShow = true
 			},
+			closeTips(){
+				this.localFlag=false
+			},
 			/* 获取二维码和web端链接暂时不看  */
 			async getArtWorkCode(){
 				console.log(this.xid)
@@ -302,8 +309,8 @@
 	}
 	.tips{
 		z-index: 16;
-		width: 160rpx;
-		height: 210rpx;
+		width: 190rpx;
+		height: 240rpx;
 		border-radius: 10rpx;
 		position: absolute;
 		top: 20%;
@@ -311,14 +318,14 @@
 		transform: translateX(-50%);
 		.work_publish{
 			width: 100%;
-			height: 70rpx;
+			height: 80rpx;
 			box-sizing: border-box;
 			
 			position: relative;
 			.btn_publish{
-				line-height: 70rpx;
+				line-height: 80rpx;
 				text-align: center;
-				font-size: 20rpx;
+				font-size: 26rpx;
 				color: white;
 				background-color: rgba(0,0,0,.4);
 				&:hover{
@@ -334,13 +341,13 @@
 		}
 		.work_code{
 			width: 100%;
-			height: 70rpx;
+			height: 80rpx;
 			box-sizing: border-box;
 			position: relative;
 			.btn_code{
-				line-height: 70rpx;
+				line-height: 80rpx;
 				text-align: center;
-				font-size: 20rpx;
+				font-size: 26rpx;
 				color: white;
 				background-color: rgba(0,0,0,.4);
 				&:hover{
@@ -356,11 +363,33 @@
 		}
 		.work_delete{
 			width: 100%;
-			height: 70rpx;
+			height: 80rpx;
+			box-sizing: border-box;
+			position: relative;
 			.btn_delete{
-				line-height: 70rpx;
+				line-height: 80rpx;
 				text-align: center;
-				font-size: 20rpx;
+				font-size: 26rpx;
+				color: white;
+				background-color: rgba(0,0,0,.4);
+				&:hover{
+					background: #D3D3D3;
+				};
+			}
+			.line{
+				position: absolute;
+				bottom: 0;
+				width: 100%;
+				border: 2rpx solid #D1D1D1;
+			}
+		}
+		.work_cancel{
+			width: 100%;
+			height: 80rpx;
+			.btn_cancel{
+				line-height: 80rpx;
+				text-align: center;
+				font-size: 26rpx;
 				color: white;
 				background-color: rgba(0,0,0,.4);
 				&:hover{
