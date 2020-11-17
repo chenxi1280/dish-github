@@ -214,7 +214,8 @@
 						title: '选中跳转到' + a.selectTitle ,
 						type: 'success',
 					})
-					uni.navigateTo({
+					//使用reLaunch清空页面站 解决多次跳转卡死问题
+					uni.reLaunch({
 						url: "../play/play?pkArtworkId=" + this.pkArtworkId + "&pkDetailId=" + a.pkDetailId,
 					})
 				} else {

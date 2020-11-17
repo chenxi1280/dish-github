@@ -133,15 +133,17 @@
 						uni.showToast({
 								title: '登录成功'
 							})
+						//登陆页面跳转标志
+						uni.setStorageSync('isLoginJump', 0)
 						setTimeout(function() {
 							uni.switchTab({
 								url: '../../mine/mine',
-								 success: function (e) {
+								success: function (e) {
 									var page = getCurrentPages().pop();
 									if (page == undefined || page == null) return;
 									page.onLoad();
 								}
-							})
+							}) 
 						}, 1500);
 					} else if (res.data.status == 508) {
 					  for (let i = 0; i < res.data.data.length; i++) {

@@ -2,7 +2,7 @@
 	<view class="playBox">
 		<!-- 入场loading -->
 		<view v-if="videoloadFlag" class="videoLoadImageBox">
-			<image src="http://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605168512421loading.gif"></image>
+			<image src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605168512421loading.gif"></image>
 		</view>
 		<view class="play" :style="{'width': mobilePhoneWidth+'px', 'height': mobilePhoneHeight+'px'}">
 			<!-- 定位选项画布 -->
@@ -293,8 +293,10 @@
 			uni.setStorageSync("detailId",this.detailId);
 		},
 		onShareAppMessage: function (res) {
+			let tree = uni.getStorageSync('mainArtworkTree')
 		    return {
-				title: '灵巫互动',
+				title: tree.artworkName,
+				imageUrl: tree.shareImageUrl,
 				path: 'pages/play/play?pkArtworkId='+this.artworkId,
 				success: function (shareTickets) {
 					console.log(shareTickets + '成功');
@@ -310,8 +312,10 @@
 		    }
 		},
 		onShareTimeline: (res) =>{
+			let tree = uni.getStorageSync('mainArtworkTree')
 			return {
-			  title: '灵巫互动',
+			  title: tree.artworkName,
+			  imageUrl: tree.shareImageUrl,
 			  query: 'pages/play/play?pkArtworkId='+this.artworkId,
 			  success: function (shareTickets) {
 			    console.log(shareTickets + '成功');
@@ -343,6 +347,7 @@
 			//重置用户选项分数
 			uni.setStorageSync('userScore',[])
 			if(this.pkDetailId != null){
+				uni.setStorageSync('isStoryLineJump',1)
 				//故事线跳转过来存一棵主树 跳转用
 				this.videoloadFlag = false
 				this.getArtworkTreeByArtworkId()
@@ -352,7 +357,7 @@
 				//不能判断是普通选项的跳转还是数值选项的跳转了 因为数值选项中也可能存在普通选项会导致误判
 				//所以不管是普通选项还是数值选项都要做一次分数的重新计算
 				//appearConditionMap != null 说明一定是树中含有数值选项的跳转 appearConditionMap == nul 说明所有节点都是普通选项的跳转
-				if(appearConditionMap != null){
+				if(appearConditionMap != null && JSON.stringify(appearConditionMap) != "{}"){
 					let currentArray = this.deepCopy(this.playedHistoryArray)
 					//如果此时的currentArray 是空的话则说明是跳转的根节点不做操作
 					if(currentArray.length != 0){
@@ -1327,6 +1332,18 @@
 			},
 			loadeddata(e){
 				this.duration = e.detail.duration
+				let pkDetailIds = uni.getStorageSync('pkDetailIds')
+				//判断是不是故事线跳转过来的第一个视频 第一个视频需要快进到结尾进行播放
+				let isStoryLineJump = uni.getStorageSync('isStoryLineJump')
+				if(isStoryLineJump === 1){
+					for (let i = 0;i < pkDetailIds.length;i++) {
+						if(pkDetailIds[i] == this.pkDetailId){
+							const videoContext = uni.createVideoContext('myVideo')
+							videoContext.seek(parseInt((this.duration-3).toFixed(0)))
+							uni.setStorageSync('isStoryLineJump', 0)
+						}
+					}
+				}
 				//加载完成将入场loading关闭
 				this.videoloadFlag = false
 				//展示故事线和举报
@@ -1467,26 +1484,26 @@
 			}
 			.likabilityTips{
 				position: fixed;
-				left: 6%;
+				left: 0;
 				top: 10%;
 				height: 600rpx;
-				width: 220rpx;
+				width: 300rpx;
 				z-index: 15;
 				// background-color: rgba(255,255,255,.5);
 				.lbtips{
-					height: 40rpx;
+					height: 50rpx;
 					width: 100%;
 					.likabilityBox{
 						margin-top: 10rpx;
 						width: 100%;
-						height: 40rpx;
+						height: 50rpx;
 						border-radius: 20rpx;
 						background-color: rgba(0,0,0,.3);
 						text-align: center;
 						.likability{
 							color: white;
-							font-size: 20rpx;
-							line-height: 40rpx;
+							font-size: 30rpx;
+							line-height: 50rpx;
 						}
 					}
 				}

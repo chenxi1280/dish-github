@@ -56,8 +56,14 @@
 			//console.log("我去请求拿数据")
 		},
 		methods: {
-			async getMineArtWorks(){
-				this.page = this.page + 1,
+			async getMineArtWorks(pageNum){
+				//pageNum确定请求页码的标志 登陆成功后从第一次进行请求
+				if(typeof(pageNum) != "undefined"){
+					this.page = 1
+				}else{
+					this.page = this.page + 1
+				}
+				// console.log('this.page: '+this.page)
 				await uni.request ({
 					url: baseURL + "/wxPersonalCenter/getWxUserArtWorks",
 					method: 'POST',

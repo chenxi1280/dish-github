@@ -80,6 +80,7 @@
 				//是否登录开关
 				unLoginedFlag: true,
 				loginedFlag: false
+				
 			}
 		},
 		components: {
@@ -91,18 +92,25 @@
 			  withShareTicket: true
 			})
 			this.current = uni.getStorageSync("mine_current")
-			let token = uni.getStorageSync("token");
+			let token = uni.getStorageSync("token")
 			if(token != null && typeof(token) != "undefined" && token.length != 0){
-				this.loginedFlag = true;
-				this.unLoginedFlag = false;
-				console.log("我去发请求")
-				this.getMineInfo();
+				// console.log("我去发请求")
+				this.getMineInfo()
+				this.loginedFlag = true
+				this.unLoginedFlag = false
+				//isLoginJump是否是从登录页面跳转过来的标志
+				if(uni.getStorageSync('isLoginJump') == 0){
+					this.$refs.verfied.getMineArtWorks(0)
+					//使用完后置为 1
+					uni.setStorageSync('isLoginJump', 1)
+				}
 			}
 			uni.setStorageSync("mine_current",0)
 		},
 		onShareAppMessage: function (res) {
 		    return {
 		      title: '灵巫互动',
+			  imageUrl: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605600100857%E5%9C%86%E5%BD%A2%E7%94%A8JPG.jpg',
 		      path: 'pages/mine/mine',
 		      success: function (shareTickets) {
 		        console.log(shareTickets + '成功');
@@ -120,6 +128,7 @@
 		onShareTimeline: (res) =>{
 			return {
 			  title: '灵巫互动',
+			  imageUrl: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605600100857%E5%9C%86%E5%BD%A2%E7%94%A8JPG.jpg',
 			  query: 'pages/mine/mine',
 			  success: function (shareTickets) {
 			    console.log(shareTickets + '成功');
@@ -136,6 +145,7 @@
 		},
 		onReachBottom() {
 			if(this.current == 0){
+				console.log('我去拿数据2')
 				this.$refs.verfied.getMineArtWorks();
 			}else{
 				this.$refs.published.getMineArtWorks();
@@ -173,20 +183,22 @@
 					data: {
 						token: uni.getStorageSync("token")
 					},
-					success: res=> {
-						if(res.data.status == 200){
+					success: res => {
+						if (res.data.status === 200) {
 							this.userName = res.data.data.username
 							this.image = res.data.data.userLogoUrl
 							if(this.image){
 								this.wxUserFlag = false
-								this.realFlag = true
 								this.userFlag = true
+								this.realFlag = true
 								this.unrealFlag = false
 							}else{
 								this.wxUserFlag = false
 								this.userFlag = true
+								this.realFlag = false
+								this.unrealFlag = true
 							}
-						}
+						} 
 					}
 				})
 			}
