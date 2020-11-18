@@ -77,7 +77,7 @@
 					<view class="title">故事线</view>
 					<view class="splitLine"></view>
 					<view class="storyLineContent">
-						<storyLine :pkArtworkId="artworkId" :pkDetailIds="playedHistoryArray"></storyLine>
+						<storyLine :pkArtworkId="artworkId" :pkDetailIds="playedHistoryArray" @goPlay="storyLineJumpPlayTodo"></storyLine>
 					</view>
 				</view>
 			</view>
@@ -222,8 +222,6 @@
 				autopalyFlag: true,
 				//是否开启手势标志
 				gestureFlag: true,
-				//视频结束触发拖动事件校正标志
-				endEventFlag: true,
 				//touchstart 横轴坐标
 				tsx: 0,
 				//touchstart纵轴坐标
@@ -244,7 +242,32 @@
 				videoloadFlag: true,
 				//好感度延时函数
 				likabilityDelayFunction: Function,
+				//临时播放记录数组 检测故事线跳转回来是否已播放使用
+				currentPlayedHistoryArray: []
 			}
+		},
+		onReady(){
+			//关闭好感度 视频加载结束时打开
+			this.likabilityFlag = false
+			//关闭故事线和举报 视频加载结束时打开
+			this.hiddenBtnFlag = false
+			//获取手机屏幕尺寸 单位是px
+			const {windowWidth, windowHeight, brand, model} = uni.getSystemInfoSync()
+			//将用户手机窗口尺寸记录方便在方法中调用
+			uni.setStorageSync('windowSize',{
+				'windowWidth': windowWidth,
+				'windowHeight': windowHeight
+			})
+			this.mobilePhoneHeight = windowHeight
+			this.mobilePhoneWidth = windowWidth
+			//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
+			this.endFlag = true;
+			//重置用户选项分数
+			uni.setStorageSync('userScore',[])
+			//重置好感度数组
+			this.likabilityArray = []
+			//获取一颗作品树
+			this.getArtworkTreeByArtworkId();
 		},
 		onLoad(option) {
 			uni.showShareMenu({
@@ -257,6 +280,7 @@
 				//a是artworkId b是status -0是为了将string 转化成number
 				let a = arr[1] - 0
 				let b = arr[3] - 0
+				//b=1 表示用户扫描的预览的二维码
 				if(b == 1){
 					uni.request ({
 						url: baseURL + "/wxPlay/getUserIdByArtwordId",
@@ -283,14 +307,20 @@
 					this.artworkId = a;
 				}
 			}else{
+				//发现页和我的页面跳转播放页携带作品id
 				this.artworkId = option.pkArtworkId
 			}
-			//故事线跳转进来的地方 会带上pkArtworkId and pkDetailId 
-			//pkDetailId变量存在this里面的 没有在data中声明
-			this.pkDetailId = option.pkDetailId
-			// 每次的故事线跳转都要重置当前播放节点
-			this.detailId = null;
-			uni.setStorageSync("detailId",this.detailId);
+		},
+		onUnload(){
+			uni.navigateBack({
+			    delta: 1 ,
+				animationDuration: 10,
+				animationType: null
+			});
+			//关闭页面时重置选项类型为默认
+			uni.setStorageSync('isNumericalOptions',0)
+			//关闭页面时重置节点分数容器
+			uni.setStorageSync('appearConditionMap',null)
 		},
 		onShareAppMessage: function (res) {
 			let tree = uni.getStorageSync('mainArtworkTree')
@@ -330,29 +360,40 @@
 			  }
 			}
 		},
-		onReady(){
-			this.likabilityFlag = false
-			this.hiddenBtnFlag = false
-			//获取手机屏幕尺寸 单位是px
-			const {windowWidth, windowHeight, brand, model} = uni.getSystemInfoSync()
-			//将尺寸记录方便在方法中调用
-			uni.setStorageSync('windowSize',{
-				'windowWidth': windowWidth,
-				'windowHeight': windowHeight
-			})
-			this.mobilePhoneHeight = windowHeight
-			this.mobilePhoneWidth = windowWidth
-			//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
-			this.endFlag = true;
-			//重置用户选项分数
-			uni.setStorageSync('userScore',[])
-			if(this.pkDetailId != null){
+		methods: {
+			//故事线跳转播放页
+			storyLineJumpPlayTodo(option){
+				//在跳转到的目标视频没有加载前深拷贝播放历史，用于检测视频是否已播放使用
+				this.currentPlayedHistoryArray = this.deepCopy(uni.getStorageSync("pkDetailIds"))
+				//故事线跳转时清除好感度延时函数
+				clearTimeout(this.likabilityDelayFunction)
+				//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
+				this.endFlag = true;
+				//重置用户选项分数
+				uni.setStorageSync('userScore',[])
+				//重置好感度数组
+				this.likabilityArray = []
+				//重置canvas画布中的按钮是否被点击的开关
+				this.isClickFlag = false
+				this.artworkId = option.pkArtworkId
+				//故事线跳转进来的地方 会带上pkArtworkId and pkDetailId 
+				//pkDetailId变量存在this里面的 没有在data中声明
+				this.pkDetailId = option.pkDetailId
+				// 每次的故事线跳转都要重置当前播放节点
+				this.detailId = null;
+				uni.setStorageSync("detailId",this.detailId)
 				uni.setStorageSync('isStoryLineJump',1)
 				//故事线跳转过来存一棵主树 跳转用
 				this.videoloadFlag = false
+				//跳转成功先关闭故事线
+				this.storyLineContentFlag = false
+				//请求获取主树
 				this.getArtworkTreeByArtworkId()
+				//请求获取子树
 				this.getArtworkTreeByDetailId()
+				//获取播放历史记录
 				this.playedHistoryArray = uni.getStorageSync("pkDetailIds")
+				//获取存放节点数值的容器
 				let appearConditionMap = uni.getStorageSync('appearConditionMap')
 				//不能判断是普通选项的跳转还是数值选项的跳转了 因为数值选项中也可能存在普通选项会导致误判
 				//所以不管是普通选项还是数值选项都要做一次分数的重新计算
@@ -404,185 +445,7 @@
 							}
 						}
 						uni.setStorageSync('userScore', userScore)
-						console.log('likabilityArray: ',this.likabilityArray)
-					}
-				}
-			}else{
-				//存一棵主树
-				this.getArtworkTreeByArtworkId();
-			}
-		},
-		onBackPress(){
-			// console.log(111)
-		},
-		onUnload(){
-			uni.navigateBack({
-			    delta: 1 ,
-				animationDuration: 10,
-				animationType: null
-			});
-			//关闭页面时重置选项类型为默认
-			uni.setStorageSync('isNumericalOptions',0)
-			//关闭页面时重置节点分数容器
-			uni.setStorageSync('appearConditionMap',null)
-		},
-		methods: {
-			// 举报页面上传截图到腾讯云
-			uploadImage(){
-				var COS = require('cos-wx-sdk-v5');
-				let that = this;
-				uni.chooseImage({
-					count: 1,
-					sizeType: ['original'],
-					sourceType: ['album','camera'],
-					success: res=> {
-						uni.showLoading({
-						    title: '加载中',
-							mask: true
-						});
-						uni.request ({
-							url: baseURL + "/artworkMaking/findCosSingature",
-							method: 'POST',
-							success: result=> {
-								// console.log(JSON.parse(res.data.data))
-								const data = JSON.parse(result.data.data);
-								// 创建COS实例  获取签名
-								const cos = new COS({
-									// 必选参数
-									getAuthorization: (options, callback) => {
-									  const obj = {
-										TmpSecretId: data.credentials.tmpSecretId,
-										TmpSecretKey: data.credentials.tmpSecretKey,
-										XCosSecurityToken: data.credentials.sessionToken,
-										StartTime: data.startTime, // 时间戳，单位秒，如：1580000000
-										ExpiredTime: data.expiredTime // 时间戳，单位秒，如：1580000900
-									  }
-									  callback(obj)
-									}
-								});
-								//获取文件路径
-								let filePath = res.tempFilePaths[0];
-								//这里指定上传的文件名
-								let Key = filePath.substr(filePath.lastIndexOf('/')+1);
-								let dateObj = new Date();
-								let timestamp = dateObj.getTime();
-								let nowDate = dateObj.toLocaleDateString();
-								//格式斜杠日期
-								let formatDate = nowDate.replace(/\//g,'-');
-								//cos上定义目录
-								let newKey = formatDate +'/'+timestamp+Key;
-								let tempObj = {};
-								tempObj.imgLocation = 'https://' + 'sike-1259692143'+'.cos.' + 'ap-chongqing' + '.myqcloud.com/'+newKey;//返回上传的绝对 URL
-								//SDK 提供的cos上传函数，如果想批量上传，可以在这里加上for循环。
-								cos.postObject({
-									//存储桶名称
-									Bucket:'sike-1259692143',
-									//地域名字
-									Region:'ap-chongqing',
-									Key:newKey,
-									//本地文件临时地址
-									FilePath:filePath,
-								},function(err,data){
-									if(err){
-									   wx.showModal({
-										  title:'返回错误',
-										  content:'请求失败'+err,
-										  showCancel:false
-									   })
-									}else{
-									   if(data){
-										  // 这里是返回的图片URL
-										  that.headImage = data.headers.Location;
-										  uni.hideLoading();
-										  uni.showToast({
-											icon: 'none',
-										  	title: '上传成功'
-										  })
-										  that.uploadBtnFlag = false;
-										  that.uploadImageFlag = true;
-									   }
-									}
-								})
-							},
-						})
-					}
-				})
-			},
-			//提交举报
-			async submit(){
-				if(!this.reportType){
-					return uni.showToast({
-						icon: 'none',
-						title: '请选择举报类型'
-					})
-				}
-				const regPhone = /([\u4e00-\u9fa5]|[\（\）\《\》\——\；\，\。\“\”\<\>\！\？]){8}/.test(this.textareaContent);
-				if(!regPhone){
-					return uni.showToast({
-						icon: 'none',
-						title: '请填写举报内容，不少于8个字'
-					})
-				}
-				await uni.request ({
-					url: baseURL + "/wxPlay/savaReportInfo",
-					method: 'POST',
-					dataType: 'json',
-					data: {
-						imgUrl: this.headImage,
-						content: this.textareaContent,
-						reportStatue: this.reportType,
-						fkUserid: uni.getStorageSync("userId"),
-						fkArtworkNodeId: uni.getStorageSync("detailId"),
-						fkArtworkId: this.artworkId
-					},
-					success: res=> {
-						if(res.data.status == 200){
-							uni.showToast({
-								icon: 'none',
-								title: "举报成功,待管理员审核",
-								position: 'center'
-							})
-							this.reportContentFlag = false
-							//举报提交之后接着播放
-							const videoContext = uni.createVideoContext('myVideo')
-							videoContext.play()
-							this.items =  [
-								{
-									value: 1,
-									name: '侵犯版权',
-									checked: false
-								},
-								{
-									value: 2,
-									name: '出现违规内容',
-									checked: false
-								},
-								{
-									value: 3,
-									name: '其它',
-									checked: false
-								}
-							]
-							this.textareaContent = ''
-						}
-					}
-				})
-			},
-			//举报页面复选框
-			checkboxChange(e) {
-				var items = this.items,
-				values = e.detail.value;
-				//那用户最后点击的那个checkbox 实现单选
-				const value = values[values.length-1];
-				//避免用户单次数的点击导致values为空
-				if(!value){return;}
-				for (var i = 0, lenI = items.length; i < lenI; ++i) {
-					const item = items[i]
-					if(value.includes(item.value)){
-						this.$set(item,'checked',true)
-						this.reportType = item.value;
-					}else{
-						this.$set(item,'checked',false)
+						// console.log('likabilityArray: ',this.likabilityArray)
 					}
 				}
 			},
@@ -837,7 +700,7 @@
 						this.background.splice(index,1,"")
 						this.likabilityFlag = false
 						this.hiddenBtnFlag = false
-						// 播放结束清楚延时函数
+						// 播放结束清除延时函数
 						clearTimeout(this.likabilityDelayFunction)
 						this.optionTouchendTodo(index)
 						break;
@@ -1332,12 +1195,11 @@
 			},
 			loadeddata(e){
 				this.duration = e.detail.duration
-				let pkDetailIds = uni.getStorageSync('pkDetailIds')
 				//判断是不是故事线跳转过来的第一个视频 第一个视频需要快进到结尾进行播放
 				let isStoryLineJump = uni.getStorageSync('isStoryLineJump')
 				if(isStoryLineJump === 1){
-					for (let i = 0;i < pkDetailIds.length;i++) {
-						if(pkDetailIds[i] == this.pkDetailId){
+					for (let i = 0;i < this.currentPlayedHistoryArray.length;i++) {
+						if(this.currentPlayedHistoryArray[i] == this.pkDetailId){
 							const videoContext = uni.createVideoContext('myVideo')
 							videoContext.seek(parseInt((this.duration-3).toFixed(0)))
 							uni.setStorageSync('isStoryLineJump', 0)
@@ -1354,7 +1216,6 @@
 				this.likabilityDelayFunction= setTimeout(()=>{
 					this.likabilityFlag = false
 				},5000)
-				console.log('延时函数对象: ',this.likabilityDelayFunction)
 				uni.setStorageSync('videoSize',{
 					videoHeight: e.detail.height,
 					videoWidth: e.detail.width
@@ -1373,8 +1234,169 @@
 			},
 			gestureTouchend(e){
 				if(e.changedTouches[0].clientX - this.tsx > 2 || e.changedTouches[0].clientY - this.tsy > 2){
-					this.forceControlProgressFlag = true
+					//计算手势拖动距离
 				}
+			},
+			//提交举报
+			async submit(){
+				if(!this.reportType){
+					return uni.showToast({
+						icon: 'none',
+						title: '请选择举报类型'
+					})
+				}
+				const regPhone = /([\u4e00-\u9fa5]|[\（\）\《\》\——\；\，\。\“\”\<\>\！\？]){8}/.test(this.textareaContent);
+				if(!regPhone){
+					return uni.showToast({
+						icon: 'none',
+						title: '请填写举报内容，不少于8个字'
+					})
+				}
+				await uni.request ({
+					url: baseURL + "/wxPlay/savaReportInfo",
+					method: 'POST',
+					dataType: 'json',
+					data: {
+						imgUrl: this.headImage,
+						content: this.textareaContent,
+						reportStatue: this.reportType,
+						fkUserid: uni.getStorageSync("userId"),
+						fkArtworkNodeId: uni.getStorageSync("detailId"),
+						fkArtworkId: this.artworkId
+					},
+					success: res=> {
+						if(res.data.status == 200){
+							uni.showToast({
+								icon: 'none',
+								title: "举报成功,待管理员审核",
+								position: 'center'
+							})
+							this.reportContentFlag = false
+							//举报提交之后接着播放
+							const videoContext = uni.createVideoContext('myVideo')
+							videoContext.play()
+							this.items =  [
+								{
+									value: 1,
+									name: '侵犯版权',
+									checked: false
+								},
+								{
+									value: 2,
+									name: '出现违规内容',
+									checked: false
+								},
+								{
+									value: 3,
+									name: '其它',
+									checked: false
+								}
+							]
+							this.textareaContent = ''
+						}
+					}
+				})
+			},
+			//举报页面复选框
+			checkboxChange(e) {
+				var items = this.items,
+				values = e.detail.value;
+				//那用户最后点击的那个checkbox 实现单选
+				const value = values[values.length-1];
+				//避免用户单次数的点击导致values为空
+				if(!value){return;}
+				for (var i = 0, lenI = items.length; i < lenI; ++i) {
+					const item = items[i]
+					if(value.includes(item.value)){
+						this.$set(item,'checked',true)
+						this.reportType = item.value;
+					}else{
+						this.$set(item,'checked',false)
+					}
+				}
+			},
+			// 举报页面上传截图到腾讯云
+			uploadImage(){
+				var COS = require('cos-wx-sdk-v5');
+				let that = this;
+				uni.chooseImage({
+					count: 1,
+					sizeType: ['original'],
+					sourceType: ['album','camera'],
+					success: res=> {
+						//显示上传loading
+						uni.showLoading({
+						    title: '加载中',
+							mask: true
+						});
+						uni.request ({
+							url: baseURL + "/artworkMaking/findCosSingature",
+							method: 'POST',
+							success: result=> {
+								// console.log(JSON.parse(res.data.data))
+								const data = JSON.parse(result.data.data);
+								// 创建COS实例  获取签名
+								const cos = new COS({
+									// 必选参数
+									getAuthorization: (options, callback) => {
+									  const obj = {
+										TmpSecretId: data.credentials.tmpSecretId,
+										TmpSecretKey: data.credentials.tmpSecretKey,
+										XCosSecurityToken: data.credentials.sessionToken,
+										StartTime: data.startTime, // 时间戳，单位秒，如：1580000000
+										ExpiredTime: data.expiredTime // 时间戳，单位秒，如：1580000900
+									  }
+									  callback(obj)
+									}
+								});
+								//获取文件路径
+								let filePath = res.tempFilePaths[0];
+								//这里指定上传的文件名
+								let Key = filePath.substr(filePath.lastIndexOf('/')+1);
+								let dateObj = new Date();
+								let timestamp = dateObj.getTime();
+								let nowDate = dateObj.toLocaleDateString();
+								//格式斜杠日期
+								let formatDate = nowDate.replace(/\//g,'-');
+								//cos上定义目录
+								let newKey = formatDate +'/'+timestamp+Key;
+								let tempObj = {};
+								tempObj.imgLocation = 'https://' + 'sike-1259692143'+'.cos.' + 'ap-chongqing' + '.myqcloud.com/'+newKey;//返回上传的绝对 URL
+								//SDK 提供的cos上传函数，如果想批量上传，可以在这里加上for循环。
+								cos.postObject({
+									//存储桶名称
+									Bucket:'sike-1259692143',
+									//地域名字
+									Region:'ap-chongqing',
+									Key:newKey,
+									//本地文件临时地址
+									FilePath:filePath,
+								},function(err,data){
+									if(err){
+									   wx.showModal({
+										  title:'返回错误',
+										  content:'请求失败'+err,
+										  showCancel:false
+									   })
+									}else{
+									   if(data){
+										  // 这里是返回的图片URL
+										  that.headImage = data.headers.Location;
+										  //上传结束关闭上传loading
+										  uni.hideLoading();
+										  uni.showToast({
+											icon: 'none',
+										  	title: '上传成功'
+										  })
+										  that.uploadBtnFlag = false;
+										  that.uploadImageFlag = true;
+									   }
+									}
+								})
+							},
+						})
+					}
+				})
 			}
 		}
 	}
@@ -1385,6 +1407,9 @@
 		width: 100%;
 		height: 100%;
 		.videoLoadImageBox{
+			position: absolute;
+			left: 0;
+			top: 0;
 			width: 100%;
 			height: 100%;
 			image{
@@ -1400,7 +1425,7 @@
 				top: 50%;
 				transform: translate(-50%, -50%);
 				margin: 0 auto;
-				z-index: 17;
+				z-index: 25;
 				canvas{
 					width: 100%;
 					height: 100%;

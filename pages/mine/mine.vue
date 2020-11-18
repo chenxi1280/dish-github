@@ -3,11 +3,11 @@
 		<u-sticky>
 			<view class="top_box" @click="hiddenTips">
 				<view class="top">
-					<view class="author_box" v-if="userFlag">
+					<view class="author_box" v-if="loginedFlag">
 						<view class = "avatarUrl" v-if="realFlag">
 							<image :src="image" ></image>
 						</view>
-						<view class = "unreal"  v-if="unrealFlag">
+						<view class = "unreal"  v-if="!realFlag">
 							<text>没有头像</text>
 						</view>
 						<view class="userinfo">
@@ -16,7 +16,7 @@
 							</view>
 						</view>
 					</view>
-					<view class="wx_author_box" v-if="wxUserFlag">
+					<view class="wx_author_box" v-if="!loginedFlag">
 						<view class = "wx_avatarUrl">
 							<open-data type="userAvatarUrl"></open-data>
 						</view>
@@ -31,7 +31,7 @@
 					</view>
 				</view>
 				<view class="mid">
-					<view class="loginBtn" v-if="unLoginedFlag">
+					<view class="loginBtn" v-if="!loginedFlag">
 						<a @click="toLoginPage">登录灵巫互动账号</a>
 					</view>
 					<view class="logined" v-if="loginedFlag">
@@ -72,13 +72,7 @@
 				scrollTop: 0,
 				//用户未上传头像开关
 				realFlag: false,
-				unrealFlag: true,
-				//展示用户头像开关
-				userFlag: false,
-				//展示游客头像开关
-				wxUserFlag: true,
 				//是否登录开关
-				unLoginedFlag: true,
 				loginedFlag: false
 				
 			}
@@ -97,7 +91,6 @@
 				// console.log("我去发请求")
 				this.getMineInfo()
 				this.loginedFlag = true
-				this.unLoginedFlag = false
 				//isLoginJump是否是从登录页面跳转过来的标志
 				if(uni.getStorageSync('isLoginJump') == 0){
 					this.$refs.verfied.getMineArtWorks(0)
@@ -188,15 +181,9 @@
 							this.userName = res.data.data.username
 							this.image = res.data.data.userLogoUrl
 							if(this.image){
-								this.wxUserFlag = false
-								this.userFlag = true
 								this.realFlag = true
-								this.unrealFlag = false
 							}else{
-								this.wxUserFlag = false
-								this.userFlag = true
 								this.realFlag = false
-								this.unrealFlag = true
 							}
 						} 
 					}

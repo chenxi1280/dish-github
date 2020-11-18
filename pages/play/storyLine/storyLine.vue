@@ -214,10 +214,8 @@
 						title: '选中跳转到' + a.selectTitle ,
 						type: 'success',
 					})
-					//使用reLaunch清空页面站 解决多次跳转卡死问题
-					uni.reLaunch({
-						url: "../play/play?pkArtworkId=" + this.pkArtworkId + "&pkDetailId=" + a.pkDetailId,
-					})
+					//使用组件跳转方式 传参
+					this.$emit("goPlay",{'pkArtworkId': this.pkArtworkId,'pkDetailId': a.pkDetailId})
 				} else {
 					this.showToast('请滑动至选择中心位进行跳转')
 				}
