@@ -59,7 +59,8 @@
 				// url: 'http://192.168.1.15:8008/Ecmartwork/getArtWorkNodes',
 				method: 'POST',
 				data: {
-					pkArtworkId: this.pkArtworkId
+					pkArtworkId: this.pkArtworkId,
+					intVideoId: this.pkDetailIds[this.onfloor]
 				},
 				success: res => {
 					// console.log(res.data.data)
@@ -189,7 +190,7 @@
 					let c = this.floorList[nowFloor][0]
 					// console.log(a)
 					
-					if (a.isNumberSelect !=null ) {
+					if (a.isNumberSelect != null ) {
 							this.isNumberFlag = a.isNumberSelect == 1
 					}
 					
@@ -199,6 +200,11 @@
 							return 
 						}
 					}				
+					// let jumpFlag = 0
+					console.log(a.pkDetailId)
+					console.log(c.pkDetailId)
+					let jumpFlag = a.pkDetailId == this.floorList[this.floorList.length - 1][0].pkDetailId
+					console.log(jumpFlag)
 					// 父节点跳转
 					for (let i = 0; i < b.length; i++) {
 						if (b[i] == c.pkDetailId) {
@@ -214,8 +220,9 @@
 						title: '选中跳转到' + a.selectTitle ,
 						type: 'success',
 					})
+					
 					//使用组件跳转方式 传参
-					this.$emit("goPlay",{'pkArtworkId': this.pkArtworkId,'pkDetailId': a.pkDetailId})
+					this.$emit("goPlay",{'pkArtworkId': this.pkArtworkId,'pkDetailId': a.pkDetailId,'jumpFlag':jumpFlag})
 				} else {
 					this.showToast('请滑动至选择中心位进行跳转')
 				}
