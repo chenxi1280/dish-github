@@ -54,13 +54,15 @@
 		onReady(option) {
 			
 			this.onfloor = this.pkDetailIds.length - 1
+			let userId = uni.getStorageSync("userId")
 			uni.request({
 				url:  baseURL + '/Ecmartwork/getArtWorkNodes',
 				// url: 'http://192.168.1.15:8008/Ecmartwork/getArtWorkNodes',
 				method: 'POST',
 				data: {
 					pkArtworkId: this.pkArtworkId,
-					intVideoId: this.pkDetailIds[this.onfloor]
+					intVideoId: this.pkDetailIds[this.onfloor],
+					fkUserid: userId
 				},
 				success: res => {
 					// console.log(res.data.data)
@@ -202,8 +204,13 @@
 					}				
 					// let jumpFlag = 0
 					console.log(a.pkDetailId)
-					console.log(c.pkDetailId)
-					let jumpFlag = a.pkDetailId == this.floorList[this.floorList.length - 1][0].pkDetailId
+					console.log(b)
+					let jumpFlag = false
+					b.forEach( v => {
+						if(v == a.pkDetailId  ) {
+							jumpFlag  = true
+						}
+					})
 					console.log(jumpFlag)
 					// 父节点跳转
 					for (let i = 0; i < b.length; i++) {
