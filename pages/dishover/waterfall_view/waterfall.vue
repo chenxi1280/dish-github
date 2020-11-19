@@ -30,7 +30,7 @@
 										<image src="../../../static/icon/heat_degree.png" style="width: 40rpx; height: 40rpx; border-radius: 20rpx; color: #FA3534;"></image>
 									</view>
 									<view style="color: #FFFFFF; padding-left: 10rpx; padding-top: 6rpx;">
-										{{item.hotCount}}
+										{{item.broadcastCount}}
 									</view>
 								</view>
 

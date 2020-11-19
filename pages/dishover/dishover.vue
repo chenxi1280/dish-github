@@ -210,7 +210,10 @@
 							limit: this.limit
 						},
 						success: res => {
-							console.log(res.data.data)
+							console.log(res.data)
+							if(res.data.status == 500) {
+								return
+							}
 							if (res.data.data.list.length != 0) {
 								res.data.data.list.forEach(v => {
 									v.high = 287.1
@@ -249,6 +252,9 @@
 							queryType: this.queryType
 						},
 						success: res => {
+							// if(res.data.status == 500) {
+							// 	return
+							// }
 							if (res.data.data != null) {
 								res.data.data.forEach(v => {
 									v.high = 287.1
