@@ -242,11 +242,15 @@
 				videoloadFlag: true,
 				//好感度延时函数
 				likabilityDelayFunction: Function,
-				//临时播放记录数组 检测故事线跳转回来是否已播放使用
-				currentPlayedHistoryArray: []
+				//故事线跳转到播放页的当前节点是否已播放标志
+				isPlayedFlag: false,
+				//是否点击了选项开关（用于保存有效观看记录使用）
+				isClickOptionFlag: false
 			}
 		},
 		onReady(){
+			//重置开关状态到初始值
+			this.isClickOptionFlag = false
 			//关闭好感度 视频加载结束时打开
 			this.likabilityFlag = false
 			//关闭故事线和举报 视频加载结束时打开
@@ -322,7 +326,7 @@
 			//关闭页面时重置节点分数容器
 			uni.setStorageSync('appearConditionMap',null)
 		},
-		onShareAppMessage: function (res) {
+		onShareAppMessage (res) {
 			let tree = uni.getStorageSync('mainArtworkTree')
 		    return {
 				title: tree.artworkName,
@@ -341,7 +345,7 @@
 				}
 		    }
 		},
-		onShareTimeline: (res) =>{
+		onShareTimeline (res) {
 			let tree = uni.getStorageSync('mainArtworkTree')
 			return {
 			  title: tree.artworkName,
@@ -363,8 +367,7 @@
 		methods: {
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option){
-				//在跳转到的目标视频没有加载前深拷贝播放历史，用于检测视频是否已播放使用
-				this.currentPlayedHistoryArray = this.deepCopy(uni.getStorageSync("pkDetailIds"))
+				this.isPlayedFlag = option.jumpFlag
 				//故事线跳转时清除好感度延时函数
 				clearTimeout(this.likabilityDelayFunction)
 				//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
@@ -382,7 +385,6 @@
 				// 每次的故事线跳转都要重置当前播放节点
 				this.detailId = null;
 				uni.setStorageSync("detailId",this.detailId)
-				uni.setStorageSync('isStoryLineJump',1)
 				//故事线跳转过来存一棵主树 跳转用
 				this.videoloadFlag = false
 				//跳转成功先关闭故事线
@@ -490,19 +492,19 @@
 							this.childs.push(childs[i])
 						}
 					}
-					this.tipsArray.length = this.option.length;
+					this.tipsArray.length = this.option.length
 				}else{
 					//islink不是null且值为1说明该节点是跳转节点 需要注意叶子节点的孩子也是空的可能会走进else故要考虑过是否是叶子节点
 					if(artworkTree.isLink != null && artworkTree.isLink === 1){
 						//从缓存中拿到主树
-						const linkId = artworkTree.linkUrl;
+						const linkId = artworkTree.linkUrl
 						//存储跳转目标节点的detailId
 						this.linkNodeId = linkId
-						const mainTree = uni.getStorageSync("mainArtworkTree");
-						this.playedHistoryArray.push(artworkTree.pkDetailId);
+						const mainTree = uni.getStorageSync("mainArtworkTree")
+						this.playedHistoryArray.push(artworkTree.pkDetailId)
 						/* //不需要去重 记录故事线走向方便数值选项分数计算
 						this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray)); */
-						uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
+						uni.setStorageSync("pkDetailIds",this.playedHistoryArray)
 						this.getTargetTree(mainTree,linkId)
 					}else{
 						//是不是最后一个视频标志 最后一个视频不需要弹窗
@@ -627,28 +629,65 @@
 					}
 				})
 			},
+			//统计有效的播放记录（进入播放页面并点击了选项（只记录第一次选项的点击）
+			async statisticsPlayRecord(){
+				await uni.request({
+					url: baseURL + "/wxPlay/statisticsPlayRecord",
+					method: 'POST',
+					dataType: 'json',
+					data: {
+						fkArtworkId: this.artworkId,
+						fkUserId: uni.getStorageSync("userId"),
+						fkArtworkDetailId: this.detailId
+					},
+					success: res=> {
+						if(res.data.status == 200){
+							// console.log("我去存数据: ",this.detailId,":",this.artworkId)
+						}
+					}
+				})
+			},
+			//统计故事线自然呈现记录（自然播放结束）
+			async statisticsStorylineNaturalshow(){
+				await uni.request({
+					url: baseURL + "/wxPlay/statisticsStorylineNaturalshow",
+					method: 'POST',
+					dataType: 'json',
+					data: {
+						fkArtworkId: this.artworkId,
+						fkUserId: uni.getStorageSync("userId"),
+						fkArtworkDetailId: this.detailId
+					},
+					success: res=> {
+						if(res.data.status == 200){
+							// console.log("我去存数据: ",this.detailId,":",this.artworkId)
+						}
+					}
+				})
+			},
 			//开关控制是否展示 选项框 故事线 举报页面
 			videoEnd(){
 				//根据是否是最后一个视频标志 最后一个视频播放结束弹出故事线 endFlag = true 表示不是最后一个视频
 				if(this.endFlag){
 					if(this.isPosition == 1){
-						this.chooseTipsShowFlag = false;
-						this.chooseTipsMaskFlag = false;
+						this.chooseTipsShowFlag = false
+						this.chooseTipsMaskFlag = false
 						this.videoShowFlag = false
 						this.screenshotShowFlag = true
-						this.showCanvasFlag = true;
+						this.showCanvasFlag = true
 						this.videoUrl = ''
 					}else{
-						this.showCanvasFlag = false;
-						this.chooseTipsShowFlag = true;
-						this.chooseTipsMaskFlag = true;
+						this.showCanvasFlag = false
+						this.chooseTipsShowFlag = true
+						this.chooseTipsMaskFlag = true
 					}
 				}else{
 					this.storyLineContentFlag = true
-					this.chooseTipsShowFlag = false;
-					this.chooseTipsMaskFlag = false;
-					this.showCanvasFlag = false;
+					this.chooseTipsShowFlag = false
+					this.chooseTipsMaskFlag = false
+					this.showCanvasFlag = false
 					uni.setStorageSync('userScore',[])
+					this.statisticsStorylineNaturalshow()
 				}
 			},
 			//视屏暂停操作
@@ -703,6 +742,11 @@
 						// 播放结束清除延时函数
 						clearTimeout(this.likabilityDelayFunction)
 						this.optionTouchendTodo(index)
+						//保存有效观看记录
+						if(!this.isClickOptionFlag){
+							this.statisticsPlayRecord()
+							this.isClickOptionFlag = true
+						}
 						break;
 					}
 					case 1: {
@@ -712,6 +756,11 @@
 						this.hiddenBtnFlag = false
 						clearTimeout(this.likabilityDelayFunction)
 						this.optionTouchendTodo(index)
+						//保存有效观看记录
+						if(!this.isClickOptionFlag){
+							this.statisticsPlayRecord()
+							this.isClickOptionFlag = true
+						}
 						break;
 					}
 					case 2: {
@@ -721,6 +770,11 @@
 						this.hiddenBtnFlag = false
 						clearTimeout(this.likabilityDelayFunction)
 						this.optionTouchendTodo(index)
+						//保存有效观看记录
+						if(!this.isClickOptionFlag){
+							this.statisticsPlayRecord()
+							this.isClickOptionFlag = true
+						}
 						break;
 					}
 					case 3: {
@@ -730,6 +784,11 @@
 						this.hiddenBtnFlag = false
 						clearTimeout(this.likabilityDelayFunction)
 						this.optionTouchendTodo(index)
+						//保存有效观看记录
+						if(!this.isClickOptionFlag){
+							this.statisticsPlayRecord()
+							this.isClickOptionFlag = true
+						}
 						break;
 					}
 				}
@@ -1032,6 +1091,11 @@
 					this.screenshotShowFlag = false
 					this.likabilityFlag = false
 					this.hiddenBtnFlag = false
+					//保存有效观看记录
+					if(!this.isClickOptionFlag){
+						this.statisticsPlayRecord()
+						this.isClickOptionFlag = true
+					}
 				}else if(this.touchRectNum == 1){
 					this.likabilityArray = []
 					clearTimeout(this.likabilityDelayFunction)
@@ -1040,6 +1104,11 @@
 					this.screenshotShowFlag = false
 					this.likabilityFlag = false
 					this.hiddenBtnFlag = false
+					//保存有效观看记录
+					if(!this.isClickOptionFlag){
+						this.statisticsPlayRecord()
+						this.isClickOptionFlag = true
+					}
 				}else if(this.touchRectNum == 2){
 					this.likabilityArray = []
 					clearTimeout(this.likabilityDelayFunction)
@@ -1048,6 +1117,11 @@
 					this.screenshotShowFlag = false
 					this.likabilityFlag = false
 					this.hiddenBtnFlag = false
+					//保存有效观看记录
+					if(!this.isClickOptionFlag){
+						this.statisticsPlayRecord()
+						this.isClickOptionFlag = true
+					}
 				}else if(this.touchRectNum == 3){
 					this.likabilityArray = []
 					clearTimeout(this.likabilityDelayFunction)
@@ -1056,6 +1130,11 @@
 					this.screenshotShowFlag = false
 					this.likabilityFlag = false
 					this.hiddenBtnFlag = false
+					//保存有效观看记录
+					if(!this.isClickOptionFlag){
+						this.statisticsPlayRecord()
+						this.isClickOptionFlag = true
+					}
 				}
 				//回到默认值
 				this.touchRectNum = 5
@@ -1196,15 +1275,10 @@
 			loadeddata(e){
 				this.duration = e.detail.duration
 				//判断是不是故事线跳转过来的第一个视频 第一个视频需要快进到结尾进行播放
-				let isStoryLineJump = uni.getStorageSync('isStoryLineJump')
-				if(isStoryLineJump === 1){
-					for (let i = 0;i < this.currentPlayedHistoryArray.length;i++) {
-						if(this.currentPlayedHistoryArray[i] == this.pkDetailId){
-							const videoContext = uni.createVideoContext('myVideo')
-							videoContext.seek(parseInt((this.duration-3).toFixed(0)))
-							uni.setStorageSync('isStoryLineJump', 0)
-						}
-					}
+				if(this.isPlayedFlag){
+					const videoContext = uni.createVideoContext('myVideo')
+					videoContext.seek(parseInt((this.duration-3).toFixed(0)))
+					this.isPlayedFlag = false
 				}
 				//加载完成将入场loading关闭
 				this.videoloadFlag = false
@@ -1501,6 +1575,7 @@
 								.option{
 									color: white;
 									padding-left: 20rpx;
+									font-size: 34rpx;
 								}
 							}
 						}

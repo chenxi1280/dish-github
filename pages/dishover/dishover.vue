@@ -118,7 +118,7 @@
 			})
 			this.addRandomDataHot()
 		},
-		onShareAppMessage: function (res) {
+		onShareAppMessage (res) {
 		    return {
 		      title: '灵巫互动',
 			  imageUrl: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605600100857%E5%9C%86%E5%BD%A2%E7%94%A8JPG.jpg',
@@ -136,7 +136,7 @@
 		      }
 		    }
 		},
-		onShareTimeline: (res) =>{
+		onShareTimeline (res) {
 			return {
 			  title: '灵巫互动',
 			  imageUrl: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605600100857%E5%9C%86%E5%BD%A2%E7%94%A8JPG.jpg',
