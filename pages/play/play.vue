@@ -122,6 +122,24 @@
 				</view>
 			</view>
 		</view>
+		<u-modal v-model="previewShow"
+				show-cancel-button="true" 
+				:cancel-style="{background: '#B5B5B5'}"
+				confirm-text="登录"
+				:confirm-style="{background: '#F08080'}"
+				:show-title = 'false'
+				cancel-color="white"
+				confirm-color="white"
+				:content-style="{'word-wrap': 'break-word',
+								'word-break': 'break-all',
+								'white-space': 'pre-line',
+								'text-align': 'center',
+								'margin': '5% 5%'}"
+				@confirm="goLogin">
+			<view class="slot-content">
+				<rich-text nodes="预览作品只能作者自己观看\n\n请登录作者帐号"></rich-text>
+			</view>
+		</u-modal>
 	</view>
 </template>
 
@@ -245,7 +263,9 @@
 				//故事线跳转到播放页的当前节点是否已播放标志
 				isPlayedFlag: false,
 				//是否点击了选项开关（用于保存有效观看记录使用）
-				isClickOptionFlag: false
+				isClickOptionFlag: false,
+				//扫码预览提示框开关
+				previewShow: false
 			}
 		},
 		onReady(){
@@ -299,10 +319,8 @@
 								if(result.data.data == userId){
 									this.artworkId = a;
 								}else{
-									uni.showToast({
-										icon: 'none',
-										title: '预览作品只能作者自己观看'
-									})
+									uni.setStorageSync('previewArtworkId', a)
+									this.previewShow = true
 								}
 							}
 						}
@@ -312,7 +330,12 @@
 				}
 			}else{
 				//发现页和我的页面跳转播放页携带作品id
-				this.artworkId = option.pkArtworkId
+				if(uni.getStorageSync('isLoginJump') == 0){
+					this.artworkId = uni.getStorageSync('previewArtworkId')
+					uni.setStorageSync('isLoginJump', 1)
+				}else{
+					this.artworkId = option.pkArtworkId
+				}
 			}
 		},
 		onUnload(){
@@ -1271,6 +1294,12 @@
 			// 深拷贝 方法
 			deepCopy(o) {
 				return JSON.parse(JSON.stringify(o))
+			},
+			//去登陆
+			goLogin(){
+				uni.redirectTo({
+					url: '../login/login/login?isPlayJump='+true
+				})
 			},
 			loadeddata(e){
 				this.duration = e.detail.duration

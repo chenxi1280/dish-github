@@ -60,14 +60,19 @@
 	      imgSrc: '',
 		  phoneBoxBorder: '',
 		  pwdBoxBorder: '',
-		  codeBoxBorder: ''
+		  codeBoxBorder: '',
+		  //是否式播放页跳转
+		  isPlayJump: false
 	    }
 	  },
 	  components: {
 	  		myDialog,
 			temporary
 	  },
-	  onLoad () {
+	  onLoad (option) {
+		if(option.isPlayJump == 'true'){
+			this.isPlayJump = true
+		}
 	    this.getTextVerify()
 	  },
 	  onUnload() {
@@ -131,20 +136,29 @@
 						uni.setStorageSync('token', res.data.data.token)
 						uni.setStorageSync('userId', res.data.data.userId)
 						uni.showToast({
-								title: '登录成功'
-							})
+							title: '登录成功'
+						})
 						//登陆页面跳转标志
 						uni.setStorageSync('isLoginJump', 0)
-						setTimeout(function() {
-							uni.switchTab({
-								url: '../../mine/mine',
-								success: function (e) {
-									var page = getCurrentPages().pop();
-									if (page == undefined || page == null) return;
-									page.onLoad();
-								}
-							}) 
-						}, 1500);
+						if(this.isPlayJump){
+							setTimeout(function() {
+								uni.redirectTo({
+									url: '../../play/play',
+								})
+							}, 1500);
+						}else{
+							setTimeout(function() {
+								uni.switchTab({
+									url: '../../mine/mine',
+									success: function (e) {
+										var page = getCurrentPages().pop();
+										if (page == undefined || page == null) return;
+										page.onLoad();
+									}
+								}) 
+							}, 1500);
+						}
+						
 					} else if (res.data.status == 508) {
 					  for (let i = 0; i < res.data.data.length; i++) {
 					    if (res.data.data[i] == '501') {
