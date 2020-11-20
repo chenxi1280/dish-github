@@ -186,6 +186,7 @@
 			},
 			goPlay(index, nowFloor) {
 				if (nowFloor == this.onfloor && index == this.oncolumn) {
+					console.log(this.floorList[nowFloor][index])
 					let a = this.floorList[nowFloor][index]
 					let b = uni.getStorageSync("pkDetailIds")
 					// 当前选中楼层的 播放历史
