@@ -330,10 +330,15 @@
 				}
 			}else{
 				//发现页和我的页面跳转播放页携带作品id
-				if(uni.getStorageSync('isLoginJump') == 0){
-					this.artworkId = uni.getStorageSync('previewArtworkId')
-					uni.setStorageSync('isLoginJump', 1)
-				}else{
+				try{
+					let isLoginJump = uni.getStorageSync('isLoginJump')
+					if(isLoginJump === 0){
+						this.artworkId = uni.getStorageSync('previewArtworkId')
+						uni.setStorageSync('isLoginJump', 1)
+					}else{
+						this.artworkId = option.pkArtworkId
+					}
+				}catch(e){
 					this.artworkId = option.pkArtworkId
 				}
 			}
