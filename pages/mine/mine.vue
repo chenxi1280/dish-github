@@ -122,7 +122,7 @@
 			return {
 			  title: '灵巫互动',
 			  imageUrl: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605600100857%E5%9C%86%E5%BD%A2%E7%94%A8JPG.jpg',
-			  query: 'pages/mine/mine',
+			  path: 'pages/mine/mine',
 			  success: function (shareTickets) {
 			    console.log(shareTickets + '成功');
 			    // 转发成功

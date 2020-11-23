@@ -362,14 +362,6 @@
 				path: 'pages/play/play?pkArtworkId='+this.artworkId,
 				success: function (shareTickets) {
 					console.log(shareTickets + '成功');
-					// 转发成功
-				},
-				fail: function (res) {
-					console.log(res + '失败');
-					// 转发失败
-				},
-				complete: function (res) {
-					// 不管成功失败都会执行
 				}
 		    }
 		},
@@ -378,17 +370,9 @@
 			return {
 			  title: tree.artworkName,
 			  imageUrl: tree.shareImageUrl,
-			  query: 'pages/play/play?pkArtworkId='+this.artworkId,
+			  path: 'pages/play/play?pkArtworkId='+this.artworkId,
 			  success: function (shareTickets) {
 			    console.log(shareTickets + '成功');
-			    // 转发成功
-			  },
-			  fail: function (res) {
-			    console.log(res + '失败');
-			    // 转发失败
-			  },
-			  complete: function (res) {
-			    // 不管成功失败都会执行
 			  }
 			}
 		},
