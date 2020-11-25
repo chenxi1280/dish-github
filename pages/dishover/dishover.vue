@@ -87,8 +87,9 @@
 				currentsort: 0,
 				queryType: "测试类",
 				limit: 10,
+				// 热门底部状态
 				loadStatus: "loadmore",
-				// 底部状态
+				// 热门底部状态
 				hotLoadStatus: 'loadmore',
 				hotList: [],
 				sortList: [],
@@ -140,7 +141,7 @@
 			return {
 			  title: '灵巫互动',
 			  imageUrl: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605600100857%E5%9C%86%E5%BD%A2%E7%94%A8JPG.jpg',
-			  path: 'pages/dishover/dishover',
+			  query: 'pages/dishover/dishover',
 			  success: function (shareTickets) {
 			    console.log(shareTickets + '成功');
 			    // 转发成功
@@ -154,6 +155,7 @@
 			  }
 			}
 		},
+		// 下拉刷新
 		onReachBottom(e) {
 			console.log('我去加载了')
 			if (this.current == 0) {
@@ -272,6 +274,7 @@
 					})
 				}
 			},
+			// 分类切换
 			swiperchange(e) {
 				let a = e.detail.current;
 				this.currentsort = a;
@@ -281,6 +284,7 @@
 				this['sortList' + this.currentsort]
 				this.judgesortData()
 			},
+			// 加载
 			judgesortData() {
 				if (this['sortList' + this.currentsort].length == 0 && this['pageSort' + this.currentsort] == 0) {
 					// console.log("111")
