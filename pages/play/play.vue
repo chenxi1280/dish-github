@@ -269,8 +269,6 @@
 			}
 		},
 		onReady(){
-			//test
-			this.artworkId = 10126
 			//重置开关状态到初始值
 			this.isClickOptionFlag = false
 			//关闭好感度 视频加载结束时打开
