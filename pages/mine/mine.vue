@@ -10,19 +10,14 @@
 						<view class = "unreal"  v-if="!realFlag">
 							<text>没有头像</text>
 						</view>
-						<view class="userinfo">
-							<view class="userName">
-								<input disabled="true" :value="userName" />
-							</view>
-						</view>
 					</view>
 					<view class="wx_author_box" v-if="!loginedFlag">
 						<view class = "wx_avatarUrl">
 							<open-data type="userAvatarUrl"></open-data>
 						</view>
-						<view class="wx_userinfo">
+						<!-- <view class="wx_userinfo">
 							<open-data type="userNickName" lang="zh_CN"></open-data>
-						</view>
+						</view> -->
 					</view>
 					<view>
 						<view class="problem" @click="customerService">
@@ -32,10 +27,12 @@
 				</view>
 				<view class="mid">
 					<view class="loginBtn" v-if="!loginedFlag">
-						<a @click="toLoginPage">登录灵巫互动账号</a>
+						<view class="loginText" @click="toLoginPage">点击登录</view>
 					</view>
-					<view class="logined" v-if="loginedFlag">
-						<text>已登录</text>
+					<view class="userinfo" v-if="loginedFlag">
+						<view class="userName">
+							<input disabled="true" :value="userName" />
+						</view>
 					</view>
 				</view>
 				<u-subsection :list="items" :current="current" @change="sectionChange"></u-subsection>
@@ -195,25 +192,27 @@
 
 <style lang="scss">
 	.mine {
+		width: 100%;
 		.top_box{
-			background-color: #FFFFFF;
+			width: 100%;
+			height: 380rpx;
+			background-color: #7E4DAB;
+			position: fixed;
+			left: 0;
+			top: 0;
+			z-index: 15;
 			.top{
-				display: flex;
-				justify-content: space-between;
-				width: 670rpx;
-				margin: 0 auto;
-				padding-top: 20rpx;
+				width: 100%;
+				padding-top: 60rpx;
 				.author_box{
-					display: flex;
-					justify-content: space-between;
 					width: 100%;
 					height: 200rpx;
-					border-radius: 16rpx;
 					.avatarUrl{
 						width: 200rpx;
 						height: 200rpx;
-						margin: 10rpx;
+						margin: 0 auto;
 						image{	
+							border: 4rpx solid white;
 							border-radius: 50%;
 							width: 100%;
 							height: 100%;
@@ -222,23 +221,12 @@
 					.unreal{
 						width: 200rpx;
 						height: 200rpx;
-						margin: 10rpx;
-						border: 2rpx solid black;
+						margin: 0 auto;
+						border: 4rpx solid white;
 						border-radius: 50%;
 						text-align: center;
 						text{
 							line-height: 200rpx;
-						}
-					}
-					.userinfo{
-						width: 250rpx;
-						height: 150rpx;
-						padding: 40rpx 0 0 40rpx;
-						margin: 20rpx 100rpx 0 0;
-						input{
-							margin: 20rpx 0 0 0;
-							font-size: 30rpx;
-							font-weight: bold;
 						}
 					}
 				}
@@ -251,9 +239,11 @@
 					.wx_avatarUrl{
 						width: 200rpx;
 						height: 200rpx;
-						margin: 10rpx;
-						open-data{	
-							border-radius: 50%;
+						border: 4rpx solid white;
+						margin: 0 auto;
+						border-radius: 50%;
+						overflow: hidden;
+						open-data{
 							width: 100%;
 							height: 100%;
 						}
@@ -271,33 +261,52 @@
 					}
 				}
 				.problem{
+					position: absolute;
+					right: 30rpx;
+					top: 30rpx;
 					height: 50rpx;
 					width: 50rpx;
-					margin-left: 50rpx;
 					.headset{
-						background: url(../../static/icon/headset.png) center no-repeat;
+						background: url(../../static/icon/service.png) center no-repeat;
 						width: 100%;
 						height: 100%;
 						background-size: 50rpx;
 					}	
 				}
 			}
-			
 			.mid{
-				margin: 40rpx 0 20rpx 0;
+				background-color: #7E4DAB;
+				padding: 30rpx 0 30rpx 0;
 				.loginBtn{
-					text-align: center;
-					font-size: 30rpx;
+					width: 150rpx;
+					height: 60rpx;
+					margin: 0 auto;
+					.loginText{
+						text-align: center;
+						color: white;
+						font-size: 30rpx;
+						line-height: 60rpx;
+					}
 				}
-				.logined{
-					text-align: center;
-					font-size: 30rpx;
+				.userinfo{
+					width: 300rpx;
+					height: 60rpx;
+					margin: 0 auto;
+					input{
+						text-align: center;
+						font-weight: bold;
+						color: white;
+						font-size: 30rpx;
+						line-height: 60rpx;
+					}
 				}
 			}
 		}
 		.bottom{
+			width: 100%;
+			margin-top: 450rpx;
+			z-index: 14;
 			background-color: #E3E3E3;
-			margin-top: 20rpx;
 		}
 	}
 	/*引入的组件样式*/

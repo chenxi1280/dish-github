@@ -122,36 +122,14 @@
 		    return {
 		      title: '灵巫互动',
 			  imageUrl: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605600100857%E5%9C%86%E5%BD%A2%E7%94%A8JPG.jpg',
-		      path: 'pages/dishover/dishover',
-		      success: function (shareTickets) {
-		        console.log(shareTickets + '成功');
-		        // 转发成功
-		      },
-		      fail: function (res) {
-		        console.log(res + '失败');
-		        // 转发失败
-		      },
-		      complete: function (res) {
-		        // 不管成功失败都会执行
-		      }
+		      path: 'pages/dishover/dishover'
 		    }
 		},
 		onShareTimeline (res) {
 			return {
 			  title: '灵巫互动',
 			  imageUrl: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605600100857%E5%9C%86%E5%BD%A2%E7%94%A8JPG.jpg',
-			  path: 'pages/dishover/dishover',
-			  success: function (shareTickets) {
-			    console.log(shareTickets + '成功');
-			    // 转发成功
-			  },
-			  fail: function (res) {
-			    console.log(res + '失败');
-			    // 转发失败
-			  },
-			  complete: function (res) {
-			    // 不管成功失败都会执行
-			  }
+			  path: 'pages/dishover/dishover'
 			}
 		},
 		onReachBottom(e) {
