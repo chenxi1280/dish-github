@@ -269,6 +269,8 @@
 			}
 		},
 		onReady(){
+			//test
+			this.artworkId = 10126
 			//重置开关状态到初始值
 			this.isClickOptionFlag = false
 			//关闭好感度 视频加载结束时打开
@@ -295,7 +297,8 @@
 		},
 		onLoad(option) {
 			uni.showShareMenu({
-			  withShareTicket: true
+			  withShareTicket: true,
+			  menus: ['shareAppMessage', 'shareTimeline']
 			})
 			//option.scene 不为空说明是二维码跳转
 			if(option.scene){
@@ -317,7 +320,7 @@
 							if(result.data.status == 200){
 								const userId = uni.getStorageSync('userId');
 								if(result.data.data == userId){
-									this.artworkId = a;
+									this.artworkId = a
 								}else{
 									uni.setStorageSync('previewArtworkId', a)
 									this.previewShow = true
@@ -342,6 +345,14 @@
 					this.artworkId = option.pkArtworkId
 				}
 			}
+			if(this.artworkId == 0){
+				//作品id 初始化之后需要取拿作品信息存起来待用
+				let previewArtworkId = uni.getStorageSync('previewArtworkId')
+				this.getPlayArtworkInfo(previewArtworkId)
+			}else{
+				//作品id 初始化之后需要取拿作品信息存起来待用
+				this.getPlayArtworkInfo(this.artworkId)
+			}
 		},
 		onUnload(){
 			uni.navigateBack({
@@ -355,25 +366,36 @@
 			uni.setStorageSync('appearConditionMap',null)
 		},
 		onShareAppMessage (res) {
-			let tree = uni.getStorageSync('mainArtworkTree')
-		    return {
-				title: tree.artworkName,
-				imageUrl: tree.shareImageUrl,
-				path: 'pages/play/play?pkArtworkId='+this.artworkId,
-				success: function (shareTickets) {
-					console.log(shareTickets + '成功');
-				}
-		    }
+			let artworkInfo = uni.getStorageSync('artworkInfo')
+			let param = 'artWorkId='+artworkInfo.pkArtworkId+'=status=4'
+			let title = artworkInfo.artworkName
+			let imageUrl = artworkInfo.artworkDescribe
+			if(artworkInfo.artworkStatus !== 4){
+				param = 'artWorkId='+artworkInfo.pkArtworkId+'=status=1'
+				title = '灵巫互动'
+				imageUrl = 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605600100857%E5%9C%86%E5%BD%A2%E7%94%A8JPG.jpg'
+			}
+			return {
+				title: title,
+				imageUrl: imageUrl,
+				path: 'pages/play/play?scene='+param
+			}
+			
 		},
 		onShareTimeline (res) {
-			let tree = uni.getStorageSync('mainArtworkTree')
+			let artworkInfo = uni.getStorageSync('artworkInfo')
+			let param = 'artWorkId='+artworkInfo.pkArtworkId+'=status=4'
+			let title = artworkInfo.artworkName
+			let imageUrl = artworkInfo.artworkDescribe
+			if(artworkInfo.artworkStatus !== 4){
+				param = 'artWorkId='+artworkInfo.pkArtworkId+'=status=1'
+				title = '灵巫互动'
+				imageUrl = 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605600100857%E5%9C%86%E5%BD%A2%E7%94%A8JPG.jpg'
+			}
 			return {
-			  title: tree.artworkName,
-			  imageUrl: tree.shareImageUrl,
-			  path: 'pages/play/play?pkArtworkId='+this.artworkId,
-			  success: function (shareTickets) {
-			    console.log(shareTickets + '成功');
-			  }
+			  title: title,
+			  imageUrl: imageUrl,
+			  path: 'pages/play/play?scene='+param
 			}
 		},
 		methods: {
@@ -641,6 +663,22 @@
 					}
 				})
 			},
+			//异步请求保存播放记录
+			async getPlayArtworkInfo(artworkId){
+				await uni.request({
+					url: baseURL + "/wxPlay/queryArtworkInfo",
+					method: 'POST',
+					dataType: 'json',
+					data: {
+						pkArtworkId: artworkId
+					},
+					success: res=> {
+						if(res.data.status == 200){
+							uni.setStorageSync("artworkInfo",res.data.data);
+						}
+					}
+				})
+			},
 			//统计有效的播放记录（进入播放页面并点击了选项（只记录第一次选项的点击）
 			async statisticsPlayRecord(){
 				await uni.request({
@@ -684,12 +722,14 @@
 					if(this.isPosition == 1){
 						this.chooseTipsShowFlag = false
 						this.chooseTipsMaskFlag = false
-						this.videoShowFlag = false
 						this.screenshotShowFlag = true
+						this.videoShowFlag = true
+						this.hiddenBtnFlag = false
 						this.showCanvasFlag = true
 						this.videoUrl = ''
 					}else{
 						this.showCanvasFlag = false
+						this.hiddenBtnFlag = false
 						this.chooseTipsShowFlag = true
 						this.chooseTipsMaskFlag = true
 					}
@@ -987,6 +1027,8 @@
 						// console.log(0)
 						//矩形左上角点的坐标(X,Y)
 						//rpx转px 故(this.windowWidth)/2 计算总长度时要减去黑边
+						let rectOpacity = this.nodeLocationList[i].rectOpacity + 0
+						console.log('rectOpacity: ',rectOpacity)
 						let rectX = parseInt(((this.nodeLocationList[i].textRectX+0)*this.canvasWidth).toFixed(0))
 						let rectY = parseInt(((this.nodeLocationList[i].textRectY+0)*this.canvasHeight).toFixed(0))
 						//矩形框高度
@@ -1016,12 +1058,12 @@
 									ctx.setFillStyle('#96CDCD')
 									this.isClickFlag = false
 								}else{
-									ctx.setStrokeStyle('rgba(255, 255, 255, 0.3)')
-									ctx.setFillStyle('rgba(255, 255, 255, 0.3)')
+									ctx.setStrokeStyle('rgba(255, 255, 255,'+ rectOpacity +')')
+									ctx.setFillStyle('rgba(255, 255, 255, '+ rectOpacity +')')
 								}
 						}else{
-							ctx.setStrokeStyle('rgba(255, 255, 255, 0.3)')
-							ctx.setFillStyle('rgba(255, 255, 255, 0.3)')
+							ctx.setStrokeStyle('rgba(255, 255, 255,'+ rectOpacity +')')
+							ctx.setFillStyle('rgba(255, 255, 255,'+ rectOpacity +')')
 						}
 						ctx.fill()
 						//开始描绘
@@ -1099,8 +1141,8 @@
 					this.likabilityArray = []
 					clearTimeout(this.likabilityDelayFunction)
 					this.canvasTouchendEventTodo()
-					this.videoShowFlag = true
 					this.screenshotShowFlag = false
+					this.videoShowFlag = true
 					this.likabilityFlag = false
 					this.hiddenBtnFlag = false
 					//保存有效观看记录
@@ -1112,8 +1154,8 @@
 					this.likabilityArray = []
 					clearTimeout(this.likabilityDelayFunction)
 					this.canvasTouchendEventTodo()
-					this.videoShowFlag = true
 					this.screenshotShowFlag = false
+					this.videoShowFlag = true
 					this.likabilityFlag = false
 					this.hiddenBtnFlag = false
 					//保存有效观看记录
@@ -1125,8 +1167,8 @@
 					this.likabilityArray = []
 					clearTimeout(this.likabilityDelayFunction)
 					this.canvasTouchendEventTodo()
-					this.videoShowFlag = true
 					this.screenshotShowFlag = false
+					this.videoShowFlag = true
 					this.likabilityFlag = false
 					this.hiddenBtnFlag = false
 					//保存有效观看记录
@@ -1138,8 +1180,8 @@
 					this.likabilityArray = []
 					clearTimeout(this.likabilityDelayFunction)
 					this.canvasTouchendEventTodo()
-					this.videoShowFlag = true
 					this.screenshotShowFlag = false
+					this.videoShowFlag = true
 					this.likabilityFlag = false
 					this.hiddenBtnFlag = false
 					//保存有效观看记录
@@ -1529,10 +1571,18 @@
 				top: 50%;
 				transform: translate(-50%, -50%);
 				video{
+					position: absolute;
+					left: 0;
+					top: 0;
+					z-index: 8;
 					width: 100%;
 					height: 100%;
 				}
 				.screenshot{
+					position: absolute;
+					left: 0;
+					top: 0;
+					z-index: 9;
 					width: 100%;
 					height: 100%;
 				}
