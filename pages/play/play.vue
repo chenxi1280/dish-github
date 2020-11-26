@@ -22,15 +22,18 @@
 			<view class="chooseTipsMask15"  v-if="chooseTipsMaskFlag">
 				<view class="chooseTipsMask16" v-if="chooseTipsShowFlag">
 					<view class="chooseTips">
-						<view class="closeBox" @click="closeChooseTips">
+						<!-- <view class="closeBox" @click="closeChooseTips">
 							<icon class="closeIcon"></icon>
-						</view>
-						<view class="title">请做出你的选择</view>
-						<view class="splitLine"></view>
+						</view> -->
+						<!-- <view class="title">请做出你的选择</view>
+						<view class="splitLine"></view> -->
 						<view class="tips" v-for="(item, index) in tipsArray" :key="index">
 							<view class="optionBox" @touchstart="changeBackground(index)" @touchend="rebackBackground(index)" :style="{'background': background[index]}">
-								<view class="option">{{option[index]}}</view>
+								<view class="option" style="text-align: center;"><text>{{option[index]}}</text></view>
 							</view>
+						</view>
+						<view class="video_rebroadcast" @click="closeChooseTips">
+							<img src="/static/icon/replay.png">
 						</view>
 					</view>
 				</view>
@@ -269,8 +272,6 @@
 			}
 		},
 		onReady(){
-			//test
-			this.artworkId = 10126
 			//重置开关状态到初始值
 			this.isClickOptionFlag = false
 			//关闭好感度 视频加载结束时打开
@@ -1596,19 +1597,22 @@
 				height: 100%;
 				z-index: 17;
 				.chooseTipsMask16{
-					background-color: rgba(255,255,255,.9);
+					background-color: rgba(255,255,255, 0);
 					position: fixed;
-					left: 0;
+					left: 50%;
 					top: 50%;
-					transform: translateY(-50%);
-					width: 100%;
+					transform: translate(-50%, -50%);
+					width: 650rpx;
 					height: 38%;
 					z-index: 18;
+					border-radius: 20rpx;
 					.chooseTips{
 						width: 100%;
-						height: 100%;
 						z-index: 25;
-						background-color: rgba(0,0,0,.3);
+						// background-color: rgba(0,0,0,1);
+						position: absolute;
+						top: 50%;
+						transform: translateY(-50%);
 						.closeBox{
 							position: absolute;
 							width: 46rpx;
@@ -1628,15 +1632,13 @@
 							font-size: 36rpx;
 							line-height: 100rpx;
 						}
-						.splitLine{
-							border: 2rpx solid #D3D3D3;
-							width: 80%;
-							margin: 0 auto;
-						}
 						.tips{
 							.optionBox{
+								background: url('https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1606382670960frame.png') no-repeat center;
+								background-size: 100% 100%;
 								width: 100%;
 								margin: 0 auto;
+								margin-bottom: 20rpx;
 								line-height: 80rpx;
 								display: flex;
 								justify-content: space-between;
@@ -1645,6 +1647,20 @@
 									padding-left: 20rpx;
 									font-size: 34rpx;
 								}
+							}
+						}
+						.video_rebroadcast {
+							width: 80rpx;
+							height: 80rpx;
+							padding: 10rpx;
+							background-color: rgba(#000, .2);
+							border-radius: 40rpx;
+							margin: 0 auto;
+							
+							img { 
+								width: 100%;
+								height: 100%;
+								// transform: rotateY(180deg);
 							}
 						}
 					}
