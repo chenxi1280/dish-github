@@ -58,19 +58,21 @@
 			</view> -->
 			<!-- 故事线和举报 -->
 			<!-- :style="hiddenBtnFlag?'display: block':'display: none'" -->
-			<view v-if="hiddenBtnFlag" >
-				<view class="reportBox" @click="showReportContent">
-					<view class="reportIconBox">
-						<icon class="reportIcon"></icon>
+			<view v-if="hiddenBtnFlag">
+				<view>
+					<view class="reportBox" @click="showReportContent">
+						<view class="reportIconBox">
+							<icon class="reportIcon"></icon>
+						</view>
+						<view class="report">举报</view>
 					</view>
-					<view class="report">举报</view>
 				</view>
-			</view>
-			<view class="storyLineBox" @click="showStoryLineContent" v-if="hiddenBtnFlag">
-				<view class="storyLineIconBox">
-					<icon class="storyLineIcon"></icon>
+				<view class="storyLineBox" @click="showStoryLineContent">
+					<view class="storyLineIconBox">
+						<icon class="storyLineIcon"></icon>
+					</view>
+					<view class="storyLine">故事线</view>
 				</view>
-				<view class="storyLine">故事线</view>
 			</view>
 			<!-- 故事线内容呈现在蒙板之上 -->
 			<view class="storyLineContentMask16" v-if="storyLineContentFlag">
@@ -167,7 +169,7 @@
 				//选项背景颜色
 				background: ["","","",""],
 				//隐藏按钮开关
-				hiddenBtnFlag: false,
+				hiddenBtnFlag: true,
 				//是否展示选项开关
 				chooseTipsShowFlag: false,
 				//选项最底层蒙版
@@ -726,9 +728,7 @@
 						this.chooseTipsMaskFlag = false
 						this.screenshotShowFlag = true
 						this.videoShowFlag = true
-						console.log(this.hiddenBtnFlag)
 						this.hiddenBtnFlag = false
-						console.log(this.hiddenBtnFlag)
 						this.showCanvasFlag = true
 						this.videoUrl = ''
 					}else{
