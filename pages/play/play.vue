@@ -54,7 +54,8 @@
 				</view>
 			</view> -->
 			<!-- 故事线和举报 -->
-			<view v-if="hiddenBtnFlag">
+			<!-- :style="hiddenBtnFlag?'display: block':'display: none'" -->
+			<view v-if="hiddenBtnFlag" >
 				<view class="reportBox" @click="showReportContent">
 					<view class="reportIconBox">
 						<icon class="reportIcon"></icon>
@@ -722,7 +723,9 @@
 						this.chooseTipsMaskFlag = false
 						this.screenshotShowFlag = true
 						this.videoShowFlag = true
+						console.log(this.hiddenBtnFlag)
 						this.hiddenBtnFlag = false
+						console.log(this.hiddenBtnFlag)
 						this.showCanvasFlag = true
 						this.videoUrl = ''
 					}else{
@@ -788,7 +791,6 @@
 						this.likabilityArray = []
 						this.background.splice(index,1,"")
 						this.likabilityFlag = false
-						this.hiddenBtnFlag = false
 						// 播放结束清除延时函数
 						clearTimeout(this.likabilityDelayFunction)
 						this.optionTouchendTodo(index)
@@ -803,7 +805,6 @@
 						this.likabilityArray = []
 						this.background.splice(index,1,"")
 						this.likabilityFlag = false
-						this.hiddenBtnFlag = false
 						clearTimeout(this.likabilityDelayFunction)
 						this.optionTouchendTodo(index)
 						//保存有效观看记录
@@ -817,7 +818,6 @@
 						this.likabilityArray = []
 						this.background.splice(index,1,"")
 						this.likabilityFlag = false
-						this.hiddenBtnFlag = false
 						clearTimeout(this.likabilityDelayFunction)
 						this.optionTouchendTodo(index)
 						//保存有效观看记录
@@ -831,7 +831,6 @@
 						this.likabilityArray = []
 						this.background.splice(index,1,"")
 						this.likabilityFlag = false
-						this.hiddenBtnFlag = false
 						clearTimeout(this.likabilityDelayFunction)
 						this.optionTouchendTodo(index)
 						//保存有效观看记录
@@ -881,6 +880,7 @@
 			closeChooseTips(){
 				this.chooseTipsShowFlag = false
 				this.chooseTipsMaskFlag = false
+				this.hiddenBtnFlag = true
 				const videoContext = uni.createVideoContext('myVideo')
 				videoContext.play()
 			},
@@ -1142,7 +1142,6 @@
 					this.screenshotShowFlag = false
 					this.videoShowFlag = true
 					this.likabilityFlag = false
-					this.hiddenBtnFlag = false
 					//保存有效观看记录
 					if(!this.isClickOptionFlag){
 						this.statisticsPlayRecord()
@@ -1155,7 +1154,6 @@
 					this.screenshotShowFlag = false
 					this.videoShowFlag = true
 					this.likabilityFlag = false
-					this.hiddenBtnFlag = false
 					//保存有效观看记录
 					if(!this.isClickOptionFlag){
 						this.statisticsPlayRecord()
@@ -1168,7 +1166,6 @@
 					this.screenshotShowFlag = false
 					this.videoShowFlag = true
 					this.likabilityFlag = false
-					this.hiddenBtnFlag = false
 					//保存有效观看记录
 					if(!this.isClickOptionFlag){
 						this.statisticsPlayRecord()
@@ -1181,7 +1178,6 @@
 					this.screenshotShowFlag = false
 					this.videoShowFlag = true
 					this.likabilityFlag = false
-					this.hiddenBtnFlag = false
 					//保存有效观看记录
 					if(!this.isClickOptionFlag){
 						this.statisticsPlayRecord()
