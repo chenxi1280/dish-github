@@ -1,7 +1,6 @@
 <template>
 	<view>
-		<view style="margin-top: 10rpx;"></view>
-		<u-search :show-action="true" action-text="搜索" :animation="true" @search="searchEvent" @custom="searchEvent" v-model="searchText"></u-search>
+		<u-search :show-action="true" action-text="搜索"  @search="searchEvent" @custom="searchEvent" v-model="searchText"></u-search>
 		<view class="wrap">
 			<view class="search_div">
 				<!-- <text class="title">热度搜索榜</text> -->

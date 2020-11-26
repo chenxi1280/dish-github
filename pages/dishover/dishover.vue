@@ -1,10 +1,10 @@
 <template>
 	<view>
 
-		<view class="search_view" @click="go_search_page">
-			<icon class="search_icon"></icon>
-			<input class="search_input" type="" placeholder=" 查找你想看的视频" disabled="" />
-
+		<view @click="go_search_page">
+<!-- 			<icon class="search_icon"></icon>
+			<input class="search_input" type="" placeholder=" 查找你想看的视频" disabled="" /> -->
+			<u-search :show-action="false"  @click="go_search_page"></u-search>
 		</view>
 
 		<u-subsection :list="items" :current="0" @change="sectionChange"></u-subsection>
