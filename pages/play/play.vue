@@ -322,7 +322,7 @@
 						},
 						success: result=> {
 							if(result.data.status == 200){
-								const userId = uni.getStorageSync('userId');
+								const userId = uni.getStorageSync('userId')
 								if(result.data.data == userId){
 									this.artworkId = a
 								}else{
@@ -618,7 +618,8 @@
 					method: 'POST',
 					dataType: 'json',
 					data: {
-						pkArtworkId: this.artworkId
+						pkArtworkId: this.artworkId,
+						userId: uni.getStorageSync("userId")
 					},
 					success: res=> {
 						if(res.data.status == 200){
@@ -639,7 +640,8 @@
 					dataType: 'json',
 					data: {
 						pkArtworkId: this.artworkId,
-						detailId:  this.pkDetailId
+						detailId:  this.pkDetailId,
+						userId: uni.getStorageSync("userId")
 					},
 					success: res=> {
 						if(res.data.status == 200){
