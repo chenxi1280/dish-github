@@ -6,6 +6,10 @@
 /* 	{
 		"path": "pages/play/play"
 	}, */
+		
+		{
+			"path": "pages/play/storyLine/horizontalStoryLine"
+		},
 		{
 			"path": "pages/dishover/dishover",
 			"style": {
