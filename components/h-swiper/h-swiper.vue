@@ -7,24 +7,26 @@
 		 :next-margin="effect3d ? effect3dPreviousMargin + 'rpx' : '0'" :style="{
 				height: height + 'rpx'
 			}">
+			<!-- :class="[uCurrent != index ? 'u-list-scale' : '']" -->
+		<!-- 	backgroundColor: 'url(' + item.nodeImgUrl + ') no-repeat center' ,
+			backgroundSize: 100 + '%' -->
 			<swiper-item class="u-swiper-item" v-for="(item, index) in list" :key="index"  @touchstart="catchTouchMove"  @touchend="catchTouchMove" >
 				<view class="u-list-image-wrap" @tap.stop.prevent="listClick(index)" :class="[uCurrent != index ? 'u-list-scale' : '']"
 				 :style="{
 						borderRadius: `${borderRadius}rpx`,
 						transform: isBig && uCurrent == index ? 'scale(1,1)' :  'scale(0.85,0.85)',
 						margin: isBig && uCurrent    == index ? 0 : '10  10rpx',
-						backgroundColor: bgColor
 					}" >
-					<!-- <view style="transform: rotate(90deg);"> -->
-						<image class="u-swiper-image" :src="item[name]" :mode="imgMode"></image>
-						<!-- <view class="u-swiper-title" :style="{
-							height:  item.isWatch ? '40%': '100%'
-						}">
-							<view v-show="!item.isWatch && !(isBig && (uCurrent == index)) " style="font-size:200rpx; padding-left: 36rpx;">?</view>
-							<view v-show="!item.isWatch && (isBig && (uCurrent == index))" style="font-size:200rpx; text-align: center;">?</view>
-								<text>{{ item.title }}</text>
-						</view> -->
-					<!-- </view> -->
+					<image class="u-swiper-image" :src="item[name]" :mode="imgMode"></image>
+						<!-- <image class="u-swiper-image" :src="item.nodeImgUrl" :mode="imgMode"></image> -->
+						<!-- :style="{
+							height :  item.isWatch ? '100%': '100%'
+						}" -->
+						<view class="u-swiper-title"   :style="{ height :  item.isWatch ? '50px': '117px',left: item.isWatch ? '-84px': '-45px'}" >	
+							<view v-show="!item.isWatch && !(isBig && (uCurrent == index))" style="font-size:106rpx; text-align: center;">?</view>
+							<view v-show="!item.isWatch &&  (isBig && (uCurrent == index))" style="font-size:106rpx; text-align: center;">?</view>
+							<text style="margin-left: 8px; margin-top: 0px;">{{ item.title }}</text>
+						</view>
 				</view>
 			</swiper-item>
 		</swiper>
@@ -243,75 +245,44 @@
 		transform: translateY(0);
 	}
 
+	.u-list-scale {
+		transform-origin: center center;
+	}
+	
 	.u-swiper-image {
-		width: 100%;
+		width: 208px;
 		will-change: transform;
-		height: 100%;
+		height: 117px;
 		display: block;
 		/* #ifdef H5 */
 		pointer-events: none;
 		/* #endif */
-		transform: rotate(90deg);
+		transform: rotateZ(90deg);
+		// transform-origin: center center
+		margin-top: 45px;
+		margin-left: -45px;
 	}
 
-	.u-swiper-indicator {
-		padding: 0 24rpx;
+
+
+	.u-swiper-title {
 		position: absolute;
-		display: flex;
-		width: 100%;
-		z-index: 1;
-	}
-
-	.u-indicator-item-rect {
-		width: 26rpx;
-		height: 8rpx;
-		margin: 0 6rpx;
-		transition: all 0.5s;
 		background-color: rgba(0, 0, 0, 0.3);
-	}
-
-	.u-indicator-item-rect-active {
-		background-color: rgba(255, 255, 255, 0.8);
-	}
-
-	.u-indicator-item-dot {
-		width: 14rpx;
-		height: 14rpx;
-		margin: 0 6rpx;
-		border-radius: 20rpx;
-		transition: all 0.5s;
-		background-color: rgba(0, 0, 0, 0.3);
-	}
-
-	.u-indicator-item-dot-active {
-		background-color: rgba(255, 255, 255, 0.8);
-	}
-
-	.u-indicator-item-round {
-		width: 14rpx;
-		height: 14rpx;
-		margin: 0 6rpx;
-		border-radius: 20rpx;
-		transition: all 0.5s;
-		background-color: rgba(0, 0, 0, 0.3);
-	}
-
-	.u-indicator-item-round-active {
-		width: 34rpx;
-		background-color: rgba(255, 255, 255, 0.8);
-	}
-
-	.u-indicator-item-number {
-		padding: 6rpx 16rpx;
-		line-height: 1;
-		background-color: rgba(0, 0, 0, 0.3);
-		border-radius: 100rpx;
-		font-size: 26rpx;
-		color: rgba(255, 255, 255, 0.8);
-	}
-
-	.u-list-scale {
-		transform-origin: center center;
+		top: 50%; 
+		// left: 0;
+		// width: 208px;
+		// height: 107px;
+		font-size: 28rpx;
+		// padding: 12rpx 24rpx;
+		color: rgba(255, 255, 255, 0.9);
+		// transform:rotateZ(90deg)!important;
+		transform: translateY(-50%) rotateZ(90deg);
+		// margin-top: -116.5px;
+		// margin-left: -46.5px;
+		width: 208px;
+		// height: 117px;
+		// border: 1px solid red;
+		
 	}
 
 	.u-list-image-wrap {
@@ -322,26 +293,15 @@
 		overflow: hidden;
 		box-sizing: content-box;
 		position: relative;
+		// border: 1px solid;
 	}
-
-	.u-swiper-title {
-		position: absolute;
-		background-color: rgba(0, 0, 0, 0.3);
-		bottom: 0;
-		left: 0;
-		width: 126px;
-		font-size: 28rpx;
-		padding: 12rpx 24rpx;
-		color: rgba(255, 255, 255, 0.9);
-		transform: rotate(90deg);
-	}
-
 	.u-swiper-item {
 		display: flex;
 		overflow: hidden;
 		align-items: center;
-		width: 107px !important;
+		width: 117px !important;
 		height: 208px !important;
-		margin-left: 150rpx;
+		margin-left: 170rpx;
+		// border: 1px solid;
 	}
 </style>

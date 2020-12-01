@@ -151,8 +151,14 @@
 						this.floorList[i] = a[i]
 					}
 				}
+				if(this.onfloor > current) {
+					this.lockColumn = this.oncolumn
+					this.oncolumn = 0
+				}else {
+					this.oncolumn = this.lockColumn
+				}
 				this.onfloor = current
-				this.oncolumn = 0
+				
 			},
 			//清除兄弟
 			clearnBrother() {

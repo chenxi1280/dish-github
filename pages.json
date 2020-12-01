@@ -6,7 +6,9 @@
 /* 	{
 		"path": "pages/play/play"
 	}, */
-		
+		{
+			"path": "pages/play/storyLine/storyLine"
+		},
 		{
 			"path": "pages/play/storyLine/horizontalStoryLine"
 		},
@@ -17,9 +19,9 @@
 			},
 			"enablePullDownRefresh": true
 		},
-		{
-			"path": "pages/play/storyLine/storyLine"
-		},
+		// {
+		// 	"path": "pages/play/storyLine/storyLine"
+		// },
 		{
 			"path": "pages/play/play"
 		},

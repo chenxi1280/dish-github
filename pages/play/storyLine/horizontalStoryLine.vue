@@ -3,9 +3,9 @@
 
 		<!-- <u-mask :show="true" style="width: 375px ; height: 100px;  position: fixed; left: 0; top: 0;z-index: 10;" ></u-mask> -->
 		<!-- <view class="cpt-mask"> </view> -->
-		<swiper :vertical="true" :previous-margin="'170'" :next-margin="'280'" :current="onfloor" @change="floorChange" style="width: 100%; height: 650px; ">
-			<swiper-item v-for="(item, floor) in floorList" :key="floor" style="margin-top: 12rpx; height: 224px; ">
-				<mswiper :list="item" :title="true" :circular="false" :autoplay="false" :height="416" :effect3d="true" :isBig="onfloor == floor"
+		<swiper :vertical="true" :previous-margin="'150'" :next-margin="'280'" :current="onfloor" @change="floorChange" style="width: 100%; height: 650px; ">
+			<swiper-item v-for="(item, floor) in floorList" :key="floor" style="margin-top: 12rpx; height: 334px; ">
+				<mswiper :list="item" :title="true" :circular="false" :autoplay="false" :height="420" :effect3d="true" :isBig="onfloor == floor"
 				 :effect3d-previous-margin="80" @change="columnChange" @click="goPlay" :nowFloor="floor"></mswiper>
 			</swiper-item>
 		</swiper>
@@ -86,7 +86,7 @@
 						})
 					})
 					// console.log(this.list)
-					// console.log(this.floorList)
+					console.log(this.floorList)
 					this.clearnBrother()
 				}
 			})
@@ -130,18 +130,22 @@
 				}
 
 			},
+			// 切换楼层
 			floorChange(e) {
 				let current = e.detail.current;
 				// this.clearnBrother()	
-				
+				console.log("当前楼层："+ current,"当前列："+ this.oncolumn)
 				for (let i = 0; i < this.floorList.length; i++) {
 					//原来的楼层
 					if (this.onfloor == i) {
 						if (this.oncolumn == 0) {
+							console.log(11)
 							// this.floorList = this.deepCopy(this.list)
+							console.log()
 							this.floorList[i].splice(1, this.floorList[i].length - 1)
 						}
 						if (this.onfloor != this.lockFloor) {
+							console.log(22)
 							this.floorList[i].splice(1, this.floorList[i].length - 1)
 						}
 					}
@@ -151,8 +155,15 @@
 						this.floorList[i] = a[i]
 					}
 				}
+				if(this.onfloor > current) {
+					this.lockColumn = this.oncolumn
+					this.oncolumn = 0
+				}else {
+					this.oncolumn = this.lockColumn
+				}
+				console.log("原来的楼层"+ this.onfloor,"现在的列:"+ this.oncolumn)
 				this.onfloor = current
-				this.oncolumn = 0
+				// this.oncolumn = 0
 			},
 			//清除兄弟
 			clearnBrother() {
