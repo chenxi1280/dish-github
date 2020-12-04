@@ -6,12 +6,10 @@
 /* 	{
 		"path": "pages/play/play"
 	}, */
-		{
-			"path": "pages/play/storyLine/storyLine"
-		},
-		{
-			"path": "pages/play/storyLine/horizontalStoryLine"
-		},
+		// {
+		// 	"path": "pages/play/storyLine/storyLine"
+		// },
+		
 		{
 			"path": "pages/dishover/dishover",
 			"style": {
@@ -19,9 +17,12 @@
 			},
 			"enablePullDownRefresh": true
 		},
-		// {
-		// 	"path": "pages/play/storyLine/storyLine"
-		// },
+		{
+			"path": "pages/play/storyLine/storyLine"
+		},
+		{
+			"path": "pages/play/storyLine/horizontalStoryLine"
+		},
 		{
 			"path": "pages/play/play"
 		},

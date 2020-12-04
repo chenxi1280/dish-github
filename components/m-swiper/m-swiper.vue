@@ -17,7 +17,8 @@
 					}">
 					<image class="u-swiper-image" :src="item[name]" :mode="imgMode"></image>
 					<view class="u-swiper-title" :style="{
-						height:  item.isWatch ? '40%': '100%'
+						height:  item.isWatch ? '40%': '100%',
+						paddingLeft: isBig && uCurrent == index ? '20rpx': '0rpx',
 					}">
 					<view v-show="!item.isWatch && !(isBig && (uCurrent == index)) " style="font-size:200rpx; padding-left: 36rpx;">?</view>
 					<view v-show="!item.isWatch && (isBig && (uCurrent == index))" style="font-size:200rpx; text-align: center;">?</view>
@@ -328,7 +329,10 @@
 		left: 0;
 		width: 126px;
 		font-size: 28rpx;
-		padding: 12rpx 24rpx;
+		// padding: 12rpx 24rpx;
+		padding-top: 12rpx;
+		padding-bottom: 12rpx;
+		padding-right: 24rpx;
 		color: rgba(255, 255, 255, 0.9);
 	}
 

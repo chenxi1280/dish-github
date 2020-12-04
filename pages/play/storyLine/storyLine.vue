@@ -32,6 +32,10 @@
 				default () {
 					return [11061, 11063, 11071]
 				}
+			},
+			pkArtworkEndingNodeId: {
+				type: [Number, String],
+				default: null
 			}
 		},
 		components: {
@@ -62,13 +66,15 @@
 				data: {
 					pkArtworkId: this.pkArtworkId,
 					intVideoId: this.pkDetailIds[this.onfloor],
-					fkUserid: userId
+					fkUserid: userId,
+					pkArtworkEndingNodeId: pkArtworkEndingNodeId
 				},
 				success: res => {
 					// console.log(res.data.data)
 					this.pkDetailIds.forEach( v => {
 						res.data.data.forEach(node => {
 							if (v === node.pkDetailId) {
+								// 是否为 跳转节点
 								if (node.isLink == 1) {
 									res.data.data.forEach( item => {
 										if (node.linkUrl == item.pkDetailId) {		
@@ -82,6 +88,11 @@
 									this.list.push(node.brotherNode)
 									this.floorList.push(node.brotherNode)
 								}
+								// // 是否为 为多结局
+								// if (node.isEndings === 1) {
+									
+								// }
+								
 							}
 						})
 					})
@@ -193,7 +204,9 @@
 			goPlay(index, nowFloor) {
 				if (nowFloor == this.onfloor && index == this.oncolumn) {
 					console.log(this.floorList[nowFloor][index])
+					// 跳转的 节点
 					let a = this.floorList[nowFloor][index]
+					// 播放记录 
 					let b = uni.getStorageSync("pkDetailIds")
 					// 当前选中楼层的 播放历史
 					let c = this.floorList[nowFloor][0]
@@ -212,6 +225,7 @@
 					// let jumpFlag = 0
 					console.log(a.pkDetailId)
 					console.log(b)
+					// 是否跳转自己
 					let jumpFlag = false
 					b.forEach( v => {
 						if(v == a.pkDetailId  ) {
@@ -234,9 +248,14 @@
 						title: '选中跳转到' + a.selectTitle ,
 						type: 'success',
 					})
-					
+					console.log(a.isEndings == null ? 0 : 1)
 					//使用组件跳转方式 传参
-					this.$emit("goPlay",{'pkArtworkId': this.pkArtworkId,'pkDetailId': a.pkDetailId,'jumpFlag':jumpFlag})
+					this.$emit("goPlay",{
+						 'pkArtworkId': this.pkArtworkId,
+						 'pkDetailId': a.pkDetailId,
+						 'jumpFlag':jumpFlag,
+						 'endings': a.isEndings == null ? 0 : 1
+						 })
 				} else {
 					this.showToast('请滑动至选择中心位进行跳转')
 				}
