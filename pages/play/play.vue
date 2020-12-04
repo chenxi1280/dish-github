@@ -6,27 +6,24 @@
 		</view>
 		<view class="play" :style="{'width': mobilePhoneWidth+'px', 'height': mobilePhoneHeight+'px'}">
 			<!-- 定位选项画布 -->
-			<view class="container"  v-show="showCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px'}">
+			<view class="container"  v-show="showCanvasFlag" 
+			:style="{'width': canvasWidth+'px', 'height': canvasHeight+'px', 'transform': transform}">
 			  <canvas canvas-id="myCanvas" @touchstart="getTouchPosition" @touchend="canvasTouchendEvent"></canvas>
 			</view>
 			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" -->
-			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px'}">
-				<video :src="videoUrl" :autoplay="autopalyFlag" direction="0" :show-mute-btn="true" :show-fullscreen-btn="false" id="myVideo"
-				:enable-play-gesture="gestureFlag" @ended="videoEnd" @pause="videoPause"  @loadedmetadata="loadeddata"
-				@touchend="gestureTouchend" @touchstart="gestureTouchstart" v-if="videoShowFlag"></video>
+			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform}">
+				<video :src="videoUrl" :autoplay="autopalyFlag" :show-mute-btn="true" :show-fullscreen-btn="false" id="myVideo"
+				:enable-play-gesture="playGestureFlag" :enable-progress-gesture="progressGestureFlag" @ended="videoEnd" @pause="videoPause"  @loadedmetadata="loadeddata"
+				@touchend="videoTouchend" @touchstart="videoTouchstart" v-if="videoShowFlag" @timeupdate="videoTimeupdate"
+				:controls="controlsFlag" ></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
 				'background-repeat':'no-repeat', backgroundSize:'100% 100%'}"></view>
 			</view>
 			<!-- 选项 -->
 			<view class="chooseTipsMask15"  v-if="chooseTipsMaskFlag">
-				<view class="chooseTipsMask16" v-if="chooseTipsShowFlag">
+				<view class="chooseTipsMask16" v-if="chooseTipsShowFlag" :style="{'transform': transform}">
 					<view class="chooseTips">
-						<!-- <view class="closeBox" @click="closeChooseTips">
-							<icon class="closeIcon"></icon>
-						</view> -->
-						<!-- <view class="title">请做出你的选择</view>
-						<view class="splitLine"></view> -->
 						<view class="tips" v-for="(item, index) in tipsArray" :key="index">
 							<view class="optionBox" @touchstart="changeBackground(index)" @touchend="rebackBackground(index)" :style="{'background': background[index]}">
 								<view class="option" style="text-align: center;"><text>{{option[index]}}</text></view>
@@ -39,10 +36,21 @@
 				</view>
 			</view>
 			<!-- 好感度 -->
-			<view class="likabilityTips" v-if="likabilityFlag" style="pointer-events: none;">
-				<view class="lbtips" v-for="(item, index) in likabilityArray" :key="index">
-					<view class="likabilityBox">
-						<view class="likability">{{likabilityArray[index].title}}{{' : '}}{{likabilityArray[index].value}}</view>
+			<view :style="showStyleFlag?'display: block':'display: none'"  class="verticalLikabilityBox">
+				<view class="likabilityTips" v-if="likabilityFlag" style="pointer-events: none;">
+					<view class="lbtips" v-for="(item, index) in likabilityArray" :key="index">
+						<view class="likabilityBox">
+							<view class="likability">{{likabilityArray[index].title}}{{' : '}}{{likabilityArray[index].value}}</view>
+						</view>
+					</view>
+				</view>
+			</view>
+			<view :style="!showStyleFlag?'display: block':'display: none'"  class="horizontalLikabilityBox">
+				<view class="likabilityTips" v-if="likabilityFlag" style="pointer-events: none;">
+					<view class="lbtips" v-for="(item, index) in likabilityArray" :key="index">
+						<view class="likabilityBox">
+							<view class="likability">{{likabilityArray[index].title}}{{' : '}}{{likabilityArray[index].value}}</view>
+						</view>
 					</view>
 				</view>
 			</view>
@@ -58,14 +66,28 @@
 			</view> -->
 			<!-- 故事线和举报 -->
 			<!-- :style="hiddenBtnFlag?'display: block':'display: none'" -->
-			<view v-if="hiddenBtnFlag">
-				<view>
-					<view class="reportBox" @click="showReportContent">
-						<view class="reportIconBox">
-							<icon class="reportIcon"></icon>
-						</view>
-						<view class="report">举报</view>
+			<!-- 横屏 -->
+			<view v-if="hiddenBtnFlag" :style="showStyleFlag?'display: block':'display: none'" class= "verticalBox">
+				<view class="reportBox" @click="showReportContent">
+					<view class="reportIconBox">
+						<icon class="reportIcon"></icon>
 					</view>
+					<view class="report">举报</view>
+				</view>
+				<view class="storyLineBox" @click="showStoryLineContent">
+					<view class="storyLineIconBox">
+						<icon class="storyLineIcon"></icon>
+					</view>
+					<view class="storyLine">故事线</view>
+				</view>
+			</view>
+			<!-- 竖屏 -->
+			<view v-if="hiddenBtnFlag" :style="!showStyleFlag?'display: block':'display: none'" class= "horizontalBox">
+				<view class="reportBox" @click="showReportContent">
+					<view class="reportIconBox">
+						<icon class="reportIcon"></icon>
+					</view>
+					<view class="report">举报</view>
 				</view>
 				<view class="storyLineBox" @click="showStoryLineContent">
 					<view class="storyLineIconBox">
@@ -146,6 +168,26 @@
 				<rich-text nodes="预览作品只能作者自己观看\n\n请登录作者帐号"></rich-text>
 			</view>
 		</u-modal>
+		<view class="progress-box" v-if="horizontalControlsFlags">
+			<view class="replayVideoIconBox" @click="replayVideo">
+				<icon></icon>
+			</view>
+			<view class="jumpbackIconBox" @click="jumpbackVideo">
+				<icon></icon>
+			</view>
+		    <view class="suspendIconBox" @click="playVideo" v-if="suspendFlag">
+				<icon></icon>
+		    </view>
+		    <view class="playIconBox" @click="suspendVideo" v-if="!suspendFlag">
+		   		<icon></icon>
+		    </view>
+		    <view class="jumpforwardIconBox" @click="jumpForwardVideo">
+		   		<icon></icon>
+		    </view>
+		    <view class="endVideoIconBox" @click="endVideo">
+		   		<icon></icon>
+		    </view>
+		</view>
 	</view>
 </template>
 
@@ -245,7 +287,9 @@
 				//是否自动播放标志
 				autopalyFlag: true,
 				//是否开启手势标志
-				gestureFlag: true,
+				playGestureFlag: true,
+				//是否开启进度控制手势开关
+				progressGestureFlag: true,
 				//touchstart 横轴坐标
 				tsx: 0,
 				//touchstart纵轴坐标
@@ -266,21 +310,37 @@
 				videoloadFlag: true,
 				//好感度延时函数
 				likabilityDelayFunction: Function,
+				//横屏播放控件延时函数
+				horizontalControlsFunction: Function,
 				//故事线跳转到播放页的当前节点是否已播放标志
 				isPlayedFlag: false,
 				//是否点击了选项开关（用于保存有效观看记录使用）
 				isClickOptionFlag: false,
 				//扫码预览提示框开关
-				previewShow: false
+				previewShow: false,
+				//video横屏播放行内样式动态设置变量
+				transform: 'translate(-50%, -50%)',
+				//播放如何展示举报和故事线按钮开关 默认竖屏展示true
+				showStyleFlag: true,
+				//是否显示video原生进度条的开关
+				controlsFlag: false,
+				//横屏视频播放控件开关
+				horizontalControlsFlags: false,
+				//播放暂停控件的开关
+				suspendFlag: false,
+				//视频的当前播放时间 250mm获取一次当前播放时间
+				currentTime: 0
 			}
 		},
 		onReady(){
+			//test
+			this.artworkId = 10146
 			//重置开关状态到初始值
 			this.isClickOptionFlag = false
 			//关闭好感度 视频加载结束时打开
 			this.likabilityFlag = false
 			//关闭故事线和举报 视频加载结束时打开
-			this.hiddenBtnFlag = false
+			this.hiddenBtnFlag = !this.hiddenBtnFlag
 			//获取手机屏幕尺寸 单位是px
 			const {windowWidth, windowHeight, brand, model} = uni.getSystemInfoSync()
 			//将用户手机窗口尺寸记录方便在方法中调用
@@ -1031,15 +1091,16 @@
 						//矩形左上角点的坐标(X,Y)
 						//rpx转px 故(this.windowWidth)/2 计算总长度时要减去黑边
 						let rectOpacity = this.nodeLocationList[i].rectOpacity + 0
-						console.log('rectOpacity: ',rectOpacity)
 						let rectX = parseInt(((this.nodeLocationList[i].textRectX+0)*this.canvasWidth).toFixed(0))
+						console.log('矩形框的x轴坐标: ',rectX)
 						let rectY = parseInt(((this.nodeLocationList[i].textRectY+0)*this.canvasHeight).toFixed(0))
+						console.log('矩形框的y轴坐标: ',rectY)
 						//矩形框高度
 						let rectH = parseInt(((this.nodeLocationList[i].hideHeightScale+0)*this.canvasHeight).toFixed(0))
-						// console.log('矩形框的高: ',rectH)
+						console.log('矩形框的高: ',rectH)
 						//矩形框宽度
 						let rectW = parseInt(((this.nodeLocationList[i].hideWidthScale+0)*this.canvasWidth).toFixed(0))
-						// console.log('矩形框的宽: ',rectW)
+						console.log('矩形框的宽: ',rectW)
 						//画矩形
 						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
 						ctx.beginPath()
@@ -1118,17 +1179,40 @@
 				//之后写入for循环中
 				if(this.rectArray.length != 0){
 					for(let i = 0; i<this.nodeLocationList.length; i++){
+						/* 竖屏
 						let touchX = e.changedTouches[0].x;
 						let touchY = e.changedTouches[0].y;
+						// console.log('touchY: ',touchY)
 						let xLowLimit = this.rectArray[i].x;
-						// console.log('xLowLimit:'+xLowLimit)
+						// console.log('x轴起始点: ',xLowLimit)
 						let yLowLimit = this.rectArray[i].y;
+						// console.log('y轴起始点: ',yLowLimit)
 						let xUpperLimit = this.rectArray[i].x+this.rectArray[i].w;
+						// console.log('x轴终点: ',xUpperLimit)
 						let yUpperLimit = this.rectArray[i].y+this.rectArray[i].h;
-						//判断边界办法
+						// console.log('y轴终点: ',yUpperLimit)
 						if(touchX > xLowLimit && touchX < xUpperLimit && touchY > yLowLimit && touchY < yUpperLimit){
 							this.touchRectNum = i;
-							// console.log('this.touchRectNum: '+this.touchRectNum)
+							console.log('this.touchRectNum: '+this.touchRectNum)
+						}
+						*/
+						//横屏
+						let touchX = this.canvasHeight - e.changedTouches[0].x;
+						// console.log('touchX: ',touchX)
+						let touchY = e.changedTouches[0].y;
+						// console.log('touchY: ',touchY)
+						let xLowLimit = this.rectArray[i].x;
+						// console.log('x轴起始点: ',xLowLimit)
+						let yLowLimit = this.rectArray[i].y;
+						// console.log('y轴起始点: ',yLowLimit)
+						let xUpperLimit = xLowLimit+this.rectArray[i].w;
+						// console.log('x轴终点: ',xUpperLimit)
+						let yUpperLimit = yLowLimit+this.rectArray[i].h;
+						// console.log('y轴终点: ',yUpperLimit)
+						//判断边界办法
+						if(touchX > yLowLimit && touchX < yUpperLimit && touchY > xLowLimit && touchY < xUpperLimit){
+							this.touchRectNum = i;
+							console.log('this.touchRectNum: '+this.touchRectNum)
 						}
 					}
 					if(this.touchRectNum < 4){
@@ -1139,7 +1223,7 @@
 			},
 			// canvas的touchEnd事件
 			canvasTouchendEvent(){
-				console.log('this.touchRectNum: '+this.touchRectNum)
+				// console.log('this.touchRectNum: '+this.touchRectNum)
 				if(this.touchRectNum == 0){
 					this.likabilityArray = []
 					clearTimeout(this.likabilityDelayFunction)
@@ -1225,13 +1309,13 @@
 				}
 			},
 			// 校正视频播放的黑边 单位px
-			validateWindowSize(){
+			validateVerticalWindowSize(){
 				let videoInfo = uni.getStorageSync('videoSize')
 				let windowSize = uni.getStorageSync('windowSize')
 				let videoHeight = videoInfo.videoHeight+0
 				let videoWidth = videoInfo.videoWidth+0
 				let videoRate = videoWidth/videoHeight
-				//dh dw canvas宽高 
+				//dh dw canvas宽高  ch cw是窗口宽高
 				let vh, vw, dh, dw, ch, cw
 				let flag = !1
 				ch = windowSize.windowHeight+0
@@ -1321,6 +1405,47 @@
 					}	
 				}
 			},
+			// 用来确定横屏播放时canvas画布的大小和video的大小
+			validateHorizontalWindowSize(windowWidth, windowHeight){
+				let videoInfo = uni.getStorageSync('videoSize')
+				let windowSize = uni.getStorageSync('windowSize')
+				let videoHeight = videoInfo.videoHeight+0
+				let videoWidth = videoInfo.videoWidth+0
+				let videoRate = videoWidth/videoHeight
+				//dh dw canvas宽高  ch cw是窗口宽高
+				let vh, vw, dh, dw, ch, cw
+				let flag = !1
+				ch = windowSize.windowHeight+0
+				cw = windowSize.windowWidth+0
+				
+				if(!flag) {
+					 dw = cw
+					 dh = dw * (16 / 9)
+					 vw = cw
+					 vh = vw * (16 / 9)
+					if (ch >= dh && dh >= vh ) {
+						this.canvasHeight = dw.toFixed(0)
+						this.canvasWidth = dh.toFixed(0)
+						this.videoHeight = vw.toFixed(0)
+						this.videoWidth = vh.toFixed(0)
+						flag = !0
+					}
+				}
+				
+				if(!flag) {
+					 dh = ch
+					 dw = dh / (16 / 9)
+					 vh = ch
+					 vw = vh / (16 / 9)
+					if (cw >= dw && dw >= vw ) {
+						this.canvasHeight = dw.toFixed(0)
+						this.canvasWidth = dh.toFixed(0)
+						this.videoHeight = vw.toFixed(0)
+						this.videoWidth = vh.toFixed(0)
+						flag = !0
+					}
+				}
+			},
 			// 深拷贝 方法
 			deepCopy(o) {
 				return JSON.parse(JSON.stringify(o))
@@ -1345,7 +1470,7 @@
 				this.hiddenBtnFlag = true
 				//展示好感度
 				this.likabilityFlag = true
-				//视频清楚延时
+				//视频清除延时
 				this.likabilityDelayFunction= setTimeout(()=>{
 					this.likabilityFlag = false
 				},5000)
@@ -1354,21 +1479,87 @@
 					videoWidth: e.detail.width
 				})
 				//加载完视频加载视频的尺寸
-				this.validateWindowSize()
+				// this.validateVerticalWindowSize()
+				//test
+				this.transform = 'translate(-50%, -50%) rotateZ(90deg)'
+				this.showStyleFlag = false
+				this.validateHorizontalWindowSize()
+				this.playGestureFlag = false
+				this.progressGestureFlag = false
+				this.horizontalControlsFlags = false
+				this.horizontalControlsFunction	= setTimeout(()=>{
+					this.horizontalControlsFlags = false
+				},5000)
+				//test
 				//初始画布必须等到选项数据先初始化完才能进行
 				if(this.isPosition == 1){
 					//初始化画布
 					this.initCanvas();
 				}
 			},
-			gestureTouchstart(e){
+			videoTimeupdate(e){
+				//获取视频当前时间
+				this.currentTime = e.detail.currentTime
+			},
+			replayVideo(){
+				const videoContext = uni.createVideoContext('myVideo')
+				videoContext.seek(0)
+				this.progressBoxTouchEnd()
+			},
+			jumpbackVideo(){
+				const videoContext = uni.createVideoContext('myVideo')
+				let targetPlayTime = this.currentTime - this.duration * 0.15
+				if(targetPlayTime < 0){
+					videoContext.seek(0)
+				}else{
+					videoContext.seek(parseInt(targetPlayTime.toFixed(0)))
+				}
+				this.progressBoxTouchEnd()
+			},
+			suspendVideo(){
+				const videoContext = uni.createVideoContext('myVideo')
+				videoContext.pause()
+				this.suspendFlag = true
+				this.progressBoxTouchEnd()
+			},
+			playVideo(){
+				const videoContext = uni.createVideoContext('myVideo')
+				videoContext.play()
+				this.suspendFlag = false
+				this.progressBoxTouchEnd()
+			},
+			jumpForwardVideo(){
+				const videoContext = uni.createVideoContext('myVideo')
+				let targetPlayTime = this.currentTime + this.duration * 0.15
+				if(targetPlayTime > this.duration - 2){
+					videoContext.seek(parseInt((this.duration-2).toFixed(0)))
+				}else{
+					videoContext.seek(parseInt(targetPlayTime.toFixed(0)))
+				}
+				this.progressBoxTouchEnd()
+			},
+			endVideo(){
+				const videoContext = uni.createVideoContext('myVideo')
+				videoContext.seek(parseInt((this.duration-2).toFixed(0)))
+				this.progressBoxTouchEnd()
+			},
+			videoTouchstart(e){
 				this.tsx = e.changedTouches[0].clientX
 				this.tsy = e.changedTouches[0].clientY
 			},
-			gestureTouchend(e){
-				if(e.changedTouches[0].clientX - this.tsx > 2 || e.changedTouches[0].clientY - this.tsy > 2){
-					//计算手势拖动距离
-				}
+			videoTouchend(e){
+				clearTimeout(this.horizontalControlsFunction)
+				this.horizontalControlsFlags = true
+				this.horizontalControlsFunction	= setTimeout(()=>{
+					this.horizontalControlsFlags = false
+				},5000)
+			},
+			progressBoxTouchEnd(){
+				clearTimeout(this.horizontalControlsFunction)
+				this.horizontalControlsFlags = true
+				this.horizontalControlsFunction	= setTimeout(()=>{
+					this.horizontalControlsFlags = false
+				},5000)
 			},
 			//提交举报
 			async submit(){
@@ -1539,6 +1730,85 @@
 	.playBox{
 		width: 100%;
 		height: 100%;
+		.progress-box{
+			position: fixed;
+			left: 5%;
+			top: 50%;
+			z-index: 10;
+			height: 50rpx;
+			width: 400rpx;
+			display: flex;
+			justify-content: center;
+			background-color:  rgba(0, 0, 0, .5);
+			transform: translate(-50%, -50%) rotateZ(90deg);
+			.replayVideoIconBox{
+				width: 50rpx;
+				height: 50rpx;
+				icon{
+					width: 100%;
+					height: 100%;
+					background: url(../../static/icon/jumpback.png) no-repeat center;
+					background-size: 50rpx;
+				}
+			}
+			.jumpbackIconBox{
+				width: 50rpx;
+				height: 50rpx;
+				margin-left: 30rpx;
+				icon{
+					width: 100%;
+					height: 100%;
+					background: url(../../static/icon/jumpback15.png) no-repeat center;
+					background-size: 50rpx;
+				}
+			}
+			.suspendIconBox{
+				width: 50rpx;
+				height: 50rpx;
+				margin-left: 30rpx;
+				icon{
+					width: 100%;
+					height: 100%;
+					background: url(../../static/icon/suspend.png) no-repeat center;
+					background-size: 50rpx;
+				}
+			}
+			.playIconBox{
+				width: 50rpx;
+				height: 50rpx;
+				margin-left: 30rpx;
+				icon{
+					width: 100%;
+					height: 100%;
+					background: url(../../static/icon/play.png) no-repeat center;
+					background-size: 50rpx;
+				}
+			}
+			.jumpforwardIconBox{
+				width: 50rpx;
+				height: 50rpx;
+				margin-left: 30rpx;
+				icon{
+					width: 100%;
+					height: 100%;
+					background: url(../../static/icon/jumpforward15.png) no-repeat center;
+					background-size: 50rpx;
+				}
+			}
+			.endVideoIconBox{
+				width: 50rpx;
+				height: 50rpx;
+				margin-left: 30rpx;
+				icon{
+					display: block;
+					transform: rotateZ(180deg);
+					width: 100%;
+					height: 100%;
+					background: url(../../static/icon/jumpback.png) no-repeat center;
+					background-size: 50rpx;
+				}
+			}
+		}
 		.videoLoadImageBox{
 			position: absolute;
 			left: 0;
@@ -1552,11 +1822,13 @@
 		}
 		.play{
 			background-color: black;
+			position: relative;
+			overflow: hidden;
 			.container{
 				position: fixed;
 				left: 50%;
 				top: 50%;
-				transform: translate(-50%, -50%);
+				// transform: translate(-50%, -50%);
 				margin: 0 auto;
 				z-index: 25;
 				canvas{
@@ -1565,15 +1837,15 @@
 				}
 			}
 			.videoBox{
-				position: fixed;
+				position: absolute;
 				left: 50%;
 				top: 50%;
-				transform: translate(-50%, -50%);
+				// transform: translate(-50%, -50%);修改为了行内样式
 				video{
 					position: absolute;
 					left: 0;
 					top: 0;
-					z-index: 8;
+					z-index: 7;
 					width: 100%;
 					height: 100%;
 				}
@@ -1599,7 +1871,7 @@
 					position: fixed;
 					left: 50%;
 					top: 50%;
-					transform: translate(-50%, -50%);
+					// transform: translate(-50%, -50%);
 					width: 650rpx;
 					height: 38%;
 					z-index: 18;
@@ -1664,28 +1936,59 @@
 					}
 				}
 			}
-			.likabilityTips{
-				position: fixed;
-				left: 0;
-				top: 10%;
-				height: 600rpx;
-				width: 300rpx;
-				z-index: 15;
-				// background-color: rgba(255,255,255,.5);
-				.lbtips{
-					height: 50rpx;
-					width: 100%;
-					.likabilityBox{
-						margin-top: 10rpx;
-						width: 100%;
+			.verticalLikabilityBox{
+				.likabilityTips{
+					position: fixed;
+					left: 0;
+					top: 10%;
+					height: 600rpx;
+					width: 300rpx;
+					z-index: 15;
+					// background-color: rgba(255,255,255,.5);
+					.lbtips{
 						height: 50rpx;
-						border-radius: 20rpx;
-						background-color: rgba(0,0,0,.3);
-						text-align: center;
-						.likability{
-							color: white;
-							font-size: 30rpx;
-							line-height: 50rpx;
+						width: 100%;
+						.likabilityBox{
+							margin-top: 10rpx;
+							width: 100%;
+							height: 50rpx;
+							border-radius: 20rpx;
+							background-color: rgba(0,0,0,.3);
+							text-align: center;
+							.likability{
+								color: white;
+								font-size: 30rpx;
+								line-height: 50rpx;
+							}
+						}
+					}
+				}
+			}
+			.horizontalLikabilityBox{
+				.likabilityTips{
+					position: fixed;
+					left: 54%;
+					top: 16%;
+					height: 600rpx;
+					width: 300rpx;
+					transform: translate(-50%, -50%) rotateZ(90deg);
+					z-index: 15;
+					// background-color: rgba(255,255,255,.5);
+					.lbtips{
+						height: 50rpx;
+						width: 100%;
+						.likabilityBox{
+							margin-top: 10rpx;
+							width: 100%;
+							height: 50rpx;
+							border-radius: 20rpx;
+							background-color: rgba(0,0,0,.3);
+							text-align: center;
+							.likability{
+								color: white;
+								font-size: 30rpx;
+								line-height: 50rpx;
+							}
 						}
 					}
 				}
@@ -1730,58 +2033,118 @@
 					}
 				}
 			}
-			.storyLineBox{
-				position: fixed;
-				right: 6%;
-				top: 40%;
-				height: 80rpx;
-				width: 100rpx;
-				z-index: 15;
-				background-color: rgba(0,0,0,.3);
-				border-radius: 20rpx;
-				.storyLineIconBox{
+			.verticalBox{
+				.storyLineBox{
+					position: fixed;
+					right: 6%;
+					top: 40%;
+					height: 80rpx;
 					width: 100rpx;
-					height: 50rpx;
-					text-align: center;
-					.storyLineIcon{
-						width: 50rpx;
+					z-index: 15;
+					background-color: rgba(0,0,0,.3);
+					border-radius: 20rpx;
+					.storyLineIconBox{
+						width: 100rpx;
 						height: 50rpx;
-						background: url(../../static/icon/fenzhi.png) no-repeat center;
-						background-size: 50rpx;
+						text-align: center;
+						.storyLineIcon{
+							width: 50rpx;
+							height: 50rpx;
+							background: url(../../static/icon/fenzhi.png) no-repeat center;
+							background-size: 50rpx;
+						}
+					}
+					.storyLine{
+						text-align: center;
+						color: white;
+						font-size: 20rpx;
+						line-height: 30rpx;
 					}
 				}
-				.storyLine{
-					text-align: center;
-					color: white;
-					font-size: 20rpx;
-					line-height: 30rpx;
+				.reportBox{
+					position: fixed;
+					right: 6%;
+					top: 50%;
+					height: 80rpx;
+					width: 100rpx;
+					z-index: 15;
+					background-color: rgba(0,0,0,.3);
+					border-radius: 20rpx;
+					.reportIconBox{
+						width: 100rpx;
+						height: 50rpx;
+						text-align: center;
+						.reportIcon{
+							width: 50rpx;
+							height: 50rpx;
+							background: url(../../static/icon/report.png) no-repeat center;
+							background-size: 50rpx;
+						}
+					}
+					.report{
+						text-align: center;
+						color: white;
+						font-size: 20rpx;
+						line-height: 30rpx;
+					}
 				}
 			}
-			.reportBox{
-				position: fixed;
-				right: 6%;
-				top: 50%;
-				height: 80rpx;
-				width: 100rpx;
-				z-index: 15;
-				background-color: rgba(0,0,0,.3);
-				border-radius: 20rpx;
-				.reportIconBox{
+			.horizontalBox{
+				.storyLineBox{
+					position: fixed;
+					right: 30%;
+					top: 90%;
+					height: 80rpx;
 					width: 100rpx;
-					height: 50rpx;
-					text-align: center;
-					.reportIcon{
-						width: 50rpx;
+					transform: translate(-50%, -50%) rotateZ(90deg);
+					z-index: 15;
+					background-color: rgba(0,0,0,.3);
+					border-radius: 20rpx;
+					.storyLineIconBox{
+						width: 100rpx;
 						height: 50rpx;
-						background: url(../../static/icon/report.png) no-repeat center;
-						background-size: 50rpx;
+						text-align: center;
+						.storyLineIcon{
+							width: 50rpx;
+							height: 50rpx;
+							background: url(../../static/icon/fenzhi.png) no-repeat center;
+							background-size: 50rpx;
+						}
+					}
+					.storyLine{
+						text-align: center;
+						color: white;
+						font-size: 20rpx;
+						line-height: 30rpx;
 					}
 				}
-				.report{
-					text-align: center;
-					color: white;
-					font-size: 20rpx;
-					line-height: 30rpx;
+				.reportBox{
+					position: fixed;
+					right: 44%;
+					top: 90%;
+					transform: translate(-50%, -50%) rotateZ(90deg);
+					height: 80rpx;
+					width: 100rpx;
+					z-index: 15;
+					background-color: rgba(0,0,0,.3);
+					border-radius: 20rpx;
+					.reportIconBox{
+						width: 100rpx;
+						height: 50rpx;
+						text-align: center;
+						.reportIcon{
+							width: 50rpx;
+							height: 50rpx;
+							background: url(../../static/icon/report.png) no-repeat center;
+							background-size: 50rpx;
+						}
+					}
+					.report{
+						text-align: center;
+						color: white;
+						font-size: 20rpx;
+						line-height: 30rpx;
+					}
 				}
 			}
 			.storyLineContentMask16{
