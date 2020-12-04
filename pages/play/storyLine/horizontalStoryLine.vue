@@ -32,6 +32,10 @@
 				default () {
 					return [11061, 11063, 11071]
 				}
+			},
+			pkArtworkEndingNodeId: {
+				type: [Number, String],
+				default: null
 			}
 		},
 		components: {
@@ -62,7 +66,8 @@
 				data: {
 					pkArtworkId: this.pkArtworkId,
 					intVideoId: this.pkDetailIds[this.onfloor],
-					fkUserid: userId
+					fkUserid: userId,
+					pkArtworkEndingNodeId: this.pkArtworkEndingNodeId
 				},
 				success: res => {
 					// console.log(res.data.data)
@@ -241,7 +246,12 @@
 					})
 					
 					//使用组件跳转方式 传参
-					this.$emit("goPlay",{'pkArtworkId': this.pkArtworkId,'pkDetailId': a.pkDetailId,'jumpFlag':jumpFlag})
+					this.$emit("goPlay",{
+					'pkArtworkId': this.pkArtworkId,
+					'pkDetailId': a.pkDetailId,
+					'jumpFlag':jumpFlag,
+					'endings': a.isEndings == null ? 0 : 1,
+					})
 				} else {
 					this.showToast('请滑动至选择中心位进行跳转')
 				}
