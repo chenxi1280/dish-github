@@ -207,9 +207,9 @@
 					let b = uni.getStorageSync("pkDetailIds")
 					// 当前选中楼层的 播放历史
 					let c = this.floorList[nowFloor][0]
-					// console.log(a)
+					console.log(a)
 					
-					if (a.isEndings) {
+					if (a.parentId == -1) {
 						this.showToast('多结局不支持跳转结局，请重新选择播放线路跳转！')
 						return
 					}
