@@ -170,10 +170,10 @@
 			</view>
 		</u-modal>
 		<!-- horizontalControlsFlags -->
-		<view class="progress-time-box" v-if="true">
+		<view class="progress-time-box" v-if="horizontalControlsFlags">
 			<view class="progress-time">{{currentTimeStr}}{{durationStr}}</view>
 		</view>
-		<view class="progress-box" v-if="true">
+		<view class="progress-box" v-if="horizontalControlsFlags">
 			<view class="f-text">首</view>
 			<view class="replayVideoIconBox" @click="replayVideo">
 				<icon></icon>
@@ -480,6 +480,8 @@
 		methods: {
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option){
+				//故事线跳转需要重新走videoEnd
+				this.multipleResultPlayFlag = false
 				this.isPlayedFlag = option.jumpFlag
 				//故事线跳转时清除好感度延时函数
 				clearTimeout(this.likabilityDelayFunction)
