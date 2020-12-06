@@ -50,7 +50,9 @@
 				oncolumn: 0, // 当前列
 				lockFloor: 0, // 锁定楼层
 				lockColumn: 0 ,// 锁定列
-				isNumberFlag:false
+				isNumberFlag:false,
+				resData:[],
+				endingFlag: false
 
 			}
 		},
@@ -71,6 +73,7 @@
 				},
 				success: res => {
 					// console.log(res.data.data)
+					this.resData = res.data.data
 					this.pkDetailIds.forEach( v => {
 						res.data.data.forEach(node => {
 							if (v === node.pkDetailId) {
@@ -92,9 +95,14 @@
 					})
 					// console.log(this.list)
 					console.log(this.floorList)
+					if (this.floorList[this.floorList.length -1][0].parentId == - 1 )  {
+						this.endingFlag = true
+					}
 					this.clearnBrother()
 				}
 			})
+			
+			
 		},
 		methods: {
 			// 换位置，并 修改title img 
@@ -202,7 +210,7 @@
 			},
 			goPlay(index, nowFloor) {
 				if (nowFloor == this.onfloor && index == this.oncolumn) {
-					console.log(this.floorList[nowFloor][index])
+				
 					let a = this.floorList[nowFloor][index]
 					let b = uni.getStorageSync("pkDetailIds")
 					// 当前选中楼层的 播放历史
@@ -213,6 +221,70 @@
 						this.showToast('多结局不支持跳转结局，请重新选择播放线路跳转！')
 						return
 					}
+					
+					console.log(this.floorList)
+					console.log(nowFloor)
+					console.log(this.floorList.length)
+					console.log(this.lockFloor)
+					if (this.endingFlag) {
+						if (index == 0 ) {
+							console.log(nowFloor)
+							console.log(this.lockFloor)
+							if (this.lockFloor != nowFloor) {
+								if (this.floorList[this.floorList.length -1][0].parentId == -1 ) {
+									if ( nowFloor == this.floorList.length - 2 ) {
+										this.showToast('多结局不支持选择最后一级选项，请在上一级选择！')
+										console.log("A")
+										return
+									}	
+								}else {
+									if ( nowFloor == this.floorList.length - 1 ) {
+										this.showToast('多结局不支持选择最后一级选项，请在上一级选择！')
+										console.log("B")
+										return
+									}	
+								}
+								
+							}else {
+								if ( nowFloor == this.floorList.length - 1 ) {
+									this.showToast('多结局不支持选择最后一级选项，请在上一级选择！')
+									console.log("B")
+									return
+								}	
+							}
+							
+						}else {
+							if ( nowFloor == this.floorList.length - 1 ) {
+								if ( nowFloor == this.floorList.length - 1 ) {
+									this.showToast('多结局不支持选择最后一级选项，请在上一级选择！')
+									console.log("C")
+									return
+								}	
+							}else {
+								if ( nowFloor == this.floorList.length - 1 ) {
+									this.showToast('多结局不支持选择最后一级选项，请在上一级选择！')
+									console.log("D")
+									return
+								}
+								
+							}
+						}
+					}
+					
+					// if (this.floorList[this.floorList.length -1][0].parentId == -1 ) {
+					// 	if (index == 0) {
+					// 		if ( nowFloor == this.floorList.length - 2 ) {
+					// 			this.showToast('多结局不支持选择最后一级选项，请在上一级选择！')
+					// 			return
+					// 		}	
+					// 	}else {
+					// 		if ( nowFloor == this.floorList.length - 1 ) {
+					// 			this.showToast('多结局不支持选择最后一级选项，请在上一级选择！')
+					// 			return
+					// 		}	
+					// 	}
+									
+					// }
 					
 					if (a.isNumberSelect != null ) {
 							this.isNumberFlag = a.isNumberSelect == 1
@@ -244,6 +316,7 @@
 					// 	a.pkDetailId = a.linkUrl
 						
 					// }
+					console.log(this.resData)
 					uni.setStorageSync("pkDetailIds", b);
 					this.$refs.uToast.show({
 						title: '选中跳转到' + a.selectTitle ,
