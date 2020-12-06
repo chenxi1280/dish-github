@@ -105,7 +105,8 @@
 					<view class="title">故事线</view>
 					<view class="splitLine"></view>
 					<view class="storyLineContent">
-						<storyLine :pkArtworkId="artworkId" :pkDetailIds="playedHistoryArray" @goPlay="storyLineJumpPlayTodo"></storyLine>
+						<horizontalStoryLine :pkArtworkId="artworkId" :pkDetailIds="playedHistoryArray" @goPlay="storyLineJumpPlayTodo" v-if="!storyLineFlag"></horizontalStoryLine>
+						<storyLine :pkArtworkId="artworkId" :pkDetailIds="playedHistoryArray" @goPlay="storyLineJumpPlayTodo" v-if="storyLineFlag"></storyLine>
 					</view>
 				</view>
 			</view>
@@ -194,9 +195,11 @@
 <script>
 	import { baseURL } from '../login/config/config.js'
 	import storyLine from './storyLine/storyLine.vue'
+	import {horizontalStoryLine} from './storyLine/horizontalStoryLine.vue'
 	export default {
 		components:{
-			storyLine
+			storyLine,
+			horizontalStoryLine
 		},
 		data() {
 			return {
@@ -211,7 +214,7 @@
 				//选项背景颜色
 				background: ["","","",""],
 				//隐藏按钮开关
-				hiddenBtnFlag: true,
+				hiddenBtnFlag: false,
 				//是否展示选项开关
 				chooseTipsShowFlag: false,
 				//选项最底层蒙版
@@ -329,18 +332,20 @@
 				//播放暂停控件的开关
 				suspendFlag: false,
 				//视频的当前播放时间 250mm获取一次当前播放时间
-				currentTime: 0
+				currentTime: 0,
+				//故事线flag true表示展示竖版的故事线
+				storyLineFlag: true,
+				//多结局路线存储容器
+				multipleResultLine: [],
+				//多结局播放标志
+				multipleResultPlayFlag: false
 			}
 		},
 		onReady(){
-			//test
-			this.artworkId = 10145
 			//重置开关状态到初始值
 			this.isClickOptionFlag = false
 			//关闭好感度 视频加载结束时打开
 			this.likabilityFlag = false
-			//关闭故事线和举报 视频加载结束时打开
-			this.hiddenBtnFlag = !this.hiddenBtnFlag
 			//获取手机屏幕尺寸 单位是px
 			const {windowWidth, windowHeight, brand, model} = uni.getSystemInfoSync()
 			//将用户手机窗口尺寸记录方便在方法中调用
@@ -493,6 +498,14 @@
 				this.getArtworkTreeByDetailId()
 				//获取播放历史记录
 				this.playedHistoryArray = uni.getStorageSync("pkDetailIds")
+				//故事线跳回重置多结局数组
+				let multipleResultLine = uni.getStorageSync("multipleResultLine")
+				multipleResultLine.splice(this.playedHistoryArray.length,multipleResultLine.length -(this.playedHistoryArray.length))
+				// console.log('数组截取的起始长度: ',this.playedHistoryArray.length)
+				// console.log('数组截取的长度: ',multipleResultLine.length -(this.playedHistoryArray.length))
+				this.multipleResultLine = multipleResultLine
+				console.log("multipleResultLine: ", this.multipleResultLine)
+				uni.setStorageSync("multipleResultLine",multipleResultLine)
 				//获取存放节点数值的容器
 				let appearConditionMap = uni.getStorageSync('appearConditionMap')
 				//不能判断是普通选项的跳转还是数值选项的跳转了 因为数值选项中也可能存在普通选项会导致误判
@@ -686,6 +699,7 @@
 							uni.setStorageSync("mainArtworkTree",res.data.data);
 							//传到播放页面带pkDetailId参数 说明故事线跳转，只需要存一棵主树跳转节点不用去播放视频
 							uni.setStorageSync('playMode',res.data.data.playMode); 
+							uni.setStorageSync('isEndings',res.data.data.isEndings ); 
 							if(this.pkDetailId != null) return;
 							this.initPlayData(res.data.data);
 						}
@@ -707,8 +721,41 @@
 					success: res=> {
 						if(res.data.status == 200){
 							uni.setStorageSync("artworkTree",res.data.data);
-							uni.setStorageSync('playMode',res.data.data.playMode); 
+							uni.setStorageSync('playMode',res.data.data.playMode);
+							uni.setStorageSync('isEndings',res.data.data.isEndings ); 
 							this.initPlayData(res.data.data);
+						}
+					}
+				})
+			},
+			async getMultipleResultLastVideo(){
+				let multipleResultStr = '0'
+				for(let i = 0; i <  this.multipleResultLine.length; i++){
+					multipleResultStr = multipleResultStr + this.multipleResultLine[i]
+				}
+				console.log(multipleResultStr)
+				await uni.request({
+					url: baseURL + "/wxPlay/getArtworkEndings",
+					method: 'POST',
+					dataType: 'json',
+					data: {
+						fkArtworkId: this.artworkId,
+						playHistory: multipleResultStr
+					},
+					success: res=> {
+						if(res.data.status == 200){
+							//清空路线容器
+							 this.multipleResultLine = []
+							//随机数
+							const uuid = Math.random().toString(36).substring(2)
+							//初始化视频
+							this.videoUrl = res.data.data.videoUrl+'?uuid='+uuid
+							uni.setStorageSync("detailId",res.data.data.fkNodeId)
+							this.playedHistoryArray.push(res.data.data.fkNodeId)
+							//存储多结局的结局视频播放历史
+							uni.setStorageSync("pkDetailIds",this.playedHistoryArray)
+							//保存播放记录
+							this.savaPlayRecord();
 						}
 					}
 				})
@@ -802,12 +849,18 @@
 						this.chooseTipsMaskFlag = true
 					}
 				}else{
-					this.storyLineContentFlag = true
 					this.chooseTipsShowFlag = false
 					this.chooseTipsMaskFlag = false
 					this.showCanvasFlag = false
 					uni.setStorageSync('userScore',[])
-					this.statisticsStorylineNaturalshow()
+					if(!this.multipleResultPlayFlag){
+						this.getMultipleResultLastVideo()
+						this.multipleResultPlayFlag = true
+					}else{
+						this.storyLineContentFlag = true
+						this.statisticsStorylineNaturalshow()
+						this.multipleResultPlayFlag = false
+					}
 				}
 			},
 			//视屏暂停操作
@@ -911,36 +964,44 @@
 			},
 			// 选项touchend事件触发时所做的操作
 			optionTouchendTodo(index){
-				let advancedList = this.childs[index].onAdvancedList
-				let userScore = uni.getStorageSync('userScore')
-				let isNumericalOptions = this.childs[index].isNumberSelect
-				if(isNumericalOptions == 1){
-					for(let i = 0; i< advancedList.length; i++){
-						if(advancedList[i].changeFlag == 1){
-							let countSymbol = advancedList[i].change
-							let countNumber = advancedList[i].changeValue - 0
-							if('+' === countSymbol){
-								userScore[i] =  userScore[i] + countNumber
-							}else{
-								userScore[i] =  userScore[i] - countNumber
-							}
-						}
-						if(advancedList[i].nameDisplay == 1){
-							let obj = {
-								title: advancedList[i].nameCondition,
-								value: userScore[i]
-							}
-							this.likabilityArray.push(obj)
-						}
-					}
+				if(uni.getStorageSync('isEndings') == 1){
+					this.multipleResultLine.push(index + 1)
+					uni.setStorageSync('multipleResultLine', this.multipleResultLine)
 					this.chooseTipsShowFlag = false
 					this.chooseTipsMaskFlag = false
-					uni.setStorageSync('userScore', userScore)
-					this.initPlayData(this.childs[index])
+					this.initPlayData(this.childs[0])
 				}else{
-					this.chooseTipsShowFlag = false
-					this.chooseTipsMaskFlag = false
-					this.initPlayData(this.childs[index])
+					let advancedList = this.childs[index].onAdvancedList
+					let userScore = uni.getStorageSync('userScore')
+					let isNumericalOptions = this.childs[index].isNumberSelect
+					if(isNumericalOptions == 1){
+						for(let i = 0; i< advancedList.length; i++){
+							if(advancedList[i].changeFlag == 1){
+								let countSymbol = advancedList[i].change
+								let countNumber = advancedList[i].changeValue - 0
+								if('+' === countSymbol){
+									userScore[i] =  userScore[i] + countNumber
+								}else{
+									userScore[i] =  userScore[i] - countNumber
+								}
+							}
+							if(advancedList[i].nameDisplay == 1){
+								let obj = {
+									title: advancedList[i].nameCondition,
+									value: userScore[i]
+								}
+								this.likabilityArray.push(obj)
+							}
+						}
+						this.chooseTipsShowFlag = false
+						this.chooseTipsMaskFlag = false
+						uni.setStorageSync('userScore', userScore)
+						this.initPlayData(this.childs[index])
+					}else{
+						this.chooseTipsShowFlag = false
+						this.chooseTipsMaskFlag = false
+						this.initPlayData(this.childs[index])
+					}
 				}
 			},
 			//点击选项关闭按钮触发事件
@@ -1151,9 +1212,9 @@
 						//矩形左上角点的坐标(X,Y)
 						//toFixed(0) 四舍五入保留设置的位数 返回一个字符串
 						let rectX = parseInt(((this.nodeLocationList[i].textRectX+0)*this.canvasHeight).toFixed(0))
-						console.log('矩形框的x轴坐标: ', rectX)
+						// console.log('矩形框的x轴坐标: ', rectX)
 						let rectY = parseInt(((this.nodeLocationList[i].textRectY+0)*this.canvasWidth).toFixed(0))
-						console.log('矩形框的y轴坐标: ', rectY)
+						// console.log('矩形框的y轴坐标: ', rectY)
 						//文字距离左右两个边框的间距
 						let marginLeftAndRightSides = 8
 						//矩形框高度
@@ -1206,10 +1267,10 @@
 						
 						//将坐标收纳成对象保存到数组，为绑定事件做准备
 						let rect={
-							x: parseInt((rectX-(rectW/2)).toFixed(0)),
-							y: parseInt((rectY-(rectH/2)).toFixed(0)),
-							w: rectW,
-							h: rectH
+							x: this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH),
+							y: parseInt((rectX-(rectW/2)).toFixed(0)),
+							w: rectH,
+							h: rectW
 						}
 						this.rectArray.push(rect)
 						//rgba(255, 255, 255, 0.5)
@@ -1236,10 +1297,10 @@
 						//设置字体颜色
 						ctx.setFillStyle('white')
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
-						let textX = parseInt(((this.canvasWidth - (rectY)+(marginLeftAndRightSides/2))-(rectW/2)).toFixed(0))
+						/* let textX = parseInt(((this.canvasWidth - (rectY)+(marginLeftAndRightSides/2))-(rectW/2)).toFixed(0))
 						console.log('textX: ', textX)
 						let textY =  parseInt(((rectH+rectX-marginBottom)-(rectH/2)).toFixed(0))
-						console.log('textY: ', textY)
+						console.log('textY: ', textY) */
 						ctx .save ();
 						ctx.translate(this.canvasWidth - rectY, rectX)
 						ctx.rotate ( 90 * Math .PI / 180 )
@@ -1286,12 +1347,12 @@
 									ctx.setFillStyle('#96CDCD')
 									this.isClickFlag = false
 								}else{
-									ctx.setStrokeStyle('rgba(255, 255, 255,'+ 1 +')')//rectOpacity
-									ctx.setFillStyle('rgba(255, 255, 255, '+ 1 +')')
+									ctx.setStrokeStyle('rgba(255, 255, 255,'+ rectOpacity +')')
+									ctx.setFillStyle('rgba(255, 255, 255, '+ rectOpacity +')')
 								}
 						}else{
-							ctx.setStrokeStyle('rgba(255, 255, 255,'+ 1 +')')
-							ctx.setFillStyle('rgba(255, 255, 255,'+ 1 +')')
+							ctx.setStrokeStyle('rgba(255, 255, 255,'+ rectOpacity +')')
+							ctx.setFillStyle('rgba(255, 255, 255,'+ rectOpacity +')')
 						}
 						ctx.fill()
 						//开始描绘
@@ -1356,13 +1417,16 @@
 						// console.log('y轴终点: ',yUpperLimit)
 						if(touchX > xLowLimit && touchX < xUpperLimit && touchY > yLowLimit && touchY < yUpperLimit){
 							this.touchRectNum = i;
-							console.log('this.touchRectNum: '+this.touchRectNum)
+							// console.log('this.touchRectNum: '+this.touchRectNum)
 						}
 					}
 					if(this.touchRectNum < 4){
 						this.isClickFlag = true
-						// this.initVerticalCanvas()
-						 this.initHorizontalCanvas()
+						if(uni.getStorageSync('playMode') == 1){
+							this.initHorizontalCanvas()
+						}else{
+							this.initVerticalCanvas();
+						}
 					}
 				}
 			},
@@ -1423,34 +1487,41 @@
 			},
 			// canvas的touchEnd事件触发时的操作
 			canvasTouchendEventTodo(){
-				let advancedList = this.childs[this.touchRectNum].onAdvancedList
-				let userScore = uni.getStorageSync('userScore')
-				let isNumericalOptions = this.childs[this.touchRectNum].isNumberSelect
-				if(isNumericalOptions == 1){
-					for(let i = 0; i< advancedList.length; i++){
-						if(advancedList[i].changeFlag == 1){
-							let countSymbol = advancedList[i].change
-							let countNumber = advancedList[i].changeValue - 0
-							if('+' === countSymbol){
-								userScore[i] =  userScore[i] + countNumber
-							}else{
-								userScore[i] =  userScore[i] - countNumber
-							}
-						}
-						if(advancedList[i].nameDisplay == 1){
-							let obj = {
-								title: advancedList[i].nameCondition,
-								value: userScore[i]
-							}
-							this.likabilityArray.push(obj)
-						}
-					}
+				if(uni.getStorageSync('isEndings') == 1){
+					this.multipleResultLine.push(this.touchRectNum + 1)
+					uni.setStorageSync('multipleResultLine', this.multipleResultLine)
 					this.showCanvasFlag = false
-					uni.setStorageSync('userScore', userScore)
-					this.initPlayData(this.childs[this.touchRectNum])
+					this.initPlayData(this.childs[0])
 				}else{
-					this.showCanvasFlag = false
-					this.initPlayData(this.childs[this.touchRectNum])
+					let advancedList = this.childs[this.touchRectNum].onAdvancedList
+					let userScore = uni.getStorageSync('userScore')
+					let isNumericalOptions = this.childs[this.touchRectNum].isNumberSelect
+					if(isNumericalOptions == 1){
+						for(let i = 0; i< advancedList.length; i++){
+							if(advancedList[i].changeFlag == 1){
+								let countSymbol = advancedList[i].change
+								let countNumber = advancedList[i].changeValue - 0
+								if('+' === countSymbol){
+									userScore[i] =  userScore[i] + countNumber
+								}else{
+									userScore[i] =  userScore[i] - countNumber
+								}
+							}
+							if(advancedList[i].nameDisplay == 1){
+								let obj = {
+									title: advancedList[i].nameCondition,
+									value: userScore[i]
+								}
+								this.likabilityArray.push(obj)
+							}
+						}
+						this.showCanvasFlag = false
+						uni.setStorageSync('userScore', userScore)
+						this.initPlayData(this.childs[this.touchRectNum])
+					}else{
+						this.showCanvasFlag = false
+						this.initPlayData(this.childs[this.touchRectNum])
+					}
 				}
 			},
 			// 校正视频播放的黑边 单位px
@@ -1624,23 +1695,30 @@
 					videoWidth: e.detail.width
 				})
 				//加载完视频加载视频的尺寸
-				// this.validateVerticalWindowSize()
-				//test
-				this.transform = 'translate(-50%, -50%) rotateZ(90deg)'
-				this.showStyleFlag = false
-				this.validateHorizontalWindowSize()
-				this.playGestureFlag = false
-				this.progressGestureFlag = false
-				this.horizontalControlsFlags = false
-				this.horizontalControlsFunction	= setTimeout(()=>{
+				if(uni.getStorageSync('playMode') == 1){
+					this.transform = 'translate(-50%, -50%) rotateZ(90deg)'
+					this.showStyleFlag = false
+					this.validateHorizontalWindowSize()
+					this.playGestureFlag = false
+					this.progressGestureFlag = false
 					this.horizontalControlsFlags = false
-				},5000)
-				//test
+					this.horizontalControlsFunction	= setTimeout(()=>{
+						this.horizontalControlsFlags = false
+					},5000)
+					this.storyLineFlag = false
+				}else{
+					this.controlsFlag = true
+					this.horizontalControlsFlags = false
+					this.validateVerticalWindowSize()
+				}
 				//初始画布必须等到选项数据先初始化完才能进行
 				if(this.isPosition == 1){
 					//初始化画布
-					// this.initVerticalCanvas();
-					this.initHorizontalCanvas()
+					if(uni.getStorageSync('playMode') == 1){
+						this.initHorizontalCanvas()
+					}else{
+						this.initVerticalCanvas();
+					}
 				}
 			},
 			videoTimeupdate(e){
@@ -1694,11 +1772,13 @@
 				this.tsy = e.changedTouches[0].clientY
 			},
 			videoTouchend(e){
-				clearTimeout(this.horizontalControlsFunction)
-				this.horizontalControlsFlags = true
-				this.horizontalControlsFunction	= setTimeout(()=>{
-					this.horizontalControlsFlags = false
-				},5000)
+				if(uni.getStorageSync('playMode') == 1){
+					clearTimeout(this.horizontalControlsFunction)
+					this.horizontalControlsFlags = true
+					this.horizontalControlsFunction	= setTimeout(()=>{
+						this.horizontalControlsFlags = false
+					},5000)
+				}
 			},
 			progressBoxTouchEnd(){
 				clearTimeout(this.horizontalControlsFunction)
