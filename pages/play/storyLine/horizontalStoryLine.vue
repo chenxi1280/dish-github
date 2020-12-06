@@ -254,8 +254,7 @@
 					this.$emit("goPlay",{
 					'pkArtworkId': this.pkArtworkId,
 					'pkDetailId': a.pkDetailId,
-					'jumpFlag':jumpFlag,
-					'endings': a.isEndings == null ? 0 : 1,
+					'jumpFlag':jumpFlag
 					})
 				} else {
 					this.showToast('请滑动至选择中心位进行跳转')
