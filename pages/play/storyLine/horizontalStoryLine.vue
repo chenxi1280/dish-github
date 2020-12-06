@@ -52,7 +52,8 @@
 				lockColumn: 0 ,// 锁定列
 				isNumberFlag:false,
 				resData:[],
-				endingFlag: false
+				endingFlag: false,
+				lockEndingFloor: -1
 
 			}
 		},
@@ -97,6 +98,7 @@
 					console.log(this.floorList)
 					if (this.floorList[this.floorList.length -1][0].parentId == - 1 )  {
 						this.endingFlag = true
+						this.lockEndingFloor = this.floorList.length - 2
 					}
 					this.clearnBrother()
 				}
@@ -230,6 +232,11 @@
 						if (index == 0 ) {
 							console.log(nowFloor)
 							console.log(this.lockFloor)
+							if (this.lockEndingFloor == nowFloor ) {
+								this.showToast('多结局不支持选择最后一级选项，请在上一级选择！')
+								console.log("AS")
+								return
+							}
 							if (this.lockFloor != nowFloor) {
 								if (this.floorList[this.floorList.length -1][0].parentId == -1 ) {
 									if ( nowFloor == this.floorList.length - 2 ) {
