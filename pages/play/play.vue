@@ -78,7 +78,7 @@
 					<view class="storyLineIconBox">
 						<icon class="storyLineIcon"></icon>
 					</view>
-					<view class="storyLine">故事线</view>
+					<view class="storyLine">换个选择</view>
 				</view>
 			</view>
 			<!-- 竖屏 -->
@@ -93,7 +93,7 @@
 					<view class="storyLineIconBox">
 						<icon class="storyLineIcon"></icon>
 					</view>
-					<view class="storyLine">故事线</view>
+					<view class="storyLine">换个选择</view>
 				</view>
 			</view>
 			<!-- 故事线内容呈现在蒙板之上 -->
@@ -169,7 +169,12 @@
 				<rich-text nodes="预览作品只能作者自己观看\n\n请登录作者帐号"></rich-text>
 			</view>
 		</u-modal>
-		<view class="progress-box" v-if="horizontalControlsFlags">
+		<!-- horizontalControlsFlags -->
+		<view class="progress-time-box" v-if="true">
+			<view class="progress-time">{{currentTimeStr}}{{durationStr}}</view>
+		</view>
+		<view class="progress-box" v-if="true">
+			<view class="f-text">首</view>
 			<view class="replayVideoIconBox" @click="replayVideo">
 				<icon></icon>
 			</view>
@@ -188,6 +193,7 @@
 		    <view class="endVideoIconBox" @click="endVideo">
 		   		<icon></icon>
 		    </view>
+			<view class="t-text">尾</view>
 		</view>
 	</view>
 </template>
@@ -338,7 +344,11 @@
 				//多结局路线存储容器
 				multipleResultLine: [],
 				//多结局播放标志
-				multipleResultPlayFlag: false
+				multipleResultPlayFlag: false,
+				//用于横屏播放时显示的视频的总时长
+				durationStr: '',
+				//用于横屏播放时显示的视频的当前时间
+				currentTimeStr: ''
 			}
 		},
 		onReady(){
@@ -969,7 +979,8 @@
 					uni.setStorageSync('multipleResultLine', this.multipleResultLine)
 					this.chooseTipsShowFlag = false
 					this.chooseTipsMaskFlag = false
-					this.initPlayData(this.childs[0])
+					let child = this.findmultipleResultChild()
+					this.initPlayData(child)
 				}else{
 					let advancedList = this.childs[index].onAdvancedList
 					let userScore = uni.getStorageSync('userScore')
@@ -1002,6 +1013,14 @@
 						this.chooseTipsMaskFlag = false
 						this.initPlayData(this.childs[index])
 					}
+				}
+			},
+			findmultipleResultChild(){
+				for(let i = 0; i < this.childs.length; i++){
+					if(this.childs[i].isLink == 1){
+						continue;
+					}
+					return this.childs[i]
 				}
 			},
 			//点击选项关闭按钮触发事件
@@ -1491,7 +1510,8 @@
 					this.multipleResultLine.push(this.touchRectNum + 1)
 					uni.setStorageSync('multipleResultLine', this.multipleResultLine)
 					this.showCanvasFlag = false
-					this.initPlayData(this.childs[0])
+					let child = this.findmultipleResultChild()
+					this.initPlayData(child)
 				}else{
 					let advancedList = this.childs[this.touchRectNum].onAdvancedList
 					let userScore = uni.getStorageSync('userScore')
@@ -1674,6 +1694,10 @@
 			},
 			loadeddata(e){
 				this.duration = e.detail.duration
+				let hour = ((this.duration/3600).toFixed(0)).length == 1 ? '0' + (this.duration/3600).toFixed(0) : (this.duration/3600).toFixed(0)
+				let minute = ((this.duration/60).toFixed(0)).length == 1 ? '0'+(this.duration/60).toFixed(0) : (this.duration/60).toFixed(0)
+				let second = ((this.duration%60).toFixed(0)).length == 1 ? '0'+(this.duration%60).toFixed(0) : (this.duration%60).toFixed(0)
+				this.durationStr = hour+":"+minute+":"+second
 				//判断是不是故事线跳转过来的第一个视频 第一个视频需要快进到结尾进行播放
 				if(this.isPlayedFlag){
 					const videoContext = uni.createVideoContext('myVideo')
@@ -1724,6 +1748,10 @@
 			videoTimeupdate(e){
 				//获取视频当前时间
 				this.currentTime = e.detail.currentTime
+				let hour = ((this.currentTime/3600).toFixed(0)).length == 1 ? '0' + (this.currentTime/3600).toFixed(0) : (this.currentTime/3600).toFixed(0)
+				let minute = ((this.currentTime/60).toFixed(0)).length == 1 ? '0'+(this.currentTime/60).toFixed(0) : (this.currentTime/60).toFixed(0)
+				let second = ((this.currentTime%60).toFixed(0)).length == 1 ? '0'+(this.currentTime%60).toFixed(0) : (this.currentTime%60).toFixed(0)
+				this.currentTimeStr = hour+":"+minute+":"+second + '/'
 			},
 			replayVideo(){
 				const videoContext = uni.createVideoContext('myVideo')
@@ -1755,8 +1783,8 @@
 			jumpForwardVideo(){
 				const videoContext = uni.createVideoContext('myVideo')
 				let targetPlayTime = this.currentTime + this.duration * 0.15
-				if(targetPlayTime > this.duration - 2){
-					videoContext.seek(parseInt((this.duration-2).toFixed(0)))
+				if(targetPlayTime > this.duration - 1){
+					videoContext.seek(parseInt((this.duration-1).toFixed(0)))
 				}else{
 					videoContext.seek(parseInt(targetPlayTime.toFixed(0)))
 				}
@@ -1764,7 +1792,7 @@
 			},
 			endVideo(){
 				const videoContext = uni.createVideoContext('myVideo')
-				videoContext.seek(parseInt((this.duration-2).toFixed(0)))
+				videoContext.seek(parseInt((this.duration-1).toFixed(0)))
 				this.progressBoxTouchEnd()
 			},
 			videoTouchstart(e){
@@ -1956,13 +1984,29 @@
 	.playBox{
 		width: 100%;
 		height: 100%;
+		.progress-time-box{
+			position: fixed;
+			left: 12%;
+			top: 50%;
+			z-index: 10;
+			height: 50rpx;
+			width: 260rpx;
+			display: flex;
+			justify-content: center;
+			background-color:  rgba(0, 0, 0, 0.5);
+			transform: translate(-50%, -50%) rotateZ(90deg);
+			.progress-time{
+				color: white;
+				line-height: 50rpx;
+			}
+		}
 		.progress-box{
 			position: fixed;
 			left: 5%;
 			top: 50%;
 			z-index: 10;
 			height: 50rpx;
-			width: 400rpx;
+			width: 450rpx;
 			display: flex;
 			justify-content: center;
 			background-color:  rgba(0, 0, 0, .5);
@@ -2033,6 +2077,14 @@
 					background: url(../../static/icon/jumpback.png) no-repeat center;
 					background-size: 50rpx;
 				}
+			}
+			.f-text{
+				color: white;
+				line-height: 50rpx;
+			}
+			.t-text{
+				color: white;
+				line-height: 50rpx;
 			}
 		}
 		.videoLoadImageBox{
@@ -2318,7 +2370,7 @@
 			.horizontalBox{
 				.storyLineBox{
 					position: fixed;
-					right: 30%;
+					right: 0;
 					top: 90%;
 					height: 80rpx;
 					width: 100rpx;
@@ -2346,8 +2398,8 @@
 				}
 				.reportBox{
 					position: fixed;
-					right: 44%;
-					top: 90%;
+					right: 0;
+					top: 80%;
 					transform: translate(-50%, -50%) rotateZ(90deg);
 					height: 80rpx;
 					width: 100rpx;
