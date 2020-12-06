@@ -344,11 +344,11 @@
 				//多结局路线存储容器
 				multipleResultLine: [],
 				//多结局播放标志
-				multipleResultPlayFlag: false,
+				parentId: 0,
 				//用于横屏播放时显示的视频的总时长
 				durationStr: '',
 				//用于横屏播放时显示的视频的当前时间
-				currentTimeStr: ''
+				currentTimeStr: '',
 			}
 		},
 		onReady(){
@@ -480,7 +480,7 @@
 		methods: {
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option){
-				//故事线跳转需要重新走videoEnd
+				//重置多结局自然呈现故事线开关
 				this.multipleResultPlayFlag = false
 				this.isPlayedFlag = option.jumpFlag
 				//故事线跳转时清除好感度延时函数
@@ -587,9 +587,10 @@
 				//初始化视频及选项
 				this.videoUrl = artworkTree.videoUrl+'?uuid='+uuid
 				this.detailId = artworkTree.pkDetailId
+				this.parentId = artworkTree.parentId
 				this.imageSrc = artworkTree.nodeLastImgUrl
 				//如果是根节点初始化存储节点分值的容器
-				if(artworkTree.parentId === 0){
+				if(this.parentId === 0){
 					//存进缓存是防止故事线进入时重置了data里面的数据
 					uni.setStorageSync('appearConditionMap', artworkTree.appearConditionMap)
 				}
@@ -764,6 +765,7 @@
 							this.videoUrl = res.data.data.videoUrl+'?uuid='+uuid
 							uni.setStorageSync("detailId",res.data.data.fkNodeId)
 							this.playedHistoryArray.push(res.data.data.fkNodeId)
+							this.parentId = res.data.data.parentId
 							//存储多结局的结局视频播放历史
 							uni.setStorageSync("pkDetailIds",this.playedHistoryArray)
 							//保存播放记录
@@ -865,13 +867,16 @@
 					this.chooseTipsMaskFlag = false
 					this.showCanvasFlag = false
 					uni.setStorageSync('userScore',[])
-					if(!this.multipleResultPlayFlag){
-						this.getMultipleResultLastVideo()
-						this.multipleResultPlayFlag = true
+					if(uni.getStorageSync('isEndings') == 1){
+						if(this.parentId != -1){
+							this.getMultipleResultLastVideo()
+						}else{
+							this.storyLineContentFlag = true
+							this.statisticsStorylineNaturalshow()
+						}
 					}else{
 						this.storyLineContentFlag = true
 						this.statisticsStorylineNaturalshow()
-						this.multipleResultPlayFlag = false
 					}
 				}
 			},
