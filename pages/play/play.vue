@@ -7,7 +7,7 @@
 		<view class="play" :style="{'width': mobilePhoneWidth+'px', 'height': mobilePhoneHeight+'px'}">
 			<!-- 定位选项画布 -->
 			<view class="container"  v-show="showCanvasFlag" 
-			:style="{'width': canvasWidth+'px', 'height': canvasHeight+'px', 'transform': transform}">
+			:style="{'width': canvasWidth+'px', 'height': canvasHeight+'px'}">
 			  <canvas canvas-id="myCanvas" @touchstart="getTouchPosition" @touchend="canvasTouchendEvent"></canvas>
 			</view>
 			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" -->
@@ -334,7 +334,7 @@
 		},
 		onReady(){
 			//test
-			this.artworkId = 10146
+			this.artworkId = 10145
 			//重置开关状态到初始值
 			this.isClickOptionFlag = false
 			//关闭好感度 视频加载结束时打开
@@ -685,6 +685,7 @@
 						if(res.data.status == 200){
 							uni.setStorageSync("mainArtworkTree",res.data.data);
 							//传到播放页面带pkDetailId参数 说明故事线跳转，只需要存一棵主树跳转节点不用去播放视频
+							uni.setStorageSync('playMode',res.data.data.playMode); 
 							if(this.pkDetailId != null) return;
 							this.initPlayData(res.data.data);
 						}
@@ -706,6 +707,7 @@
 					success: res=> {
 						if(res.data.status == 200){
 							uni.setStorageSync("artworkTree",res.data.data);
+							uni.setStorageSync('playMode',res.data.data.playMode); 
 							this.initPlayData(res.data.data);
 						}
 					}
@@ -979,8 +981,8 @@
 				const videoContext = uni.createVideoContext('myVideo')
 				videoContext.play()
 			},
-			//初始化canvas画布
-			initCanvas(){
+			//初始化竖屏canvas画布
+			initVerticalCanvas(){
 				this.rectArray = []
 				const ctx = uni.createCanvasContext('myCanvas')
 				// console.log('画布的宽: ',this.canvasWidth)
@@ -1136,6 +1138,168 @@
 					}
 				}
 			},
+			//初始化竖屏canvas画布
+			initHorizontalCanvas(){
+				this.rectArray = []
+				const ctx = uni.createCanvasContext('myCanvas')
+				// console.log('画布的宽: ',this.canvasWidth)
+				// console.log('画布的高: ',this.canvasHeight)
+				ctx.clearRect(0 , 0 , this.canvasWidth, this.canvasHeight)
+				for(let i = 0; i < this.nodeLocationList.length; i++){
+					if(this.nodeLocationList[i].isHide == 1){
+						// console.log(1)
+						//矩形左上角点的坐标(X,Y)
+						//toFixed(0) 四舍五入保留设置的位数 返回一个字符串
+						let rectX = parseInt(((this.nodeLocationList[i].textRectX+0)*this.canvasHeight).toFixed(0))
+						console.log('矩形框的x轴坐标: ', rectX)
+						let rectY = parseInt(((this.nodeLocationList[i].textRectY+0)*this.canvasWidth).toFixed(0))
+						console.log('矩形框的y轴坐标: ', rectY)
+						//文字距离左右两个边框的间距
+						let marginLeftAndRightSides = 8
+						//矩形框高度
+						let rectH = 22
+						// console.log('矩形框的高: ',rectW)
+						//字体大小
+						let fontSize = 14
+						//文字距离矩形框下边框边距
+						let marginBottom = 6
+						//文本内容
+						let textContent = this.option[i]
+						//测量之前要先确定字体大小 因为矩形宽是根据字体的长度来绘画的 不设置会影响测量
+						ctx.setFontSize(fontSize)
+						//测量文本宽度
+						let metrics = ctx.measureText(textContent)
+						//宽度取整 Math.ceil向上取整即省去小数再加1 宽度由文本的宽度加边距组成
+						let rectW = parseInt(metrics.width.toFixed(0))+marginLeftAndRightSides;
+						//末尾小圆圈的横纵坐标 算总长度时应该减去黑边
+						let cX = parseInt(((this.nodeLocationList[i].circleX+0)*this.canvasHeight).toFixed(0))
+						// console.log('圆点的x轴坐标: ', cX)
+						let cY = parseInt(((this.nodeLocationList[i].circleY+0)*this.canvasWidth).toFixed(0))
+						// console.log('圆点的y轴坐标: ', cY)
+						//画线 连线到小圆心
+						let cr = 2
+						ctx.moveTo(this.canvasWidth - (cY + 2), cX)
+						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
+						ctx.lineTo(this.canvasWidth - (rectY), rectX)
+						ctx.setStrokeStyle('white')
+						ctx.stroke()
+						
+						//画末尾小圆圈
+						//x,y,r,sAngle（起始弧度,单位弧度（在3点钟方向）），eAngle（终止弧度）counterclockwise可选，默认是false 标识顺时针 
+						//让起始点转到12点就需要倒退0.5* Math.PI 但整圆是2 * Math.PI 故终止弧度加0.5* Math.PI
+						//外圈
+						ctx.beginPath()
+						ctx.arc(this.canvasWidth - (cY + 2), cX, cr*3, 0, 2 * Math.PI)
+						ctx.setFillStyle('#87CEEB')
+						ctx.fill()
+						//内圈
+						ctx.beginPath()
+						ctx.arc(this.canvasWidth - (cY + 2), cX, cr, 0, 2 * Math.PI)
+						ctx.setFillStyle('#E3E3E3')
+						ctx.fill()
+						
+						//画矩形
+						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
+						ctx.beginPath()
+						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
+						ctx.rect(this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH), parseInt((rectX-(rectW/2)).toFixed(0)), rectH, rectW)
+						
+						//将坐标收纳成对象保存到数组，为绑定事件做准备
+						let rect={
+							x: parseInt((rectX-(rectW/2)).toFixed(0)),
+							y: parseInt((rectY-(rectH/2)).toFixed(0)),
+							w: rectW,
+							h: rectH
+						}
+						this.rectArray.push(rect)
+						//rgba(255, 255, 255, 0.5)
+						if(this.isClickFlag){
+							if(this.touchRectNum == i){
+									//矩形边框颜色
+									ctx.setStrokeStyle('#96CDCD')
+									//矩形填充色
+									ctx.setFillStyle('#96CDCD')
+									this.isClickFlag = false
+								}else{
+									ctx.setStrokeStyle('rgba(0, 0, 0, 0.5)')
+									ctx.setFillStyle('rgba(0, 0, 0, 0.5)')
+								}
+						}else{
+							ctx.setStrokeStyle('rgba(0, 0, 0, 0.5)')
+							ctx.setFillStyle('rgba(0, 0, 0, 0.5)')
+						}
+						ctx.fill()
+						//开始描绘
+						ctx.stroke()
+						
+						//写字
+						//设置字体颜色
+						ctx.setFillStyle('white')
+						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
+						let textX = parseInt(((this.canvasWidth - (rectY)+(marginLeftAndRightSides/2))-(rectW/2)).toFixed(0))
+						console.log('textX: ', textX)
+						let textY =  parseInt(((rectH+rectX-marginBottom)-(rectH/2)).toFixed(0))
+						console.log('textY: ', textY)
+						ctx .save ();
+						ctx.translate(this.canvasWidth - rectY, rectX)
+						ctx.rotate ( 90 * Math .PI / 180 )
+						ctx.fillText(textContent, -rectW*2/5, rectH/4)//-rectW/2, rectH/4
+						ctx.setTextAlign('center')
+						ctx.translate( -rectX  , this.canvasWidth - rectY)
+						ctx .restore ()
+						//开始描绘
+						ctx.stroke()
+						ctx.draw(true)
+					}else{
+						// console.log(0)
+						//矩形左上角点的坐标(X,Y)
+						//rpx转px 故(this.windowWidth)/2 计算总长度时要减去黑边
+						let rectOpacity = this.nodeLocationList[i].rectOpacity + 0
+						let rectX = parseInt(((this.nodeLocationList[i].textRectX+0)*this.canvasHeight).toFixed(0))
+						// console.log('矩形框的x轴坐标: ', rectX)
+						let rectY = parseInt(((this.nodeLocationList[i].textRectY+0)*this.canvasWidth).toFixed(0))
+						// console.log('矩形框的y轴坐标: ', rectY)
+						//矩形框高度
+						let rectH = parseInt(((this.nodeLocationList[i].hideHeightScale+0)*this.canvasWidth).toFixed(0))
+						// console.log('矩形框的高: ',rectH)
+						//矩形框宽度
+						let rectW = parseInt(((this.nodeLocationList[i].hideWidthScale+0)*this.canvasHeight).toFixed(0))
+						// console.log('矩形框的宽: ',rectW)
+						//画矩形
+						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
+						ctx.beginPath()
+						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
+						ctx.rect(this.canvasWidth -(rectY+rectH), rectX, rectH, rectW)
+						//将坐标收纳成对象保存到数组，为绑定事件做准备
+						let rect={
+							x: this.canvasWidth -(rectY+rectH),
+							y: rectX,
+							w: rectH,
+							h: rectW
+						}
+						this.rectArray.push(rect)
+						if(this.isClickFlag){
+							if(this.touchRectNum == i){
+									//矩形边框颜色
+									ctx.setStrokeStyle('#96CDCD')
+									//矩形填充色
+									ctx.setFillStyle('#96CDCD')
+									this.isClickFlag = false
+								}else{
+									ctx.setStrokeStyle('rgba(255, 255, 255,'+ 1 +')')//rectOpacity
+									ctx.setFillStyle('rgba(255, 255, 255, '+ 1 +')')
+								}
+						}else{
+							ctx.setStrokeStyle('rgba(255, 255, 255,'+ 1 +')')
+							ctx.setFillStyle('rgba(255, 255, 255,'+ 1 +')')
+						}
+						ctx.fill()
+						//开始描绘
+						ctx.stroke()
+						ctx.draw(true)
+					}
+				}
+			},
 			// 绘制圆角矩形方法 (x,y):圆角矩形起始坐标; width: 矩形宽度; height: 矩形高度; r: 矩形圆角;
 			drawRect(ctx, x, y, width, height, r){
 				ctx.beginPath();
@@ -1179,7 +1343,6 @@
 				//之后写入for循环中
 				if(this.rectArray.length != 0){
 					for(let i = 0; i<this.nodeLocationList.length; i++){
-						/* 竖屏
 						let touchX = e.changedTouches[0].x;
 						let touchY = e.changedTouches[0].y;
 						// console.log('touchY: ',touchY)
@@ -1195,29 +1358,11 @@
 							this.touchRectNum = i;
 							console.log('this.touchRectNum: '+this.touchRectNum)
 						}
-						*/
-						//横屏
-						let touchX = this.canvasHeight - e.changedTouches[0].x;
-						// console.log('touchX: ',touchX)
-						let touchY = e.changedTouches[0].y;
-						// console.log('touchY: ',touchY)
-						let xLowLimit = this.rectArray[i].x;
-						// console.log('x轴起始点: ',xLowLimit)
-						let yLowLimit = this.rectArray[i].y;
-						// console.log('y轴起始点: ',yLowLimit)
-						let xUpperLimit = xLowLimit+this.rectArray[i].w;
-						// console.log('x轴终点: ',xUpperLimit)
-						let yUpperLimit = yLowLimit+this.rectArray[i].h;
-						// console.log('y轴终点: ',yUpperLimit)
-						//判断边界办法
-						if(touchX > yLowLimit && touchX < yUpperLimit && touchY > xLowLimit && touchY < xUpperLimit){
-							this.touchRectNum = i;
-							console.log('this.touchRectNum: '+this.touchRectNum)
-						}
 					}
 					if(this.touchRectNum < 4){
 						this.isClickFlag = true
-						this.initCanvas()
+						// this.initVerticalCanvas()
+						 this.initHorizontalCanvas()
 					}
 				}
 			},
@@ -1424,8 +1569,8 @@
 					 vw = cw
 					 vh = vw * (16 / 9)
 					if (ch >= dh && dh >= vh ) {
-						this.canvasHeight = dw.toFixed(0)
-						this.canvasWidth = dh.toFixed(0)
+						this.canvasHeight = dh.toFixed(0)
+						this.canvasWidth = dw.toFixed(0)
 						this.videoHeight = vw.toFixed(0)
 						this.videoWidth = vh.toFixed(0)
 						flag = !0
@@ -1438,8 +1583,8 @@
 					 vh = ch
 					 vw = vh / (16 / 9)
 					if (cw >= dw && dw >= vw ) {
-						this.canvasHeight = dw.toFixed(0)
-						this.canvasWidth = dh.toFixed(0)
+						this.canvasHeight = dh.toFixed(0)
+						this.canvasWidth = dw.toFixed(0)
 						this.videoHeight = vw.toFixed(0)
 						this.videoWidth = vh.toFixed(0)
 						flag = !0
@@ -1494,7 +1639,8 @@
 				//初始画布必须等到选项数据先初始化完才能进行
 				if(this.isPosition == 1){
 					//初始化画布
-					this.initCanvas();
+					// this.initVerticalCanvas();
+					this.initHorizontalCanvas()
 				}
 			},
 			videoTimeupdate(e){
@@ -1828,7 +1974,7 @@
 				position: fixed;
 				left: 50%;
 				top: 50%;
-				// transform: translate(-50%, -50%);
+				transform: translate(-50%, -50%);
 				margin: 0 auto;
 				z-index: 25;
 				canvas{
