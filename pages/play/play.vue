@@ -170,10 +170,10 @@
 			</view>
 		</u-modal>
 		<!-- horizontalControlsFlags -->
-		<view class="progress-time-box" v-if="true">
+		<view class="progress-time-box" v-if="horizontalControlsFlags">
 			<view class="progress-time">{{currentTimeStr}}{{durationStr}}</view>
 		</view>
-		<view class="progress-box" v-if="true">
+		<view class="progress-box" v-if="horizontalControlsFlags">
 			<view class="f-text">首</view>
 			<view class="replayVideoIconBox" @click="replayVideo">
 				<icon></icon>
