@@ -209,6 +209,11 @@
 					let c = this.floorList[nowFloor][0]
 					// console.log(a)
 					
+					if (a.isEndings) {
+						this.showToast('多结局不支持跳转结局，请重新选择播放线路跳转！')
+						return
+					}
+					
 					if (a.isNumberSelect != null ) {
 							this.isNumberFlag = a.isNumberSelect == 1
 					}

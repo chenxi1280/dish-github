@@ -201,7 +201,7 @@
 					}
 				}
 			},
-			goPlay(index, nowFloor) {
+			goPlay(index, nowFloor) {	
 				if (nowFloor == this.onfloor && index == this.oncolumn) {
 					console.log(this.floorList[nowFloor][index])
 					// 跳转的 节点
@@ -211,7 +211,10 @@
 					// 当前选中楼层的 播放历史
 					let c = this.floorList[nowFloor][0]
 					// console.log(a)
-					
+					if (a.isEndings) {
+						this.showToast('多结局不支持跳转结局，请重新选择播放线路跳转！')
+						return
+					}
 					if (a.isNumberSelect != null ) {
 							this.isNumberFlag = a.isNumberSelect == 1
 					}
@@ -254,7 +257,6 @@
 						 'pkArtworkId': this.pkArtworkId,
 						 'pkDetailId': a.pkDetailId,
 						 'jumpFlag':jumpFlag,
-						 'endings': a.isEndings == null ? 0 : 1
 						 })
 				} else {
 					this.showToast('请滑动至选择中心位进行跳转')
