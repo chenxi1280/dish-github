@@ -480,6 +480,8 @@
 		methods: {
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option){
+				//故事线跳转需要重新走videoEnd
+				this.multipleResultPlayFlag = false
 				this.isPlayedFlag = option.jumpFlag
 				//故事线跳转时清除好感度延时函数
 				clearTimeout(this.likabilityDelayFunction)
