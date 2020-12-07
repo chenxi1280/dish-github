@@ -480,8 +480,6 @@
 		methods: {
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option){
-				if(uni.getStorageSync('isEndings') == 1){
-				}
 				this.isPlayedFlag = option.jumpFlag
 				//故事线跳转时清除好感度延时函数
 				clearTimeout(this.likabilityDelayFunction)
@@ -577,6 +575,10 @@
 			},
 			//对节点播放数据进行筛选和提取
 			initPlayData(artworkTree){
+				//打开video开关
+				if(uni.getStorageSync('isEndings') == 1){
+					this.videoShowFlag = true
+				}
 				//是否是定位选项的标志 1是定位选项 其他是普通选项
 				this.isPosition = artworkTree.isPosition
 				if(this.isPosition == 1){
@@ -764,7 +766,7 @@
 					success: res=> {
 						if(res.data.status == 200){
 							//清空路线容器
-							 this.multipleResultLine = []
+							this.multipleResultLine = []
 							//随机数
 							const uuid = Math.random().toString(36).substring(2)
 							//初始化视频
@@ -881,6 +883,7 @@
 							this.getMultipleResultLastVideo()
 						}else{
 							this.storyLineContentFlag = true
+							this.videoShowFlag = false
 							this.statisticsStorylineNaturalshow()
 						}
 					}else{
@@ -896,6 +899,7 @@
 			//展示故事线内容的时候暂停视频
 			showStoryLineContent(){
 				this.storyLineContentFlag = true
+				this.videoShowFlag = false
 				const videoContext = uni.createVideoContext('myVideo')
 				//暂停视屏
 				videoContext.pause()
@@ -1049,6 +1053,7 @@
 			},
 			//点击故事线关闭按钮触发事件
 			closeStoryLineContent(){
+				this.videoShowFlag = true
 				this.storyLineContentFlag = false
 				const videoContext = uni.createVideoContext('myVideo')
 				videoContext.play()
