@@ -269,16 +269,25 @@
 							
 						}
 					}
-					console.log(d)
-					this.resData.forEach( v => {
-						if (a.pkDetailId == v.pkDetailId ) {
-							v.brotherNode.forEach( (n,i)=> {
-								if ( c.pkDetailId == n.pkDetailId ) {
-									d.push(i+1)
-								}
-							})
-						}
-					})
+					console.log(a.pkDetailId)
+					// console.log("递归结果："+ this.finduexTreeByPkDetailId(a.pkDetailId))
+					console.log(nowFloor)
+					if (nowFloor ==  0) {
+						d = [] 
+					}else {
+						d.push(this.finduexTreeByPkDetailId(a.pkDetailId)+1)
+					}
+					
+					// this.resData.forEach( v => {
+					// 	if (c.pkDetailId == v.pkDetailId ) {
+					// 		v.brotherNode.forEach( (n,i)=> {
+					// 			if ( a.pkDetailId == n.pkDetailId ) {
+									// d.push(i+1)
+					// 			}
+					// 		})
+					// 	}
+					// })
+					
 					console.log(d)
 					console.log(this.resData)
 					uni.setStorageSync("multipleResultLine", d);
@@ -304,6 +313,29 @@
 					type: 'error',
 				})
 			},
+			finduexTreeByPkDetailId (pkDetailId) {
+			  const newNodeData =  uni.getStorageSync("mainArtworkTree")
+			  let a 
+			  finduexTree(pkDetailId, newNodeData)
+			  return  a
+			  function finduexTree (pkDetileId, newNodeData) {
+			    if (newNodeData.pkDetileId == pkDetileId) {
+			       a = -1
+			    } else {
+			      if (newNodeData.childs != null) {
+			        newNodeData.childs.forEach( (v,i) => {
+			          if (v.pkDetailId == pkDetileId) {
+						a = i
+			            // return i
+			          }else{
+						  finduexTree( pkDetileId, v)
+					  }
+			        })
+			      }
+			    }
+			  }
+			 
+			}
 		}
 	}
 </script>
