@@ -226,52 +226,9 @@
 					console.log(this.floorList)
 					console.log(index)
 					if (this.endingFlag) {
-						if (index == 0 ) {
-							console.log(nowFloor)
-							console.log(this.lockFloor)
-							if (this.lockEndingFloor == nowFloor ) {
-								this.showToast('多结局不支持选择最后一级选项，请在上一级选择！')
-								console.log("AS")
-								return
-							}
-							if (this.lockFloor != nowFloor) {
-								if (this.floorList[this.floorList.length -1][0].parentId == -1 ) {
-									if ( nowFloor == this.floorList.length - 2 ) {
-										this.showToast('多结局不支持选择最后一级选项，请在上一级选择！')
-										console.log("A")
-										return
-									}	
-								}else {
-									if ( nowFloor == this.floorList.length - 1 ) {
-										this.showToast('多结局不支持选择最后一级选项，请在上一级选择！')
-										console.log("B")
-										return
-									}	
-								}
-								
-							}else {
-								if ( nowFloor == this.floorList.length - 1 ) {
-									this.showToast('多结局不支持选择最后一级选项，请在上一级选择！')
-									console.log("B")
-									return
-								}	
-							}
-							
-						}else {
-							if ( nowFloor == this.floorList.length - 1 ) {
-								if ( nowFloor == this.floorList.length - 1 ) {
-									this.showToast('多结局不支持选择最后一级选项，请在上一级选择！')
-									console.log("C")
-									return
-								}	
-							}else {
-								if ( nowFloor == this.floorList.length - 1 ) {
-									this.showToast('多结局不支持选择最后一级选项，请在上一级选择！')
-									console.log("D")
-									return
-								}
-								
-							}
+						if (nowFloor == this.lockEndingFloor){
+							this.showToast('多结局不支持跳转结局，请重新选择播放线路跳转！')
+							return
 						}
 					}
 					if (a.isNumberSelect != null ) {
