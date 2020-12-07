@@ -287,9 +287,7 @@
 					// 		})
 					// 	}
 					// })
-					
-					console.log(d)
-					console.log(this.resData)
+
 					uni.setStorageSync("multipleResultLine", d);
 					uni.setStorageSync("pkDetailIds", b);
 					this.$refs.uToast.show({
