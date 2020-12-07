@@ -480,6 +480,8 @@
 		methods: {
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option){
+				//故事线跳转重置跳转节点的目标节点的id
+				this.linkNodeId = null
 				this.isPlayedFlag = option.jumpFlag
 				//故事线跳转时清除好感度延时函数
 				clearTimeout(this.likabilityDelayFunction)
@@ -643,7 +645,7 @@
 						this.endFlag = false;
 					}
 				}
-				//非跳转节点存播放记录
+				//非跳转节点的目标节点存播放记录
 				if (this.linkNodeId != this.detailId) {
 					// 将作品detailId留存提供给故事线
 					this.playedHistoryArray.push(artworkTree.pkDetailId);
@@ -1746,7 +1748,7 @@
 					this.validateHorizontalWindowSize()
 					this.playGestureFlag = false
 					this.progressGestureFlag = false
-					this.horizontalControlsFlags = false
+					this.horizontalControlsFlags = true
 					this.horizontalControlsFunction	= setTimeout(()=>{
 						this.horizontalControlsFlags = false
 					},5000)
