@@ -218,27 +218,23 @@
 					let b = uni.getStorageSync("pkDetailIds")
 					// 当前选中楼层的 播放历史
 					let c = this.floorList[nowFloor][0]
+					// 多节点播放记录
+					let d = uni.getStorageSync("multipleResultLine")
+					// let mainArtworkTree  = uni.getStorageSync("mainArtworkTree")
 					// console.log(a)
 					if (a.parentId == -1) {
 						this.showToast('多结局不支持跳转结局，请重新选择播放线路跳转！')
 						return
 					}
-					console.log(this.floorList)
-					console.log(index)
 					if (this.endingFlag) {
 						if (nowFloor == this.lockEndingFloor){
 							this.showToast('多结局不支持跳转结局，请重新选择播放线路跳转！')
 							return
 						}
 					}
-					if (a.isNumberSelect != null ) {
-							this.isNumberFlag = a.isNumberSelect === '1' 
-					}
 					
-					console.log('isNumberSelect:'+ a.isNumberSelect)
 					if (a.isNumberSelect != null) {
 						if ((a.isNumberSelect - 0) === 1) {
-							console.log('isNumberSelect:'+ a.isNumberSelect)
 							if (index != 0 ) {
 								this.showToast('本选项数值选项，无法直接跳转，请在上级进行跳转')
 								return 
@@ -260,15 +256,27 @@
 					for (let i = 0; i < b.length; i++) {
 						if (b[i] == c.pkDetailId) {
 							b.splice(i)
+							if ( i != 0) {
+								if (d !=null && d.length > 0) {
+									d.splice(i -1 )
+								}
+							}
+							
 						}
 					}
-					
-					
-					// if (a.isLink == 1){
-					// 	a.pkDetailId = a.linkUrl
-						
-					// }
-					console.log(b)
+					console.log(d)
+					this.resData.forEach( v => {
+						if (a.pkDetailId == v.pkDetailId ) {
+							v.brotherNode.forEach( (n,i)=> {
+								if ( c.pkDetailId == n.pkDetailId ) {
+									d.push(i+1)
+								}
+							})
+						}
+					})
+					console.log(d)
+					console.log(this.resData)
+					uni.setStorageSync("multipleResultLine", d);
 					// 修改 storage 的播放历史
 					uni.setStorageSync("pkDetailIds", b);
 					this.$refs.uToast.show({

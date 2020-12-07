@@ -213,21 +213,21 @@
 			goPlay(index, nowFloor) {
 				if (nowFloor == this.onfloor && index == this.oncolumn) {
 				
+					// 跳转的 节点
 					let a = this.floorList[nowFloor][index]
+					// 播放记录 
 					let b = uni.getStorageSync("pkDetailIds")
-					// 当前选中楼层的 播放历史
+					// 选中楼层的 第一个节点 
 					let c = this.floorList[nowFloor][0]
-					console.log(a)
+					// 多节点播放记录  
+					let d = uni.getStorageSync("multipleResultLine")
+					// let mainArtworkTree  = uni.getStorageSync("mainArtworkTree")
 					
+					console.log(d)					
 					if (a.parentId == -1) {
 						this.showToast('多结局不支持跳转结局，请重新选择播放线路跳转！')
 						return
 					}
-					
-					console.log(this.floorList)
-					console.log(nowFloor)
-					console.log(this.floorList.length)
-					console.log(this.lockFloor)
 					if (this.endingFlag) {
 						if (nowFloor == this.lockEndingFloor){
 							this.showToast('多结局不支持跳转结局，请重新选择播放线路跳转！')
@@ -235,20 +235,6 @@
 						}
 					}
 					
-					// if (this.floorList[this.floorList.length -1][0].parentId == -1 ) {
-					// 	if (index == 0) {
-					// 		if ( nowFloor == this.floorList.length - 2 ) {
-					// 			this.showToast('多结局不支持选择最后一级选项，请在上一级选择！')
-					// 			return
-					// 		}	
-					// 	}else {
-					// 		if ( nowFloor == this.floorList.length - 1 ) {
-					// 			this.showToast('多结局不支持选择最后一级选项，请在上一级选择！')
-					// 			return
-					// 		}	
-					// 	}
-									
-					// }
 					
 					if (a.isNumberSelect != null ) {
 							this.isNumberFlag = a.isNumberSelect + 0 == 1 
@@ -265,26 +251,37 @@
 					}
 						
 					// let jumpFlag = 0
-					console.log(a.pkDetailId)
-					console.log(b)
 					let jumpFlag = false
 					b.forEach( v => {
 						if(v == a.pkDetailId  ) {
 							jumpFlag  = true
 						}
 					})
-					console.log(jumpFlag)
 					// 父节点跳转
 					for (let i = 0; i < b.length; i++) {
 						if (b[i] == c.pkDetailId) {
 							b.splice(i)
+							if ( i != 0) {
+								if (d !=null && d.length > 0) {
+									d.splice(i -1 )
+								}
+							}
+							
 						}
 					}
-					// if (a.isLink == 1){
-					// 	a.pkDetailId = a.linkUrl
-						
-					// }
+					console.log(d)
+					this.resData.forEach( v => {
+						if (a.pkDetailId == v.pkDetailId ) {
+							v.brotherNode.forEach( (n,i)=> {
+								if ( c.pkDetailId == n.pkDetailId ) {
+									d.push(i+1)
+								}
+							})
+						}
+					})
+					console.log(d)
 					console.log(this.resData)
+					uni.setStorageSync("multipleResultLine", d);
 					uni.setStorageSync("pkDetailIds", b);
 					this.$refs.uToast.show({
 						title: '选中跳转到' + a.selectTitle ,
