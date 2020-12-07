@@ -480,8 +480,8 @@
 		methods: {
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option){
-				//重置多结局自然呈现故事线开关
-				this.multipleResultPlayFlag = false
+				if(uni.getStorageSync('isEndings') == 1){
+				}
 				this.isPlayedFlag = option.jumpFlag
 				//故事线跳转时清除好感度延时函数
 				clearTimeout(this.likabilityDelayFunction)
@@ -510,19 +510,20 @@
 				this.getArtworkTreeByDetailId()
 				//获取播放历史记录
 				this.playedHistoryArray = uni.getStorageSync("pkDetailIds")
-				//故事线跳回重置多结局数组
-				let multipleResultLine = uni.getStorageSync("multipleResultLine")
+				//重置多结局数组（故事线跳回时进行重组直接获取就好了）
+				this.multipleResultLine = uni.getStorageSync("multipleResultLine")
+				/* let multipleResultLine = uni.getStorageSync("multipleResultLine")
 				multipleResultLine.splice(this.playedHistoryArray.length,multipleResultLine.length -(this.playedHistoryArray.length))
-				// console.log('数组截取的起始长度: ',this.playedHistoryArray.length)
-				// console.log('数组截取的长度: ',multipleResultLine.length -(this.playedHistoryArray.length))
+				console.log('数组截取的起始长度: ',this.playedHistoryArray.length)
+				console.log('数组截取的长度: ',multipleResultLine.length -(this.playedHistoryArray.length))
 				this.multipleResultLine = multipleResultLine
 				console.log("multipleResultLine: ", this.multipleResultLine)
-				uni.setStorageSync("multipleResultLine",multipleResultLine)
+				uni.setStorageSync("multipleResultLine",multipleResultLine) */
 				//获取存放节点数值的容器
 				let appearConditionMap = uni.getStorageSync('appearConditionMap')
 				//不能判断是普通选项的跳转还是数值选项的跳转了 因为数值选项中也可能存在普通选项会导致误判
 				//所以不管是普通选项还是数值选项都要做一次分数的重新计算
-				//appearConditionMap != null 说明一定是树中含有数值选项的跳转 appearConditionMap == nul 说明所有节点都是普通选项的跳转
+				//appearConditionMap != null 说明一定是树中含有数值选项的跳转 appearConditionMap == null 说明所有节点都是普通选项的跳转
 				if(appearConditionMap != null && JSON.stringify(appearConditionMap) != "{}"){
 					let currentArray = this.deepCopy(this.playedHistoryArray)
 					//如果此时的currentArray 是空的话则说明是跳转的根节点不做操作
@@ -592,7 +593,12 @@
 				//如果是根节点初始化存储节点分值的容器
 				if(this.parentId === 0){
 					//存进缓存是防止故事线进入时重置了data里面的数据
-					uni.setStorageSync('appearConditionMap', artworkTree.appearConditionMap)
+					let appearConditionMap = artworkTree.appearConditionMap
+					if(appearConditionMap == null || appearConditionMap.length === 0){
+						uni.setStorageSync('appearConditionMap', {})
+					}else{
+						uni.setStorageSync('appearConditionMap', appearConditionMap)
+					}
 				}
 				// 将选项置空 避免选项中出现上一次选项的情况
 				this.option = []
@@ -770,6 +776,9 @@
 							uni.setStorageSync("pkDetailIds",this.playedHistoryArray)
 							//保存播放记录
 							this.savaPlayRecord();
+						}else{
+							this.storyLineContentFlag = true
+							console.log('我去请求500')
 						}
 					}
 				})
@@ -986,7 +995,7 @@
 					uni.setStorageSync('multipleResultLine', this.multipleResultLine)
 					this.chooseTipsShowFlag = false
 					this.chooseTipsMaskFlag = false
-					let child = this.findmultipleResultChild()
+					let child = this.childs[index]
 					this.initPlayData(child)
 				}else{
 					let advancedList = this.childs[index].onAdvancedList
@@ -1022,14 +1031,14 @@
 					}
 				}
 			},
-			findmultipleResultChild(){
+			/* findmultipleResultChild(){
 				for(let i = 0; i < this.childs.length; i++){
 					if(this.childs[i].isLink == 1){
 						continue;
 					}
 					return this.childs[i]
 				}
-			},
+			}, */
 			//点击选项关闭按钮触发事件
 			closeChooseTips(){
 				this.chooseTipsShowFlag = false
@@ -1517,7 +1526,7 @@
 					this.multipleResultLine.push(this.touchRectNum + 1)
 					uni.setStorageSync('multipleResultLine', this.multipleResultLine)
 					this.showCanvasFlag = false
-					let child = this.findmultipleResultChild()
+					let child = this.childs[this.touchRectNum]
 					this.initPlayData(child)
 				}else{
 					let advancedList = this.childs[this.touchRectNum].onAdvancedList
