@@ -232,15 +232,19 @@
 						}
 					}
 					if (a.isNumberSelect != null ) {
-							this.isNumberFlag = a.isNumberSelect == 1
+							this.isNumberFlag = a.isNumberSelect === '1' 
 					}
 					
-					if (this.isNumberFlag) {
-						if (index != 0 ) {
-							this.showToast('本选项数值选项，无法直接跳转，请在上级进行跳转')
-							return 
-						}
-					}				
+					console.log('isNumberSelect:'+ a.isNumberSelect)
+					if (a.isNumberSelect != null) {
+						if ((a.isNumberSelect - 0) === 1) {
+							console.log('isNumberSelect:'+ a.isNumberSelect)
+							if (index != 0 ) {
+								this.showToast('本选项数值选项，无法直接跳转，请在上级进行跳转')
+								return 
+							} 
+						}	
+					}			
 					// let jumpFlag = 0
 					console.log(a.pkDetailId)
 					console.log(b)
