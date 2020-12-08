@@ -269,14 +269,16 @@
 							
 						}
 					}
-					console.log(a.pkDetailId)
-					// console.log("递归结果："+ this.finduexTreeByPkDetailId(a.pkDetailId))
-					console.log(nowFloor)
-					if (nowFloor ==  0) {
-						d = [] 
-					}else {
-						d.push(this.finduexTreeByPkDetailId(a.pkDetailId)+1)
-					}
+					// console.log(a.pkDetailId)
+					// // console.log("递归结果："+ this.finduexTreeByPkDetailId(a.pkDetailId))
+					// console.log(nowFloor)
+					if (this.endingFlag) {
+						if (nowFloor ==  0) {
+							d = [] 
+						}else {
+							d.push(this.finduexTreeByPkDetailId(a.pkDetailId)+1)
+						}
+					}	
 					
 					// this.resData.forEach( v => {
 					// 	if (c.pkDetailId == v.pkDetailId ) {
