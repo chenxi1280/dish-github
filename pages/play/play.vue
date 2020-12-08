@@ -1829,7 +1829,7 @@
 			videoTouchend(e){
 				if(uni.getStorageSync('playMode') == 1){
 					clearTimeout(this.horizontalControlsFunction)
-					this.horizontalControlsFlags = true
+					this.horizontalControlsFlags = !this.horizontalControlsFlags
 					this.horizontalControlsFunction	= setTimeout(()=>{
 						this.horizontalControlsFlags = false
 					},5000)
@@ -2013,8 +2013,8 @@
 		height: 100%;
 		.progress-time-box{
 			position: fixed;
-			left: 12%;
-			top: 50%;
+			left: 5%;
+			top: 84%;
 			z-index: 10;
 			height: 50rpx;
 			width: 260rpx;
