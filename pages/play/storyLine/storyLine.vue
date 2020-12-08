@@ -264,12 +264,13 @@
 							
 						}
 					}
-
-					if (nowFloor ==  0) {
-						d = [] 
-					}else {
-						d.push(this.finduexTreeByPkDetailId(a.pkDetailId)+1)
-					}
+					if (this.endingFlag) {
+						if (nowFloor ==  0) {
+							d = [] 
+						}else {
+							d.push(this.finduexTreeByPkDetailId(a.pkDetailId)+1)
+						}
+					}					
 					uni.setStorageSync("multipleResultLine", d);
 					// 修改 storage 的播放历史
 					uni.setStorageSync("pkDetailIds", b);
@@ -277,7 +278,6 @@
 						title: '选中跳转到' + a.selectTitle ,
 						type: 'success',
 					})
-					console.log(a.isEndings == null ? 0 : 1)
 					//使用组件跳转方式 传参
 					this.$emit("goPlay",{
 						 'pkArtworkId': this.pkArtworkId,
