@@ -1740,7 +1740,7 @@
 				//视频清除延时
 				this.likabilityDelayFunction= setTimeout(()=>{
 					this.likabilityFlag = false
-				},5000000)
+				},5000)
 				uni.setStorageSync('videoSize',{
 					videoHeight: e.detail.height,
 					videoWidth: e.detail.width
@@ -1752,6 +1752,7 @@
 					this.validateHorizontalWindowSize()
 					this.playGestureFlag = false
 					this.progressGestureFlag = false
+					clearTimeout(this.horizontalControlsFunction)
 					this.horizontalControlsFlags = true
 					this.horizontalControlsFunction	= setTimeout(()=>{
 						this.horizontalControlsFlags = false
