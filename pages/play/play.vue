@@ -1721,10 +1721,8 @@
 			},
 			loadeddata(e){
 				this.duration = e.detail.duration
-				let hour = ((this.duration/3600).toFixed(0)).length == 1 ? '0' + (this.duration/3600).toFixed(0) : (this.duration/3600).toFixed(0)
-				let minute = ((this.duration/60).toFixed(0)).length == 1 ? '0'+(this.duration/60).toFixed(0) : (this.duration/60).toFixed(0)
-				let second = ((this.duration%60).toFixed(0)).length == 1 ? '0'+(this.duration%60).toFixed(0) : (this.duration%60).toFixed(0)
-				this.durationStr = hour+":"+minute+":"+second
+				let date = this.formatDate(this.duration)
+				this.durationStr = date
 				//判断是不是故事线跳转过来的第一个视频 第一个视频需要快进到结尾进行播放
 				if(this.isPlayedFlag){
 					const videoContext = uni.createVideoContext('myVideo')
@@ -1776,25 +1774,34 @@
 			videoTimeupdate(e){
 				//获取视频当前时间
 				this.currentTime = e.detail.currentTime
-				let hour = ((this.currentTime/3600).toFixed(0)).length == 1 ? '0' + (this.currentTime/3600).toFixed(0) : (this.currentTime/3600).toFixed(0)
-				let minute = ((this.currentTime/60).toFixed(0)).length == 1 ? '0'+(this.currentTime/60).toFixed(0) : (this.currentTime/60).toFixed(0)
-				let second = ((this.currentTime%60).toFixed(0)).length == 1 ? '0'+(this.currentTime%60).toFixed(0) : (this.currentTime%60).toFixed(0)
-				this.currentTimeStr = hour+":"+minute+":"+second + '/'
+				let date = this.formatDate(this.currentTime)
+				this.currentTimeStr = date + '/'
+			},
+			formatDate(date){
+				let hour = (parseInt(date/3600)+'').length == 1 ? '0' + parseInt(date/3600) : parseInt(date/3600)
+				let minute = (parseInt(date/60)+'').length == 1 ? '0'+ parseInt(date/60) : parseInt(date/60)
+				let second = (parseInt(date%60)+'').length == 1 ? '0'+ parseInt(date%60) : parseInt(date%60)
+				return hour+":"+minute+":"+second
 			},
 			replayVideo(){
-				const videoContext = uni.createVideoContext('myVideo')
-				videoContext.seek(0)
-				this.progressBoxTouchEnd()
+				if(!this.suspendFlag){
+					const videoContext = uni.createVideoContext('myVideo')
+					videoContext.seek(0)
+					this.progressBoxTouchEnd()
+				}
 			},
 			jumpbackVideo(){
-				const videoContext = uni.createVideoContext('myVideo')
-				let targetPlayTime = this.currentTime - this.duration * 0.15
-				if(targetPlayTime < 0){
-					videoContext.seek(0)
-				}else{
-					videoContext.seek(parseInt(targetPlayTime.toFixed(0)))
+				if(!this.suspendFlag){
+					const videoContext = uni.createVideoContext('myVideo')
+					let currentTime = this.deepCopy(this.currentTime)
+					let targetPlayTime = currentTime - this.duration * 0.15
+					if(targetPlayTime < 0){
+						videoContext.seek(0)
+					}else{
+						videoContext.seek(parseInt(targetPlayTime))
+					}
+					this.progressBoxTouchEnd()
 				}
-				this.progressBoxTouchEnd()
 			},
 			suspendVideo(){
 				const videoContext = uni.createVideoContext('myVideo')
@@ -1809,19 +1816,24 @@
 				this.progressBoxTouchEnd()
 			},
 			jumpForwardVideo(){
-				const videoContext = uni.createVideoContext('myVideo')
-				let targetPlayTime = this.currentTime + this.duration * 0.15
-				if(targetPlayTime > this.duration - 1){
-					videoContext.seek(parseInt((this.duration-1).toFixed(0)))
-				}else{
-					videoContext.seek(parseInt(targetPlayTime.toFixed(0)))
+				if(!this.suspendFlag){
+					const videoContext = uni.createVideoContext('myVideo')
+					let currentTime = this.deepCopy(this.currentTime)
+					let targetPlayTime = currentTime + this.duration * 0.15
+					if(targetPlayTime > parseInt(this.duration - 1)){
+						videoContext.seek(parseInt(this.duration - 1))
+					}else{
+						videoContext.seek(parseInt(targetPlayTime))
+					}
+					this.progressBoxTouchEnd()
 				}
-				this.progressBoxTouchEnd()
 			},
 			endVideo(){
-				const videoContext = uni.createVideoContext('myVideo')
-				videoContext.seek(parseInt((this.duration-1).toFixed(0)))
-				this.progressBoxTouchEnd()
+				if(!this.suspendFlag){
+					const videoContext = uni.createVideoContext('myVideo')
+					videoContext.seek(parseInt(this.duration-1))
+					this.progressBoxTouchEnd()
+				}
 			},
 			videoTouchstart(e){
 				this.tsx = e.changedTouches[0].clientX
