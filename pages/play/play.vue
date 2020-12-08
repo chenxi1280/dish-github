@@ -547,12 +547,12 @@
 							let key = ''+currentArray[i]
 							let value = appearConditionMap[key]
 							let showConditionNameFlag = false
-							if(currentArray[i] === this.pkDetailId){
-								if(value[0].nameFlag == 1){
-									showConditionNameFlag = true
-								}
-							}
 							if(typeof(value) != 'undefined' && value.length != 0 ){
+								if(currentArray[i] === this.pkDetailId){
+									if(value[0].nameFlag == 1){
+										showConditionNameFlag = true
+									}
+								}
 								for(let j = 0; j < value.length; j++){
 									//根据开关判断是否进行数值判断
 									if(value[j].changeFlag == 1){
@@ -901,7 +901,9 @@
 			//展示故事线内容的时候暂停视频
 			showStoryLineContent(){
 				this.storyLineContentFlag = true
-				this.videoShowFlag = false
+				if(uni.getStorageSync('isEndings') == 1){
+					this.videoShowFlag = false
+				}
 				const videoContext = uni.createVideoContext('myVideo')
 				//暂停视屏
 				videoContext.pause()
@@ -1055,7 +1057,9 @@
 			},
 			//点击故事线关闭按钮触发事件
 			closeStoryLineContent(){
-				this.videoShowFlag = true
+				if(uni.getStorageSync('isEndings') == 1){
+					this.videoShowFlag = true
+				}
 				this.storyLineContentFlag = false
 				const videoContext = uni.createVideoContext('myVideo')
 				videoContext.play()
@@ -1736,7 +1740,7 @@
 				//视频清除延时
 				this.likabilityDelayFunction= setTimeout(()=>{
 					this.likabilityFlag = false
-				},5000)
+				},5000000)
 				uni.setStorageSync('videoSize',{
 					videoHeight: e.detail.height,
 					videoWidth: e.detail.width
@@ -2243,7 +2247,7 @@
 					left: 0;
 					top: 10%;
 					height: 600rpx;
-					width: 300rpx;
+					width: 420rpx;
 					z-index: 15;
 					// background-color: rgba(255,255,255,.5);
 					.lbtips{
@@ -2251,15 +2255,15 @@
 						width: 100%;
 						.likabilityBox{
 							margin-top: 10rpx;
-							width: 100%;
+							padding: 10rpx 20rpx;
 							height: 50rpx;
 							border-radius: 20rpx;
 							background-color: rgba(0,0,0,.3);
-							text-align: center;
+							text-align: left;
 							.likability{
 								color: white;
 								font-size: 30rpx;
-								line-height: 50rpx;
+								line-height: 30rpx;
 							}
 						}
 					}
@@ -2269,9 +2273,9 @@
 				.likabilityTips{
 					position: fixed;
 					left: 54%;
-					top: 16%;
+					top: 22%;
 					height: 600rpx;
-					width: 300rpx;
+					width: 420rpx;
 					transform: translate(-50%, -50%) rotateZ(90deg);
 					z-index: 15;
 					// background-color: rgba(255,255,255,.5);
@@ -2280,15 +2284,15 @@
 						width: 100%;
 						.likabilityBox{
 							margin-top: 10rpx;
-							width: 100%;
+							padding: 10rpx 20rpx;
 							height: 50rpx;
 							border-radius: 20rpx;
 							background-color: rgba(0,0,0,.3);
-							text-align: center;
+							text-align: left;
 							.likability{
 								color: white;
 								font-size: 30rpx;
-								line-height: 50rpx;
+								line-height: 30rpx;
 							}
 						}
 					}
