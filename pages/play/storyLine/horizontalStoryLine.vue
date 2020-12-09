@@ -33,10 +33,10 @@
 					return [11061, 11063, 11071]
 				}
 			},
-			pkArtworkEndingNodeId: {
-				type: [Number, String],
-				default: null
-			}
+			// pkArtworkEndingNodeId: {
+			// 	type: [Number, String],
+			// 	default: null
+			// }
 		},
 		components: {
 			mswiper
@@ -62,6 +62,7 @@
 			
 			this.onfloor = this.pkDetailIds.length - 1
 			let userId = uni.getStorageSync("userId")
+			let pkArtworkEndingNodeId = uni.getStorageSync("fkNodeId")
 			uni.request({
 				url:  baseURL + '/Ecmartwork/getArtWorkNodes',
 				// url: 'http://192.168.1.15:8008/Ecmartwork/getArtWorkNodes',
@@ -70,7 +71,7 @@
 					pkArtworkId: this.pkArtworkId,
 					intVideoId: this.pkDetailIds[this.onfloor],
 					fkUserid: userId,
-					pkArtworkEndingNodeId: this.pkArtworkEndingNodeId
+					pkArtworkEndingNodeId: pkArtworkEndingNodeId
 				},
 				success: res => {
 					// console.log(res.data.data)
@@ -109,19 +110,21 @@
 		methods: {
 			// 换位置，并 修改title img 
 			setNode(data, pkNodeId,item) {
-				for (let i = 0; i < data.length; i++) {
-					data[i].title = data[i].selectTitle
-					data[i].image = data[i].nodeImgUrl
-					//是否展示问号
-					data[i].isWatch = false
-					if (pkNodeId === data[i].pkDetailId) {
-						if (item != null )  data[i].image = item.nodeImgUrl
-						data[i].isWatch = true
-						data.unshift(data[i])
-						data.splice(i + 1, 1)
+				if (data != null && data.length >= 1){
+					for (let i = 0; i < data.length; i++) {
+						data[i].title = data[i].selectTitle
+						data[i].image = data[i].nodeImgUrl
+						//是否展示问号
+						data[i].isWatch = false
+						if (pkNodeId === data[i].pkDetailId) {
+							if (item != null )  data[i].image = item.nodeImgUrl
+							data[i].isWatch = true
+							data.unshift(data[i])
+							data.splice(i + 1, 1)
+						}
 					}
+					return data
 				}
-				return data
 			},
 			columnChange(index, nowFloor) {
 				// console.log(index, nowFloor)
