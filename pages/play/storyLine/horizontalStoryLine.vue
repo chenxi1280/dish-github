@@ -3,20 +3,20 @@
 
 		<!-- <u-mask :show="true" style="width: 375px ; height: 100px;  position: fixed; left: 0; top: 0;z-index: 10;" ></u-mask> -->
 		<!-- <view class="cpt-mask"> </view> -->
-		<swiper :vertical="true" :previous-margin="'170'" :next-margin="'280'" :current="onfloor" @change="floorChange" style="width: 100%; height: 650px; ">
-			<swiper-item v-for="(item, floor) in floorList" :key="floor" style="margin-top: 12rpx; height: 224px; ">
-				<mswiper :list="item" :title="true" :circular="false" :autoplay="false" :height="416" :effect3d="true" :isBig="onfloor == floor"
+		<swiper :vertical="true" :previous-margin="'150'" :next-margin="'280'" :current="onfloor" @change="floorChange" style="width: 100%; height: 650px; ">
+			<swiper-item v-for="(item, floor) in floorList" :key="floor" style="margin-top: 12rpx; height: 334px; ">
+				<mswiper :list="item" :title="true" :circular="false" :autoplay="false" :height="420" :effect3d="true" :isBig="onfloor == floor"
 				 :effect3d-previous-margin="80" @change="columnChange" @click="goPlay" :nowFloor="floor"></mswiper>
 			</swiper-item>
 		</swiper>
-		<view class="cpt-mask-tips-bottom"> </view>
-		<view class="cpt-mask-tips-top"> </view>
+<!-- 		<view class="cpt-mask-tips-bottom"> </view>
+		<view class="cpt-mask-tips-top"> </view> -->
 		<u-toast ref="uToast" />
 	</view>
 </template>
 
 <script>
-	import mswiper from '../../../components/m-swiper/m-swiper'
+	import mswiper from '../../../components/h-swiper/h-swiper'
 	import {
 		baseURL
 	} from '../../login/config/config.js'
@@ -52,7 +52,7 @@
 				lockColumn: 0 ,// 锁定列
 				isNumberFlag:false,
 				resData:[],
-				endingFlag:false,
+				endingFlag: false,
 				lockEndingFloor: -1
 
 			}
@@ -76,11 +76,10 @@
 				},
 				success: res => {
 					// console.log(res.data.data)
-					this.resData = res.data.data 
+					this.resData = res.data.data
 					this.pkDetailIds.forEach( v => {
 						res.data.data.forEach(node => {
 							if (v === node.pkDetailId) {
-								// 是否为 跳转节点
 								if (node.isLink == 1) {
 									res.data.data.forEach( item => {
 										if (node.linkUrl == item.pkDetailId) {		
@@ -94,16 +93,11 @@
 									this.list.push(node.brotherNode)
 									this.floorList.push(node.brotherNode)
 								}
-								// // 是否为 为多结局
-								// if (node.isEndings === 1) {
-									
-								// }
-								
 							}
 						})
 					})
 					// console.log(this.list)
-					// console.log(this.floorList)
+					console.log(this.floorList)
 					if (this.floorList[this.floorList.length -1][0].parentId == - 1 )  {
 						// this.endingFlag = true
 						this.lockEndingFloor = this.floorList.length - 2
@@ -111,6 +105,8 @@
 					this.clearnBrother()
 				}
 			})
+			
+			
 		},
 		methods: {
 			// 换位置，并 修改title img 
@@ -153,18 +149,22 @@
 				}
 
 			},
+			// 切换楼层
 			floorChange(e) {
 				let current = e.detail.current;
 				// this.clearnBrother()	
-				
+				console.log("当前楼层："+ current,"当前列："+ this.oncolumn)
 				for (let i = 0; i < this.floorList.length; i++) {
 					//原来的楼层
 					if (this.onfloor == i) {
 						if (this.oncolumn == 0) {
+							console.log(11)
 							// this.floorList = this.deepCopy(this.list)
+							console.log()
 							this.floorList[i].splice(1, this.floorList[i].length - 1)
 						}
 						if (this.onfloor != this.lockFloor) {
+							console.log(22)
 							this.floorList[i].splice(1, this.floorList[i].length - 1)
 						}
 					}
@@ -180,8 +180,9 @@
 				}else {
 					this.oncolumn = this.lockColumn
 				}
+				console.log("原来的楼层"+ this.onfloor,"现在的列:"+ this.oncolumn)
 				this.onfloor = current
-				
+				// this.oncolumn = 0
 			},
 			//清除兄弟
 			clearnBrother() {
@@ -213,19 +214,20 @@
 					}
 				}
 			},
-			goPlay(index, nowFloor) {	
+			goPlay(index, nowFloor) {
 				if (nowFloor == this.onfloor && index == this.oncolumn) {
-					console.log(this.floorList[nowFloor][index])
+				
 					// 跳转的 节点
 					let a = this.floorList[nowFloor][index]
 					// 播放记录 
 					let b = uni.getStorageSync("pkDetailIds")
-					// 当前选中楼层的 播放历史
+					// 选中楼层的 第一个节点 
 					let c = this.floorList[nowFloor][0]
-					// 多节点播放记录
+					// 多节点播放记录  
 					let d = uni.getStorageSync("multipleResultLine")
 					// let mainArtworkTree  = uni.getStorageSync("mainArtworkTree")
-					// console.log(a)
+					
+					console.log(d)					
 					if (a.parentId == -1) {
 						this.showToast('请选择上面有选项的进行跳转！')
 						return
@@ -237,25 +239,28 @@
 						}
 					}
 					
+					
+					if (a.isNumberSelect != null ) {
+							this.isNumberFlag = a.isNumberSelect + 0 == 1 
+					}
+
 					if (a.isNumberSelect != null) {
 						if ((a.isNumberSelect - 0) === 1) {
+							console.log('isNumberSelect:'+ a.isNumberSelect)
 							if (index != 0 ) {
 								this.showToast('本选项数值选项，无法直接跳转，请在上级进行跳转')
 								return 
 							} 
 						}	
-					}			
+					}
+						
 					// let jumpFlag = 0
-					console.log(a.pkDetailId)
-					console.log(b)
-					// 是否跳转自己
 					let jumpFlag = false
 					b.forEach( v => {
 						if(v == a.pkDetailId  ) {
 							jumpFlag  = true
 						}
 					})
-					console.log(jumpFlag)
 					// 父节点跳转
 					for (let i = 0; i < b.length; i++) {
 						if (b[i] == c.pkDetailId) {
@@ -268,27 +273,40 @@
 							
 						}
 					}
+					// console.log(a.pkDetailId)
+					// // console.log("递归结果："+ this.finduexTreeByPkDetailId(a.pkDetailId))
+					// console.log(nowFloor)
 					if (this.endingFlag) {
 						if (nowFloor ==  0) {
 							d = [] 
 						}else {
-							console.log(this.finduexTreeByPkDetailId(a.pkDetailId) + 1 )
 							d.push(this.finduexTreeByPkDetailId(a.pkDetailId)+1)
 						}
-					}					
+					}	
+					
+					// this.resData.forEach( v => {
+					// 	if (c.pkDetailId == v.pkDetailId ) {
+					// 		v.brotherNode.forEach( (n,i)=> {
+					// 			if ( a.pkDetailId == n.pkDetailId ) {
+									// d.push(i+1)
+					// 			}
+					// 		})
+					// 	}
+					// })
+
 					uni.setStorageSync("multipleResultLine", d);
-					// 修改 storage 的播放历史
 					uni.setStorageSync("pkDetailIds", b);
 					this.$refs.uToast.show({
 						title: '选中跳转到' + a.selectTitle ,
 						type: 'success',
 					})
+					
 					//使用组件跳转方式 传参
 					this.$emit("goPlay",{
-						 'pkArtworkId': this.pkArtworkId,
-						 'pkDetailId': a.pkDetailId,
-						 'jumpFlag':jumpFlag
-						 })
+					'pkArtworkId': this.pkArtworkId,
+					'pkDetailId': a.pkDetailId,
+					'jumpFlag':jumpFlag
+					})
 				} else {
 					this.showToast('请滑动至选择中心位进行跳转')
 				}

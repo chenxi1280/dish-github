@@ -47,10 +47,9 @@
 							</scroll-view>
 						</swiper-item>
 
-					
-
 					</swiper>
 				</view>
+
 			</view>
 			<u-back-top :scroll-top="scrollTop"></u-back-top>
 		</view>
@@ -195,12 +194,11 @@
 							if (res.data.data.list.length != 0) {
 								res.data.data.list.forEach(v => {
 									v.high = 287.1
-									v.logoPath = v.logoPath + '/common'
+									if (v.logoPath.indexOf( '/common') == -1) {
+										v.logoPath = v.logoPath + '/common'
+									}
 									this.hotList.push(v)
 								})
-								// console.log(this.limit)
-								// console.log(res.data.data.length )
-								
 								if (res.data.data.loadStatus != null ) {
 									this.hotLoadStatus = 'nomore'
 								}
@@ -214,7 +212,7 @@
 					})
 					// console.log(this.hotLoadStatus)
 				}
-				
+
 
 			},
 			addRandomDataSort() {
@@ -236,6 +234,9 @@
 							if (res.data.data != null) {
 								res.data.data.forEach(v => {
 									v.high = 287.1
+									if (v.logoPath.indexOf( '/common') == -1) {
+										v.logoPath = v.logoPath + '/common'
+									}
 									this['sortList' + this.currentsort].push(v)
 									// this.sortList.push(v)
 								})
@@ -332,5 +333,5 @@
 		font-size: 20rpx;
 		line-height: 1;
 	}
-	
+
 </style>
