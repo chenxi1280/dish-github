@@ -63,6 +63,7 @@
 			this.onfloor = this.pkDetailIds.length - 1
 			let userId = uni.getStorageSync("userId")
 			let pkArtworkEndingNodeId = uni.getStorageSync("fkNodeId")
+			this.endingFlag =  uni.getStorageSync("isEndings")
 			uni.request({
 				url:  baseURL + '/Ecmartwork/getArtWorkNodes',
 				// url: 'http://192.168.1.15:8008/Ecmartwork/getArtWorkNodes',
@@ -104,7 +105,7 @@
 					// console.log(this.list)
 					// console.log(this.floorList)
 					if (this.floorList[this.floorList.length -1][0].parentId == - 1 )  {
-						this.endingFlag = true
+						// this.endingFlag = true
 						this.lockEndingFloor = this.floorList.length - 2
 					}
 					this.clearnBrother()
@@ -226,12 +227,12 @@
 					// let mainArtworkTree  = uni.getStorageSync("mainArtworkTree")
 					// console.log(a)
 					if (a.parentId == -1) {
-						this.showToast('多结局不支持跳转结局，请重新选择播放线路跳转！')
+						this.showToast('请选择上面有选项的进行跳转！')
 						return
 					}
 					if (this.endingFlag) {
 						if (nowFloor == this.lockEndingFloor){
-							this.showToast('多结局不支持跳转结局，请重新选择播放线路跳转！')
+							this.showToast('请选择上面的一级跳转！')
 							return
 						}
 					}
@@ -271,6 +272,7 @@
 						if (nowFloor ==  0) {
 							d = [] 
 						}else {
+							console.log(this.finduexTreeByPkDetailId(a.pkDetailId) + 1 )
 							d.push(this.finduexTreeByPkDetailId(a.pkDetailId)+1)
 						}
 					}					
