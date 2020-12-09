@@ -47,10 +47,9 @@
 							</scroll-view>
 						</swiper-item>
 
-					
-
 					</swiper>
 				</view>
+
 			</view>
 			<u-back-top :scroll-top="scrollTop"></u-back-top>
 		</view>
@@ -197,7 +196,7 @@
 									v.high = 287.1
 									if (v.logoPath.indexOf( '/common') == -1) {
 										v.logoPath = v.logoPath + '/common'
-									}	
+									}
 									this.hotList.push(v)
 								})
 								if (res.data.data.loadStatus != null ) {
@@ -213,7 +212,7 @@
 					})
 					// console.log(this.hotLoadStatus)
 				}
-				
+
 
 			},
 			addRandomDataSort() {
@@ -237,7 +236,7 @@
 									v.high = 287.1
 									if (v.logoPath.indexOf( '/common') == -1) {
 										v.logoPath = v.logoPath + '/common'
-									}	
+									}
 									this['sortList' + this.currentsort].push(v)
 									// this.sortList.push(v)
 								})
@@ -334,5 +333,5 @@
 		font-size: 20rpx;
 		line-height: 1;
 	}
-	
+
 </style>
