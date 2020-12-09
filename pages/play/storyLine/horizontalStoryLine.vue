@@ -234,7 +234,7 @@
 					}
 					if (this.endingFlag) {
 						if (nowFloor == this.lockEndingFloor){
-							this.showToast('请选择上面的一级跳转！')
+							this.showToast('请选择上面一级跳转！')
 							return
 						}
 					}
