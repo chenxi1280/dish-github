@@ -774,6 +774,7 @@
 							//初始化视频
 							this.videoUrl = res.data.data.videoUrl+'?uuid='+uuid
 							uni.setStorageSync("detailId",res.data.data.fkNodeId)
+							uni.setStorageSync("fkNodeId",res.data.data.fkNodeId)
 							this.playedHistoryArray.push(res.data.data.fkNodeId)
 							this.parentId = res.data.data.parentId
 							//存储多结局的结局视频播放历史
