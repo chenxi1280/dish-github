@@ -388,25 +388,7 @@
 				let b = arr[3] - 0
 				//b=1 表示用户扫描的预览的二维码
 				if(b == 1){
-					uni.request ({
-						url: baseURL + "/wxPlay/getUserIdByArtwordId",
-						method: 'POST',
-						dataType: 'json',
-						data: {
-							pkArtworkId: a
-						},
-						success: result=> {
-							if(result.data.status == 200){
-								const userId = uni.getStorageSync('userId')
-								if(result.data.data == userId){
-									this.artworkId = a
-								}else{
-									uni.setStorageSync('previewArtworkId', a)
-									this.previewShow = true
-								}
-							}
-						}
-					});
+					this.getUserIdByArtwordId(a)
 				}else{
 					this.artworkId = a;
 				}
@@ -706,6 +688,27 @@
 					}
 				}
 			},
+			async getUserIdByArtwordId(a){
+				await uni.request ({
+					url: baseURL + "/wxPlay/getUserIdByArtwordId",
+					method: 'POST',
+					dataType: 'json',
+					data: {
+						pkArtworkId: a
+					},
+					success: result=> {
+						if(result.data.status == 200){
+							const userId = uni.getStorageSync('userId')
+							if(result.data.data == userId){
+								this.artworkId = a
+							}else{
+								uni.setStorageSync('previewArtworkId', a)
+								this.previewShow = true
+							}
+						}
+					}
+				});
+			},
 			//异步请求获取作品树 by ArtworkId
 			async getArtworkTreeByArtworkId(){
 				console.log( this.artworkId)
@@ -725,6 +728,8 @@
 							uni.setStorageSync('isEndings',res.data.data.isEndings ); 
 							if(this.pkDetailId != null) return;
 							this.initPlayData(res.data.data);
+						}else{
+							this.videoShowFlag = false
 						}
 					}
 				})
@@ -747,6 +752,8 @@
 							uni.setStorageSync('playMode',res.data.data.playMode);
 							uni.setStorageSync('isEndings',res.data.data.isEndings ); 
 							this.initPlayData(res.data.data);
+						}else{
+							this.videoShowFlag = false
 						}
 					}
 				})
@@ -897,7 +904,8 @@
 			},
 			//视屏暂停操作
 			videoPause(){
-				this.hiddenBtnFlag = true
+				// this.hiddenBtnFlag = true
+				// console.log('我暂停了')
 			},
 			//展示故事线内容的时候暂停视频
 			showStoryLineContent(){
@@ -1108,7 +1116,7 @@
 						//文字距离左右两个边框的间距
 						let marginLeftAndRightSides = 8
 						//矩形框高度
-						let rectH = 22
+						let rectH = 30
 						// console.log('矩形框的高: ',rectW)
 						//字体大小
 						let fontSize = 16
@@ -1153,6 +1161,8 @@
 						//画矩形
 						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
 						ctx.beginPath()
+						let lineWidth = 2
+						ctx.lineWidth = lineWidth
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
 						// ctx.rect(parseInt((rectX-(rectW/2)).toFixed(0)), parseInt((rectY-(rectH/2)).toFixed(0)), rectW, rectH)
 						ctx.rect(parseInt(((this.nodeLocationList[i].textRectX+0)*this.canvasWidth-(rectW/2)).toFixed(0)), 
@@ -1175,16 +1185,25 @@
 									ctx.setFillStyle('#96CDCD')
 									this.isClickFlag = false
 								}else{
-									ctx.setStrokeStyle('#C0C0C0')
-									ctx.setFillStyle('#C0C0C0')
+									ctx.setStrokeStyle('#FFFFFF')
+									ctx.setFillStyle('#7E4DAB')
 								}
 						}else{
-							ctx.setStrokeStyle('#C0C0C0')
-							ctx.setFillStyle('#C0C0C0')
+							ctx.setStrokeStyle('#FFFFFF')
+							ctx.setFillStyle('#7E4DAB')
 						}
 						ctx.fill()
 						//开始描绘
 						ctx.stroke()
+						
+						// 画皮肤
+						ctx.beginPath()
+						let imageW= 25
+						let	imageH= 30
+						ctx.drawImage("../../static/icon/left.png", parseInt((rectX-(rectW/2)).toFixed(0))-imageW+lineWidth/2, 
+						parseInt((rectY-(rectH/2)).toFixed(0))-lineWidth/2, imageW, imageH+lineWidth)
+						ctx.drawImage("../../static/icon/right.png", parseInt((rectX-(rectW/2)).toFixed(0))+rectW-lineWidth/2, 
+						parseInt((rectY-(rectH/2)).toFixed(0))-lineWidth/2, imageW, imageH+lineWidth)
 						
 						//写字
 						//设置字体颜色
@@ -1259,13 +1278,11 @@
 						//矩形左上角点的坐标(X,Y)
 						//toFixed(0) 四舍五入保留设置的位数 返回一个字符串
 						let rectX = parseInt(((this.nodeLocationList[i].textRectX+0)*this.canvasHeight).toFixed(0))
-						// console.log('矩形框的x轴坐标: ', rectX)
 						let rectY = parseInt(((this.nodeLocationList[i].textRectY+0)*this.canvasWidth).toFixed(0))
-						// console.log('矩形框的y轴坐标: ', rectY)
 						//文字距离左右两个边框的间距
 						let marginLeftAndRightSides = 8
 						//矩形框高度
-						let rectH = 22
+						let rectH = 30
 						// console.log('矩形框的高: ',rectW)
 						//字体大小
 						let fontSize = 14
@@ -1309,9 +1326,12 @@
 						//画矩形
 						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
 						ctx.beginPath()
+						let lineWidth = 2
+						ctx.lineWidth = lineWidth
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
 						ctx.rect(this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH), parseInt((rectX-(rectW/2)).toFixed(0)), rectH, rectW)
-						
+						console.log('矩形框的x轴坐标: ', this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH))
+						console.log('矩形框的y轴坐标: ', parseInt((rectX-(rectW/2)).toFixed(0)))
 						//将坐标收纳成对象保存到数组，为绑定事件做准备
 						let rect={
 							x: this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH),
@@ -1329,17 +1349,33 @@
 									ctx.setFillStyle('#96CDCD')
 									this.isClickFlag = false
 								}else{
-									ctx.setStrokeStyle('rgba(0, 0, 0, 0.5)')
-									ctx.setFillStyle('rgba(0, 0, 0, 0.5)')
+									ctx.setStrokeStyle('#FFFFFF')
+									ctx.setFillStyle('#7E4DAB')
 								}
 						}else{
-							ctx.setStrokeStyle('rgba(0, 0, 0, 0.5)')
-							ctx.setFillStyle('rgba(0, 0, 0, 0.5)')
+							ctx.setStrokeStyle('#FFFFFF')
+							ctx.setFillStyle('#7E4DAB')
 						}
 						ctx.fill()
 						//开始描绘
 						ctx.stroke()
 						
+						// 画皮肤
+						ctx.beginPath()
+						let imageW= 25
+						let	imageH= 30
+						ctx.drawImage("../../static/icon/left_deg.png", 
+						this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH)-lineWidth/2,
+						parseInt((rectX-(rectW/2)).toFixed(0))-imageW+lineWidth/2,
+						imageH+lineWidth,
+						imageW)
+						console.log('皮肤的x轴坐标: ', parseInt((rectX-(rectW/2)).toFixed(0)))
+						console.log('皮肤的y轴坐标: ', this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH))
+						ctx.drawImage("../../static/icon/right_deg.png",
+						this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH)-lineWidth/2,
+						parseInt((rectX-(rectW/2)).toFixed(0))+rectW-lineWidth,
+						imageH+lineWidth,
+						imageW)
 						//写字
 						//设置字体颜色
 						ctx.setFillStyle('white')
@@ -2160,10 +2196,12 @@
 				left: 50%;
 				top: 50%;
 				// transform: translate(-50%, -50%);修改为了行内样式
+				overflow: hidden;
 				video{
-					position: absolute;
+					position: fixed;
 					left: 0;
 					top: 0;
+					bottom: 0;
 					z-index: 7;
 					width: 100%;
 					height: 100%;
