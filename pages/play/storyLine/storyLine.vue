@@ -72,7 +72,8 @@
 					pkArtworkId: this.pkArtworkId,
 					intVideoId: this.pkDetailIds[this.onfloor],
 					fkUserid: userId,
-					pkArtworkEndingNodeId: pkArtworkEndingNodeId
+					pkArtworkEndingNodeId: pkArtworkEndingNodeId,
+					endingFlag:this.endingFlag
 				},
 				success: res => {
 					// console.log(res.data.data)

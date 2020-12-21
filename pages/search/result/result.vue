@@ -61,14 +61,14 @@
 </script>
 
 <style lang="scss">
-	
+
 	.artWorkImgDiv {
 		width: 100%;
 		// height: 100%;
 		border-radius: 4px;
 	}
-	
-	
+
+
 	.demo-warter {
 		border-radius: 8px;
 		margin: 5px;
@@ -76,20 +76,20 @@
 		padding: 8px;
 		position: relative;
 	}
-	
-	
-	
+
+
+
 	.demo-image {
 		width: 100%;
 		border-radius: 4px;
 	}
-	
-	
+
+
 	.demo-tag {
 		display: flex;
 		margin-top: 5px;
 	}
-	
+
 	.demo-tag-owner {
 		background-color: $u-type-error;
 		color: #FFFFFF;
