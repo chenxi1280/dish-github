@@ -1285,7 +1285,7 @@
 						let rectH = 30
 						// console.log('矩形框的高: ',rectW)
 						//字体大小
-						let fontSize = 14
+						let fontSize = 16
 						//文字距离矩形框下边框边距
 						let marginBottom = 6
 						//文本内容
