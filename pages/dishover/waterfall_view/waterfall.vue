@@ -7,9 +7,10 @@
 
 
 					<view v-show="item.code  == 'ad'" >
-						<image class="demo-image" :src="item.logoPath"></image>
+						<ad-custom unit-id="adunit-59f062ee3b27d685"></ad-custom>
 					</view>
-					<view :style=' " background:url(" + item.logoPath + ") no-repeat center ;background-size: 100% 100%; " ' class="artWorkImgDiv" v-show="item.code  != 'ad'"
+					
+					<view :style=' " background:url(" + item.logoPath + ") no-repeat center ;background-size: 100% 100%; " ' class="artWorkImgDiv" v-if ="item.code  != 'ad'"
 					 @click="goPlayPage(item.pkArtworkId)">
 
 						<view :style=' "height: " + item.high + "px;  display: flex;  flex-direction: column-reverse;" '>
@@ -44,9 +45,10 @@
 			<template v-slot:right="{rightList}">
 				<view class="demo-warter" v-for="(item, index) in rightList" :key="index">
 
-					<view v-show="item.code  == 'ad'" >
-						<image class="demo-image" :src="item.logoPath"></image>
+					<view v-show="item.code  == 'ad'"  >
+						<ad-custom unit-id="adunit-59f062ee3b27d685"></ad-custom>
 					</view>
+					
 					<view :style=' " background:url(" + item.logoPath + ") center; background-size: cover;" ' class="artWorkImgDiv" v-show="item.code  != 'ad'"
 					 @click="goPlayPage(item.pkArtworkId)">
 
