@@ -49,7 +49,7 @@
 						<ad-custom unit-id="adunit-59f062ee3b27d685"></ad-custom>
 					</view>
 					
-					<view :style=' " background:url(" + item.logoPath + ") center; background-size: cover;" ' class="artWorkImgDiv" v-show="item.code  != 'ad'"
+					<view :style=' " background:url(" + item.logoPath + ") center; background-size: cover;" ' class="artWorkImgDiv" v-if="item.code  != 'ad' "
 					 @click="goPlayPage(item.pkArtworkId)">
 
 						<view :style=' "height: " + item.high + "px;  display: flex;  flex-direction: column-reverse;" '>
@@ -82,7 +82,7 @@
 				</view>
 			</template>
 		</u-waterfall>
-		<u-loadmore bg-color="rgb(240, 240, 240)" :status="status" />
+		<!-- <u-loadmore bg-color="rgb(240, 240, 240)" :status="status" /> -->
 
 	</view>
 </template>

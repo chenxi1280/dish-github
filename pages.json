@@ -80,7 +80,7 @@
 			}
 		}
 
-	],
+    ],
 	"tabBar": {
 		"selectedColor": "#1296db",
 		"list": [/* {

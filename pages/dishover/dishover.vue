@@ -6,11 +6,12 @@
 			<input class="search_input" type="" placeholder=" 查找你想看的视频" disabled="" /> -->
 			<u-search :show-action="false"  @click="go_search_page"></u-search>
 		</view>
-
+		<incentive></incentive>
 		<u-subsection :list="items" :current="0" @change="sectionChange"></u-subsection>
 		<view class="content">
 			<view v-if="current === 0">
 				<waterfall :flowList="hotList" :status="hotloadStatus"></waterfall>
+				<u-loadmore :bg-color="'#f2f2f2'" :status="hotLoadStatus"  :icon="true" :icon-type="'circle'" :load-text="loadText" />
 			</view>
 			<view v-if="current === 1">
 
@@ -26,24 +27,28 @@
 						<swiper-item class="swiper-item">
 							<scroll-view scroll-y style="height: 100%;width: 100%;" @scrolltolower="onreachBottom">
 								<waterfall :flowList="sortList0" :status="loadStatus"></waterfall>
+								<u-loadmore :bg-color="'#f2f2f2'" :status="loadStatus0"  :icon="true" :icon-type="'circle'" :load-text="loadText" />
 							</scroll-view>
 						</swiper-item>
 
 						<swiper-item class="swiper-item">
 							<scroll-view scroll-y style="height: 100%;width: 100%;" @scrolltolower="onreachBottom">
 								<waterfall :flowList="sortList1" :status="loadStatus"></waterfall>
+								<u-loadmore :bg-color="'#f2f2f2'" :status="loadStatus1"  :icon="true" :icon-type="'circle'" :load-text="loadText" />	
 							</scroll-view>
 						</swiper-item>
 
 						<swiper-item class="swiper-item">
 							<scroll-view scroll-y style="height: 100%;width: 100%;" @scrolltolower="onreachBottom">
 								<waterfall :flowList="sortList2" :status="loadStatus"></waterfall>
+								<u-loadmore :bg-color="'#f2f2f2'" :status="loadStatus2"  :icon="true" :icon-type="'circle'" :load-text="loadText" />
 							</scroll-view>
 						</swiper-item>
 
 						<swiper-item class="swiper-item">
 							<scroll-view scroll-y style="height: 100%;width: 100%;" @scrolltolower="onreachBottom">
 								<waterfall :flowList="sortList3" :status="loadStatus"></waterfall>
+								<u-loadmore :bg-color="'#f2f2f2'" :status="loadStatus3"  :icon="true" :icon-type="'circle'" :load-text="loadText" />
 							</scroll-view>
 						</swiper-item>
 
@@ -61,7 +66,6 @@
 	import {
 		baseURL
 	} from '../login/config/config.js'
-
 	import search from '../search/search'
 	import waterfall from './waterfall_view/waterfall.vue'
 	export default {
@@ -71,6 +75,11 @@
 		},
 		data() {
 			return {
+				loadText: {
+					loadmore: '轻轻上拉',
+					loading: '努力加载中',
+					nomore: '实在没有了'
+				},
 				items: ['热门', '分类'],
 				current: 0,
 				scrollTop: 0,
@@ -86,9 +95,9 @@
 				currentsort: 0,
 				queryType: "测试类",
 				limit: 10,
-				loadStatus: "loadmore",
+				loadStatus: "loading",
 				// 底部状态
-				hotLoadStatus: 'loadmore',
+				hotLoadStatus: 'loading',
 				hotList: [],
 				sortList: [],
 				//热门页数
@@ -105,7 +114,11 @@
 				pageSort2: 0,
 				pageSort3: 0,
 				pageSort4: 0,
-				swiperCurrent: 0
+				swiperCurrent: 0,
+				loadStatus0 : 'loading',
+				loadStatus1 : 'loading',
+				loadStatus2 : 'loading',
+				loadStatus3 : 'loading'
 			}
 		},
 		// onShow() {
@@ -134,11 +147,11 @@
 		onReachBottom(e) {
 			console.log('我去加载了')
 			if (this.current == 0) {
-				if (this.hotLoadStatus === 'loadmore') {
+				if (this.hotLoadStatus === 'loading') {
 					this.addRandomDataHot()
 				}
 			} else if (this.current == 1) {
-				if (this.loadStatus == "loadmore") {
+				if (this.loadStatus == "loading") {
 					this.addRandomDataSort()
 				}
 			}
@@ -184,11 +197,13 @@
 						method: 'POST',
 						data: {
 							page: this.pageHot,
-							limit: this.limit
+							limit: this.limit,
+							playClient: 1
 						},
 						success: res => {
 							console.log(res.data)
 							if(res.data.status == 500) {
+								this.hotLoadStatus = 'nomore'
 								return
 							}
 							if (res.data.data.list.length != 0) {
@@ -227,12 +242,14 @@
 						data: {
 							page: this['pageSort' + this.currentsort],
 							limit: this.limit,
-							queryType: this.queryType
+							queryType: this.queryType,
+							playClient: 1
 						},
 						success: res => {
-							// if(res.data.status == 500) {
-							// 	return
-							// }
+							if(res.status == 500) {
+								this['loadStatus' + this.currentsort] = 'nomore'
+								return
+							}
 							if (res.data.data != null) {
 								res.data.data.forEach(v => {
 									v.high = 287.1
@@ -245,10 +262,10 @@
 									// this.sortList.push(v)
 								})
 								if (res.data.data.length < this.limit) {
-									this.loadStatus = 'nomore'
+									this['loadStatus' + this.currentsort] = 'nomore'
 								}
 							} else {
-								this.loadStatus = 'nomore'
+								this['loadStatus' + this.currentsort] = 'nomore'
 							}
 
 						}
@@ -272,7 +289,7 @@
 				}
 			},
 			onreachBottom() {
-				if (this.loadStatus == "loadmore") {
+				if (this.loadStatus == "loading") {
 					this.addRandomDataSort()
 				}
 			}
