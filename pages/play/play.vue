@@ -4,6 +4,41 @@
 		<view v-if="videoloadFlag" class="videoLoadImageBox">
 			<image src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605168512421loading.gif"></image>
 		</view>
+		<view v-if="!playMode" :style="{transform: transform, position: 'fixed', left: '160rpx', top:'40rpx',zIndex: '9'}">
+			<Advertising isCustom @customAddEvent="showDialog" @customConfirmEvent="openAdvertising" @customCloseEvent="closeDialog"></Advertising>
+		</view>
+		<view v-if="playMode" :style="{transform: transform, position: 'fixed', right: '-40rpx', bottom:'120rpx', zIndex: '9'}">
+			<Advertising isCustom @customAddEvent="showDialog"  @customConfirmEvent="openAdvertising" @customCloseEvent="closeDialog"></Advertising>
+		</view>
+		<!-- 确认观看激励视频广告的弹窗 -->
+		<view v-if="playMode">
+			<u-modal v-model="showAdvertisingFlag" title="温馨提示" :show-confirm-button="false" z-index="999">
+				<view class="slot-content">
+					<view style="padding: 0 20rpx;padding-top: 40rpx;">
+						<view>完整观看激励视频可以获得15个光的奖励哦</view>
+						<view @click="openAdvertising" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
+							<image src="../../static/icon/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
+							<view style="display: inline-block;margin-left: 10rpx;color: #fff;transform: translateY(-4rpx);">立即获取</view>
+						</view>
+						<view @click="closeDialog" style="position: absolute;right: 20rpx; top: 20rpx;width: 40rpx;height: 40rpx;text-align: center;line-height: 40rpx;font-size: 40rpx;">x</view>
+					</view>
+				</view>
+			</u-modal>
+		</view>
+		<view v-if="!playMode">
+			<u-modal v-model="showAdvertisingFlag" title="温馨提示" :show-confirm-button="false" z-index="999">
+				<view class="slot-content">
+					<view style="padding: 0 20rpx;padding-top: 40rpx;">
+						<view>完整观看激励视频可以获得15个光的奖励哦</view>
+						<view @click="openAdvertising" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
+							<image src="../../static/icon/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
+							<view style="display: inline-block;margin-left: 10rpx;color: #fff;transform: translateY(-4rpx);">立即获取</view>
+						</view>
+						<view @click="closeDialog" style="position: absolute;right: 20rpx; top: 20rpx;width: 40rpx;height: 40rpx;text-align: center;line-height: 40rpx;font-size: 40rpx;">x</view>
+					</view>
+				</view>
+			</u-modal>
+		</view>
 		<view class="play" :style="{'width': mobilePhoneWidth+'px', 'height': mobilePhoneHeight+'px'}">
 			<!-- 定位选项画布 -->
 			<view class="container"  v-show="showCanvasFlag" 
@@ -202,10 +237,12 @@
 	import { baseURL } from '../login/config/config.js'
 	import storyLine from './storyLine/storyLine.vue'
 	import {horizontalStoryLine} from './storyLine/horizontalStoryLine.vue'
+	import Advertising from '../../components/Advertising/Advertising.vue'
 	export default {
 		components:{
 			storyLine,
-			horizontalStoryLine
+			horizontalStoryLine,
+			Advertising
 		},
 		data() {
 			return {
@@ -349,6 +386,10 @@
 				durationStr: '',
 				//用于横屏播放时显示的视频的当前时间
 				currentTimeStr: '',
+				// 播放模式
+				playMode: 0,
+				// 激励广告确认弹窗
+				showAdvertisingFlag: false
 			}
 		},
 		onReady(){
@@ -460,6 +501,55 @@
 			}
 		},
 		methods: {
+			// 关闭激励广告确认框
+			closeDialog () {
+				if (this.isCustom) {
+					this.$emit('customCloseEvent')
+				} else {
+					this.showAdvertisingFlag = false
+				}
+			},
+			// 观看激励广告
+			openAdvertising () {
+				this.showAdvertisingFlag = false
+				this.advertising = wx.createRewardedVideoAd({
+					adUnitId: 'adunit-7423fd1b2c7c5724'
+				})
+				//捕捉错误
+				this.advertising.onError(err => {
+					uni.showToast({
+						title:'获取激励视频失败，请重试'
+					})
+				})
+				// 激励广告显示并加载
+				if (this.advertising) {
+					this.advertising.load().then(() => {
+						this.advertising.show().then(() => {
+						})
+					}).catch(() => {
+						this.advertising.load().then(() => {
+							this.advertising.show().then(() => {
+							})
+						}).catch(() => {
+							uni.showToast({
+								title:'激励视频加载失败，请重试'
+							})
+						})
+					})
+				}
+				// 监听激励广告关闭
+				this.advertising.onClose((status) => {
+					if (status.isEnded) {
+						console.log('给光')
+					} else {
+						console.log('憨批用户不给光')
+					}
+					this.advertising.destroy()
+				})
+			},
+			showDialog () {
+				this.showAdvertisingFlag = true
+			},
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option){
 				//故事线跳转重置跳转节点的目标节点的id
@@ -1782,6 +1872,7 @@
 				})
 				//加载完视频加载视频的尺寸
 				if(uni.getStorageSync('playMode') == 1){
+					this.playMode = 1
 					this.transform = 'translate(-50%, -50%) rotateZ(90deg)'
 					this.showStyleFlag = false
 					this.validateHorizontalWindowSize()

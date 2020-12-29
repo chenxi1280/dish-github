@@ -79,8 +79,7 @@
 				"navigationBarTitleText": "搜索结果"
 			}
 		}
-
-	],
+    ],
 	"tabBar": {
 		"selectedColor": "#1296db",
 		"list": [/* {

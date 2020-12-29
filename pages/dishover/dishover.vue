@@ -1,10 +1,12 @@
 <template>
 	<view>
-
-		<view @click="go_search_page">
+		<view style="position: relative;height: 80rpx;width: 750rpx;padding: 0 20rpx;box-sizing: border-box;padding-top: 10rpx;display: flex;">
 <!-- 			<icon class="search_icon"></icon>
 			<input class="search_input" type="" placeholder=" 查找你想看的视频" disabled="" /> -->
-			<u-search :show-action="false"  @click="go_search_page"></u-search>
+			<Advertising></Advertising>
+			<view style="width: calc(50% - 20rpx);position: absolute;right: 20rpx;border: 1px solid #e5e5e5;height: 70rpx; border-radius: 30rpx;flex: 1;" @click="go_search_page">
+				<u-search :show-action="false" @click="go_search_page"></u-search>
+			</view>
 		</view>
 
 		<u-subsection :list="items" :current="0" @change="sectionChange"></u-subsection>
@@ -64,10 +66,12 @@
 
 	import search from '../search/search'
 	import waterfall from './waterfall_view/waterfall.vue'
+	import Advertising from '../../components/Advertising/Advertising.vue'
 	export default {
 		components: {
 			waterfall,
-			search
+			search,
+			Advertising
 		},
 		data() {
 			return {
@@ -105,7 +109,7 @@
 				pageSort2: 0,
 				pageSort3: 0,
 				pageSort4: 0,
-				swiperCurrent: 0
+				swiperCurrent: 0,
 			}
 		},
 		// onShow() {
