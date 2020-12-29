@@ -34,7 +34,8 @@
 				method: 'POST',
 				data: {
 					page: 1,
-					limit: 10
+					limit: 10,
+					playClient: 1
 				},
 				success: res => {
 					if (res.data.data != null) {

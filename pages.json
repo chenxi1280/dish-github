@@ -2,7 +2,7 @@
 	"easycom": {
 		"^u-(.*)": "@/uview-ui/components/u-$1/u-$1.vue"
 	},
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages	
+	"pages": [
 		{
 			"path": "pages/dishover/dishover",
 			"style": {
@@ -21,8 +21,6 @@
 			"style": {
 				"navigationBarTextStyle":"white",
 				"navigationBarBackgroundColor":"#000000"
-				//自定义导航条
-				// "navigationStyle":"custom"
 			}
 		},
 		{
@@ -36,13 +34,7 @@
 			"style": {
 				"navigationBarTitleText": "搜索"
 			}
-		},/* 
-		{
-			"path": "pages/make/make",
-			"style": {
-				"navigationBarTitleText": "制作"
-			}
-		}, */
+		},
 		{
 			"path": "pages/index/index",
 			"style": {
@@ -82,13 +74,7 @@
     ],
 	"tabBar": {
 		"selectedColor": "#1296db",
-		"list": [/* {
-				"pagePath": "pages/make/make",
-				"text": "制作",
-				"iconPath": "static/icon/tabBar_make.png",
-				"selectedIconPath": "static/icon/onTabBar_make.png",
-				"backgroundColor": "#fff"
-			}, */
+		"list": [
 			{
 				"pagePath": "pages/dishover/dishover",
 				"text": "发现",
@@ -111,7 +97,5 @@
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8",
 		"onReachBottomDistance": 100
-		// "enablePullDownRefresh": true 
 	}
-
 }

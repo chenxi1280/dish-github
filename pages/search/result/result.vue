@@ -39,7 +39,8 @@
 					data: {
 						page: this.page,
 						limit: this.limit,
-						searchText: this.searchText
+						searchText: this.searchText,
+						playClient: 1
 					},
 					success: res => {
 						if(res.data.data != null){
