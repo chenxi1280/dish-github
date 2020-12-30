@@ -8,7 +8,7 @@
 				<u-search :show-action="false" @click="go_search_page"></u-search>
 			</view>
 		</view>
-		<incentive></incentive>
+		<incentive :lightNumber="lightNumber" :ecmUserLightUpLimit="ecmUserLightUpLimit"></incentive>
 		<u-subsection :list="items" :current="0" @change="sectionChange"></u-subsection>
 		<view class="content">
 			<view v-if="current === 0">
@@ -122,7 +122,11 @@
 				loadStatus0 : 'loading',
 				loadStatus1 : 'loading',
 				loadStatus2 : 'loading',
-				loadStatus3 : 'loading'
+				loadStatus3 : 'loading',
+				// 光数量
+				lightNumber: 0,
+				// 光上限
+				ecmUserLightUpLimit: 0
 			}
 		},
 		// onShow() {
@@ -133,6 +137,7 @@
 			  withShareTicket: true
 			})
 			this.addRandomDataHot()
+			this.getLight()
 		},
 		onShareAppMessage (res) {
 		    return {
@@ -166,6 +171,26 @@
 			}, 1000);
 		},
 		methods: {
+			// 获取光
+			getLight () {
+				uni.request({
+					url: baseURL + '/user/light/getUserLight',
+					method: 'POST',
+					dataType: 'json',
+					data: {
+						token: uni.getStorageSync('token')
+					},
+					header: {
+						'Authorization': uni.getStorageSync('token')
+					},
+					success: res => {
+						if (res.data.status === 200) {
+							this.ecmUserLightUpLimit = res.data.data.ecmUserLightUpLimit
+							this.lightNumber = res.data.data.lightNumber
+						}
+					}
+				})
+			},
 			go_search_page() {
 				uni.navigateTo({
 					url: "../search/search"
@@ -188,7 +213,6 @@
 				this.swiperCurrent = index;
 				this.queryType = this.list[index].name
 				this['sortList' + this.currentsort]
-
 				this.judgesortData()
 			},
 			addRandomDataHot() {
