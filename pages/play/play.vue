@@ -406,7 +406,7 @@
 				//本次播放是否消费开关
 				iscustomLightFlag: false,
 				//是否是故事线跳回开关
-				storyLineJumpFlag: false
+				storyLineJumpFlag: false,
 				// 播放模式
 				playMode: 0,
 				// 激励广告确认弹窗
