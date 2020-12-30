@@ -836,7 +836,14 @@
 					},
 					success: result=> {
 						if(result.data.status == 200){
-							
+							if(this.storyLineJumpFlag){
+								this.iscustomLightFlag = true
+								this.storyLineJumpFlag = false
+							}else{
+								this.iscustomLightFlag = true
+							}
+						}else if(result.data.status == 10086){
+							this.showAdvertisingFlag = true
 						}
 					}
 				});
@@ -929,13 +936,33 @@
 			},
 			//异步请求保存播放记录
 			async savaPlayRecord(){
+				let userId = uni.getStorageSync("userId")
+				if(uni.getStorageSync("openid")){
+					if(!userId){
+						if(this.savaRecordCount > 2){
+							this.savaRecordCount == 0
+							//三次都未请求到userID
+							userId = -1
+						}else{
+							setTimeout(()=>{
+								this.savaPlayRecord()
+							},100)
+							this.savaRecordCount++
+						}
+					}else{
+						this.savaRecordCount == 0
+					}
+				}else{
+					//朋友圈点击
+					userId = -2
+				}
 				await uni.request({
 					url: baseURL + "/wxPlay/savaPlayRecord",
 					method: 'POST',
 					dataType: 'json',
 					data: {
 						pkArtworkId: this.artworkId,
-						userId: uni.getStorageSync("userId"),
+						userId: userId,
 						detailId: this.detailId
 					},
 					success: res=> {
@@ -945,7 +972,7 @@
 					}
 				})
 			},
-			//异步请求保存播放记录
+			//异步请求获取作品信息
 			async getPlayArtworkInfo(artworkId){
 				await uni.request({
 					url: baseURL + "/wxPlay/queryArtworkInfo",
@@ -963,16 +990,23 @@
 			},
 			//统计有效的播放记录（进入播放页面并点击了选项（只记录第一次选项的点击）
 			async statisticsPlayRecord(){
-				//TODO
-				if(!uni.getStorageSync("userId")){
-					if(this.savaRecordCount > 2){
-						this.savaRecordCount == 0
+				let userId = uni.getStorageSync("userId")
+				if(uni.getStorageSync("openid")){
+					if(!userId){
+						if(this.savaRecordCount > 2){
+							this.savaRecordCount == 0
+							//三次都未请求到userID
+							userId = -1
+						}else{
+							this.statisticsPlayRecord()
+							this.savaRecordCount++
+						}
 					}else{
-						this.statisticsPlayRecord()
-						this.savaRecordCount++
+						this.savaRecordCount == 0
 					}
 				}else{
-					this.savaRecordCount == 0
+					//朋友圈点击
+					userId = -2
 				}
 				await uni.request({
 					url: baseURL + "/wxPlay/statisticsPlayRecord",
@@ -980,7 +1014,7 @@
 					dataType: 'json',
 					data: {
 						fkArtworkId: this.artworkId,
-						fkUserId: uni.getStorageSync("userId"),
+						fkUserId: userId,
 						fkArtworkDetailId: this.detailId
 					},
 					success: res=> {
@@ -992,13 +1026,31 @@
 			},
 			//统计故事线自然呈现记录（自然播放结束）
 			async statisticsStorylineNaturalshow(){
+				let userId = uni.getStorageSync("userId")
+				if(uni.getStorageSync("openid")){
+					if(!userId){
+						if(this.savaRecordCount > 2){
+							this.savaRecordCount == 0
+							//三次都未请求到userID
+							userId = -1
+						}else{
+							this.statisticsStorylineNaturalshow()
+							this.savaRecordCount++
+						}
+					}else{
+						this.savaRecordCount == 0
+					}
+				}else{
+					//朋友圈点击
+					userId = -2
+				}
 				await uni.request({
 					url: baseURL + "/wxPlay/statisticsStorylineNaturalshow",
 					method: 'POST',
 					dataType: 'json',
 					data: {
 						fkArtworkId: this.artworkId,
-						fkUserId: uni.getStorageSync("userId"),
+						fkUserId: userId,
 						fkArtworkDetailId: this.detailId
 					},
 					success: res=> {
@@ -1071,7 +1123,7 @@
 			},
 			//触摸选项touchstart事件
 			changeBackground(index){
-				switch(index){
+				/* switch(index){
 					case 0: {
 						this.background.splice(index,1,"#96CDCD");
 						break;
@@ -1088,12 +1140,20 @@
 						this.background.splice(index,1,"#96CDCD");
 						break;
 					}
-				}
+				} */
 			},
 			//触摸选项touchend事件
 			rebackBackground(index){
 				switch(index){
 					case 0: {
+						if(!this.iscustomLightFlag){
+							if(this.storyLineJumpFlag){
+								return this.customLightByUserId(3)
+							}else{
+								return this.customLightByUserId(4)
+							}
+						}
+						this.background.splice(index,1,"#96CDCD");
 						// splice替换数组元素
 						this.likabilityArray = []
 						this.background.splice(index,1,"")
@@ -1106,19 +1166,17 @@
 							this.statisticsPlayRecord()
 							this.isClickOptionFlag = true
 						}
-						if(!this.iscustomLightFlag){
-							if(this.storyLineJumpFlag){
-								this.customLightByUserId(3)
-								this.iscustomLightFlag = true
-								this.storyLineJumpFlag = false
-							}else{
-								this.customLightByUserId(4)
-								this.iscustomLightFlag = true
-							}
-						}
 						break;
 					}
 					case 1: {
+						if(!this.iscustomLightFlag){
+							if(this.storyLineJumpFlag){
+								return this.customLightByUserId(3)
+							}else{
+								return this.customLightByUserId(4)
+							}
+						}
+						this.background.splice(index,1,"#96CDCD");
 						this.likabilityArray = []
 						this.background.splice(index,1,"")
 						this.likabilityFlag = false
@@ -1128,20 +1186,18 @@
 						if(!this.isClickOptionFlag){
 							this.statisticsPlayRecord()
 							this.isClickOptionFlag = true
-						}
-						if(!this.iscustomLightFlag){
-							if(this.storyLineJumpFlag){
-								this.customLightByUserId(3)
-								this.iscustomLightFlag = true
-								this.storyLineJumpFlag = false
-							}else{
-								this.customLightByUserId(4)
-								this.iscustomLightFlag = true
-							}
 						}
 						break;
 					}
 					case 2: {
+						if(!this.iscustomLightFlag){
+							if(this.storyLineJumpFlag){
+								return this.customLightByUserId(3)
+							}else{
+								return this.customLightByUserId(4)
+							}
+						}
+						this.background.splice(index,1,"#96CDCD");
 						this.likabilityArray = []
 						this.background.splice(index,1,"")
 						this.likabilityFlag = false
@@ -1151,20 +1207,18 @@
 						if(!this.isClickOptionFlag){
 							this.statisticsPlayRecord()
 							this.isClickOptionFlag = true
-						}
-						if(!this.iscustomLightFlag){
-							if(this.storyLineJumpFlag){
-								this.customLightByUserId(3)
-								this.iscustomLightFlag = true
-								this.storyLineJumpFlag = false
-							}else{
-								this.customLightByUserId(4)
-								this.iscustomLightFlag = true
-							}
 						}
 						break;
 					}
 					case 3: {
+						if(!this.iscustomLightFlag){
+							if(this.storyLineJumpFlag){
+								return this.customLightByUserId(3)
+							}else{
+								return this.customLightByUserId(4)
+							}
+						}
+						this.background.splice(index,1,"#96CDCD");
 						this.likabilityArray = []
 						this.background.splice(index,1,"")
 						this.likabilityFlag = false
@@ -1174,16 +1228,6 @@
 						if(!this.isClickOptionFlag){
 							this.statisticsPlayRecord()
 							this.isClickOptionFlag = true
-						}
-						if(!this.iscustomLightFlag){
-							if(this.storyLineJumpFlag){
-								this.customLightByUserId(3)
-								this.iscustomLightFlag = true
-								this.storyLineJumpFlag = false
-							}else{
-								this.customLightByUserId(4)
-								this.iscustomLightFlag = true
-							}
 						}
 						break;
 					}
@@ -1701,6 +1745,13 @@
 			canvasTouchendEvent(){
 				// console.log('this.touchRectNum: '+this.touchRectNum)
 				if(this.touchRectNum == 0){
+					if(!this.iscustomLightFlag){
+						if(this.storyLineJumpFlag){
+							return this.customLightByUserId(3)
+						}else{
+							return this.customLightByUserId(4)
+						}
+					}
 					this.likabilityArray = []
 					clearTimeout(this.likabilityDelayFunction)
 					this.canvasTouchendEventTodo()
@@ -1711,18 +1762,15 @@
 					if(!this.isClickOptionFlag){
 						this.statisticsPlayRecord()
 						this.isClickOptionFlag = true
-					}
-					if(!this.iscustomLightFlag){
-						if(this.storyLineJumpFlag){
-							this.customLightByUserId(3)
-							this.iscustomLightFlag = true
-							this.storyLineJumpFlag = false
-						}else{
-							this.customLightByUserId(4)
-							this.iscustomLightFlag = true
-						}
 					}
 				}else if(this.touchRectNum == 1){
+					if(!this.iscustomLightFlag){
+						if(this.storyLineJumpFlag){
+							return this.customLightByUserId(3)
+						}else{
+							return this.customLightByUserId(4)
+						}
+					}
 					this.likabilityArray = []
 					clearTimeout(this.likabilityDelayFunction)
 					this.canvasTouchendEventTodo()
@@ -1733,18 +1781,15 @@
 					if(!this.isClickOptionFlag){
 						this.statisticsPlayRecord()
 						this.isClickOptionFlag = true
-					}
-					if(!this.iscustomLightFlag){
-						if(this.storyLineJumpFlag){
-							this.customLightByUserId(3)
-							this.iscustomLightFlag = true
-							this.storyLineJumpFlag = false
-						}else{
-							this.customLightByUserId(4)
-							this.iscustomLightFlag = true
-						}
 					}
 				}else if(this.touchRectNum == 2){
+					if(!this.iscustomLightFlag){
+						if(this.storyLineJumpFlag){
+							return this.customLightByUserId(3)
+						}else{
+							return this.customLightByUserId(4)
+						}
+					}
 					this.likabilityArray = []
 					clearTimeout(this.likabilityDelayFunction)
 					this.canvasTouchendEventTodo()
@@ -1755,18 +1800,15 @@
 					if(!this.isClickOptionFlag){
 						this.statisticsPlayRecord()
 						this.isClickOptionFlag = true
-					}
-					if(!this.iscustomLightFlag){
-						if(this.storyLineJumpFlag){
-							this.customLightByUserId(3)
-							this.iscustomLightFlag = true
-							this.storyLineJumpFlag = false
-						}else{
-							this.customLightByUserId(4)
-							this.iscustomLightFlag = true
-						}
 					}
 				}else if(this.touchRectNum == 3){
+					if(!this.iscustomLightFlag){
+						if(this.storyLineJumpFlag){
+							return this.customLightByUserId(3)
+						}else{
+							return this.customLightByUserId(4)
+						}
+					}
 					this.likabilityArray = []
 					clearTimeout(this.likabilityDelayFunction)
 					this.canvasTouchendEventTodo()
@@ -1777,16 +1819,6 @@
 					if(!this.isClickOptionFlag){
 						this.statisticsPlayRecord()
 						this.isClickOptionFlag = true
-					}
-					if(!this.iscustomLightFlag){
-						if(this.storyLineJumpFlag){
-							this.customLightByUserId(3)
-							this.iscustomLightFlag = true
-							this.storyLineJumpFlag = false
-						}else{
-							this.customLightByUserId(4)
-							this.iscustomLightFlag = true
-						}
 					}
 				}
 				//回到默认值
