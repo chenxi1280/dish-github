@@ -5,10 +5,10 @@
 			<image src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605168512421loading.gif"></image>
 		</view>
 		<view v-if="!playMode" :style="{transform: transform, position: 'fixed', left: '160rpx', top:'40rpx',zIndex: '9'}">
-			<Advertising isCustom @customAddEvent="showDialog" @customConfirmEvent="openAdvertising" @customCloseEvent="closeDialog"></Advertising>
+			<Advertising isCustom @customAddEvent="showDialog" @customConfirmEvent="openAdvertising" @customCloseEvent="closeDialog" :lightNumber="lightNumber" :ecmUserLightUpLimit="ecmUserLightUpLimit"></Advertising>
 		</view>
 		<view v-if="playMode" :style="{transform: transform, position: 'fixed', right: '-40rpx', bottom:'120rpx', zIndex: '9'}">
-			<Advertising isCustom @customAddEvent="showDialog"  @customConfirmEvent="openAdvertising" @customCloseEvent="closeDialog"></Advertising>
+			<Advertising isCustom @customAddEvent="showDialog"  @customConfirmEvent="openAdvertising" @customCloseEvent="closeDialog" :lightNumber="lightNumber" :ecmUserLightUpLimit="ecmUserLightUpLimit"></Advertising>
 		</view>
 		<!-- 确认观看激励视频广告的弹窗 -->
 		<view v-if="playMode">
@@ -251,6 +251,7 @@
 	import storyLine from './storyLine/storyLine.vue'
 	import {horizontalStoryLine} from './storyLine/horizontalStoryLine.vue'
 	import Advertising from '../../components/Advertising/Advertising.vue'
+	import {globalBus} from '../../common/js/util.js'
 	export default {
 		components:{
 			storyLine,
@@ -359,8 +360,6 @@
 				videoShowFlag: true,
 				//是否展示截屏图片的标志
 				screenshotShowFlag: false,
-				//光的数值
-				lightNumber: 25,
 				//是否展示好感度标志
 				likabilityFlag: false,
 				//好感度数值容器
@@ -406,14 +405,20 @@
 				//本次播放是否消费开关
 				iscustomLightFlag: false,
 				//是否是故事线跳回开关
-				storyLineJumpFlag: false
+				storyLineJumpFlag: false,
 				// 播放模式
 				playMode: 0,
 				// 激励广告确认弹窗
-				showAdvertisingFlag: false
+				showAdvertisingFlag: false,
+				// 光数量
+				lightNumber: 0,
+				// 光上限
+				ecmUserLightUpLimit: 0
 			}
 		},
 		onReady(){
+			// 监听是否重新获取光的数量
+			this.isGetLight()
 			//重置开关状态到初始值
 			this.isClickOptionFlag = false
 			//关闭好感度 视频加载结束时打开
@@ -437,6 +442,7 @@
 			this.getArtworkTreeByArtworkId();
 		},
 		onLoad(option) {
+			this.initLightNum()
 			uni.showShareMenu({
 			  withShareTicket: true,
 			  menus: ['shareAppMessage', 'shareTimeline']
@@ -522,13 +528,24 @@
 			}
 		},
 		methods: {
+			// 监听是否重新获取光的数量
+			isGetLight () {
+				globalBus.$on('getNewLightOfComponents', () => {
+					this.initLightNum()
+				})
+			},
+			// 初始化光的数量
+			initLightNum () {
+				this.lightNumber = uni.getStorageSync('lightNumber') || 0
+				this.ecmUserLightUpLimit = uni.getStorageSync('ecmUserLightUpLimit') || 0
+			},
 			// 关闭激励广告确认框
 			closeDialog () {
-				if (this.isCustom) {
-					this.$emit('customCloseEvent')
-				} else {
-					this.showAdvertisingFlag = false
-				}
+				this.showAdvertisingFlag = false
+			},
+			// 显示激励广告确认弹窗
+			showDialog () {
+				this.showAdvertisingFlag = true
 			},
 			// 观看激励广告
 			openAdvertising () {
@@ -562,14 +579,12 @@
 				this.advertising.onClose((status) => {
 					if (status.isEnded) {
 						console.log('给光')
+						globalBus.$emit('requestOfAES')
 					} else {
 						console.log('憨批用户不给光')
 					}
-					this.advertising.destroy()
+					this.advertising.offClose()
 				})
-			},
-			showDialog () {
-				this.showAdvertisingFlag = true
 			},
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option){

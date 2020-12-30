@@ -1,11 +1,11 @@
 <template>
 	<view style="z-index: 999;">
-		<view class="light_container" style="height: 60rpx;padding: 10rpx;background-color: #975aa8;width: 250rpx;border-radius: 30rpx;padding-left: 20rpx;margin-top: 6rpx;" @click="showAdvertising">
+		<view class="light_container" style="height: 60rpx;padding: 10rpx;background-color: #975aa8;width: 250rpx;border-radius: 30rpx;padding-left: 20rpx;margin-top: 6rpx;position: relative;" @click="showAdvertising">
 			<image :src="lightIconUrl.light" style="display: inline-block;height: 40rpx;width: 40rpx;margin-bottom: 10rpx;"></image>
 			<image :src="lightIconUrl.ride" style="display: inline-block;height: 24rpx;width: 24rpx;margin-bottom: 16rpx;margin-left: 20rpx;"></image>
-			<image v-if="this.lightNumber !== this.ecmUserLightUpLimit" :src="numberUrlOne" style="display: inline-block;height: 32rpx;width: 20rpx;transform:translateY(-14rpx);margin-left: 20rpx;"></image>
-			<image v-if="this.lightNumber >= 10 && this.lightNumber !== this.ecmUserLightUpLimit" :src="numberUrlTwo" style="display: inline-block;height: 32rpx;width: 20rpx;transform:translateY(-14rpx);margin-left: 10rpx;"></image>
-			<image v-if="this.lightNumber === this.ecmUserLightUpLimit" :src="lightIconUrl.max" style="display: inline-block;height: 30rpx;width: 70rpx;transform:translateY(-14rpx);margin-left: 10rpx;"></image>
+			<image v-if="lightNumber !== ecmUserLightUpLimit" :src="numberUrlOne" style="display: inline-block;height: 32rpx;width: 20rpx;transform:translateY(-14rpx);margin-left: 20rpx;"></image>
+			<image v-if="lightNumber >= 10 && lightNumber !== ecmUserLightUpLimit" :src="numberUrlTwo" style="display: inline-block;height: 32rpx;width: 20rpx;transform:translateY(-14rpx);margin-left: 10rpx;"></image>
+			<image v-if="lightNumber === ecmUserLightUpLimit" :src="lightIconUrl.max" style="display: inline-block;height: 30rpx;width: 70rpx;transform:translateY(-14rpx);margin-left: 10rpx;"></image>
 			<view class="add_icon">
 				<view class="line"></view>
 			</view>
@@ -27,6 +27,9 @@
 </template>
 
 <script>
+	import {globalBus} from '../../common/js/util.js'
+	import CryptoJS from 'crypto-js'
+	import baseURL from '../../pages/login/config/config.js'
 	export default {
 		data() {
 			return {
@@ -67,7 +70,7 @@
 			// 光上限
 			ecmUserLightUpLimit: {
 				type: Number,
-				default: 0
+				default: 10
 			},
 			// 光数量
 			lightNumber: {
@@ -75,15 +78,60 @@
 				default: 0
 			}
 		},
+		mounted () {
+			this.isShowNumber()
+			this.isEditLightNum()
+		},
+		computed: {
+		},
 		methods: {
+			// showNum () {
+			// },
+			// 监听是否重新获取了光的数量
+			isEditLightNum () {
+				globalBus.$on('initLightStyle', () => {
+					this.isShowNumber()
+				})
+			},
 			// 根据光数量和光上限决定显示的内容
 			isShowNumber () {
-				if (this.ecmUserLightUpLimit === this.lightNumber) {
-					
+				console.log('初始化', this.lightNumber)
+				if (this.lightNumber >= 10) {
+					const numberOne = ((this.lightNumber + '').charAt(0) - 0)
+					const numberTwo = ((this.lightNumber + '').charAt(1) - 0)
+					console.log(numberOne, 'numberOne', numberTwo, 'numberTwo')
+					this.numberUrlOne = this.lightIconUrl.number[numberOne]
+					this.numberUrlTwo = this.lightIconUrl.number[numberTwo]
+				} else {
+					const numberOne = ((this.lightNumber + '').charAt(0) - 0)
+					console.log(numberOne, 'numberOne', this.lightNumber)
+					this.numberUrlOne = this.lightIconUrl.number[numberOne]
 				}
+			},
+			// 加密
+			encrypt(plaintText) {
+				// 秘钥
+				const COUNT = "1&&2$*$2&&1**##$"
+				const UNCOUNT  = CryptoJS.enc.Utf8.parse(COUNT);//Latin1 w8m31+Yy/Nw6thPsMpO5fg==
+				const SUNJIEJIE = CryptoJS.enc.Utf8.parse(plaintText);
+				const CHENXIDA = CryptoJS.AES.encrypt(SUNJIEJIE, UNCOUNT, {mode:CryptoJS.mode.ECB,padding: CryptoJS.pad.Pkcs7});
+				return CHENXIDA.toString();
+			},
+			// 解密
+			decrypt(word){
+				const CRYPTOJSKEY= "1&&2$*$2&&1**##$"
+				const key  = CryptoJS.enc.Utf8.parse(CRYPTOJSKEY);//Latin1 w8m31+Yy/Nw6thPsMpO5fg==
+				const decrypt = CryptoJS.AES.decrypt(word, key, {mode:CryptoJS.mode.ECB,padding: CryptoJS.pad.Pkcs7});
+				return CryptoJS.enc.Utf8.stringify(decrypt).toString();
 			},
 			// 观看激励广告
 			openAdvertising () {
+				// const timer = uni.getStorageSync('userId') + new Date().getTime() + ''
+				// // const timer = '151dw5q4d5wq1d5wq61d'
+				// const res = this.encrypt(timer)
+				// console.log(res, '加密')
+				// const data = this.decrypt(res)
+				// console.log(data, '解密')
 				if (this.isCustom) {
 					this.$emit('customConfirmEvent')
 					return false
@@ -118,10 +166,12 @@
 				this.advertising.onClose((status) => {
 					if (status.isEnded) {
 						console.log('给光')
+						globalBus.$emit('requestOfAES')
 					} else {
 						console.log('憨批用户不给光')
 					}
-					this.advertising.destroy()
+					this.advertising.offClose()
+					// this.advertising.destroy()
 				})
 			},
 			// 关闭激励广告确认框
@@ -147,15 +197,14 @@
 <style lang="scss">
 	.light_container {
 		.add_icon {
+			position: absolute;
 			display: inline-block;
 			width: 40rpx;
 			height: 40rpx;
 			border: 2rpx solid #fff;
-			margin-bottom: 12rpx;
-			margin-left: 10rpx;
 			border-radius: 20rpx;
 			box-sizing: border-box;
-			// text-align: center;
+			right: 10rpx;
 			.line {
 				width: 20rpx;
 				height: 4rpx;
