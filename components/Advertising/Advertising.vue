@@ -95,16 +95,17 @@
 			},
 			// 根据光数量和光上限决定显示的内容
 			isShowNumber () {
-				console.log('初始化', this.lightNumber)
-				if (this.lightNumber >= 10) {
-					const numberOne = ((this.lightNumber + '').charAt(0) - 0)
-					const numberTwo = ((this.lightNumber + '').charAt(1) - 0)
+				const num = uni.getStorageSync('lightNumber')
+				console.log('初始化', num)
+				if (this.num >= 10) {
+					const numberOne = ((num + '').charAt(0) - 0)
+					const numberTwo = ((num + '').charAt(1) - 0)
 					console.log(numberOne, 'numberOne', numberTwo, 'numberTwo')
 					this.numberUrlOne = this.lightIconUrl.number[numberOne]
 					this.numberUrlTwo = this.lightIconUrl.number[numberTwo]
 				} else {
-					const numberOne = ((this.lightNumber + '').charAt(0) - 0)
-					console.log(numberOne, 'numberOne', this.lightNumber)
+					const numberOne = ((num + '').charAt(0) - 0)
+					console.log(numberOne, 'numberOne', num)
 					this.numberUrlOne = this.lightIconUrl.number[numberOne]
 				}
 			},
