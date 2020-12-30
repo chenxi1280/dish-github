@@ -115,6 +115,12 @@
 					</view>
 					<view class="storyLine">换个选择</view>
 				</view>
+				<view class="seeMoreBox" @click="goDiscover">
+					<view class="seeMoreIconBox">
+						<icon class="seeMoreIcon"></icon>
+					</view>
+					<view class="seeMore">看更多</view>
+				</view>
 			</view>
 			<!-- 竖屏 -->
 			<view v-if="hiddenBtnFlag" :style="!showStyleFlag?'display: block':'display: none'" class= "horizontalBox">
@@ -129,6 +135,12 @@
 						<icon class="storyLineIcon"></icon>
 					</view>
 					<view class="storyLine">换个选择</view>
+				</view>
+				<view class="seeMoreBox" @click="goDiscover">
+					<view class="seeMoreIconBox">
+						<icon class="seeMoreIcon"></icon>
+					</view>
+					<view class="seeMore">看更多</view>
 				</view>
 			</view>
 			<!-- 故事线内容呈现在蒙板之上 -->
@@ -205,8 +217,9 @@
 			</view>
 		</u-modal>
 		<!-- horizontalControlsFlags -->
-		<view class="progress-time-box" v-if="horizontalControlsFlags">
-			<view class="progress-time">{{currentTimeStr}}{{durationStr}}</view>
+		<view class="progress-line-box" :style="{'width': videoWidth*0.8+'px'}" v-if="horizontalControlsFlags">
+			<progress :percent="percent" stroke-width="2" active-mode="forwards" active-color="#FF7256"></progress>
+			<view class="progress-time">{{durationStr}}</view>
 		</view>
 		<view class="progress-box" v-if="horizontalControlsFlags">
 			<view class="f-text">首</view>
@@ -386,6 +399,14 @@
 				durationStr: '',
 				//用于横屏播放时显示的视频的当前时间
 				currentTimeStr: '',
+				//进度条进度
+				percent: 0,
+				//记录保存次数
+				savaRecordCount: 0,
+				//本次播放是否消费开关
+				iscustomLightFlag: false,
+				//是否是故事线跳回开关
+				storyLineJumpFlag: false
 				// 播放模式
 				playMode: 0,
 				// 激励广告确认弹窗
@@ -552,9 +573,12 @@
 			},
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option){
+				this.iscustomLightFlag = false
 				//故事线跳转重置跳转节点的目标节点的id
 				this.linkNodeId = null
+				//初始化是否此视频是否播放过开关
 				this.isPlayedFlag = option.jumpFlag
+				this.storyLineJumpFlag = true
 				//故事线跳转时清除好感度延时函数
 				clearTimeout(this.likabilityDelayFunction)
 				//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
@@ -799,6 +823,24 @@
 					}
 				});
 			},
+			async customLightByUserId(eventId){
+				//故事线消费的eventId = 3
+				//初次播放消费eventId = 4
+				await uni.request ({
+					url: baseURL + "/wxPlay/customLight",
+					method: 'POST',
+					dataType: 'json',
+					data: {
+						userId: uni.getStorageSync('userId'),
+						eventId: eventId
+					},
+					success: result=> {
+						if(result.data.status == 200){
+							
+						}
+					}
+				});
+			},
 			//异步请求获取作品树 by ArtworkId
 			async getArtworkTreeByArtworkId(){
 				console.log( this.artworkId)
@@ -921,6 +963,17 @@
 			},
 			//统计有效的播放记录（进入播放页面并点击了选项（只记录第一次选项的点击）
 			async statisticsPlayRecord(){
+				//TODO
+				if(!uni.getStorageSync("userId")){
+					if(this.savaRecordCount > 2){
+						this.savaRecordCount == 0
+					}else{
+						this.statisticsPlayRecord()
+						this.savaRecordCount++
+					}
+				}else{
+					this.savaRecordCount == 0
+				}
 				await uni.request({
 					url: baseURL + "/wxPlay/statisticsPlayRecord",
 					method: 'POST',
@@ -958,6 +1011,7 @@
 			//开关控制是否展示 选项框 故事线 举报页面
 			videoEnd(){
 				//根据是否是最后一个视频标志 最后一个视频播放结束弹出故事线 endFlag = true 表示不是最后一个视频
+				this.percent = 100
 				if(this.endFlag){
 					if(this.isPosition == 1){
 						this.chooseTipsShowFlag = false
@@ -1052,6 +1106,16 @@
 							this.statisticsPlayRecord()
 							this.isClickOptionFlag = true
 						}
+						if(!this.iscustomLightFlag){
+							if(this.storyLineJumpFlag){
+								this.customLightByUserId(3)
+								this.iscustomLightFlag = true
+								this.storyLineJumpFlag = false
+							}else{
+								this.customLightByUserId(4)
+								this.iscustomLightFlag = true
+							}
+						}
 						break;
 					}
 					case 1: {
@@ -1064,6 +1128,16 @@
 						if(!this.isClickOptionFlag){
 							this.statisticsPlayRecord()
 							this.isClickOptionFlag = true
+						}
+						if(!this.iscustomLightFlag){
+							if(this.storyLineJumpFlag){
+								this.customLightByUserId(3)
+								this.iscustomLightFlag = true
+								this.storyLineJumpFlag = false
+							}else{
+								this.customLightByUserId(4)
+								this.iscustomLightFlag = true
+							}
 						}
 						break;
 					}
@@ -1078,6 +1152,16 @@
 							this.statisticsPlayRecord()
 							this.isClickOptionFlag = true
 						}
+						if(!this.iscustomLightFlag){
+							if(this.storyLineJumpFlag){
+								this.customLightByUserId(3)
+								this.iscustomLightFlag = true
+								this.storyLineJumpFlag = false
+							}else{
+								this.customLightByUserId(4)
+								this.iscustomLightFlag = true
+							}
+						}
 						break;
 					}
 					case 3: {
@@ -1090,6 +1174,16 @@
 						if(!this.isClickOptionFlag){
 							this.statisticsPlayRecord()
 							this.isClickOptionFlag = true
+						}
+						if(!this.iscustomLightFlag){
+							if(this.storyLineJumpFlag){
+								this.customLightByUserId(3)
+								this.iscustomLightFlag = true
+								this.storyLineJumpFlag = false
+							}else{
+								this.customLightByUserId(4)
+								this.iscustomLightFlag = true
+							}
 						}
 						break;
 					}
@@ -1220,7 +1314,7 @@
 						//测量文本宽度
 						let metrics = ctx.measureText(textContent)
 						//宽度取整 Math.ceil向上取整即省去小数再加1 宽度由文本的宽度加边距组成
-						let rectW = parseInt(metrics.width.toFixed(0))+marginLeftAndRightSides;
+						let rectW = parseInt(metrics.width.toFixed(0))+marginLeftAndRightSides
 						// console.log('矩形框的宽: ',rectW)
 						//末尾小圆圈的横纵坐标 算总长度时应该减去黑边
 						let cX = parseInt(((this.nodeLocationList[i].circleX+0)*this.canvasWidth).toFixed(0))
@@ -1270,9 +1364,9 @@
 						if(this.isClickFlag){
 							if(this.touchRectNum == i){
 									//矩形边框颜色
-									ctx.setStrokeStyle('#96CDCD')
+									ctx.setStrokeStyle('#FFFFFF')
 									//矩形填充色
-									ctx.setFillStyle('#96CDCD')
+									ctx.setFillStyle('#7E4DAB')
 									this.isClickFlag = false
 								}else{
 									ctx.setStrokeStyle('#FFFFFF')
@@ -1311,15 +1405,15 @@
 						//rpx转px 故(this.windowWidth)/2 计算总长度时要减去黑边
 						let rectOpacity = this.nodeLocationList[i].rectOpacity + 0
 						let rectX = parseInt(((this.nodeLocationList[i].textRectX+0)*this.canvasWidth).toFixed(0))
-						console.log('矩形框的x轴坐标: ',rectX)
+						// console.log('矩形框的x轴坐标: ',rectX)
 						let rectY = parseInt(((this.nodeLocationList[i].textRectY+0)*this.canvasHeight).toFixed(0))
-						console.log('矩形框的y轴坐标: ',rectY)
+						// console.log('矩形框的y轴坐标: ',rectY)
 						//矩形框高度
 						let rectH = parseInt(((this.nodeLocationList[i].hideHeightScale+0)*this.canvasHeight).toFixed(0))
-						console.log('矩形框的高: ',rectH)
+						// console.log('矩形框的高: ',rectH)
 						//矩形框宽度
 						let rectW = parseInt(((this.nodeLocationList[i].hideWidthScale+0)*this.canvasWidth).toFixed(0))
-						console.log('矩形框的宽: ',rectW)
+						// console.log('矩形框的宽: ',rectW)
 						//画矩形
 						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
 						ctx.beginPath()
@@ -1336,9 +1430,9 @@
 						if(this.isClickFlag){
 							if(this.touchRectNum == i){
 									//矩形边框颜色
-									ctx.setStrokeStyle('#96CDCD')
+									ctx.setStrokeStyle('rgba(255, 255, 255,0.1)')
 									//矩形填充色
-									ctx.setFillStyle('#96CDCD')
+									ctx.setFillStyle('rgba(255, 255, 255,0.1)')
 									this.isClickFlag = false
 								}else{
 									ctx.setStrokeStyle('rgba(255, 255, 255,'+ rectOpacity +')')
@@ -1420,8 +1514,8 @@
 						ctx.lineWidth = lineWidth
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
 						ctx.rect(this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH), parseInt((rectX-(rectW/2)).toFixed(0)), rectH, rectW)
-						console.log('矩形框的x轴坐标: ', this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH))
-						console.log('矩形框的y轴坐标: ', parseInt((rectX-(rectW/2)).toFixed(0)))
+						// console.log('矩形框的x轴坐标: ', this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH))
+						// console.log('矩形框的y轴坐标: ', parseInt((rectX-(rectW/2)).toFixed(0)))
 						//将坐标收纳成对象保存到数组，为绑定事件做准备
 						let rect={
 							x: this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH),
@@ -1434,9 +1528,9 @@
 						if(this.isClickFlag){
 							if(this.touchRectNum == i){
 									//矩形边框颜色
-									ctx.setStrokeStyle('#96CDCD')
+									ctx.setStrokeStyle('#FFFFFF')
 									//矩形填充色
-									ctx.setFillStyle('#96CDCD')
+									ctx.setFillStyle('#7E4DAB')
 									this.isClickFlag = false
 								}else{
 									ctx.setStrokeStyle('#FFFFFF')
@@ -1515,9 +1609,9 @@
 						if(this.isClickFlag){
 							if(this.touchRectNum == i){
 									//矩形边框颜色
-									ctx.setStrokeStyle('#96CDCD')
+									ctx.setStrokeStyle('rgba(255, 255, 255,0.1)')
 									//矩形填充色
-									ctx.setFillStyle('#96CDCD')
+									ctx.setFillStyle('rgba(255, 255, 255,0.1)')
 									this.isClickFlag = false
 								}else{
 									ctx.setStrokeStyle('rgba(255, 255, 255,'+ rectOpacity +')')
@@ -1618,6 +1712,16 @@
 						this.statisticsPlayRecord()
 						this.isClickOptionFlag = true
 					}
+					if(!this.iscustomLightFlag){
+						if(this.storyLineJumpFlag){
+							this.customLightByUserId(3)
+							this.iscustomLightFlag = true
+							this.storyLineJumpFlag = false
+						}else{
+							this.customLightByUserId(4)
+							this.iscustomLightFlag = true
+						}
+					}
 				}else if(this.touchRectNum == 1){
 					this.likabilityArray = []
 					clearTimeout(this.likabilityDelayFunction)
@@ -1629,6 +1733,16 @@
 					if(!this.isClickOptionFlag){
 						this.statisticsPlayRecord()
 						this.isClickOptionFlag = true
+					}
+					if(!this.iscustomLightFlag){
+						if(this.storyLineJumpFlag){
+							this.customLightByUserId(3)
+							this.iscustomLightFlag = true
+							this.storyLineJumpFlag = false
+						}else{
+							this.customLightByUserId(4)
+							this.iscustomLightFlag = true
+						}
 					}
 				}else if(this.touchRectNum == 2){
 					this.likabilityArray = []
@@ -1642,6 +1756,16 @@
 						this.statisticsPlayRecord()
 						this.isClickOptionFlag = true
 					}
+					if(!this.iscustomLightFlag){
+						if(this.storyLineJumpFlag){
+							this.customLightByUserId(3)
+							this.iscustomLightFlag = true
+							this.storyLineJumpFlag = false
+						}else{
+							this.customLightByUserId(4)
+							this.iscustomLightFlag = true
+						}
+					}
 				}else if(this.touchRectNum == 3){
 					this.likabilityArray = []
 					clearTimeout(this.likabilityDelayFunction)
@@ -1653,6 +1777,16 @@
 					if(!this.isClickOptionFlag){
 						this.statisticsPlayRecord()
 						this.isClickOptionFlag = true
+					}
+					if(!this.iscustomLightFlag){
+						if(this.storyLineJumpFlag){
+							this.customLightByUserId(3)
+							this.iscustomLightFlag = true
+							this.storyLineJumpFlag = false
+						}else{
+							this.customLightByUserId(4)
+							this.iscustomLightFlag = true
+						}
 					}
 				}
 				//回到默认值
@@ -1846,6 +1980,15 @@
 					url: '../login/login/login?isPlayJump='+true
 				})
 			},
+			goDiscover(){
+				console.log('我触发了')
+				uni.switchTab({
+					url: '../dishover/dishover',
+					fail(err) {
+						console.log('跳转失败:',err)
+					}
+				})
+			},
 			loadeddata(e){
 				this.duration = e.detail.duration
 				let date = this.formatDate(this.duration)
@@ -1902,8 +2045,12 @@
 			videoTimeupdate(e){
 				//获取视频当前时间
 				this.currentTime = e.detail.currentTime
-				let date = this.formatDate(this.currentTime)
-				this.currentTimeStr = date + '/'
+				//获取视频当前时间
+				if(this.duration -this.currentTime > 0.4){
+					this.percent = parseInt(this.currentTime/this.duration*100)
+				}else{
+					this.percent = 100
+				}
 			},
 			formatDate(date){
 				let hour = (parseInt(date/3600)+'').length == 1 ? '0' + parseInt(date/3600) : parseInt(date/3600)
@@ -2152,31 +2299,36 @@
 	.playBox{
 		width: 100%;
 		height: 100%;
-		.progress-time-box{
+		.progress-line-box{
 			position: fixed;
-			left: 5%;
-			top: 84%;
-			z-index: 10;
+			left: 2%;
+			top: 50%;
 			height: 50rpx;
-			width: 260rpx;
-			display: flex;
-			justify-content: center;
-			background-color:  rgba(0, 0, 0, 0.5);
+			z-index: 10;
 			transform: translate(-50%, -50%) rotateZ(90deg);
+			progress{
+				position: absolute;
+				top: 48%;
+				left: 4%;
+				width: 80%;
+			}
 			.progress-time{
+				position: absolute;
+				left: 85%;
 				color: white;
 				line-height: 50rpx;
 			}
 		}
 		.progress-box{
 			position: fixed;
-			left: 5%;
+			left: 6%;
 			top: 50%;
 			z-index: 10;
 			height: 50rpx;
 			width: 450rpx;
 			display: flex;
 			justify-content: center;
+			border-radius: 20rpx;
 			background-color:  rgba(0, 0, 0, .5);
 			transform: translate(-50%, -50%) rotateZ(90deg);
 			.replayVideoIconBox{
@@ -2485,7 +2637,7 @@
 				.storyLineBox{
 					position: fixed;
 					right: 6%;
-					top: 40%;
+					top: 37%;
 					height: 80rpx;
 					width: 100rpx;
 					z-index: 15;
@@ -2512,7 +2664,7 @@
 				.reportBox{
 					position: fixed;
 					right: 6%;
-					top: 50%;
+					top: 45%;
 					height: 80rpx;
 					width: 100rpx;
 					z-index: 15;
@@ -2536,12 +2688,39 @@
 						line-height: 30rpx;
 					}
 				}
+				.seeMoreBox{
+					position: fixed;
+					right: 6%;
+					top: 53%;
+					height: 80rpx;
+					width: 100rpx;
+					z-index: 15;
+					background-color: rgba(0,0,0,.3);
+					border-radius: 20rpx;
+					.seeMoreIconBox{
+						width: 100rpx;
+						height: 50rpx;
+						text-align: center;
+						.seeMoreIcon{
+							width: 50rpx;
+							height: 50rpx;
+							background: url(../../static/icon/seeMore.png) no-repeat center;
+							background-size: 50rpx;
+						}
+					}
+					.seeMore{
+						text-align: center;
+						color: white;
+						font-size: 20rpx;
+						line-height: 30rpx;
+					}
+				}
 			}
 			.horizontalBox{
 				.storyLineBox{
 					position: fixed;
 					right: 0;
-					top: 90%;
+					top: 70%;
 					height: 80rpx;
 					width: 100rpx;
 					transform: translate(-50%, -50%) rotateZ(90deg);
@@ -2588,6 +2767,34 @@
 						}
 					}
 					.report{
+						text-align: center;
+						color: white;
+						font-size: 20rpx;
+						line-height: 30rpx;
+					}
+				}
+				.seeMoreBox{
+					position: fixed;
+					right: 0;
+					top: 90%;
+					transform: translate(-50%, -50%) rotateZ(90deg);
+					height: 80rpx;
+					width: 100rpx;
+					z-index: 15;
+					background-color: rgba(0,0,0,.3);
+					border-radius: 20rpx;
+					.seeMoreIconBox{
+						width: 100rpx;
+						height: 50rpx;
+						text-align: center;
+						.seeMoreIcon{
+							width: 50rpx;
+							height: 50rpx;
+							background: url(../../static/icon/seeMore.png) no-repeat center;
+							background-size: 50rpx;
+						}
+					}
+					.seeMore{
 						text-align: center;
 						color: white;
 						font-size: 20rpx;
