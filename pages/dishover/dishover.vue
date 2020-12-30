@@ -3,7 +3,7 @@
 		<view style="position: relative;height: 80rpx;width: 750rpx;padding: 0 20rpx;box-sizing: border-box;padding-top: 10rpx;display: flex;">
 <!-- 			<icon class="search_icon"></icon>
 			<input class="search_input" type="" placeholder=" 查找你想看的视频" disabled="" /> -->
-			<Advertising></Advertising>
+			<Advertising :lightNumber.sync="lightNumber" :ecmUserLightUpLimit.sync="ecmUserLightUpLimit"></Advertising>
 			<view style="width: calc(50% - 20rpx);position: absolute;right: 20rpx;border: 1px solid #e5e5e5;height: 70rpx; border-radius: 30rpx;flex: 1;" @click="go_search_page">
 				<u-search :show-action="false" @click="go_search_page"></u-search>
 			</view>
@@ -71,6 +71,7 @@
 	import search from '../search/search'
 	import waterfall from './waterfall_view/waterfall.vue'
 	import Advertising from '../../components/Advertising/Advertising.vue'
+	import {globalBus} from '../../common/js/util.js'
 	export default {
 		components: {
 			waterfall,
@@ -170,7 +171,44 @@
 				uni.stopPullDownRefresh();
 			}, 1000);
 		},
+		onReady () {
+			this.isRequestAes()
+			this.isGetLight()
+		},
 		methods: {
+			// 监听是否需要重新获取光
+			isGetLight () {
+				globalBus.$on('getLight', (res) => {
+					// this.getLight()
+					this.lightNumber = res.lightNumber
+					this.ecmUserLightUpLimit = res.upLimit
+					console.log(res, '传递', )
+					uni.setStorageSync('lightNumber', this.lightNumber)
+					uni.setStorageSync('ecmUserLightUpLimit', this.ecmUserLightUpLimit)
+					globalBus.$emit('getNewLightOfComponents')
+					globalBus.$emit('initLightStyle')
+				})
+			},
+			// 监听增加光请求
+			isRequestAes () {
+				globalBus.$on('requestOfAES', (res) => {
+					uni.request({
+						url: baseURL + '/wxPlay/addLight',
+						method: 'POST',
+						dataType: 'json',
+						data: {
+							userId: uni.getStorageSync('userId'),
+							eventId: 2
+						},
+						success: res => {
+							uni.showToast({
+								title: '恭喜成功获得光'
+							})
+							globalBus.$emit('getLight', res.data.data)
+						}
+					})
+				})
+			},
 			// 获取光
 			getLight () {
 				uni.request({
@@ -187,6 +225,10 @@
 						if (res.data.status === 200) {
 							this.ecmUserLightUpLimit = res.data.data.ecmUserLightUpLimit
 							this.lightNumber = res.data.data.lightNumber
+							console.log(this.ecmUserLightUpLimit, this.lightNumber)
+							uni.setStorageSync('ecmUserLightUpLimit', this.ecmUserLightUpLimit)
+							uni.setStorageSync('lightNumber', this.lightNumber)
+							globalBus.$emit('initLightStyle')
 						}
 					}
 				})

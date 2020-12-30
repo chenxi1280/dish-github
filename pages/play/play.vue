@@ -5,10 +5,10 @@
 			<image src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605168512421loading.gif"></image>
 		</view>
 		<view v-if="!playMode" :style="{transform: transform, position: 'fixed', left: '160rpx', top:'40rpx',zIndex: '9'}">
-			<Advertising isCustom @customAddEvent="showDialog" @customConfirmEvent="openAdvertising" @customCloseEvent="closeDialog"></Advertising>
+			<Advertising isCustom @customAddEvent="showDialog" @customConfirmEvent="openAdvertising" @customCloseEvent="closeDialog" :lightNumber="lightNumber" :ecmUserLightUpLimit="ecmUserLightUpLimit"></Advertising>
 		</view>
 		<view v-if="playMode" :style="{transform: transform, position: 'fixed', right: '-40rpx', bottom:'120rpx', zIndex: '9'}">
-			<Advertising isCustom @customAddEvent="showDialog"  @customConfirmEvent="openAdvertising" @customCloseEvent="closeDialog"></Advertising>
+			<Advertising isCustom @customAddEvent="showDialog"  @customConfirmEvent="openAdvertising" @customCloseEvent="closeDialog" :lightNumber="lightNumber" :ecmUserLightUpLimit="ecmUserLightUpLimit"></Advertising>
 		</view>
 		<!-- 确认观看激励视频广告的弹窗 -->
 		<view v-if="playMode">
@@ -251,6 +251,7 @@
 	import storyLine from './storyLine/storyLine.vue'
 	import {horizontalStoryLine} from './storyLine/horizontalStoryLine.vue'
 	import Advertising from '../../components/Advertising/Advertising.vue'
+	import {globalBus} from '../../common/js/util.js'
 	export default {
 		components:{
 			storyLine,
@@ -359,8 +360,6 @@
 				videoShowFlag: true,
 				//是否展示截屏图片的标志
 				screenshotShowFlag: false,
-				//光的数值
-				lightNumber: 25,
 				//是否展示好感度标志
 				likabilityFlag: false,
 				//好感度数值容器
@@ -410,10 +409,16 @@
 				// 播放模式
 				playMode: 0,
 				// 激励广告确认弹窗
-				showAdvertisingFlag: false
+				showAdvertisingFlag: false,
+				// 光数量
+				lightNumber: 0,
+				// 光上限
+				ecmUserLightUpLimit: 0
 			}
 		},
 		onReady(){
+			// 监听是否重新获取光的数量
+			this.isGetLight()
 			//重置开关状态到初始值
 			this.isClickOptionFlag = false
 			//关闭好感度 视频加载结束时打开
@@ -437,6 +442,7 @@
 			this.getArtworkTreeByArtworkId();
 		},
 		onLoad(option) {
+			this.initLightNum()
 			uni.showShareMenu({
 			  withShareTicket: true,
 			  menus: ['shareAppMessage', 'shareTimeline']
@@ -522,13 +528,24 @@
 			}
 		},
 		methods: {
+			// 监听是否重新获取光的数量
+			isGetLight () {
+				globalBus.$on('getNewLightOfComponents', () => {
+					this.initLightNum()
+				})
+			},
+			// 初始化光的数量
+			initLightNum () {
+				this.lightNumber = uni.getStorageSync('lightNumber') || 0
+				this.ecmUserLightUpLimit = uni.getStorageSync('ecmUserLightUpLimit') || 0
+			},
 			// 关闭激励广告确认框
 			closeDialog () {
-				if (this.isCustom) {
-					this.$emit('customCloseEvent')
-				} else {
-					this.showAdvertisingFlag = false
-				}
+				this.showAdvertisingFlag = false
+			},
+			// 显示激励广告确认弹窗
+			showDialog () {
+				this.showAdvertisingFlag = true
 			},
 			// 观看激励广告
 			openAdvertising () {
@@ -562,14 +579,12 @@
 				this.advertising.onClose((status) => {
 					if (status.isEnded) {
 						console.log('给光')
+						globalBus.$emit('requestOfAES')
 					} else {
 						console.log('憨批用户不给光')
 					}
-					this.advertising.destroy()
+					this.advertising.offClose()
 				})
-			},
-			showDialog () {
-				this.showAdvertisingFlag = true
 			},
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option){
@@ -836,7 +851,14 @@
 					},
 					success: result=> {
 						if(result.data.status == 200){
-							
+							if(this.storyLineJumpFlag){
+								this.iscustomLightFlag = true
+								this.storyLineJumpFlag = false
+							}else{
+								this.iscustomLightFlag = true
+							}
+						}else if(result.data.status == 10086){
+							this.showAdvertisingFlag = true
 						}
 					}
 				});
@@ -929,13 +951,33 @@
 			},
 			//异步请求保存播放记录
 			async savaPlayRecord(){
+				let userId = uni.getStorageSync("userId")
+				if(uni.getStorageSync("openid")){
+					if(!userId){
+						if(this.savaRecordCount > 2){
+							this.savaRecordCount == 0
+							//三次都未请求到userID
+							userId = -1
+						}else{
+							setTimeout(()=>{
+								this.savaPlayRecord()
+							},100)
+							this.savaRecordCount++
+						}
+					}else{
+						this.savaRecordCount == 0
+					}
+				}else{
+					//朋友圈点击
+					userId = -2
+				}
 				await uni.request({
 					url: baseURL + "/wxPlay/savaPlayRecord",
 					method: 'POST',
 					dataType: 'json',
 					data: {
 						pkArtworkId: this.artworkId,
-						userId: uni.getStorageSync("userId"),
+						userId: userId,
 						detailId: this.detailId
 					},
 					success: res=> {
@@ -945,7 +987,7 @@
 					}
 				})
 			},
-			//异步请求保存播放记录
+			//异步请求获取作品信息
 			async getPlayArtworkInfo(artworkId){
 				await uni.request({
 					url: baseURL + "/wxPlay/queryArtworkInfo",
@@ -963,16 +1005,23 @@
 			},
 			//统计有效的播放记录（进入播放页面并点击了选项（只记录第一次选项的点击）
 			async statisticsPlayRecord(){
-				//TODO
-				if(!uni.getStorageSync("userId")){
-					if(this.savaRecordCount > 2){
-						this.savaRecordCount == 0
+				let userId = uni.getStorageSync("userId")
+				if(uni.getStorageSync("openid")){
+					if(!userId){
+						if(this.savaRecordCount > 2){
+							this.savaRecordCount == 0
+							//三次都未请求到userID
+							userId = -1
+						}else{
+							this.statisticsPlayRecord()
+							this.savaRecordCount++
+						}
 					}else{
-						this.statisticsPlayRecord()
-						this.savaRecordCount++
+						this.savaRecordCount == 0
 					}
 				}else{
-					this.savaRecordCount == 0
+					//朋友圈点击
+					userId = -2
 				}
 				await uni.request({
 					url: baseURL + "/wxPlay/statisticsPlayRecord",
@@ -980,7 +1029,7 @@
 					dataType: 'json',
 					data: {
 						fkArtworkId: this.artworkId,
-						fkUserId: uni.getStorageSync("userId"),
+						fkUserId: userId,
 						fkArtworkDetailId: this.detailId
 					},
 					success: res=> {
@@ -992,13 +1041,31 @@
 			},
 			//统计故事线自然呈现记录（自然播放结束）
 			async statisticsStorylineNaturalshow(){
+				let userId = uni.getStorageSync("userId")
+				if(uni.getStorageSync("openid")){
+					if(!userId){
+						if(this.savaRecordCount > 2){
+							this.savaRecordCount == 0
+							//三次都未请求到userID
+							userId = -1
+						}else{
+							this.statisticsStorylineNaturalshow()
+							this.savaRecordCount++
+						}
+					}else{
+						this.savaRecordCount == 0
+					}
+				}else{
+					//朋友圈点击
+					userId = -2
+				}
 				await uni.request({
 					url: baseURL + "/wxPlay/statisticsStorylineNaturalshow",
 					method: 'POST',
 					dataType: 'json',
 					data: {
 						fkArtworkId: this.artworkId,
-						fkUserId: uni.getStorageSync("userId"),
+						fkUserId: userId,
 						fkArtworkDetailId: this.detailId
 					},
 					success: res=> {
@@ -1071,7 +1138,7 @@
 			},
 			//触摸选项touchstart事件
 			changeBackground(index){
-				switch(index){
+				/* switch(index){
 					case 0: {
 						this.background.splice(index,1,"#96CDCD");
 						break;
@@ -1088,12 +1155,20 @@
 						this.background.splice(index,1,"#96CDCD");
 						break;
 					}
-				}
+				} */
 			},
 			//触摸选项touchend事件
 			rebackBackground(index){
 				switch(index){
 					case 0: {
+						if(!this.iscustomLightFlag){
+							if(this.storyLineJumpFlag){
+								return this.customLightByUserId(3)
+							}else{
+								return this.customLightByUserId(4)
+							}
+						}
+						this.background.splice(index,1,"#96CDCD");
 						// splice替换数组元素
 						this.likabilityArray = []
 						this.background.splice(index,1,"")
@@ -1106,19 +1181,17 @@
 							this.statisticsPlayRecord()
 							this.isClickOptionFlag = true
 						}
-						if(!this.iscustomLightFlag){
-							if(this.storyLineJumpFlag){
-								this.customLightByUserId(3)
-								this.iscustomLightFlag = true
-								this.storyLineJumpFlag = false
-							}else{
-								this.customLightByUserId(4)
-								this.iscustomLightFlag = true
-							}
-						}
 						break;
 					}
 					case 1: {
+						if(!this.iscustomLightFlag){
+							if(this.storyLineJumpFlag){
+								return this.customLightByUserId(3)
+							}else{
+								return this.customLightByUserId(4)
+							}
+						}
+						this.background.splice(index,1,"#96CDCD");
 						this.likabilityArray = []
 						this.background.splice(index,1,"")
 						this.likabilityFlag = false
@@ -1128,20 +1201,18 @@
 						if(!this.isClickOptionFlag){
 							this.statisticsPlayRecord()
 							this.isClickOptionFlag = true
-						}
-						if(!this.iscustomLightFlag){
-							if(this.storyLineJumpFlag){
-								this.customLightByUserId(3)
-								this.iscustomLightFlag = true
-								this.storyLineJumpFlag = false
-							}else{
-								this.customLightByUserId(4)
-								this.iscustomLightFlag = true
-							}
 						}
 						break;
 					}
 					case 2: {
+						if(!this.iscustomLightFlag){
+							if(this.storyLineJumpFlag){
+								return this.customLightByUserId(3)
+							}else{
+								return this.customLightByUserId(4)
+							}
+						}
+						this.background.splice(index,1,"#96CDCD");
 						this.likabilityArray = []
 						this.background.splice(index,1,"")
 						this.likabilityFlag = false
@@ -1151,20 +1222,18 @@
 						if(!this.isClickOptionFlag){
 							this.statisticsPlayRecord()
 							this.isClickOptionFlag = true
-						}
-						if(!this.iscustomLightFlag){
-							if(this.storyLineJumpFlag){
-								this.customLightByUserId(3)
-								this.iscustomLightFlag = true
-								this.storyLineJumpFlag = false
-							}else{
-								this.customLightByUserId(4)
-								this.iscustomLightFlag = true
-							}
 						}
 						break;
 					}
 					case 3: {
+						if(!this.iscustomLightFlag){
+							if(this.storyLineJumpFlag){
+								return this.customLightByUserId(3)
+							}else{
+								return this.customLightByUserId(4)
+							}
+						}
+						this.background.splice(index,1,"#96CDCD");
 						this.likabilityArray = []
 						this.background.splice(index,1,"")
 						this.likabilityFlag = false
@@ -1174,16 +1243,6 @@
 						if(!this.isClickOptionFlag){
 							this.statisticsPlayRecord()
 							this.isClickOptionFlag = true
-						}
-						if(!this.iscustomLightFlag){
-							if(this.storyLineJumpFlag){
-								this.customLightByUserId(3)
-								this.iscustomLightFlag = true
-								this.storyLineJumpFlag = false
-							}else{
-								this.customLightByUserId(4)
-								this.iscustomLightFlag = true
-							}
 						}
 						break;
 					}
@@ -1701,6 +1760,13 @@
 			canvasTouchendEvent(){
 				// console.log('this.touchRectNum: '+this.touchRectNum)
 				if(this.touchRectNum == 0){
+					if(!this.iscustomLightFlag){
+						if(this.storyLineJumpFlag){
+							return this.customLightByUserId(3)
+						}else{
+							return this.customLightByUserId(4)
+						}
+					}
 					this.likabilityArray = []
 					clearTimeout(this.likabilityDelayFunction)
 					this.canvasTouchendEventTodo()
@@ -1711,18 +1777,15 @@
 					if(!this.isClickOptionFlag){
 						this.statisticsPlayRecord()
 						this.isClickOptionFlag = true
-					}
-					if(!this.iscustomLightFlag){
-						if(this.storyLineJumpFlag){
-							this.customLightByUserId(3)
-							this.iscustomLightFlag = true
-							this.storyLineJumpFlag = false
-						}else{
-							this.customLightByUserId(4)
-							this.iscustomLightFlag = true
-						}
 					}
 				}else if(this.touchRectNum == 1){
+					if(!this.iscustomLightFlag){
+						if(this.storyLineJumpFlag){
+							return this.customLightByUserId(3)
+						}else{
+							return this.customLightByUserId(4)
+						}
+					}
 					this.likabilityArray = []
 					clearTimeout(this.likabilityDelayFunction)
 					this.canvasTouchendEventTodo()
@@ -1733,18 +1796,15 @@
 					if(!this.isClickOptionFlag){
 						this.statisticsPlayRecord()
 						this.isClickOptionFlag = true
-					}
-					if(!this.iscustomLightFlag){
-						if(this.storyLineJumpFlag){
-							this.customLightByUserId(3)
-							this.iscustomLightFlag = true
-							this.storyLineJumpFlag = false
-						}else{
-							this.customLightByUserId(4)
-							this.iscustomLightFlag = true
-						}
 					}
 				}else if(this.touchRectNum == 2){
+					if(!this.iscustomLightFlag){
+						if(this.storyLineJumpFlag){
+							return this.customLightByUserId(3)
+						}else{
+							return this.customLightByUserId(4)
+						}
+					}
 					this.likabilityArray = []
 					clearTimeout(this.likabilityDelayFunction)
 					this.canvasTouchendEventTodo()
@@ -1755,18 +1815,15 @@
 					if(!this.isClickOptionFlag){
 						this.statisticsPlayRecord()
 						this.isClickOptionFlag = true
-					}
-					if(!this.iscustomLightFlag){
-						if(this.storyLineJumpFlag){
-							this.customLightByUserId(3)
-							this.iscustomLightFlag = true
-							this.storyLineJumpFlag = false
-						}else{
-							this.customLightByUserId(4)
-							this.iscustomLightFlag = true
-						}
 					}
 				}else if(this.touchRectNum == 3){
+					if(!this.iscustomLightFlag){
+						if(this.storyLineJumpFlag){
+							return this.customLightByUserId(3)
+						}else{
+							return this.customLightByUserId(4)
+						}
+					}
 					this.likabilityArray = []
 					clearTimeout(this.likabilityDelayFunction)
 					this.canvasTouchendEventTodo()
@@ -1777,16 +1834,6 @@
 					if(!this.isClickOptionFlag){
 						this.statisticsPlayRecord()
 						this.isClickOptionFlag = true
-					}
-					if(!this.iscustomLightFlag){
-						if(this.storyLineJumpFlag){
-							this.customLightByUserId(3)
-							this.iscustomLightFlag = true
-							this.storyLineJumpFlag = false
-						}else{
-							this.customLightByUserId(4)
-							this.iscustomLightFlag = true
-						}
 					}
 				}
 				//回到默认值
