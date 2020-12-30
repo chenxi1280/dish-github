@@ -3,8 +3,9 @@
 		<view class="light_container" style="height: 60rpx;padding: 10rpx;background-color: #975aa8;width: 250rpx;border-radius: 30rpx;padding-left: 20rpx;margin-top: 6rpx;" @click="showAdvertising">
 			<image :src="lightIconUrl.light" style="display: inline-block;height: 40rpx;width: 40rpx;margin-bottom: 10rpx;"></image>
 			<image :src="lightIconUrl.ride" style="display: inline-block;height: 24rpx;width: 24rpx;margin-bottom: 16rpx;margin-left: 20rpx;"></image>
-			<image :src="lightIconUrl.nine" style="display: inline-block;height: 32rpx;width: 20rpx;margin-bottom: 14rpx;margin-left: 20rpx;"></image>
-			<image :src="lightIconUrl.two" style="display: inline-block;height: 32rpx;width: 20rpx;margin-bottom: 14rpx;margin-left: 10rpx;"></image>
+			<image v-if="this.lightNumber !== this.ecmUserLightUpLimit" :src="numberUrlOne" style="display: inline-block;height: 32rpx;width: 20rpx;transform:translateY(-14rpx);margin-left: 20rpx;"></image>
+			<image v-if="this.lightNumber >= 10 && this.lightNumber !== this.ecmUserLightUpLimit" :src="numberUrlTwo" style="display: inline-block;height: 32rpx;width: 20rpx;transform:translateY(-14rpx);margin-left: 10rpx;"></image>
+			<image v-if="this.lightNumber === this.ecmUserLightUpLimit" :src="lightIconUrl.max" style="display: inline-block;height: 30rpx;width: 70rpx;transform:translateY(-14rpx);margin-left: 10rpx;"></image>
 			<view class="add_icon">
 				<view class="line"></view>
 			</view>
@@ -31,20 +32,26 @@
 			return {
 				// 光图标地址
 				lightIconUrl: {
-					zero: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/16092217310570.png',
-					one: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/16092217448581.png',
-					two: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/16092217566402.png',
-					three: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/16092217681013.png',
-					four: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/16092217827134.png',
-					five: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/16092218093205.png',
-					six: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/16092218381466.png',
-					seven: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/16092218503377.png',
-					eight: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/16092218622068.png',
-					nine: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/16092218835049.png',
-					max: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/1609206818980max.png',
+					number: [
+						'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/16092217310570.png',
+						'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/16092217448581.png',
+						'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/16092217566402.png',
+						'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/16092217681013.png',
+						'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/16092217827134.png',
+						'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/16092218093205.png',
+						'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/16092218381466.png',
+						'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/16092218503377.png',
+						'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/16092218622068.png',
+						'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/16092218835049.png',
+					],
+					max: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/1609295327340max.png',
 					ride: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/1609221900603%E4%B9%98%E5%8F%B7.png',
 					light: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/1609206885162%E5%85%893.png'
 				},
+				// 实际的数字地址  十位
+				numberUrlOne: '',
+				// 实际的数字地址  个位
+				numberUrlTwo: '',
 				// 观看激励视频的确认弹窗
 				showAdvertisingFlag: false,
 				// 激励广告实例
@@ -56,9 +63,25 @@
 			isCustom: {
 				type: Boolean,
 				default: false
+			},
+			// 光上限
+			ecmUserLightUpLimit: {
+				type: Number,
+				default: 0
+			},
+			// 光数量
+			lightNumber: {
+				type: Number,
+				default: 0
 			}
 		},
 		methods: {
+			// 根据光数量和光上限决定显示的内容
+			isShowNumber () {
+				if (this.ecmUserLightUpLimit === this.lightNumber) {
+					
+				}
+			},
 			// 观看激励广告
 			openAdvertising () {
 				if (this.isCustom) {
@@ -129,7 +152,7 @@
 			height: 40rpx;
 			border: 2rpx solid #fff;
 			margin-bottom: 12rpx;
-			margin-left: 20rpx;
+			margin-left: 10rpx;
 			border-radius: 20rpx;
 			box-sizing: border-box;
 			// text-align: center;
