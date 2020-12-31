@@ -568,11 +568,19 @@
 			},
 			// 关闭激励广告确认框
 			closeDialog () {
+				this.showCanvasFlag = true
 				this.showAdvertisingFlag = false
+				const videoContext = uni.createVideoContext('myVideo')
+				//暂停视屏
+				videoContext.play()
 			},
 			// 显示激励广告确认弹窗
 			showDialog () {
+				this.showCanvasFlag = false
 				this.showAdvertisingFlag = true
+				const videoContext = uni.createVideoContext('myVideo')
+				//暂停视屏
+				videoContext.pause()
 			},
 			// 观看激励广告
 			openAdvertising () {
@@ -606,7 +614,9 @@
 				}
 				// 监听激励广告关闭
 				this.advertising.onClose((status) => {
-					this.showCanvasFlag = true
+					const videoContext = uni.createVideoContext('myVideo')
+					//暂停视屏
+					videoContext.play()
 					if (status.isEnded) {
 						console.log('给光')
 						globalBus.$emit('requestOfAES')
