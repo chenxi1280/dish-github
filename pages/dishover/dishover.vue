@@ -136,7 +136,7 @@
 			this.getLight()
 		},
 		onLoad() {
-			this.getAddLightCount()
+			// this.getAddLightCount()
 			uni.showShareMenu({
 			  withShareTicket: true
 			})
@@ -177,6 +177,7 @@
 		onReady () {
 			this.isRequestAes()
 			this.isGetLight()
+			this.getAddLightCount()
 		},
 		methods: {
 			// 获取当前一次性看广告加光的数量
@@ -192,8 +193,10 @@
 					},
 					success: (res) => {
 						const rewardLightStr = res.data.data.rewardLight
-						const rewardLight = rewardLightStr.split('+' || '-')[1] - 0
-						uni.setStorageSync('rewardLight', rewardLight)
+						const rewardLight = rewardLightStr.split('+' || '-')[1] - 0 || 0
+						if (rewardLight) {
+							uni.setStorageSync('rewardLight', rewardLight)
+						}
 					}
 				})
 			},

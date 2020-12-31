@@ -462,7 +462,7 @@
 		},
 		onLoad(option) {
 			// 初始化看广告获取光的数量
-			this.rewardLight = uni.getStorageSync('rewardLight')
+			this.rewardLight = uni.getStorageSync('rewardLight') || 3
 			this.randomText()
 			this.initLightNum()
 			uni.showShareMenu({
@@ -583,6 +583,7 @@
 				//捕捉错误
 				this.advertising.onError(err => {
 					uni.showToast({
+						icon: 'none',
 						title:'获取激励视频失败，请重试'
 					})
 				})
@@ -612,6 +613,7 @@
 						console.log('憨批用户不给光')
 					}
 					this.advertising.offClose()
+					/* this.advertising.destroy() */
 				})
 			},
 			//故事线跳转播放页
