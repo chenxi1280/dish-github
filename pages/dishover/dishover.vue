@@ -3,7 +3,9 @@
 		<view style="position: relative;height: 80rpx;width: 750rpx;padding: 0 20rpx;box-sizing: border-box;padding-top: 10rpx;display: flex;">
 <!-- 			<icon class="search_icon"></icon>
 			<input class="search_input" type="" placeholder=" 查找你想看的视频" disabled="" /> -->
-			<Advertising :lightNumber.sync="lightNumber" :ecmUserLightUpLimit.sync="ecmUserLightUpLimit"></Advertising>
+			<view style="position: fixed;z-index: 999;">
+				<Advertising :lightNumber.sync="lightNumber" :ecmUserLightUpLimit.sync="ecmUserLightUpLimit"></Advertising>
+			</view>
 			<view style="width: calc(50% - 20rpx);position: absolute;right: 20rpx;border: 1px solid #e5e5e5;height: 70rpx; border-radius: 30rpx;flex: 1;" @click="go_search_page">
 				<u-search :show-action="false" @click="go_search_page"></u-search>
 			</view>
@@ -130,10 +132,11 @@
 				ecmUserLightUpLimit: 0
 			}
 		},
-		// onShow() {
-		// 	this.addRandomDataHot()
-		// },
+		onShow() {
+			this.getLight()
+		},
 		onLoad() {
+			this.getAddLightCount()
 			uni.showShareMenu({
 			  withShareTicket: true
 			})
@@ -176,6 +179,24 @@
 			this.isGetLight()
 		},
 		methods: {
+			// 获取当前一次性看广告加光的数量
+			getAddLightCount () {
+				uni.request({
+					url:baseURL + '/user/light/getUserReward',
+					method:'post',
+					data: {
+						fkEcmUserLightEventId: 2
+					},
+					header: {
+						'Authorization': uni.getStorageSync('token')
+					},
+					success: (res) => {
+						const rewardLightStr = res.data.data.rewardLight
+						const rewardLight = rewardLightStr.split('+' || '-')[1] - 0
+						uni.setStorageSync('rewardLight', rewardLight)
+					}
+				})
+			},
 			// 监听是否需要重新获取光
 			isGetLight () {
 				globalBus.$on('getLight', (res) => {

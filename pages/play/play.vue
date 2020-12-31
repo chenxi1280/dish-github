@@ -1,8 +1,10 @@
 <template>
 	<view class="playBox">
 		<!-- 入场loading -->
-		<view v-if="videoloadFlag" class="videoLoadImageBox">
-			<image src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605168512421loading.gif"></image>
+		<view v-if="videoloadFlag" class="videoLoadImageBox" style="z-index: 999;">
+			<!-- <view style="position: absolute;text-align: center;width: 100%;font-size: 40rpx;top: 40%;color: #fff;">Tips :</view> -->
+			<view style="white-space: pre-line;position: absolute;left: 50%; top: 50%;transform: translate(-50%, -50%);color: #fff;font-size: 40rpx;width: 750rpx;text-align: center;line-height: 60rpx;">{{tipsText}}</view>
+			<image src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1609384346693loading2.gif"></image>
 		</view>
 		<view v-if="!playMode" :style="{transform: transform, position: 'fixed', left: '160rpx', top:'40rpx',zIndex: '9'}">
 			<Advertising isCustom @customAddEvent="showDialog" @customConfirmEvent="openAdvertising" @customCloseEvent="closeDialog" :lightNumber="lightNumber" :ecmUserLightUpLimit="ecmUserLightUpLimit"></Advertising>
@@ -29,7 +31,7 @@
 			<u-modal v-model="showAdvertisingFlag" title="温馨提示" :show-confirm-button="false" z-index="999">
 				<view class="slot-content">
 					<view style="padding: 0 20rpx;padding-top: 40rpx;">
-						<view>完整观看激励视频可以获得15个光的奖励哦</view>
+						<view>完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view>
 						<view @click="openAdvertising" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
 							<image src="../../static/icon/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
 							<view style="display: inline-block;margin-left: 10rpx;color: #fff;transform: translateY(-4rpx);">立即获取</view>
@@ -413,7 +415,25 @@
 				// 光数量
 				lightNumber: 0,
 				// 光上限
-				ecmUserLightUpLimit: 0
+				ecmUserLightUpLimit: 0,
+				tips: [
+					'Tips : \n\n人生的选择不能重做，\n还好互动视频可以。',
+					'Tips : \n\n如果你做出了错误的选择，\n点击“换个选择”，\n可以再选一次。',
+					'Tips : \n\n如果你想更改选择，\n点击“换个选择”，\n可以回顾你的所有选择。',
+					'Tips : \n\n如果作品让你感觉不适，\n点击“投诉”，\n可以把情况反馈给我们。',
+					'Tips : \n\n点击“观看更多”，\n或者去发现页面，\n都可以看到更多好看的互动视频。',
+					'Tips : \n\n竖屏观看时，\n手指在屏幕任意位置拖动，\n就可以调整播放进度。',
+					'Tips : \n\n横屏观看时，\n点击底部控制器上的圈15，\n可以向前后跳跃视频时长的15%。',
+					'Tips : \n\n横屏观看时，\n点击底部控制器上的快进首尾，\n可以直接回到视频的开始或结尾。',
+					'Tips : \n\n点击按钮或者其他可以互动的元素，\n可以操作剧情按照你的意思发展。',
+					'Tips : \n\n点击右上角的省略号，\n可以和你的朋友一起玩耍。',
+					'Tips : \n\n光是希望的凝结，\n消耗光，\n可以更改你的选择。',
+					'Tips : \n\n获得光的最好方式，\n是跟随指引。',
+					'Tips : \n\n制作互动视频，\n请登录ivetool.com。',
+					'Tips : \n\n联系我们，\n请搜索灵巫互动公众号，\n使用底部菜单或留言。'
+				],
+				tipsText: '',
+				rewardLight: 0
 			}
 		},
 		onReady(){
@@ -442,6 +462,9 @@
 			this.getArtworkTreeByArtworkId();
 		},
 		onLoad(option) {
+			// 初始化看广告获取光的数量
+			this.rewardLight = uni.getStorageSync('rewardLight')
+			this.randomText()
 			this.initLightNum()
 			uni.showShareMenu({
 			  withShareTicket: true,
@@ -528,6 +551,11 @@
 			}
 		},
 		methods: {
+			// 随机填充Tips
+			randomText () {
+				const num = parseInt(Math.random() * 14)
+				this.tipsText = this.tips[num]
+			},
 			// 监听是否重新获取光的数量
 			isGetLight () {
 				globalBus.$on('getNewLightOfComponents', () => {

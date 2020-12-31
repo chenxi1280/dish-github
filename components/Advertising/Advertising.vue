@@ -13,7 +13,7 @@
 			<u-modal v-model="showAdvertisingFlag" title="温馨提示" :show-confirm-button="false" z-index="999">
 				<view class="slot-content">
 					<view style="padding: 0 20rpx;padding-top: 40rpx;">
-						<view>完整观看激励视频可以获得15个光的奖励哦</view>
+						<view>完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view>
 						<view @click="openAdvertising" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
 							<image src="../../static/icon/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
 							<view style="display: inline-block;margin-left: 10rpx;color: #fff;transform: translateY(-4rpx);">立即获取</view>
@@ -58,7 +58,9 @@
 				// 观看激励视频的确认弹窗
 				showAdvertisingFlag: false,
 				// 激励广告实例
-				advertising: null
+				advertising: null,
+				// 看广告获取光的数量
+				rewardLight: 0
 			}
 		},
 		props:{
@@ -83,6 +85,8 @@
 			}
 		},
 		mounted () {
+			// 初始化看广告获取光的数量
+			this.rewardLight = uni.getStorageSync('rewardLight')
 			this.isShowNumber()
 			this.isEditLightNum()
 		},
@@ -101,7 +105,7 @@
 			isShowNumber () {
 				const num = uni.getStorageSync('lightNumber')
 				console.log('初始化', num)
-				if (this.num >= 10) {
+				if (num >= 10) {
 					const numberOne = ((num + '').charAt(0) - 0)
 					const numberTwo = ((num + '').charAt(1) - 0)
 					console.log(numberOne, 'numberOne', numberTwo, 'numberTwo')
