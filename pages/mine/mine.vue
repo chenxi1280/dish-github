@@ -3,6 +3,9 @@
 		<u-sticky>
 			<view class="top_box" @click="hiddenTips">
 				<view class="top">
+					<view style="position: absolute; top: 90rpx;left: 8rpx">
+						<Advertising :lightNumber.sync="lightNumber" :ecmUserLightUpLimit.sync="ecmUserLightUpLimit"></Advertising>
+					</view>
 					<view class="author_box" v-if="loginedFlag">
 						<view class = "avatarUrl" v-if="realFlag">
 							<image :src="image" ></image>
@@ -58,7 +61,7 @@
 	import verfied from './verfied.vue'
 	import { baseURL } from '../login/config/config.js'
 	import { globalBus } from '../../common/js/util.js'
-	
+	import Advertising from '../../components/Advertising/Advertising.vue'
 	export default {
 		data () {
 			return {
@@ -70,13 +73,15 @@
 				//用户未上传头像开关
 				realFlag: false,
 				//是否登录开关
-				loginedFlag: false
-				
+				loginedFlag: false,
+				lightNumber: 0,
+				ecmUserLightUpLimit: 0
 			}
 		},
 		components: {
 		    'published': published,
-			'verfied': verfied
+			'verfied': verfied,
+			Advertising
 		},
 		onLoad(options) {
 			uni.showShareMenu({
@@ -115,6 +120,9 @@
 		      }
 		    }
 		},
+		onShow () {
+			this.getLightNum()
+		},
 		onShareTimeline (res) {
 			return {
 			  title: '灵巫互动',
@@ -142,6 +150,11 @@
 			}
 		},
 		methods: {
+			// 初始化光数量
+			getLightNum () {
+				this.lightNumber = uni.getStorageSync('lightNumber')
+				this.ecmUserLightUpLimit = uni.getStorageSync('ecmUserLightUpLimit')
+			},
 			hiddenTips(){
 				globalBus.$emit("tips");
 			},
@@ -262,7 +275,7 @@
 				}
 				.problem{
 					position: absolute;
-					right: 30rpx;
+					left: 30rpx;
 					top: 30rpx;
 					height: 50rpx;
 					width: 50rpx;

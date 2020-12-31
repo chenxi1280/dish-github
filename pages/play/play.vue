@@ -7,7 +7,7 @@
 		<view v-if="!playMode" :style="{transform: transform, position: 'fixed', left: '160rpx', top:'40rpx',zIndex: '9'}">
 			<Advertising isCustom @customAddEvent="showDialog" @customConfirmEvent="openAdvertising" @customCloseEvent="closeDialog" :lightNumber="lightNumber" :ecmUserLightUpLimit="ecmUserLightUpLimit"></Advertising>
 		</view>
-		<view v-if="playMode" :style="{transform: transform, position: 'fixed', right: '-40rpx', bottom:'120rpx', zIndex: '9'}">
+		<view v-if="playMode" :style="{transform: transform, position: 'fixed', right: '-200rpx', top:'140rpx', zIndex: '9'}">
 			<Advertising isCustom @customAddEvent="showDialog"  @customConfirmEvent="openAdvertising" @customCloseEvent="closeDialog" :lightNumber="lightNumber" :ecmUserLightUpLimit="ecmUserLightUpLimit"></Advertising>
 		</view>
 		<!-- 确认观看激励视频广告的弹窗 -->
@@ -2622,8 +2622,8 @@
 			.horizontalLikabilityBox{
 				.likabilityTips{
 					position: fixed;
-					left: 54%;
-					top: 22%;
+					left: 50%;
+					top: 15%;
 					height: 600rpx;
 					width: 420rpx;
 					transform: translate(-50%, -50%) rotateZ(90deg);
