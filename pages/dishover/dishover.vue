@@ -134,15 +134,12 @@
 		},
 		onShow() {
 			this.getLight()
-		/* 	globalBus.$emit('initLightStyle') */
 		},
 		onLoad() {
-			// this.getAddLightCount()
 			uni.showShareMenu({
 			  withShareTicket: true
 			})
 			this.addRandomDataHot()
-			this.getLight()
 		},
 		onShareAppMessage (res) {
 		    return {
@@ -178,26 +175,36 @@
 		onReady () {
 			this.isRequestAes()
 			this.isGetLight()
-			this.getAddLightCount()
+		 	// TODO
+			if (uni.getStorageSync('userId')) {
+				this.getLight()
+				this.getAddLightCount()
+			}
+			this.isAppReady()
 		},
 		methods: {
+			// 游客登录时  监听app页面是否就绪  就绪则加载
+			isAppReady () {
+				globalBus.$on('getLightOfAppReady', () => {
+					console.log('发请求')
+					this.getAddLightCount()
+					this.getLight()
+				})
+			},
 			// 获取当前一次性看广告加光的数量
 			getAddLightCount () {
 				uni.request({
 					url:baseURL + '/user/light/getUserReward',
 					method:'post',
 					data: {
-						fkEcmUserLightEventId: 2
-					},
-					header: {
-						'Authorization': uni.getStorageSync('token')
+						fkEcmUserLightEventId: 2,
+						// TODO
+						fkUserId: uni.getStorageSync('userId')
 					},
 					success: (res) => {
-						const rewardLightStr = res.data.data.rewardLight
+						const rewardLightStr = res.data.data.rewardLight || '+3'
 						const rewardLight = rewardLightStr.split('+' || '-')[1] - 0 || 0
-						if (rewardLight) {
-							uni.setStorageSync('rewardLight', rewardLight)
-						}
+						uni.setStorageSync('rewardLight', rewardLight)
 					}
 				})
 			},
@@ -241,7 +248,8 @@
 					method: 'POST',
 					dataType: 'json',
 					data: {
-						token: uni.getStorageSync('token')
+						token: uni.getStorageSync('token'),
+						fkUserId: uni.getStorageSync('userId')
 					},
 					header: {
 						'Authorization': uni.getStorageSync('token')
