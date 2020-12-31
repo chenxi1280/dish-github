@@ -5,9 +5,8 @@
 			<template v-slot:left="{leftList}">
 				<view class="demo-warter" v-for="(item, index) in leftList" :key="index">
 
-
 					<view v-show="item.code  == 'ad'" >
-						<ad-custom unit-id="adunit-59f062ee3b27d685"></ad-custom>
+						<ad-custom unit-id="adunit-59f062ee3b27d685" @onload="adLoad" @onerror="adError" @bindload="adLoad" @binderror="adError" ></ad-custom>
 					</view>
 					
 					<view :style=' " background:url(" + item.logoPath + ") no-repeat center ;background-size: 100% 100%; " ' class="artWorkImgDiv" v-if ="item.code  != 'ad'"
@@ -46,7 +45,7 @@
 				<view class="demo-warter" v-for="(item, index) in rightList" :key="index">
 
 					<view v-show="item.code  == 'ad'"  >
-						<ad-custom unit-id="adunit-59f062ee3b27d685"></ad-custom>
+						<ad-custom unit-id="adunit-59f062ee3b27d685"  @bindload="adLoad" @binderror="adError" ></ad-custom>
 					</view>
 					
 					<view :style=' " background:url(" + item.logoPath + ") center; background-size: cover;" ' class="artWorkImgDiv" v-if="item.code  != 'ad' "
@@ -104,13 +103,12 @@
 
 			}
 		},
-
 		onShow(e) {
-
+			this.adLoad()
+			this.adError()
 			
 			console.log(this.flowList)
 		},
-
 		methods: {
 			goPlayPage(pkArtworkId) {
 				console.log(pkArtworkId)
@@ -122,11 +120,27 @@
 				uni.navigateTo({
 					url: "../ad/adPage",
 				})
+			},
+			adLoad() {
+				console.log('原生模板广告加载成功')
+			},
+			adError(err) {
+				console.log('原生模板广告加载失败', err)
 			}
-
+		},
+		adLoad() {
+			console.log('原生模板广告加载成功')
+		},
+		adError(err) {
+			console.log('原生模板广告加载失败', err)
 		}
-
 	}
+	// function adLoad() {
+	//     console.log('原生模板广告加载成功')
+	// }
+	// function adError(err) {
+	// 	console.log('原生模板广告加载失败', err)
+	// }
 </script>
 
 <style>

@@ -43,9 +43,8 @@
 		</view>
 		<view class="play" :style="{'width': mobilePhoneWidth+'px', 'height': mobilePhoneHeight+'px'}">
 			<!-- 定位选项画布 -->
-			<view class="container"  v-show="showCanvasFlag" 
-			:style="{'width': canvasWidth+'px', 'height': canvasHeight+'px'}">
-			  <canvas canvas-id="myCanvas" @touchstart="getTouchPosition" @touchend="canvasTouchendEvent"></canvas>
+			<view class="container"  v-show="showCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px'}">
+				  <canvas canvas-id="myCanvas" @touchstart="getTouchPosition" @touchend="canvasTouchendEvent"></canvas>
 			</view>
 			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" -->
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform}">
@@ -605,6 +604,7 @@
 				}
 				// 监听激励广告关闭
 				this.advertising.onClose((status) => {
+					this.showCanvasFlag = true
 					if (status.isEnded) {
 						console.log('给光')
 						globalBus.$emit('requestOfAES')
@@ -913,6 +913,7 @@
 								}
 							}
 						}else if(result.data.status == 10086){
+							this.showCanvasFlag = false
 							this.showAdvertisingFlag = true
 						}
 					}
@@ -1554,9 +1555,9 @@
 						if(this.isClickFlag){
 							if(this.touchRectNum == i){
 									//矩形边框颜色
-									ctx.setStrokeStyle('rgba(255, 255, 255,0.1)')
+									ctx.setStrokeStyle('rgba(255, 255, 255,0)')
 									//矩形填充色
-									ctx.setFillStyle('rgba(255, 255, 255,0.1)')
+									ctx.setFillStyle('rgba(255, 255, 255,0)')
 									this.isClickFlag = false
 								}else{
 									ctx.setStrokeStyle('rgba(255, 255, 255,'+ rectOpacity +')')
@@ -1735,9 +1736,9 @@
 						if(this.isClickFlag){
 							if(this.touchRectNum == i){
 									//矩形边框颜色
-									ctx.setStrokeStyle('rgba(255, 255, 255,0.1)')
+									ctx.setStrokeStyle('rgba(255, 255, 255,0)')
 									//矩形填充色
-									ctx.setFillStyle('rgba(255, 255, 255,0.1)')
+									ctx.setFillStyle('rgba(255, 255, 255,0)')
 									this.isClickFlag = false
 								}else{
 									ctx.setStrokeStyle('rgba(255, 255, 255,'+ rectOpacity +')')
