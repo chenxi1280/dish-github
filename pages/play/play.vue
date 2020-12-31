@@ -1511,7 +1511,7 @@
 						ctx.beginPath()
 						let imageW= 25
 						let	imageH= 30
-						ctx.drawImage("../../static/icon/left.png", parseInt((rectX-(rectW/2)).toFixed(0))-imageW+lineWidth/2, 
+						ctx.drawImage("../../static/icon/left.png", parseInt((rectX-(rectW/2)).toFixed(0))-imageW+lineWidth, 
 						parseInt((rectY-(rectH/2)).toFixed(0))-lineWidth/2, imageW, imageH+lineWidth)
 						ctx.drawImage("../../static/icon/right.png", parseInt((rectX-(rectW/2)).toFixed(0))+rectW-lineWidth/2, 
 						parseInt((rectY-(rectH/2)).toFixed(0))-lineWidth/2, imageW, imageH+lineWidth)
@@ -1679,14 +1679,14 @@
 						let	imageH= 30
 						ctx.drawImage("../../static/icon/left_deg.png", 
 						this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH)-lineWidth/2,
-						parseInt((rectX-(rectW/2)).toFixed(0))-imageW+lineWidth,
+						parseInt((rectX-(rectW/2)).toFixed(0))-imageW+lineWidth+1,
 						imageH+lineWidth,
 						imageW)
 						console.log('皮肤的x轴坐标: ', parseInt((rectX-(rectW/2)).toFixed(0)))
 						console.log('皮肤的y轴坐标: ', this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH))
 						ctx.drawImage("../../static/icon/right_deg.png",
 						this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH)-lineWidth/2,
-						parseInt((rectX-(rectW/2)).toFixed(0))+rectW-lineWidth/2,
+						parseInt((rectX-(rectW/2)).toFixed(0))+rectW-lineWidth,
 						imageH+lineWidth,
 						imageW)
 						//写字
