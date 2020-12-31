@@ -1,6 +1,4 @@
 unpackage
 /unpackage
 /.idea
-/node_modules/cos-js-sdk-v5
-/node_modules/cos-wx-sdk-v5
-/node_modules/xmldom
+/node_modules
