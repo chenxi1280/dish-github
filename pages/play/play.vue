@@ -2104,7 +2104,7 @@
 			},
 			goDiscover(){
 				console.log('我触发了')
-				uni.reLaunch({
+				uni.switchTab({
 					url: '../dishover/dishover',
 					fail(err) {
 						console.log('跳转失败:',err)
