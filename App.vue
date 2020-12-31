@@ -1,6 +1,7 @@
 <script>
 	
 	import { baseURL } from 'pages/login/config/config.js'
+	import {globalBus} from './common/js/util'
 	
 	export default {
 		data() {
@@ -65,10 +66,11 @@
                     },
                     success: (res) => {
                         if (res.data.status == 200) {
-							uni.setStorageSync("userId",res.data.data)
-                            uni.reLaunch({
-                                url: 'pages/dishover/dishover'
-                            })
+													uni.setStorageSync("userId",res.data.data)
+													uni.reLaunch({
+															url: 'pages/dishover/dishover'
+													})
+													globalBus.$emit('getLightOfAppReady')
                         }
                     }
                    
