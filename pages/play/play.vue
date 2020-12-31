@@ -568,7 +568,11 @@
 			},
 			// 关闭激励广告确认框
 			closeDialog () {
-				this.showCanvasFlag = true
+				console.log('this.currentTime:',this.currentTime)
+				console.log('this.duration:',this.duration)
+				if(this.duration - this.currentTime > 0.25){
+					this.showCanvasFlag = true
+				}
 				this.showAdvertisingFlag = false
 				const videoContext = uni.createVideoContext('myVideo')
 				//暂停视屏
@@ -576,11 +580,6 @@
 			},
 			// 显示激励广告确认弹窗
 			showDialog () {
-				console.log('this.currentTime:',this.currentTime)
-				console.log('this.duration:',this.duration)
-				if(this.duration - this.currentTime > 0.25){
-					return false
-				}
 				this.showCanvasFlag = false
 				this.showAdvertisingFlag = true
 				const videoContext = uni.createVideoContext('myVideo')
