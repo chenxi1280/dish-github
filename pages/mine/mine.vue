@@ -3,8 +3,8 @@
 		<u-sticky>
 			<view class="top_box" @click="hiddenTips">
 				<view class="top">
-					<view style="position: absolute; top: 90rpx;left: 8rpx">
-						<Advertising :lightNumber.sync="lightNumber" :ecmUserLightUpLimit.sync="ecmUserLightUpLimit"></Advertising>
+					<view style="position: absolute; top: 10rpx;left: 8rpx">
+						<Advertising :lightNumber.sync="lightNumber" :ecmUserLightUpLimit.sync="ecmUserLightUpLimit" color="#7d3b90"></Advertising>
 					</view>
 					<view class="author_box" v-if="loginedFlag">
 						<view class = "avatarUrl" v-if="realFlag">
@@ -275,8 +275,8 @@
 				}
 				.problem{
 					position: absolute;
-					left: 30rpx;
-					top: 30rpx;
+					right: 30rpx;
+					top: 26rpx;
 					height: 50rpx;
 					width: 50rpx;
 					.headset{

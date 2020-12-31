@@ -1,6 +1,6 @@
 <template>
 	<view style="z-index: 999;">
-		<view class="light_container" style="height: 60rpx;padding: 10rpx;background-color: #7E4DAB;width: 250rpx;border-radius: 30rpx;padding-left: 20rpx;margin-top: 6rpx;position: relative;" @click="showAdvertising">
+		<view class="light_container" :style="{height: '60rpx',padding: '10rpx',backgroundColor: color,width: '250rpx',borderRadius: '30rpx',paddingLeft: '20rpx',marginTop: '6rpx',position: 'relative'}" @click="showAdvertising">
 			<image :src="lightIconUrl.light" style="display: inline-block;height: 40rpx;width: 40rpx;margin-bottom: 10rpx;"></image>
 			<image :src="lightIconUrl.ride" style="display: inline-block;height: 24rpx;width: 24rpx;margin-bottom: 16rpx;margin-left: 20rpx;"></image>
 			<image v-if="lightNumber !== ecmUserLightUpLimit" :src="numberUrlOne" style="display: inline-block;height: 32rpx;width: 20rpx;transform:translateY(-14rpx);margin-left: 20rpx;"></image>
@@ -76,6 +76,10 @@
 			lightNumber: {
 				type: Number,
 				default: 0
+			},
+			color: {
+				type: String,
+				default: '#7E4DAB'
 			}
 		},
 		mounted () {
