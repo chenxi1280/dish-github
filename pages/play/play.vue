@@ -838,7 +838,7 @@
 					}
 				});
 			},
-			async customLightByUserId(eventId){
+			async customLightByUserId(eventId,index){
 				//故事线消费的eventId = 3
 				//初次播放消费eventId = 4
 				await uni.request ({
@@ -851,13 +851,38 @@
 					},
 					success: result=> {
 						if(result.data.status == 200){
-							console.log(result, '嘿嘿')
+							// console.log(result, '嘿嘿')
 							this.setLight(result.data.data)
 							if(this.storyLineJumpFlag){
 								this.iscustomLightFlag = true
 								this.storyLineJumpFlag = false
 							}else{
 								this.iscustomLightFlag = true
+							}
+							if(this.isPosition == 1){
+								this.likabilityArray = []
+								clearTimeout(this.likabilityDelayFunction)
+								this.canvasTouchendEventTodo()
+								this.screenshotShowFlag = false
+								this.videoShowFlag = true
+								this.likabilityFlag = false
+								//保存有效观看记录
+								if(!this.isClickOptionFlag){
+									this.statisticsPlayRecord()
+									this.isClickOptionFlag = true
+								}
+							}else{
+								this.likabilityArray = []
+								this.background.splice(index,1,"")
+								this.likabilityFlag = false
+								// 播放结束清除延时函数
+								clearTimeout(this.likabilityDelayFunction)
+								this.optionTouchendTodo(index)
+								//保存有效观看记录
+								if(!this.isClickOptionFlag){
+									this.statisticsPlayRecord()
+									this.isClickOptionFlag = true
+								}
 							}
 						}else if(result.data.status == 10086){
 							this.showAdvertisingFlag = true
@@ -1171,86 +1196,88 @@
 					case 0: {
 						if(!this.iscustomLightFlag){
 							if(this.storyLineJumpFlag){
-								return this.customLightByUserId(3)
+								return this.customLightByUserId(3,0)
 							}else{
-								return this.customLightByUserId(4)
+								return this.customLightByUserId(4,0)
 							}
-						}
-						this.background.splice(index,1,"#96CDCD");
-						// splice替换数组元素
-						this.likabilityArray = []
-						this.background.splice(index,1,"")
-						this.likabilityFlag = false
-						// 播放结束清除延时函数
-						clearTimeout(this.likabilityDelayFunction)
-						this.optionTouchendTodo(index)
-						//保存有效观看记录
-						if(!this.isClickOptionFlag){
-							this.statisticsPlayRecord()
-							this.isClickOptionFlag = true
+						}else{
+							this.likabilityArray = []
+							this.background.splice(index,1,"")
+							this.likabilityFlag = false
+							// 播放结束清除延时函数
+							clearTimeout(this.likabilityDelayFunction)
+							this.optionTouchendTodo(index)
+							//保存有效观看记录
+							if(!this.isClickOptionFlag){
+								this.statisticsPlayRecord()
+								this.isClickOptionFlag = true
+							}
 						}
 						break;
 					}
 					case 1: {
 						if(!this.iscustomLightFlag){
 							if(this.storyLineJumpFlag){
-								return this.customLightByUserId(3)
+								return this.customLightByUserId(3,1)
 							}else{
-								return this.customLightByUserId(4)
+								return this.customLightByUserId(4,1)
 							}
-						}
-						this.background.splice(index,1,"#96CDCD");
-						this.likabilityArray = []
-						this.background.splice(index,1,"")
-						this.likabilityFlag = false
-						clearTimeout(this.likabilityDelayFunction)
-						this.optionTouchendTodo(index)
-						//保存有效观看记录
-						if(!this.isClickOptionFlag){
-							this.statisticsPlayRecord()
-							this.isClickOptionFlag = true
+						}else{
+							this.likabilityArray = []
+							this.background.splice(index,1,"")
+							this.likabilityFlag = false
+							// 播放结束清除延时函数
+							clearTimeout(this.likabilityDelayFunction)
+							this.optionTouchendTodo(index)
+							//保存有效观看记录
+							if(!this.isClickOptionFlag){
+								this.statisticsPlayRecord()
+								this.isClickOptionFlag = true
+							}
 						}
 						break;
 					}
 					case 2: {
 						if(!this.iscustomLightFlag){
 							if(this.storyLineJumpFlag){
-								return this.customLightByUserId(3)
+								return this.customLightByUserId(3,2)
 							}else{
-								return this.customLightByUserId(4)
+								return this.customLightByUserId(4,2)
 							}
-						}
-						this.background.splice(index,1,"#96CDCD");
-						this.likabilityArray = []
-						this.background.splice(index,1,"")
-						this.likabilityFlag = false
-						clearTimeout(this.likabilityDelayFunction)
-						this.optionTouchendTodo(index)
-						//保存有效观看记录
-						if(!this.isClickOptionFlag){
-							this.statisticsPlayRecord()
-							this.isClickOptionFlag = true
+						}else{
+							this.likabilityArray = []
+							this.background.splice(index,1,"")
+							this.likabilityFlag = false
+							// 播放结束清除延时函数
+							clearTimeout(this.likabilityDelayFunction)
+							this.optionTouchendTodo(index)
+							//保存有效观看记录
+							if(!this.isClickOptionFlag){
+								this.statisticsPlayRecord()
+								this.isClickOptionFlag = true
+							}
 						}
 						break;
 					}
 					case 3: {
 						if(!this.iscustomLightFlag){
 							if(this.storyLineJumpFlag){
-								return this.customLightByUserId(3)
+								return this.customLightByUserId(3,3)
 							}else{
-								return this.customLightByUserId(4)
+								return this.customLightByUserId(4,3)
 							}
-						}
-						this.background.splice(index,1,"#96CDCD");
-						this.likabilityArray = []
-						this.background.splice(index,1,"")
-						this.likabilityFlag = false
-						clearTimeout(this.likabilityDelayFunction)
-						this.optionTouchendTodo(index)
-						//保存有效观看记录
-						if(!this.isClickOptionFlag){
-							this.statisticsPlayRecord()
-							this.isClickOptionFlag = true
+						}else{
+							this.likabilityArray = []
+							this.background.splice(index,1,"")
+							this.likabilityFlag = false
+							// 播放结束清除延时函数
+							clearTimeout(this.likabilityDelayFunction)
+							this.optionTouchendTodo(index)
+							//保存有效观看记录
+							if(!this.isClickOptionFlag){
+								this.statisticsPlayRecord()
+								this.isClickOptionFlag = true
+							}
 						}
 						break;
 					}
@@ -1389,6 +1416,8 @@
 						
 						//画线 连线到小圆心
 						let cr = 2
+						ctx.beginPath()
+						ctx.setLineWidth(1)
 						ctx.moveTo(cX, cY)
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
 						ctx.lineTo(rectX, rectY)
@@ -1554,6 +1583,8 @@
 						// console.log('圆点的y轴坐标: ', cY)
 						//画线 连线到小圆心
 						let cr = 2
+						ctx.beginPath()
+						ctx.setLineWidth(1)
 						ctx.moveTo(this.canvasWidth - (cY + 2), cX)
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
 						ctx.lineTo(this.canvasWidth - (rectY), rectX)
@@ -1617,14 +1648,14 @@
 						let	imageH= 30
 						ctx.drawImage("../../static/icon/left_deg.png", 
 						this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH)-lineWidth/2,
-						parseInt((rectX-(rectW/2)).toFixed(0))-imageW+lineWidth/2,
+						parseInt((rectX-(rectW/2)).toFixed(0))-imageW+lineWidth,
 						imageH+lineWidth,
 						imageW)
 						console.log('皮肤的x轴坐标: ', parseInt((rectX-(rectW/2)).toFixed(0)))
 						console.log('皮肤的y轴坐标: ', this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH))
 						ctx.drawImage("../../static/icon/right_deg.png",
 						this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH)-lineWidth/2,
-						parseInt((rectX-(rectW/2)).toFixed(0))+rectW-lineWidth,
+						parseInt((rectX-(rectW/2)).toFixed(0))+rectW-lineWidth/2,
 						imageH+lineWidth,
 						imageW)
 						//写字
@@ -1774,17 +1805,18 @@
 						}else{
 							return this.customLightByUserId(4)
 						}
-					}
-					this.likabilityArray = []
-					clearTimeout(this.likabilityDelayFunction)
-					this.canvasTouchendEventTodo()
-					this.screenshotShowFlag = false
-					this.videoShowFlag = true
-					this.likabilityFlag = false
-					//保存有效观看记录
-					if(!this.isClickOptionFlag){
-						this.statisticsPlayRecord()
-						this.isClickOptionFlag = true
+					}else{
+						this.likabilityArray = []
+						clearTimeout(this.likabilityDelayFunction)
+						this.canvasTouchendEventTodo()
+						this.screenshotShowFlag = false
+						this.videoShowFlag = true
+						this.likabilityFlag = false
+						//保存有效观看记录
+						if(!this.isClickOptionFlag){
+							this.statisticsPlayRecord()
+							this.isClickOptionFlag = true
+						}
 					}
 				}else if(this.touchRectNum == 1){
 					if(!this.iscustomLightFlag){
@@ -1793,17 +1825,18 @@
 						}else{
 							return this.customLightByUserId(4)
 						}
-					}
-					this.likabilityArray = []
-					clearTimeout(this.likabilityDelayFunction)
-					this.canvasTouchendEventTodo()
-					this.screenshotShowFlag = false
-					this.videoShowFlag = true
-					this.likabilityFlag = false
-					//保存有效观看记录
-					if(!this.isClickOptionFlag){
-						this.statisticsPlayRecord()
-						this.isClickOptionFlag = true
+					}else{
+						this.likabilityArray = []
+						clearTimeout(this.likabilityDelayFunction)
+						this.canvasTouchendEventTodo()
+						this.screenshotShowFlag = false
+						this.videoShowFlag = true
+						this.likabilityFlag = false
+						//保存有效观看记录
+						if(!this.isClickOptionFlag){
+							this.statisticsPlayRecord()
+							this.isClickOptionFlag = true
+						}
 					}
 				}else if(this.touchRectNum == 2){
 					if(!this.iscustomLightFlag){
@@ -1812,17 +1845,18 @@
 						}else{
 							return this.customLightByUserId(4)
 						}
-					}
-					this.likabilityArray = []
-					clearTimeout(this.likabilityDelayFunction)
-					this.canvasTouchendEventTodo()
-					this.screenshotShowFlag = false
-					this.videoShowFlag = true
-					this.likabilityFlag = false
-					//保存有效观看记录
-					if(!this.isClickOptionFlag){
-						this.statisticsPlayRecord()
-						this.isClickOptionFlag = true
+					}else{
+						this.likabilityArray = []
+						clearTimeout(this.likabilityDelayFunction)
+						this.canvasTouchendEventTodo()
+						this.screenshotShowFlag = false
+						this.videoShowFlag = true
+						this.likabilityFlag = false
+						//保存有效观看记录
+						if(!this.isClickOptionFlag){
+							this.statisticsPlayRecord()
+							this.isClickOptionFlag = true
+						}
 					}
 				}else if(this.touchRectNum == 3){
 					if(!this.iscustomLightFlag){
@@ -1831,17 +1865,18 @@
 						}else{
 							return this.customLightByUserId(4)
 						}
-					}
-					this.likabilityArray = []
-					clearTimeout(this.likabilityDelayFunction)
-					this.canvasTouchendEventTodo()
-					this.screenshotShowFlag = false
-					this.videoShowFlag = true
-					this.likabilityFlag = false
-					//保存有效观看记录
-					if(!this.isClickOptionFlag){
-						this.statisticsPlayRecord()
-						this.isClickOptionFlag = true
+					}else{
+						this.likabilityArray = []
+						clearTimeout(this.likabilityDelayFunction)
+						this.canvasTouchendEventTodo()
+						this.screenshotShowFlag = false
+						this.videoShowFlag = true
+						this.likabilityFlag = false
+						//保存有效观看记录
+						if(!this.isClickOptionFlag){
+							this.statisticsPlayRecord()
+							this.isClickOptionFlag = true
+						}
 					}
 				}
 				//回到默认值
@@ -2037,7 +2072,7 @@
 			},
 			goDiscover(){
 				console.log('我触发了')
-				uni.switchTab({
+				uni.reLaunch({
 					url: '../dishover/dishover',
 					fail(err) {
 						console.log('跳转失败:',err)
