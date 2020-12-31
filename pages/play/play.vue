@@ -851,6 +851,8 @@
 					},
 					success: result=> {
 						if(result.data.status == 200){
+							console.log(result, '嘿嘿')
+							this.setLight(result.data.data)
 							if(this.storyLineJumpFlag){
 								this.iscustomLightFlag = true
 								this.storyLineJumpFlag = false
@@ -862,6 +864,12 @@
 						}
 					}
 				});
+			},
+			// 重新设置光
+			setLight (data) {
+				uni.setStorageSync('lightNumber', data.lightNumber)
+				uni.setStorageSync('ecmUserLightUpLimit', data.upLimit)
+				globalBus.$emit('initLightStyle')
 			},
 			//异步请求获取作品树 by ArtworkId
 			async getArtworkTreeByArtworkId(){
