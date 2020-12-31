@@ -368,25 +368,6 @@
 
 </script>
 <style lang="scss">
-	.search_view {
-		background-color: #f2f2f2;
-		display: flex;
-		border-radius: 10px;
-
-
-		.search_icon {
-			background: url(../../static/icon/icon_search.png) no-repeat center;
-			width: 80rpx;
-			height: 80rpx;
-			background-size: 60rpx;
-		};
-
-		.search_input {
-			width: 100%;
-			height: 80rpx;
-
-		}
-	}
 
 	.artWorkImgDiv {
 		width: 100%;
