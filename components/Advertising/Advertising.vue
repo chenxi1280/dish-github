@@ -186,6 +186,7 @@
 							})
 						}).catch(() => {
 							uni.showToast({
+								icon: 'none',
 								title:'激励视频加载失败，请重试'
 							})
 						})
