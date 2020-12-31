@@ -3,9 +3,9 @@
 		<view class="light_container" :style="{height: '60rpx',padding: '10rpx',backgroundColor: color,width: '250rpx',borderRadius: '30rpx',paddingLeft: '20rpx',marginTop: '6rpx',position: 'relative'}" @click="showAdvertising">
 			<image :src="lightIconUrl.light" style="display: inline-block;height: 40rpx;width: 40rpx;margin-bottom: 10rpx;"></image>
 			<image :src="lightIconUrl.ride" style="display: inline-block;height: 24rpx;width: 24rpx;margin-bottom: 16rpx;margin-left: 20rpx;"></image>
-			<image v-if="lightNumber !== ecmUserLightUpLimit" :src="numberUrlOne" style="display: inline-block;height: 32rpx;width: 20rpx;transform:translateY(-14rpx);margin-left: 20rpx;"></image>
-			<image v-if="lightNumber >= 10 && lightNumber !== ecmUserLightUpLimit" :src="numberUrlTwo" style="display: inline-block;height: 32rpx;width: 20rpx;transform:translateY(-14rpx);margin-left: 10rpx;"></image>
-			<image v-if="lightNumber === ecmUserLightUpLimit" :src="lightIconUrl.max" style="display: inline-block;height: 30rpx;width: 70rpx;transform:translateY(-14rpx);margin-left: 10rpx;"></image>
+			<image v-if="isShowNumOne" :src="numberUrlOne" style="display: inline-block;height: 32rpx;width: 20rpx;transform:translateY(-14rpx);margin-left: 20rpx;"></image>
+			<image v-if="isShowNumTwo" :src="numberUrlTwo" style="display: inline-block;height: 32rpx;width: 20rpx;transform:translateY(-14rpx);margin-left: 10rpx;"></image>
+			<image v-if="isShowMax" :src="lightIconUrl.max" style="display: inline-block;height: 30rpx;width: 70rpx;transform:translateY(-14rpx);margin-left: 10rpx;"></image>
 			<view class="add_icon">
 				<view class="line"></view>
 			</view>
@@ -60,7 +60,10 @@
 				// 激励广告实例
 				advertising: null,
 				// 看广告获取光的数量
-				rewardLight: 0
+				rewardLight: 0,
+				isShowMax: false,
+				isShowNumOne: false,
+				isShowNumTwo: false
 			}
 		},
 		props:{
@@ -104,7 +107,23 @@
 			// 根据光数量和光上限决定显示的内容
 			isShowNumber () {
 				const num = uni.getStorageSync('lightNumber')
-				console.log('初始化', num)
+				const limit = uni.getStorageSync('ecmUserLightUpLimit')
+				if (num === limit) {
+					this.isShowMax = true
+				} else {
+					this.isShowMax = false
+				}
+				if (num !== limit) {
+					this.isShowNumOne = true
+				} else {
+					this.isShowNumOne = false
+				}
+				if (num >= 10 && num !== limit) {
+					this.isShowNumTwo = true
+				} else {
+					this.isShowNumTwo = false
+				}
+				console.log('初始化', num, this.isShowMax)
 				if (num >= 10) {
 					const numberOne = ((num + '').charAt(0) - 0)
 					const numberTwo = ((num + '').charAt(1) - 0)

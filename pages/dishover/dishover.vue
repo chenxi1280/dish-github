@@ -134,6 +134,7 @@
 		},
 		onShow() {
 			this.getLight()
+		/* 	globalBus.$emit('initLightStyle') */
 		},
 		onLoad() {
 			// this.getAddLightCount()
