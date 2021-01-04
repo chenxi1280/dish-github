@@ -253,6 +253,9 @@
 	import {horizontalStoryLine} from './storyLine/horizontalStoryLine.vue'
 	import Advertising from '../../components/Advertising/Advertising.vue'
 	import {globalBus} from '../../common/js/util.js'
+	import {verticalJumpDialog} from '../../components/dialog/verticalJumpDialog.vue'
+	import {horizontalJumpDialog} from '../../components/dialog/horizontalJumpDialog.vue'
+	
 	export default {
 		components:{
 			storyLine,
@@ -570,10 +573,11 @@
 			closeDialog () {
 				console.log('this.currentTime:',this.currentTime)
 				console.log('this.duration:',this.duration)
-				if(this.duration - this.currentTime < 0.25){
-					this.showCanvasFlag = true
-				}
 				this.showAdvertisingFlag = false
+				if(this.duration - this.currentTime < 0.25 || this.currentTime == 0){
+					this.showCanvasFlag = true
+					return false
+				}
 				const videoContext = uni.createVideoContext('myVideo')
 				//暂停视屏
 				videoContext.play()
@@ -603,6 +607,9 @@
 						icon: 'none',
 						title:'获取激励视频失败，请重试'
 					})
+					if(this.duration - this.currentTime < 0.25 || this.currentTime == 0){
+						this.showCanvasFlag = true
+					}
 				})
 				// 激励广告显示并加载
 				if (this.advertising) {
@@ -610,10 +617,16 @@
 						this.advertising.show().then(() => {
 						})
 					}).catch(() => {
+						if(this.duration - this.currentTime < 0.25 || this.currentTime == 0){
+							this.showCanvasFlag = true
+						}
 						this.advertising.load().then(() => {
 							this.advertising.show().then(() => {
 							})
 						}).catch(() => {
+							if(this.duration - this.currentTime < 0.25 || this.currentTime == 0){
+								this.showCanvasFlag = true
+							}
 							uni.showToast({
 								icon: 'none',
 								title:'激励视频加载失败，请重试'
@@ -623,9 +636,13 @@
 				}
 				// 监听激励广告关闭
 				this.advertising.onClose((status) => {
-					const videoContext = uni.createVideoContext('myVideo')
-					//暂停视屏
-					videoContext.play()
+					if(this.duration - (this.currentTime + 0.25) < 0.25 || this.currentTime == 0){
+						this.showCanvasFlag = true
+					}else{
+						const videoContext = uni.createVideoContext('myVideo')
+						//暂停视屏
+						videoContext.play()
+					}
 					if (status.isEnded) {
 						console.log('给光')
 						globalBus.$emit('requestOfAES')
@@ -1533,7 +1550,7 @@
 						let	imageH= 30
 						ctx.drawImage("../../static/icon/left.png", parseInt((rectX-(rectW/2)).toFixed(0))-imageW+lineWidth, 
 						parseInt((rectY-(rectH/2)).toFixed(0))-lineWidth/2, imageW, imageH+lineWidth)
-						ctx.drawImage("../../static/icon/right.png", parseInt((rectX-(rectW/2)).toFixed(0))+rectW-lineWidth/2, 
+						ctx.drawImage("../../static/icon/right.png", parseInt((rectX-(rectW/2)).toFixed(0))+rectW-lineWidth, 
 						parseInt((rectY-(rectH/2)).toFixed(0))-lineWidth/2, imageW, imageH+lineWidth)
 						
 						//写字
@@ -1817,23 +1834,24 @@
 			},
 			// canvas的touchStart事件
 			getTouchPosition(e){
+				this.touchRectNum = 5;
 				//之后写入for循环中
 				if(this.rectArray.length != 0){
 					for(let i = 0; i<this.nodeLocationList.length; i++){
 						let touchX = e.changedTouches[0].x;
 						let touchY = e.changedTouches[0].y;
-						// console.log('touchY: ',touchY)
+						console.log('touchY: ',touchY)
 						let xLowLimit = this.rectArray[i].x;
-						// console.log('x轴起始点: ',xLowLimit)
+						console.log('x轴起始点: ',xLowLimit)
 						let yLowLimit = this.rectArray[i].y;
-						// console.log('y轴起始点: ',yLowLimit)
+						console.log('y轴起始点: ',yLowLimit)
 						let xUpperLimit = this.rectArray[i].x+this.rectArray[i].w;
-						// console.log('x轴终点: ',xUpperLimit)
+						console.log('x轴终点: ',xUpperLimit)
 						let yUpperLimit = this.rectArray[i].y+this.rectArray[i].h;
-						// console.log('y轴终点: ',yUpperLimit)
+						console.log('y轴终点: ',yUpperLimit)
 						if(touchX > xLowLimit && touchX < xUpperLimit && touchY > yLowLimit && touchY < yUpperLimit){
 							this.touchRectNum = i;
-							// console.log('this.touchRectNum: '+this.touchRectNum)
+							console.log('this.touchRectNum: '+this.touchRectNum)
 						}
 					}
 					if(this.touchRectNum < 4){
@@ -1848,7 +1866,7 @@
 			},
 			// canvas的touchEnd事件
 			canvasTouchendEvent(){
-				// console.log('this.touchRectNum: '+this.touchRectNum)
+				console.log('this.touchRectNum: '+this.touchRectNum)
 				if(this.touchRectNum == 0){
 					if(!this.iscustomLightFlag){
 						if(this.storyLineJumpFlag){
