@@ -435,7 +435,8 @@
 					'Tips : \n\n联系我们，\n请搜索灵巫互动公众号，\n使用底部菜单或留言。'
 				],
 				tipsText: '',
-				rewardLight: 0
+				rewardLight: 0,
+				isVideoEndFlag: false
 			}
 		},
 		onReady(){
@@ -926,30 +927,22 @@
 							}else{
 								this.iscustomLightFlag = true
 							}
+							this.likabilityArray = []
+							clearTimeout(this.likabilityDelayFunction)
+							this.likabilityFlag = false
 							if(this.isPosition == 1){
-								this.likabilityArray = []
-								clearTimeout(this.likabilityDelayFunction)
 								this.canvasTouchendEventTodo()
 								this.screenshotShowFlag = false
 								this.videoShowFlag = true
-								this.likabilityFlag = false
-								//保存有效观看记录
-								if(!this.isClickOptionFlag){
-									this.statisticsPlayRecord()
-									this.isClickOptionFlag = true
-								}
 							}else{
-								this.likabilityArray = []
 								this.background.splice(index,1,"")
-								this.likabilityFlag = false
 								// 播放结束清除延时函数
-								clearTimeout(this.likabilityDelayFunction)
 								this.optionTouchendTodo(index)
-								//保存有效观看记录
-								if(!this.isClickOptionFlag){
-									this.statisticsPlayRecord()
-									this.isClickOptionFlag = true
-								}
+							}
+							//保存有效观看记录
+							if(!this.isClickOptionFlag){
+								this.statisticsPlayRecord()
+								this.isClickOptionFlag = true
 							}
 						}else if(result.data.status == 10086){
 							this.showCanvasFlag = false
@@ -1180,6 +1173,7 @@
 			videoEnd(){
 				//根据是否是最后一个视频标志 最后一个视频播放结束弹出故事线 endFlag = true 表示不是最后一个视频
 				this.percent = 100
+				this.isVideoEndFlag = true
 				if(this.endFlag){
 					if(this.isPosition == 1){
 						this.chooseTipsShowFlag = false
@@ -1262,92 +1256,41 @@
 			rebackBackground(index){
 				switch(index){
 					case 0: {
-						if(!this.iscustomLightFlag){
-							if(this.storyLineJumpFlag){
-								return this.customLightByUserId(3,0)
-							}else{
-								return this.customLightByUserId(4,0)
-							}
-						}else{
-							this.likabilityArray = []
-							this.background.splice(index,1,"")
-							this.likabilityFlag = false
-							// 播放结束清除延时函数
-							clearTimeout(this.likabilityDelayFunction)
-							this.optionTouchendTodo(index)
-							//保存有效观看记录
-							if(!this.isClickOptionFlag){
-								this.statisticsPlayRecord()
-								this.isClickOptionFlag = true
-							}
-						}
+						this.clickCommonOptionTodo(index)
 						break;
 					}
 					case 1: {
-						if(!this.iscustomLightFlag){
-							if(this.storyLineJumpFlag){
-								return this.customLightByUserId(3,1)
-							}else{
-								return this.customLightByUserId(4,1)
-							}
-						}else{
-							this.likabilityArray = []
-							this.background.splice(index,1,"")
-							this.likabilityFlag = false
-							// 播放结束清除延时函数
-							clearTimeout(this.likabilityDelayFunction)
-							this.optionTouchendTodo(index)
-							//保存有效观看记录
-							if(!this.isClickOptionFlag){
-								this.statisticsPlayRecord()
-								this.isClickOptionFlag = true
-							}
-						}
+						this.clickCommonOptionTodo(index)
 						break;
 					}
 					case 2: {
-						if(!this.iscustomLightFlag){
-							if(this.storyLineJumpFlag){
-								return this.customLightByUserId(3,2)
-							}else{
-								return this.customLightByUserId(4,2)
-							}
-						}else{
-							this.likabilityArray = []
-							this.background.splice(index,1,"")
-							this.likabilityFlag = false
-							// 播放结束清除延时函数
-							clearTimeout(this.likabilityDelayFunction)
-							this.optionTouchendTodo(index)
-							//保存有效观看记录
-							if(!this.isClickOptionFlag){
-								this.statisticsPlayRecord()
-								this.isClickOptionFlag = true
-							}
-						}
+						this.clickCommonOptionTodo(index)
 						break;
 					}
 					case 3: {
-						if(!this.iscustomLightFlag){
-							if(this.storyLineJumpFlag){
-								return this.customLightByUserId(3,3)
-							}else{
-								return this.customLightByUserId(4,3)
-							}
-						}else{
-							this.likabilityArray = []
-							this.background.splice(index,1,"")
-							this.likabilityFlag = false
-							// 播放结束清除延时函数
-							clearTimeout(this.likabilityDelayFunction)
-							this.optionTouchendTodo(index)
-							//保存有效观看记录
-							if(!this.isClickOptionFlag){
-								this.statisticsPlayRecord()
-								this.isClickOptionFlag = true
-							}
-						}
+						this.clickCommonOptionTodo(index)
 						break;
+					}
+				}
+			},
+			clickCommonOptionTodo(index){
+				if(!this.iscustomLightFlag){
+					if(this.storyLineJumpFlag){
+						return this.customLightByUserId(3,index)
+					}else{
+						return this.customLightByUserId(4,index)
+					}
+				}else{
+					this.likabilityArray = []
+					this.background.splice(index,1,"")
+					this.likabilityFlag = false
+					// 播放结束清除延时函数
+					clearTimeout(this.likabilityDelayFunction)
+					this.optionTouchendTodo(index)
+					//保存有效观看记录
+					if(!this.isClickOptionFlag){
+						this.statisticsPlayRecord()
+						this.isClickOptionFlag = true
 					}
 				}
 			},
@@ -1868,88 +1811,37 @@
 			canvasTouchendEvent(){
 				console.log('this.touchRectNum: '+this.touchRectNum)
 				if(this.touchRectNum == 0){
-					if(!this.iscustomLightFlag){
-						if(this.storyLineJumpFlag){
-							return this.customLightByUserId(3)
-						}else{
-							return this.customLightByUserId(4)
-						}
-					}else{
-						this.likabilityArray = []
-						clearTimeout(this.likabilityDelayFunction)
-						this.canvasTouchendEventTodo()
-						this.screenshotShowFlag = false
-						this.videoShowFlag = true
-						this.likabilityFlag = false
-						//保存有效观看记录
-						if(!this.isClickOptionFlag){
-							this.statisticsPlayRecord()
-							this.isClickOptionFlag = true
-						}
-					}
+					this.clickPositionOptionTodo()
 				}else if(this.touchRectNum == 1){
-					if(!this.iscustomLightFlag){
-						if(this.storyLineJumpFlag){
-							return this.customLightByUserId(3)
-						}else{
-							return this.customLightByUserId(4)
-						}
-					}else{
-						this.likabilityArray = []
-						clearTimeout(this.likabilityDelayFunction)
-						this.canvasTouchendEventTodo()
-						this.screenshotShowFlag = false
-						this.videoShowFlag = true
-						this.likabilityFlag = false
-						//保存有效观看记录
-						if(!this.isClickOptionFlag){
-							this.statisticsPlayRecord()
-							this.isClickOptionFlag = true
-						}
-					}
+					this.clickPositionOptionTodo()
 				}else if(this.touchRectNum == 2){
-					if(!this.iscustomLightFlag){
-						if(this.storyLineJumpFlag){
-							return this.customLightByUserId(3)
-						}else{
-							return this.customLightByUserId(4)
-						}
-					}else{
-						this.likabilityArray = []
-						clearTimeout(this.likabilityDelayFunction)
-						this.canvasTouchendEventTodo()
-						this.screenshotShowFlag = false
-						this.videoShowFlag = true
-						this.likabilityFlag = false
-						//保存有效观看记录
-						if(!this.isClickOptionFlag){
-							this.statisticsPlayRecord()
-							this.isClickOptionFlag = true
-						}
-					}
+					this.clickPositionOptionTodo()
 				}else if(this.touchRectNum == 3){
-					if(!this.iscustomLightFlag){
-						if(this.storyLineJumpFlag){
-							return this.customLightByUserId(3)
-						}else{
-							return this.customLightByUserId(4)
-						}
-					}else{
-						this.likabilityArray = []
-						clearTimeout(this.likabilityDelayFunction)
-						this.canvasTouchendEventTodo()
-						this.screenshotShowFlag = false
-						this.videoShowFlag = true
-						this.likabilityFlag = false
-						//保存有效观看记录
-						if(!this.isClickOptionFlag){
-							this.statisticsPlayRecord()
-							this.isClickOptionFlag = true
-						}
-					}
+					this.clickPositionOptionTodo()
 				}
 				//回到默认值
 				this.touchRectNum = 5
+			},
+			clickPositionOptionTodo(){
+				if(!this.iscustomLightFlag){
+					if(this.storyLineJumpFlag){
+						return this.customLightByUserId(3)
+					}else{
+						return this.customLightByUserId(4)
+					}
+				}else{
+					this.likabilityArray = []
+					clearTimeout(this.likabilityDelayFunction)
+					this.canvasTouchendEventTodo()
+					this.screenshotShowFlag = false
+					this.videoShowFlag = true
+					this.likabilityFlag = false
+					//保存有效观看记录
+					if(!this.isClickOptionFlag){
+						this.statisticsPlayRecord()
+						this.isClickOptionFlag = true
+					}
+				}
 			},
 			// canvas的touchEnd事件触发时的操作
 			canvasTouchendEventTodo(){

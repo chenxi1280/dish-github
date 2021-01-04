@@ -27,6 +27,10 @@
 			appId: {
 				type: String,
 				default: 'wx25e1eb19e2d9e715'
+			},
+			artworkName:{
+				type: String,
+				default: '灵巫'
 			}
 		},
 		onReady() {
@@ -45,6 +49,11 @@
 					appId: this.appId,
 					path: this.navigatorUrl,
 					envVersion: 'release',
+					extraData: {
+					          source:'CandleWitches',
+					          miniProgramName:'灵巫互动',
+					          artwork: this.artworkName
+					},
 					success(res){
 						console.log('跳转成功')
 					},
