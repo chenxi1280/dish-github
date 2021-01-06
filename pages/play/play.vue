@@ -51,18 +51,27 @@
 				<video :src="videoUrl" :autoplay="autopalyFlag" :show-mute-btn="true" :show-fullscreen-btn="false" id="myVideo"
 				:enable-play-gesture="playGestureFlag" :enable-progress-gesture="progressGestureFlag" @ended="videoEnd" @pause="videoPause"  @loadedmetadata="loadeddata"
 				@touchend="videoTouchend" @touchstart="videoTouchstart" v-if="videoShowFlag" @timeupdate="videoTimeupdate"
-				:controls="controlsFlag" ></video>
+				:controls="controlsFlag" @play="videoPlay" ></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
 				'background-repeat':'no-repeat', backgroundSize:'100% 100%'}"></view>
 			</view>
-			<!-- 选项 -->
+			<!-- 普通选项 -->
 			<view class="chooseTipsMask15"  v-if="chooseTipsMaskFlag">
 				<view class="chooseTipsMask16" v-if="chooseTipsShowFlag" :style="{'transform': transform}">
 					<view class="chooseTips">
 						<view class="tips" v-for="(item, index) in tipsArray" :key="index">
 							<view class="optionBox" @touchstart="changeBackground(index)" @touchend="rebackBackground(index)" :style="{'background': background[index]}">
-								<view class="option" style="text-align: center;"><text>{{option[index]}}</text></view>
+								<view class="option" style="text-align: center;" v-if="!conditionState[index]">
+									<text>{{option[index]}}</text>
+								</view>
+								<view class="option" style="text-align: center;" v-if="conditionState[index]">
+									<text>{{option[index]}}</text>
+									<view class="iconBox">
+										<icon></icon>
+										<text>广告解锁</text>
+									</view>
+								</view>
 							</view>
 						</view>
 						<view class="video_rebroadcast" @click="closeChooseTips">
@@ -253,8 +262,8 @@
 	import {horizontalStoryLine} from './storyLine/horizontalStoryLine.vue'
 	import Advertising from '../../components/Advertising/Advertising.vue'
 	import {globalBus} from '../../common/js/util.js'
-	import {verticalJumpDialog} from '../../components/dialog/verticalJumpDialog.vue'
-	import {horizontalJumpDialog} from '../../components/dialog/horizontalJumpDialog.vue'
+	// import {verticalJumpDialog} from '../../components/dialog/verticalJumpDialog.vue'
+	// import {horizontalJumpDialog} from '../../components/dialog/horizontalJumpDialog.vue'
 	
 	export default {
 		components:{
@@ -278,7 +287,7 @@
 				hiddenBtnFlag: false,
 				//是否展示选项开关
 				chooseTipsShowFlag: false,
-				//选项最底层蒙版
+				//选项最底层蒙板开关
 				chooseTipsMaskFlag: false,
 				//是否展示故事线开关
 				storyLineContentFlag: false,
@@ -344,6 +353,8 @@
 				rectArray: [],
 				//默认是个不会被触发的数字 
 				touchRectNum: 5,
+				//普通选项下标
+				optionIndex: 5,
 				//是否被点击的标志
 				isClickFlag: false,
 				//视频播放的信息
@@ -436,7 +447,13 @@
 				],
 				tipsText: '',
 				rewardLight: 0,
-				isVideoEndFlag: false
+				//视频是否播放结束的开关
+				isVideoEndFlag: false,
+				videoContext: null,
+				//举报页面复选框的内容
+				checkBoxValue: null,
+				//条件选项标志的数组
+				conditionState: []
 			}
 		},
 		onReady(){
@@ -465,6 +482,9 @@
 			this.getArtworkTreeByArtworkId();
 		},
 		onLoad(option) {
+			//初始化video对象
+			this.videoContext = uni.createVideoContext('myVideo')
+			console.log('this.videoContext: ',this.videoContext)
 			// 初始化看广告获取光的数量
 			this.rewardLight = uni.getStorageSync('rewardLight') || 3
 			this.randomText()
@@ -572,29 +592,22 @@
 			},
 			// 关闭激励广告确认框
 			closeDialog () {
-				console.log('this.currentTime:',this.currentTime)
-				console.log('this.duration:',this.duration)
 				this.showAdvertisingFlag = false
-				if(this.duration - this.currentTime < 0.25 || this.currentTime == 0){
-					this.showCanvasFlag = true
-					return false
+				if(this.isVideoEndFlag){
+					if(this.isPosition == 1){
+						this.showCanvasFlag = true
+					}
+				}else{
+					this.videoContext.play()
 				}
-				const videoContext = uni.createVideoContext('myVideo')
-				//暂停视屏
-				videoContext.play()
 			},
 			// 显示激励广告确认弹窗
 			showDialog () {
-				console.log('this.currentTime:',this.currentTime)
-				console.log('this.duration:',this.duration)
-				if(this.duration - this.currentTime < 0.25 || this.currentTime == 0){
-					return false
+				if(!this.isVideoEndFlag){
+					this.showCanvasFlag = false
+					this.showAdvertisingFlag = true
+					this.videoContext.pause()
 				}
-				this.showCanvasFlag = false
-				this.showAdvertisingFlag = true
-				const videoContext = uni.createVideoContext('myVideo')
-				//暂停视屏
-				videoContext.pause()
 			},
 			// 观看激励广告
 			openAdvertising () {
@@ -608,8 +621,10 @@
 						icon: 'none',
 						title:'获取激励视频失败，请重试'
 					})
-					if(this.duration - this.currentTime < 0.25 || this.currentTime == 0){
-						this.showCanvasFlag = true
+					if(this.isVideoEndFlag){
+						if(this.isPosition == 1){
+							this.showCanvasFlag = true
+						}
 					}
 				})
 				// 激励广告显示并加载
@@ -618,15 +633,19 @@
 						this.advertising.show().then(() => {
 						})
 					}).catch(() => {
-						if(this.duration - this.currentTime < 0.25 || this.currentTime == 0){
-							this.showCanvasFlag = true
+						if(this.isVideoEndFlag){
+							if(this.isPosition == 1){
+								this.showCanvasFlag = true
+							}
 						}
 						this.advertising.load().then(() => {
 							this.advertising.show().then(() => {
 							})
 						}).catch(() => {
-							if(this.duration - this.currentTime < 0.25 || this.currentTime == 0){
-								this.showCanvasFlag = true
+							if(this.isVideoEndFlag){
+								if(this.isPosition == 1){
+									this.showCanvasFlag = true
+								}
 							}
 							uni.showToast({
 								icon: 'none',
@@ -637,21 +656,25 @@
 				}
 				// 监听激励广告关闭
 				this.advertising.onClose((status) => {
-					if(this.duration - (this.currentTime + 0.25) < 0.25 || this.currentTime == 0){
-						this.showCanvasFlag = true
+					if(this.isVideoEndFlag){
+						if(this.isPosition == 1){
+							this.showCanvasFlag = true
+						}
 					}else{
-						const videoContext = uni.createVideoContext('myVideo')
-						//暂停视屏
-						videoContext.play()
+						this.videoContext.play()
 					}
 					if (status.isEnded) {
-						console.log('给光')
-						globalBus.$emit('requestOfAES')
+						if(this.conditionState[this.optionIndex] == 1){
+							//成功播放完广告
+							this.customLightSuccessCallBack(this.optionIndex)
+						}else{
+							console.log('给光')
+							globalBus.$emit('requestOfAES')
+						}
 					} else {
 						console.log('憨批用户不给光')
 					}
 					this.advertising.offClose()
-					/* this.advertising.destroy() */
 				})
 			},
 			//故事线跳转播放页
@@ -756,6 +779,7 @@
 			},
 			//对节点播放数据进行筛选和提取
 			initPlayData(artworkTree){
+				this.conditionState = []
 				//打开video开关
 				if(uni.getStorageSync('isEndings') == 1){
 					this.videoShowFlag = true
@@ -804,8 +828,16 @@
 							this.option.push(childs[i].selectTitle)
 							this.childs.push(childs[i])
 						}
+						let conditionState = childs[i].conditionState
+						if(conditionState == 1){
+							this.conditionState.push(1)
+						}else{
+							this.conditionState.push(0)
+						}
 					}
+					console.log('this.conditionState: ',this.conditionState)
 					this.tipsArray.length = this.option.length
+					console.log('this.tipsArray.length: ',this.tipsArray.length)
 				}else{
 					//islink不是null且值为1说明该节点是跳转节点 需要注意叶子节点的孩子也是空的可能会走进else故要考虑过是否是叶子节点
 					if(artworkTree.isLink != null && artworkTree.isLink === 1){
@@ -906,7 +938,7 @@
 					}
 				});
 			},
-			async customLightByUserId(eventId,index){
+			async customLightByUserId(eventId){
 				//故事线消费的eventId = 3
 				//初次播放消费eventId = 4
 				await uni.request ({
@@ -921,35 +953,38 @@
 						if(result.data.status == 200){
 							// console.log(result, '嘿嘿')
 							this.setLight(result.data.data)
-							if(this.storyLineJumpFlag){
-								this.iscustomLightFlag = true
-								this.storyLineJumpFlag = false
-							}else{
-								this.iscustomLightFlag = true
-							}
-							this.likabilityArray = []
-							clearTimeout(this.likabilityDelayFunction)
-							this.likabilityFlag = false
-							if(this.isPosition == 1){
-								this.canvasTouchendEventTodo()
-								this.screenshotShowFlag = false
-								this.videoShowFlag = true
-							}else{
-								this.background.splice(index,1,"")
-								// 播放结束清除延时函数
-								this.optionTouchendTodo(index)
-							}
-							//保存有效观看记录
-							if(!this.isClickOptionFlag){
-								this.statisticsPlayRecord()
-								this.isClickOptionFlag = true
-							}
+							this.customLightSuccessCallBack(this.optionIndex)
 						}else if(result.data.status == 10086){
 							this.showCanvasFlag = false
 							this.showAdvertisingFlag = true
 						}
 					}
 				});
+			},
+			customLightSuccessCallBack(index){
+				if(this.storyLineJumpFlag){
+					this.iscustomLightFlag = true
+					this.storyLineJumpFlag = false
+				}else{
+					this.iscustomLightFlag = true
+				}
+				this.likabilityArray = []
+				clearTimeout(this.likabilityDelayFunction)
+				this.likabilityFlag = false
+				if(this.isPosition == 1){
+					this.screenshotShowFlag = false
+					this.canvasTouchendEventTodo()
+					this.videoShowFlag = true
+				}else{
+					this.background.splice(index,1,"")
+					// 播放结束清除延时函数
+					this.optionTouchendTodo(index)
+				}
+				//保存有效观看记录
+				if(!this.isClickOptionFlag){
+					this.statisticsPlayRecord()
+					this.isClickOptionFlag = true
+				}
 			},
 			// 重新设置光
 			setLight (data) {
@@ -1035,7 +1070,7 @@
 							//存储多结局的结局视频播放历史
 							uni.setStorageSync("pkDetailIds",this.playedHistoryArray)
 							//保存播放记录
-							this.savaPlayRecord();
+							this.savaPlayRecord()
 						}else{
 							this.storyLineContentFlag = true
 							console.log('我去请求500')
@@ -1208,10 +1243,12 @@
 					}
 				}
 			},
+			videoPlay(){
+				this.isVideoEndFlag = false
+			},
 			//视屏暂停操作
 			videoPause(){
-				// this.hiddenBtnFlag = true
-				// console.log('我暂停了')
+				
 			},
 			//展示故事线内容的时候暂停视频
 			showStoryLineContent(){
@@ -1219,17 +1256,15 @@
 				if(uni.getStorageSync('isEndings') == 1){
 					this.videoShowFlag = false
 				}
-				const videoContext = uni.createVideoContext('myVideo')
 				//暂停视屏
-				videoContext.pause()
+				this.videoContext.pause()
 			},
 			//展示举报内容的时候暂停视频
 			showReportContent(){
 				this.reportContentFlag = true
 				this.uploadBtnFlag = true
 				this.uploadImageFlag = false
-				const videoContext = uni.createVideoContext('myVideo')
-				videoContext.pause()
+				this.videoContext.pause()
 			},
 			//触摸选项touchstart事件
 			changeBackground(index){
@@ -1256,41 +1291,50 @@
 			rebackBackground(index){
 				switch(index){
 					case 0: {
+						this.optionIndex = index
 						this.clickCommonOptionTodo(index)
 						break;
 					}
 					case 1: {
+						this.optionIndex = index
 						this.clickCommonOptionTodo(index)
 						break;
 					}
 					case 2: {
+						this.optionIndex = index
 						this.clickCommonOptionTodo(index)
 						break;
 					}
 					case 3: {
+						this.optionIndex = index
 						this.clickCommonOptionTodo(index)
 						break;
 					}
 				}
 			},
 			clickCommonOptionTodo(index){
-				if(!this.iscustomLightFlag){
-					if(this.storyLineJumpFlag){
-						return this.customLightByUserId(3,index)
-					}else{
-						return this.customLightByUserId(4,index)
-					}
+				if(this.conditionState[index] == 1){
+					console.log('作者让你看广告啊，跟我没关系')
+					this.openAdvertising()
 				}else{
-					this.likabilityArray = []
-					this.background.splice(index,1,"")
-					this.likabilityFlag = false
-					// 播放结束清除延时函数
-					clearTimeout(this.likabilityDelayFunction)
-					this.optionTouchendTodo(index)
-					//保存有效观看记录
-					if(!this.isClickOptionFlag){
-						this.statisticsPlayRecord()
-						this.isClickOptionFlag = true
+					if(!this.iscustomLightFlag){
+						if(this.storyLineJumpFlag){
+							return this.customLightByUserId(3)
+						}else{
+							return this.customLightByUserId(4)
+						}
+					}else{
+						this.likabilityArray = []
+						this.background.splice(index,1,"")
+						this.likabilityFlag = false
+						// 播放结束清除延时函数
+						clearTimeout(this.likabilityDelayFunction)
+						this.optionTouchendTodo(index)
+						//保存有效观看记录
+						if(!this.isClickOptionFlag){
+							this.statisticsPlayRecord()
+							this.isClickOptionFlag = true
+						}
 					}
 				}
 			},
@@ -1350,8 +1394,7 @@
 				this.chooseTipsShowFlag = false
 				this.chooseTipsMaskFlag = false
 				this.hiddenBtnFlag = true
-				const videoContext = uni.createVideoContext('myVideo')
-				videoContext.play()
+				this.videoContext.play()
 			},
 			//点击故事线关闭按钮触发事件
 			closeStoryLineContent(){
@@ -1359,8 +1402,7 @@
 					this.videoShowFlag = true
 				}
 				this.storyLineContentFlag = false
-				const videoContext = uni.createVideoContext('myVideo')
-				videoContext.play()
+				this.videoContext.play()
 			},
 			//点击举报关闭按钮触发事件
 			closeReportContent(){
@@ -1383,8 +1425,7 @@
 					}
 				]
 				this.textareaContent = ''
-				const videoContext = uni.createVideoContext('myVideo')
-				videoContext.play()
+				this.videoContext.play()
 			},
 			//初始化竖屏canvas画布
 			initVerticalCanvas(){
@@ -1426,74 +1467,31 @@
 						let cY = parseInt(((this.nodeLocationList[i].circleY+0)*this.canvasHeight).toFixed(0))
 						
 						//画线 连线到小圆心
-						let cr = 2
-						ctx.beginPath()
-						ctx.setLineWidth(1)
-						ctx.moveTo(cX, cY)
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
-						ctx.lineTo(rectX, rectY)
-						ctx.setStrokeStyle('white')
-						ctx.stroke()
+						let cr = 2
+						this.drawLine(ctx, cX, cY, rectX, rectY)
 						
 						//画末尾小圆圈
 						//x,y,r,sAngle（起始弧度,单位弧度（在3点钟方向）），eAngle（终止弧度）counterclockwise可选，默认是false 标识顺时针 
 						//让起始点转到12点就需要倒退0.5* Math.PI 但整圆是2 * Math.PI 故终止弧度加0.5* Math.PI
 						//外圈
-						ctx.beginPath()
-						ctx.arc(cX, cY, cr*3, 0, 2 * Math.PI)
-						ctx.setFillStyle('#87CEEB')
-						ctx.fill()
+						this.drawcircule(ctx, cX, cY, cr*3, 0, 2 * Math.PI, '#87CEEB')
 						//内圈
-						ctx.beginPath()
-						ctx.arc(cX, cY, cr, 0, 2 * Math.PI)
-						ctx.setFillStyle('#E3E3E3')
-						ctx.fill()
+						this.drawcircule(ctx, cX, cY, cr, 0, 2 * Math.PI, '#E3E3E3')
 						
 						//画矩形
 						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
-						ctx.beginPath()
-						let lineWidth = 2
-						ctx.lineWidth = lineWidth
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
-						// ctx.rect(parseInt((rectX-(rectW/2)).toFixed(0)), parseInt((rectY-(rectH/2)).toFixed(0)), rectW, rectH)
-						ctx.rect(parseInt(((this.nodeLocationList[i].textRectX+0)*this.canvasWidth-(rectW/2)).toFixed(0)), 
-						parseInt(((this.nodeLocationList[i].textRectY+0)*this.canvasHeight-(rectH/2)).toFixed(0)), rectW, rectH)
-						
-						//将坐标收纳成对象保存到数组，为绑定事件做准备
-						let rect={
-							x: parseInt((rectX-(rectW/2)).toFixed(0)),
-							y: parseInt((rectY-(rectH/2)).toFixed(0)),
-							w: rectW,
-							h: rectH
-						}
-						this.rectArray.push(rect)
-						//rgba(255, 255, 255, 0.5)
-						if(this.isClickFlag){
-							if(this.touchRectNum == i){
-									//矩形边框颜色
-									ctx.setStrokeStyle('#FFFFFF')
-									//矩形填充色
-									ctx.setFillStyle('#7E4DAB')
-									this.isClickFlag = false
-								}else{
-									ctx.setStrokeStyle('#FFFFFF')
-									ctx.setFillStyle('#7E4DAB')
-								}
-						}else{
-							ctx.setStrokeStyle('#FFFFFF')
-							ctx.setFillStyle('#7E4DAB')
-						}
-						ctx.fill()
-						//开始描绘
-						ctx.stroke()
+						let lineWidth = 2
+						this.drawDisplayRect(ctx, parseInt(((this.nodeLocationList[i].textRectX+0)*this.canvasWidth-(rectW/2)).toFixed(0)), 
+						parseInt(((this.nodeLocationList[i].textRectY+0)*this.canvasHeight-(rectH/2)).toFixed(0)), rectW, rectH, lineWidth, i)
 						
 						// 画皮肤
-						ctx.beginPath()
 						let imageW= 25
 						let	imageH= 30
-						ctx.drawImage("../../static/icon/left.png", parseInt((rectX-(rectW/2)).toFixed(0))-imageW+lineWidth, 
+						this.drawImageForPositionOption(ctx,"../../static/icon/left.png",parseInt((rectX-(rectW/2)).toFixed(0))-imageW+lineWidth, 
 						parseInt((rectY-(rectH/2)).toFixed(0))-lineWidth/2, imageW, imageH+lineWidth)
-						ctx.drawImage("../../static/icon/right.png", parseInt((rectX-(rectW/2)).toFixed(0))+rectW-lineWidth, 
+						this.drawImageForPositionOption(ctx,"../../static/icon/right.png", parseInt((rectX-(rectW/2)).toFixed(0))+rectW-lineWidth,
 						parseInt((rectY-(rectH/2)).toFixed(0))-lineWidth/2, imageW, imageH+lineWidth)
 						
 						//写字
@@ -1503,6 +1501,13 @@
 						let textX = parseInt(((rectX+(marginLeftAndRightSides/2))-(rectW/2)).toFixed(0))
 						let textY =  parseInt(((rectH+rectY-marginBottom)-(rectH/2)).toFixed(0))
 						ctx.fillText(textContent, textX, textY)
+						
+						//绘制广告
+						if(this.conditionState[i] == 1){
+							let adX = rectX - 45
+							let adY = rectY - 24
+							this.drawVerticalAdvertisement(ctx,adX,adY)
+						}
 						//开始描绘
 						ctx.stroke()
 						ctx.draw(true)
@@ -1522,37 +1527,7 @@
 						let rectW = parseInt(((this.nodeLocationList[i].hideWidthScale+0)*this.canvasWidth).toFixed(0))
 						// console.log('矩形框的宽: ',rectW)
 						//画矩形
-						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
-						ctx.beginPath()
-						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
-						ctx.rect(rectX, rectY, rectW, rectH)
-						//将坐标收纳成对象保存到数组，为绑定事件做准备
-						let rect={
-							x: rectX,
-							y: rectY,
-							w: rectW,
-							h: rectH
-						}
-						this.rectArray.push(rect)
-						if(this.isClickFlag){
-							if(this.touchRectNum == i){
-									//矩形边框颜色
-									ctx.setStrokeStyle('rgba(255, 255, 255,0)')
-									//矩形填充色
-									ctx.setFillStyle('rgba(255, 255, 255,0)')
-									this.isClickFlag = false
-								}else{
-									ctx.setStrokeStyle('rgba(255, 255, 255,'+ rectOpacity +')')
-									ctx.setFillStyle('rgba(255, 255, 255, '+ rectOpacity +')')
-								}
-						}else{
-							ctx.setStrokeStyle('rgba(255, 255, 255,'+ rectOpacity +')')
-							ctx.setFillStyle('rgba(255, 255, 255,'+ rectOpacity +')')
-						}
-						ctx.fill()
-						//开始描绘
-						ctx.stroke()
-						ctx.draw(true)
+						this.drawTransparentRect(ctx, rectX, rectY, rectW, rectH, rectOpacity, i)
 					}
 				}
 			},
@@ -1594,96 +1569,55 @@
 						// console.log('圆点的y轴坐标: ', cY)
 						//画线 连线到小圆心
 						let cr = 2
-						ctx.beginPath()
-						ctx.setLineWidth(1)
-						ctx.moveTo(this.canvasWidth - (cY + 2), cX)
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
-						ctx.lineTo(this.canvasWidth - (rectY), rectX)
-						ctx.setStrokeStyle('white')
-						ctx.stroke()
+						this.drawLine(ctx, this.canvasWidth - (cY + 2), cX, this.canvasWidth - (rectY), rectX)
 						
 						//画末尾小圆圈
 						//x,y,r,sAngle（起始弧度,单位弧度（在3点钟方向）），eAngle（终止弧度）counterclockwise可选，默认是false 标识顺时针 
 						//让起始点转到12点就需要倒退0.5* Math.PI 但整圆是2 * Math.PI 故终止弧度加0.5* Math.PI
 						//外圈
-						ctx.beginPath()
-						ctx.arc(this.canvasWidth - (cY + 2), cX, cr*3, 0, 2 * Math.PI)
-						ctx.setFillStyle('#87CEEB')
-						ctx.fill()
+						this.drawcircule(ctx, this.canvasWidth - (cY + 2), cX, cr*3, 0, 2 * Math.PI, '#87CEEB')
 						//内圈
-						ctx.beginPath()
-						ctx.arc(this.canvasWidth - (cY + 2), cX, cr, 0, 2 * Math.PI)
-						ctx.setFillStyle('#E3E3E3')
-						ctx.fill()
+						this.drawcircule(ctx, this.canvasWidth - (cY + 2), cX, cr, 0, 2 * Math.PI, '#E3E3E3')
 						
 						//画矩形
 						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
-						ctx.beginPath()
-						let lineWidth = 2
-						ctx.lineWidth = lineWidth
 						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
-						ctx.rect(this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH), parseInt((rectX-(rectW/2)).toFixed(0)), rectH, rectW)
+						let lineWidth = 2
+						this.drawDisplayRect(ctx, this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH),
+						parseInt((rectX-(rectW/2)).toFixed(0)), rectH, rectW, lineWidth, i)
 						// console.log('矩形框的x轴坐标: ', this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH))
 						// console.log('矩形框的y轴坐标: ', parseInt((rectX-(rectW/2)).toFixed(0)))
-						//将坐标收纳成对象保存到数组，为绑定事件做准备
-						let rect={
-							x: this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH),
-							y: parseInt((rectX-(rectW/2)).toFixed(0)),
-							w: rectH,
-							h: rectW
-						}
-						this.rectArray.push(rect)
-						//rgba(255, 255, 255, 0.5)
-						if(this.isClickFlag){
-							if(this.touchRectNum == i){
-									//矩形边框颜色
-									ctx.setStrokeStyle('#FFFFFF')
-									//矩形填充色
-									ctx.setFillStyle('#7E4DAB')
-									this.isClickFlag = false
-								}else{
-									ctx.setStrokeStyle('#FFFFFF')
-									ctx.setFillStyle('#7E4DAB')
-								}
-						}else{
-							ctx.setStrokeStyle('#FFFFFF')
-							ctx.setFillStyle('#7E4DAB')
-						}
-						ctx.fill()
-						//开始描绘
-						ctx.stroke()
 						
 						// 画皮肤
-						ctx.beginPath()
 						let imageW= 25
 						let	imageH= 30
-						ctx.drawImage("../../static/icon/left_deg.png", 
+						this.drawImageForPositionOption(ctx,"../../static/icon/left_deg.png",
 						this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH)-lineWidth/2,
 						parseInt((rectX-(rectW/2)).toFixed(0))-imageW+lineWidth+1,
-						imageH+lineWidth,
-						imageW)
-						console.log('皮肤的x轴坐标: ', parseInt((rectX-(rectW/2)).toFixed(0)))
-						console.log('皮肤的y轴坐标: ', this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH))
-						ctx.drawImage("../../static/icon/right_deg.png",
+						imageH+lineWidth,imageW)
+						this.drawImageForPositionOption(ctx,"../../static/icon/right_deg.png",
 						this.canvasWidth - (parseInt((rectY-(rectH/2)).toFixed(0)) + rectH)-lineWidth/2,
 						parseInt((rectX-(rectW/2)).toFixed(0))+rectW-lineWidth,
 						imageH+lineWidth,
 						imageW)
+						
 						//写字
 						//设置字体颜色
 						ctx.setFillStyle('white')
-						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
-						/* let textX = parseInt(((this.canvasWidth - (rectY)+(marginLeftAndRightSides/2))-(rectW/2)).toFixed(0))
-						console.log('textX: ', textX)
-						let textY =  parseInt(((rectH+rectX-marginBottom)-(rectH/2)).toFixed(0))
-						console.log('textY: ', textY) */
-						ctx .save ();
+						ctx.save ()
 						ctx.translate(this.canvasWidth - rectY, rectX)
 						ctx.rotate ( 90 * Math .PI / 180 )
 						ctx.fillText(textContent, -rectW*2/5, rectH/4)//-rectW/2, rectH/4
 						ctx.setTextAlign('center')
 						ctx.translate( -rectX  , this.canvasWidth - rectY)
-						ctx .restore ()
+						ctx.restore ()
+						
+						if(this.conditionState[i] == 1){
+							let adX = this.canvasWidth - (rectY)
+							let adY = rectX - 45
+							this.drawHorizontalAdvertisement(ctx, adX ,adY)
+						}
 						//开始描绘
 						ctx.stroke()
 						ctx.draw(true)
@@ -1703,53 +1637,178 @@
 						let rectW = parseInt(((this.nodeLocationList[i].hideWidthScale+0)*this.canvasHeight).toFixed(0))
 						// console.log('矩形框的宽: ',rectW)
 						//画矩形
-						//前两个值为左上角起始点坐标x,y，后面两位为矩形宽高 最后一个元素是矩形圆角的像素
-						ctx.beginPath()
-						//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
-						ctx.rect(this.canvasWidth -(rectY+rectH), rectX, rectH, rectW)
-						//将坐标收纳成对象保存到数组，为绑定事件做准备
-						let rect={
-							x: this.canvasWidth -(rectY+rectH),
-							y: rectX,
-							w: rectH,
-							h: rectW
-						}
-						this.rectArray.push(rect)
-						if(this.isClickFlag){
-							if(this.touchRectNum == i){
-									//矩形边框颜色
-									ctx.setStrokeStyle('rgba(255, 255, 255,0)')
-									//矩形填充色
-									ctx.setFillStyle('rgba(255, 255, 255,0)')
-									this.isClickFlag = false
-								}else{
-									ctx.setStrokeStyle('rgba(255, 255, 255,'+ rectOpacity +')')
-									ctx.setFillStyle('rgba(255, 255, 255, '+ rectOpacity +')')
-								}
-						}else{
-							ctx.setStrokeStyle('rgba(255, 255, 255,'+ rectOpacity +')')
-							ctx.setFillStyle('rgba(255, 255, 255,'+ rectOpacity +')')
-						}
-						ctx.fill()
-						//开始描绘
-						ctx.stroke()
-						ctx.draw(true)
+						this.drawTransparentRect(ctx, this.canvasWidth -(rectY+rectH), rectX, rectH, rectW, rectOpacity, i)
 					}
 				}
 			},
-			// 绘制圆角矩形方法 (x,y):圆角矩形起始坐标; width: 矩形宽度; height: 矩形高度; r: 矩形圆角;
-			drawRect(ctx, x, y, width, height, r){
-				ctx.beginPath();
-				ctx.moveTo(x + r, y);
-				ctx.lineTo(x + width - r, y);
-				ctx.arc(x + width - r, y + r, r, Math.PI*1.5, Math.PI*2);
-				ctx.lineTo(x + width, y + height - r);
-				ctx.arc(x + width - r, y + height - r, r, 0, Math.PI*0.5);
-				ctx.lineTo(x + r, y + height);
-				ctx.arc(x + r, y + height - r, r, Math.PI*0.5, Math.PI);
-				ctx.lineTo(x, y + r);
-				ctx.arc(x + r, y + r, r, Math.PI, Math.PI*1.5);
+			drawVerticalAdvertisement(ctx, x, y){
+				let r = 12 //圆角矩形弧度
+				let width = 90
+				let height = 24
+				let fontSize = 12
+				let adImageWidth = 22
+				let adImageHeight = 22
+				let textContent = '广告解锁'
+				let adImageUrl = '../../static/icon/advertisement.png'
+				this.fillRoundRect(ctx, x, y, width, height, r , 'rgba(255, 255, 255,0.6)')
+				this.drawImageForPositionOption(ctx, adImageUrl, x+10, y + 1, adImageWidth, adImageHeight)
+				
+				//设置字体颜色
+				ctx.setFillStyle('#707070')
+				ctx.setFontSize(fontSize)
+				//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
+				let textX = x + 22 + 2 + 10
+				let textY = y + 16
+				ctx.fillText(textContent, textX, textY)
 			},
+			drawHorizontalAdvertisement(ctx, x, y){
+				let r = 12 //圆角矩形弧度
+				let width = 90
+				let height = 24
+				let fontSize = 12
+				let adImageWidth = 20
+				let adImageHeight = 20
+				let textContent = '广告解锁'
+				let adImageUrl = '../../static/icon/Hadvertisement.png'
+				this.fillRoundRect(ctx, x, y, height, width, r , 'rgba(255, 255, 255,0.6)')
+				this.drawImageForPositionOption(ctx, adImageUrl, x+2, y+10, adImageHeight, adImageWidth)
+				
+				//设置字体颜色
+				ctx.setFillStyle('#707070')
+				ctx.setFontSize(fontSize)
+				//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
+				let textX = x + 22 + 2 + 10
+				let textY = y + 16
+				ctx.save ();
+				ctx.translate(x, y)
+				ctx.rotate ( 90 * Math .PI / 180 )
+				ctx.translate(x-2*x, -y-24)
+				ctx.fillText(textContent, textX, textY)
+				ctx.restore()
+			},
+			drawcircule(ctx, cX, cY, cr, sAngle, eAngle, fillColor){
+				ctx.beginPath()
+				ctx.arc(cX, cY, cr, sAngle, eAngle)
+				ctx.setFillStyle(fillColor)
+				ctx.fill()
+			},
+			drawLine(ctx, cX, cY, rectX, rectY){
+				ctx.beginPath()
+				ctx.setLineWidth(1)
+				ctx.moveTo(cX, cY)
+				ctx.lineTo(rectX, rectY)
+				ctx.setStrokeStyle('white')
+				ctx.stroke()
+			},
+			drawDisplayRect(ctx, x, y, width, height, lineWidth, i){
+				ctx.lineWidth = lineWidth
+				ctx.rect(x, y, width, height)
+				//将坐标收纳成对象保存到数组，为绑定事件做准备
+				let rect={
+					x: x,
+					y: y,
+					w: width,
+					h: height
+				}
+				this.rectArray.push(rect)
+				if(this.isClickFlag){
+					if(this.touchRectNum == i){
+							//矩形边框颜色
+							ctx.setStrokeStyle('#FFFFFF')
+							//矩形填充色
+							ctx.setFillStyle('#7E4DAB')
+							this.isClickFlag = false
+						}else{
+							ctx.setStrokeStyle('#FFFFFF')
+							ctx.setFillStyle('#7E4DAB')
+						}
+				}else{
+					ctx.setStrokeStyle('#FFFFFF')
+					ctx.setFillStyle('#7E4DAB')
+				}
+				ctx.fill()
+				//开始描绘
+				ctx.stroke()
+			},
+			//绘制横竖屏定位选项的皮肤
+			drawImageForPositionOption(ctx, imagePath, x, y, width, height){
+				ctx.beginPath()
+				ctx.drawImage(imagePath, x, y, width, height)
+			},
+			//绘制横屏竖屏透明矩形的方法
+			drawTransparentRect(ctx, x, y, width, height, rectOpacity, i){
+				ctx.beginPath()
+				//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
+				ctx.rect(x, y, width, height)
+				//将坐标收纳成对象保存到数组，为绑定事件做准备
+				let rect={
+					x: x,
+					y: y,
+					w: width,
+					h: height
+				}
+				this.rectArray.push(rect)
+				if(this.isClickFlag){
+					if(this.touchRectNum == i){
+							//矩形边框颜色
+							ctx.setStrokeStyle('rgba(255, 255, 255,0)')
+							//矩形填充色
+							ctx.setFillStyle('rgba(255, 255, 255,0)')
+							this.isClickFlag = false
+						}else{
+							ctx.setStrokeStyle('rgba(255, 255, 255,'+ rectOpacity +')')
+							ctx.setFillStyle('rgba(255, 255, 255, '+ rectOpacity +')')
+						}
+				}else{
+					ctx.setStrokeStyle('rgba(255, 255, 255,'+ rectOpacity +')')
+					ctx.setFillStyle('rgba(255, 255, 255,'+ rectOpacity +')')
+				}
+				ctx.fill()
+				//开始描绘
+				ctx.stroke()
+				ctx.draw(true)
+			},
+			 /**该方法用来绘制一个有填充色的圆角矩形 
+			    *@param cxt:canvas的上下文环境 
+			    *@param x:左上角x轴坐标 
+			    *@param y:左上角y轴坐标 
+			    *@param width:矩形的宽度 
+			    *@param height:矩形的高度 
+			    *@param radius:圆的半径 
+			    *@param fillColor:填充颜色 
+			**/
+			fillRoundRect(ctx, x, y, width, height, radius, fillColor) {
+				//圆的直径必然要小于矩形的宽高          
+				if (2 * radius > width || 2 * radius > height) { return false; }
+		
+				ctx.save();
+				ctx.translate(x, y);
+				//绘制圆角矩形的各个边  
+				this.drawRoundRectPath(ctx, width, height, radius);
+				ctx.fillStyle = fillColor || "#000"; //若是给定了值就用给定的值否则给予默认值  
+				ctx.fill();
+				ctx.restore();
+			},
+			drawRoundRectPath(ctx, width, height, radius) {
+				ctx.beginPath(0);
+				//从右下角顺时针绘制，弧度从0到1/2PI  
+				ctx.arc(width - radius, height - radius, radius, 0, Math.PI / 2);
+				//矩形下边线  
+				ctx.lineTo(radius, height);
+				//左下角圆弧，弧度从1/2PI到PI  
+				ctx.arc(radius, height - radius, radius, Math.PI / 2, Math.PI);
+				//矩形左边线  
+				ctx.lineTo(0, radius);
+				//左上角圆弧，弧度从PI到3/2PI  
+				ctx.arc(radius, radius, radius, Math.PI, Math.PI * 3 / 2);
+				//上边线  
+				ctx.lineTo(width - radius, 0);
+				//右上角圆弧  
+				ctx.arc(width - radius, radius, radius, Math.PI * 3 / 2, Math.PI * 2);
+				//右边线  
+				ctx.lineTo(width, height - radius);
+				ctx.closePath();
+			 },
 			// canvas中计算控制文本换行方法
 			drawText(t,x,y,w){
 				//参数t是文本 w是屏幕宽度,
@@ -1783,15 +1842,15 @@
 					for(let i = 0; i<this.nodeLocationList.length; i++){
 						let touchX = e.changedTouches[0].x;
 						let touchY = e.changedTouches[0].y;
-						console.log('touchY: ',touchY)
+						// console.log('touchY: ',touchY)
 						let xLowLimit = this.rectArray[i].x;
-						console.log('x轴起始点: ',xLowLimit)
+						// console.log('x轴起始点: ',xLowLimit)
 						let yLowLimit = this.rectArray[i].y;
-						console.log('y轴起始点: ',yLowLimit)
+						// console.log('y轴起始点: ',yLowLimit)
 						let xUpperLimit = this.rectArray[i].x+this.rectArray[i].w;
-						console.log('x轴终点: ',xUpperLimit)
+						// console.log('x轴终点: ',xUpperLimit)
 						let yUpperLimit = this.rectArray[i].y+this.rectArray[i].h;
-						console.log('y轴终点: ',yUpperLimit)
+						// console.log('y轴终点: ',yUpperLimit)
 						if(touchX > xLowLimit && touchX < xUpperLimit && touchY > yLowLimit && touchY < yUpperLimit){
 							this.touchRectNum = i;
 							console.log('this.touchRectNum: '+this.touchRectNum)
@@ -1819,27 +1878,31 @@
 				}else if(this.touchRectNum == 3){
 					this.clickPositionOptionTodo()
 				}
-				//回到默认值
-				this.touchRectNum = 5
 			},
 			clickPositionOptionTodo(){
-				if(!this.iscustomLightFlag){
-					if(this.storyLineJumpFlag){
-						return this.customLightByUserId(3)
-					}else{
-						return this.customLightByUserId(4)
-					}
+				if(this.conditionState[this.touchRectNum] == 1){
+					console.log('作者让你看广告啊，跟我没关系')
+					this.openAdvertising()
+					this.showCanvasFlag = false
 				}else{
-					this.likabilityArray = []
-					clearTimeout(this.likabilityDelayFunction)
-					this.canvasTouchendEventTodo()
-					this.screenshotShowFlag = false
-					this.videoShowFlag = true
-					this.likabilityFlag = false
-					//保存有效观看记录
-					if(!this.isClickOptionFlag){
-						this.statisticsPlayRecord()
-						this.isClickOptionFlag = true
+					if(!this.iscustomLightFlag){
+						if(this.storyLineJumpFlag){
+							return this.customLightByUserId(3)
+						}else{
+							return this.customLightByUserId(4)
+						}
+					}else{
+						this.likabilityArray = []
+						clearTimeout(this.likabilityDelayFunction)
+						this.screenshotShowFlag = false
+						this.canvasTouchendEventTodo()
+						this.likabilityFlag = false
+						this.videoShowFlag = true
+						//保存有效观看记录
+						if(!this.isClickOptionFlag){
+							this.statisticsPlayRecord()
+							this.isClickOptionFlag = true
+						}
 					}
 				}
 			},
@@ -1852,6 +1915,7 @@
 					let child = this.childs[this.touchRectNum]
 					this.initPlayData(child)
 				}else{
+					console.log(this.touchRectNum)
 					let advancedList = this.childs[this.touchRectNum].onAdvancedList
 					let userScore = uni.getStorageSync('userScore')
 					let isNumericalOptions = this.childs[this.touchRectNum].isNumberSelect
@@ -2046,8 +2110,7 @@
 				this.durationStr = date
 				//判断是不是故事线跳转过来的第一个视频 第一个视频需要快进到结尾进行播放
 				if(this.isPlayedFlag){
-					const videoContext = uni.createVideoContext('myVideo')
-					videoContext.seek(parseInt((this.duration-3).toFixed(0)))
+					this.videoContext.seek(parseInt((this.duration-3).toFixed(0)))
 					this.isPlayedFlag = false
 				}
 				//加载完成将入场loading关闭
@@ -2111,53 +2174,47 @@
 			},
 			replayVideo(){
 				if(!this.suspendFlag){
-					const videoContext = uni.createVideoContext('myVideo')
-					videoContext.seek(0)
+					this.videoContext.seek(0)
 					this.progressBoxTouchEnd()
 				}
 			},
 			jumpbackVideo(){
 				if(!this.suspendFlag){
-					const videoContext = uni.createVideoContext('myVideo')
 					let currentTime = this.deepCopy(this.currentTime)
 					let targetPlayTime = currentTime - this.duration * 0.15
 					if(targetPlayTime < 0){
-						videoContext.seek(0)
+						this.videoContext.seek(0)
 					}else{
-						videoContext.seek(parseInt(targetPlayTime))
+						this.videoContext.seek(parseInt(targetPlayTime))
 					}
 					this.progressBoxTouchEnd()
 				}
 			},
 			suspendVideo(){
-				const videoContext = uni.createVideoContext('myVideo')
-				videoContext.pause()
+				this.videoContext.pause()
 				this.suspendFlag = true
 				this.progressBoxTouchEnd()
 			},
 			playVideo(){
-				const videoContext = uni.createVideoContext('myVideo')
-				videoContext.play()
+				this.videoContext.play()
 				this.suspendFlag = false
 				this.progressBoxTouchEnd()
 			},
 			jumpForwardVideo(){
 				if(!this.suspendFlag){
-					const videoContext = uni.createVideoContext('myVideo')
 					let currentTime = this.deepCopy(this.currentTime)
 					let targetPlayTime = currentTime + this.duration * 0.15
 					if(targetPlayTime > parseInt(this.duration - 1)){
-						videoContext.seek(parseInt(this.duration - 1))
+						this.videoContext.seek(parseInt(this.duration - 1))
 					}else{
-						videoContext.seek(parseInt(targetPlayTime))
+						this.videoContext.seek(parseInt(targetPlayTime))
 					}
 					this.progressBoxTouchEnd()
 				}
 			},
 			endVideo(){
 				if(!this.suspendFlag){
-					const videoContext = uni.createVideoContext('myVideo')
-					videoContext.seek(parseInt(this.duration-1))
+					this.videoContext.seek(parseInt(this.duration-1))
 					this.progressBoxTouchEnd()
 				}
 			},
@@ -2183,7 +2240,7 @@
 			},
 			//提交举报
 			async submit(){
-				if(!this.reportType){
+				if(!this.reportType || !this.checkBoxValue){
 					return uni.showToast({
 						icon: 'none',
 						title: '请选择举报类型'
@@ -2217,8 +2274,7 @@
 							})
 							this.reportContentFlag = false
 							//举报提交之后接着播放
-							const videoContext = uni.createVideoContext('myVideo')
-							videoContext.play()
+							this.videoContext.play()
 							this.items =  [
 								{
 									value: 1,
@@ -2243,17 +2299,19 @@
 			},
 			//举报页面复选框
 			checkboxChange(e) {
-				var items = this.items,
-				values = e.detail.value;
+				let items = this.items
+				let values = e.detail.value
 				//那用户最后点击的那个checkbox 实现单选
-				const value = values[values.length-1];
+				const value = values[values.length-1]
+				this.checkBoxValue = value
+				// console.log('this.checkBoxValue: ',this.checkBoxValue)
 				//避免用户单次数的点击导致values为空
 				if(!value){return;}
 				for (var i = 0, lenI = items.length; i < lenI; ++i) {
 					const item = items[i]
 					if(value.includes(item.value)){
 						this.$set(item,'checked',true)
-						this.reportType = item.value;
+						this.reportType = item.value
 					}else{
 						this.$set(item,'checked',false)
 					}
@@ -2554,6 +2612,7 @@
 							line-height: 100rpx;
 						}
 						.tips{
+							position: relative;
 							.optionBox{
 								background: url('https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1606382670960frame.png') no-repeat center;
 								background-size: 100% 100%;
@@ -2567,6 +2626,33 @@
 									color: white;
 									padding-left: 20rpx;
 									font-size: 34rpx;
+									.iconBox{
+										position: absolute;
+										right: 0;
+										top: -18rpx;
+										// background-color: #7E4DAB;
+										background-color: rgba(#ffffff,0.6);
+										height: 50rpx;
+										width: 180rpx;
+										border-radius: 25rpx;
+										display: flex;
+										justify-content: flex-start;
+										icon{
+											display: inline-block;
+											margin-left: 12rpx;
+											line-height: 50rpx;
+											background: url(../../static/icon/advertisement.png) no-repeat center;
+											width: 50rpx;
+											height: 50rpx;
+											background-size: 50rpx;
+										}
+										text{
+											margin-left: 8rpx;
+											line-height: 50rpx;
+											color: #707070;
+											font-size: 24rpx;
+										}
+									}
 								}
 							}
 						}

@@ -123,16 +123,16 @@
 				} else {
 					this.isShowNumTwo = false
 				}
-				console.log('初始化', num, this.isShowMax)
+				// console.log('初始化', num, this.isShowMax)
 				if (num >= 10) {
 					const numberOne = ((num + '').charAt(0) - 0)
 					const numberTwo = ((num + '').charAt(1) - 0)
-					console.log(numberOne, 'numberOne', numberTwo, 'numberTwo')
+					// console.log(numberOne, 'numberOne', numberTwo, 'numberTwo')
 					this.numberUrlOne = this.lightIconUrl.number[numberOne]
 					this.numberUrlTwo = this.lightIconUrl.number[numberTwo]
 				} else {
 					const numberOne = ((num + '').charAt(0) - 0)
-					console.log(numberOne, 'numberOne', num)
+					// console.log(numberOne, 'numberOne', num)
 					this.numberUrlOne = this.lightIconUrl.number[numberOne]
 				}
 			},
@@ -195,10 +195,10 @@
 				// 监听激励广告关闭
 				this.advertising.onClose((status) => {
 					if (status.isEnded) {
-						console.log('给光')
+						// console.log('给光')
 						globalBus.$emit('requestOfAES')
 					} else {
-						console.log('憨批用户不给光')
+						// console.log('憨批用户不给光')
 					}
 					this.advertising.offClose()
 					/* this.advertising.destroy() */
