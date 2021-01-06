@@ -1,8 +1,5 @@
 <template>
 	<view class="wrap">
-
-		<!-- <u-mask :show="true" style="width: 375px ; height: 100px;  position: fixed; left: 0; top: 0;z-index: 10;" ></u-mask> -->
-		<!-- <view class="cpt-mask"> </view> -->
 		<swiper :vertical="true" :previous-margin="'170'" :next-margin="'280'" :current="onfloor" @change="floorChange" style="width: 100%; height: 650px; ">
 			<swiper-item v-for="(item, floor) in floorList" :key="floor" style="margin-top: 12rpx; height: 224px; ">
 				<mswiper :list="item" :title="true" :circular="false" :autoplay="false" :height="416" :effect3d="true" :isBig="onfloor == floor"
@@ -12,7 +9,23 @@
 		<view class="cpt-mask-tips-bottom"> </view>
 		<view class="cpt-mask-tips-top"> </view>
 		<u-toast ref="uToast" />
+		<view>
+			<u-modal v-model="showAdvertisingFlagStory" title="温馨提示" :show-confirm-button="false" z-index="999">
+				<view class="slot-content">
+					<view style="padding: 0 20rpx;padding-top: 40rpx;">
+						<view>完整观看激励视频才可以跳转到该节点</view>
+						<view @click="openAdvertising" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
+							<image src="../../static/icon/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
+							<view style="display: inline-block;margin-left: 10rpx;color: #fff;transform: translateY(-4rpx);">立即获取</view>
+						</view>
+						<view @click="closeDialog" style="position: absolute;right: 20rpx; top: 20rpx;width: 40rpx;height: 40rpx;text-align: center;line-height: 40rpx;font-size: 40rpx;">x</view>
+					</view>
+				</view>
+			</u-modal>
+		</view>
 	</view>
+	
+	
 </template>
 
 <script>
@@ -53,7 +66,8 @@
 				isNumberFlag:false,
 				resData:[],
 				endingFlag:false,
-				lockEndingFloor: -1
+				lockEndingFloor: -1,
+				showAdvertisingFlagStory: false
 
 			}
 		},
@@ -219,6 +233,7 @@
 					console.log(this.floorList[nowFloor][index])
 					// 跳转的 节点
 					let a = this.floorList[nowFloor][index]
+					console.log(a)
 					// 播放记录 
 					let b = uni.getStorageSync("pkDetailIds")
 					// 当前选中楼层的 播放历史
@@ -237,7 +252,6 @@
 							return
 						}
 					}
-					
 					if (a.isNumberSelect != null) {
 						if ((a.isNumberSelect - 0) === 1) {
 							if (index != 0 ) {
@@ -269,11 +283,17 @@
 							
 						}
 					}
+					if (a.conditionState && !jumpFlag) {
+						console.log('我进来了')
+						this.showAdvertisingFlagStory = true
+						return
+						// this.$parent.showDialog()
+					}
+					//需要封装 重新吊起
 					if (this.endingFlag) {
 						if (nowFloor ==  0) {
 							d = [] 
 						}else {
-							console.log(this.finduexTreeByPkDetailId(a.pkDetailId) + 1 )
 							d.push(this.finduexTreeByPkDetailId(a.pkDetailId)+1)
 						}
 					}					
@@ -322,6 +342,79 @@
 			    }
 			  }
 			 
+			},
+			//关闭广告框
+			closeDialog() {
+				this.showAdvertisingFlagStory = false
+			},
+			// 观看激励广告
+			openAdvertising () {
+				this.showAdvertisingFlagStory = false
+				this.advertising = wx.createRewardedVideoAd({
+					adUnitId: 'adunit-7423fd1b2c7c5724'
+				})
+				//捕捉错误
+				this.advertising.onError(err => {
+					uni.showToast({
+						icon: 'none',
+						title:'获取激励视频失败，请重试'
+					})
+					if(this.isVideoEndFlag){
+						if(this.isPosition == 1){
+							this.showCanvasFlag = true
+						}
+					}
+				})
+				// 激励广告显示并加载
+				if (this.advertising) {
+					this.advertising.load().then(() => {
+						this.advertising.show().then(() => {
+						})
+					}).catch(() => {
+						if(this.isVideoEndFlag){
+							if(this.isPosition == 1){
+								this.showCanvasFlag = true
+							}
+						}
+						this.advertising.load().then(() => {
+							this.advertising.show().then(() => {
+							})
+						}).catch(() => {
+							if(this.isVideoEndFlag){
+								if(this.isPosition == 1){
+									this.showCanvasFlag = true
+								}
+							}
+							uni.showToast({
+								icon: 'none',
+								title:'激励视频加载失败，请重试'
+							})
+						})
+					})
+				}
+				// 监听激励广告关闭
+				this.advertising.onClose((status) => {
+					if(this.isVideoEndFlag){
+						if(this.isPosition == 1){
+							this.showCanvasFlag = true
+						}
+					}else{
+						this.videoContext.play()
+					}
+					if (status.isEnded) {
+						if(this.conditionState[this.optionIndex] == 1){
+							//成功播放完广告
+							// this.customLightSuccessCallBack(this.optionIndex)
+							console.log('我可以去了')
+						}else{
+							console.log('给光')
+							globalBus.$emit('requestOfAES')
+						}
+					} else {
+						console.log('憨批用户不给光')
+					}
+					this.advertising.offClose()
+				})
 			}
 		}
 	}
