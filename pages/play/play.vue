@@ -262,8 +262,8 @@
 	import {horizontalStoryLine} from './storyLine/horizontalStoryLine.vue'
 	import Advertising from '../../components/Advertising/Advertising.vue'
 	import {globalBus} from '../../common/js/util.js'
-	// import {verticalJumpDialog} from '../../components/dialog/verticalJumpDialog.vue'
-	// import {horizontalJumpDialog} from '../../components/dialog/horizontalJumpDialog.vue'
+	import {verticalJumpDialog} from '../../components/dialog/verticalJumpDialog.vue'
+	import {horizontalJumpDialog} from '../../components/dialog/horizontalJumpDialog.vue'
 	
 	export default {
 		components:{
@@ -664,12 +664,22 @@
 						this.videoContext.play()
 					}
 					if (status.isEnded) {
-						if(this.conditionState[this.optionIndex] == 1){
-							//成功播放完广告
-							this.customLightSuccessCallBack(this.optionIndex)
+						if(this.isPosition == 1){
+							if(this.conditionState[this.touchRectNum] == 1){
+								//成功播放完广告
+								this.customLightSuccessCallBack(this.touchRectNum)
+							}else{
+								console.log('给光')
+								globalBus.$emit('requestOfAES')
+							}
 						}else{
-							console.log('给光')
-							globalBus.$emit('requestOfAES')
+							if(this.conditionState[this.optionIndex] == 1){
+								//成功播放完广告
+								this.customLightSuccessCallBack(this.optionIndex)
+							}else{
+								console.log('给光')
+								globalBus.$emit('requestOfAES')
+							}
 						}
 					} else {
 						console.log('憨批用户不给光')
