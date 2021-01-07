@@ -15,7 +15,7 @@
 					<view style="padding: 0 20rpx;padding-top: 40rpx;">
 						<view>完整观看激励视频才可以跳转到该节点</view>
 						<view @click="openAdvertising" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
-							<image src="../../static/icon/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
+							<image src="../../../static/icon/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
 							<view style="display: inline-block;margin-left: 10rpx;color: #fff;transform: translateY(-4rpx);">立即获取</view>
 						</view>
 						<view @click="closeDialog" style="position: absolute;right: 20rpx; top: 20rpx;width: 40rpx;height: 40rpx;text-align: center;line-height: 40rpx;font-size: 40rpx;">x</view>
@@ -24,8 +24,8 @@
 			</u-modal>
 		</view>
 	</view>
-	
-	
+
+
 </template>
 
 <script>
@@ -62,10 +62,10 @@
 				onfloor: 5, // 当前楼
 				oncolumn: 0, // 当前列
 				lockFloor: 0, // 锁定楼层
-				lockColumn: 0 ,// 锁定列
-				isNumberFlag:false,
-				resData:[],
-				endingFlag:false,
+				lockColumn: 0, // 锁定列
+				isNumberFlag: false,
+				resData: [],
+				endingFlag: false,
 				lockEndingFloor: -1,
 				showAdvertisingFlagStory: false
 
@@ -73,13 +73,14 @@
 		},
 
 		onReady(option) {
-			
+
 			this.onfloor = this.pkDetailIds.length - 1
+			this.endingFlag = uni.getStorageSync("isEndings")
+			
 			let userId = uni.getStorageSync("userId")
 			let pkArtworkEndingNodeId = uni.getStorageSync("fkNodeId")
-			this.endingFlag =  uni.getStorageSync("isEndings")
 			uni.request({
-				url:  baseURL + '/Ecmartwork/getArtWorkNodes',
+				url: baseURL + '/Ecmartwork/getArtWorkNodes',
 				// url: 'http://192.168.1.15:8008/Ecmartwork/getArtWorkNodes',
 				method: 'POST',
 				data: {
@@ -87,57 +88,57 @@
 					intVideoId: this.pkDetailIds[this.onfloor],
 					fkUserid: userId,
 					pkArtworkEndingNodeId: pkArtworkEndingNodeId,
-					endingFlag:this.endingFlag
+					endingFlag: this.endingFlag
 				},
 				success: res => {
 					// console.log(res.data.data)
-					this.resData = res.data.data 
-					this.pkDetailIds.forEach( v => {
+					this.resData = res.data.data
+					this.pkDetailIds.forEach(v => {
 						res.data.data.forEach(node => {
 							if (v === node.pkDetailId) {
 								// 是否为 跳转节点
 								if (node.isLink == 1) {
-									res.data.data.forEach( item => {
-										if (node.linkUrl == item.pkDetailId) {		
-											this.setNode(node.brotherNode, v,item)
+									res.data.data.forEach(item => {
+										if (node.linkUrl == item.pkDetailId) {
+											this.setNode(node.brotherNode, v, item)
 											this.list.push(node.brotherNode)
 											this.floorList.push(node.brotherNode)
 										}
 									})
-								}else {
+								} else {
 									this.setNode(node.brotherNode, v)
 									this.list.push(node.brotherNode)
 									this.floorList.push(node.brotherNode)
 								}
 								// // 是否为 为多结局
 								// if (node.isEndings === 1) {
-									
+
 								// }
-								
+
 							}
 						})
 					})
-					// console.log(this.list)
-					// console.log(this.floorList)
-					if (this.floorList[this.floorList.length -1][0].parentId == - 1 )  {
+					if (this.floorList[this.floorList.length - 1][0].parentId == -1) {
 						// this.endingFlag = true
 						this.lockEndingFloor = this.floorList.length - 2
 					}
 					this.clearnBrother()
 				}
 			})
+			
+			console.log(this.floorList)
 		},
 		methods: {
 			// 换位置，并 修改title img 
-			setNode(data, pkNodeId,item) {
-				if (data != null && data.length >= 1){
+			setNode(data, pkNodeId, item) {
+				if (data != null && data.length >= 1) {
 					for (let i = 0; i < data.length; i++) {
 						data[i].title = data[i].selectTitle
 						data[i].image = data[i].nodeImgUrl
 						//是否展示问号
 						data[i].isWatch = false
 						if (pkNodeId === data[i].pkDetailId) {
-							if (item != null )  data[i].image = item.nodeImgUrl
+							if (item != null) data[i].image = item.nodeImgUrl
 							data[i].isWatch = true
 							data.unshift(data[i])
 							data.splice(i + 1, 1)
@@ -171,7 +172,7 @@
 			floorChange(e) {
 				let current = e.detail.current;
 				// this.clearnBrother()	
-				
+
 				for (let i = 0; i < this.floorList.length; i++) {
 					//原来的楼层
 					if (this.onfloor == i) {
@@ -189,14 +190,14 @@
 						this.floorList[i] = a[i]
 					}
 				}
-				if(this.onfloor > current) {
+				if (this.onfloor > current) {
 					this.lockColumn = this.oncolumn
 					this.oncolumn = 0
-				}else {
+				} else {
 					this.oncolumn = this.lockColumn
 				}
 				this.onfloor = current
-				
+
 			},
 			//清除兄弟
 			clearnBrother() {
@@ -228,88 +229,90 @@
 					}
 				}
 			},
-			goPlay(index, nowFloor) {	
+			goPlay(index, nowFloor) {
 				if (nowFloor == this.onfloor && index == this.oncolumn) {
-					console.log(this.floorList[nowFloor][index])
 					// 跳转的 节点
-					let a = this.floorList[nowFloor][index]
-					console.log(a)
+					let onNode = this.floorList[nowFloor][index]
 					// 播放记录 
-					let b = uni.getStorageSync("pkDetailIds")
-					// 当前选中楼层的 播放历史
-					let c = this.floorList[nowFloor][0]
+					let playHistory = uni.getStorageSync("pkDetailIds")
+					// 当前选中楼层的 播放的节点 
+					let playNode = this.floorList[nowFloor][0]
 					// 多节点播放记录
-					let d = uni.getStorageSync("multipleResultLine")
-					// let mainArtworkTree  = uni.getStorageSync("mainArtworkTree")
-					// console.log(a)
-					if (a.parentId == -1) {
+					let moreEndingHistory = uni.getStorageSync("multipleResultLine")
+
+					if (onNode.parentId == -1) {
 						this.showToast('请选择上面有选项的进行跳转！')
 						return
 					}
 					if (this.endingFlag) {
-						if (nowFloor == this.lockEndingFloor){
+						if (nowFloor == this.lockEndingFloor) {
 							this.showToast('请选择上面一级跳转！')
 							return
 						}
 					}
-					if (a.isNumberSelect != null) {
-						if ((a.isNumberSelect - 0) === 1) {
-							if (index != 0 ) {
+					if (onNode.isNumberSelect != null) {
+						if ((onNode.isNumberSelect - 0) === 1) {
+							if (index != 0) {
 								this.showToast('本选项数值选项，无法直接跳转，请在上级进行跳转')
-								return 
-							} 
-						}	
-					}			
-					// let jumpFlag = 0
-					console.log(a.pkDetailId)
-					console.log(b)
+								return
+							}
+						}
+					}
+					console.log(onNode.pkDetailId)
+					console.log(playHistory)
 					// 是否跳转自己
 					let jumpFlag = false
-					b.forEach( v => {
-						if(v == a.pkDetailId  ) {
-							jumpFlag  = true
+					playHistory.forEach(v => {
+						if (v == onNode.pkDetailId) {
+							jumpFlag = true
 						}
 					})
 					console.log(jumpFlag)
 					// 父节点跳转
-					for (let i = 0; i < b.length; i++) {
-						if (b[i] == c.pkDetailId) {
-							b.splice(i)
-							if ( i != 0) {
-								if (d !=null && d.length > 0) {
-									d.splice(i -1 )
+					for (let i = 0; i < playHistory.length; i++) {
+						if (playHistory[i] == playNode.pkDetailId) {
+							playHistory.splice(i)
+							if (i != 0) {
+								if (moreEndingHistory != null && moreEndingHistory.length > 0) {
+									moreEndingHistory.splice(i - 1)
 								}
 							}
-							
+
 						}
 					}
-					if (a.conditionState && !jumpFlag) {
+
+
+					if (this.endingFlag) {
+						if (nowFloor == 0) {
+							moreEndingHistory = []
+						} else {
+							moreEndingHistory.push(this.finduexTreeByPkDetailId(onNode.pkDetailId) + 1)
+						}
+					}
+					if (onNode.conditionState && !jumpFlag) {
 						console.log('我进来了')
+						this.moreEndingHistory = moreEndingHistory
+						this.playHistory = playHistory
+						this.onNode = onNode
+						this.jumpFlag = jumpFlag
 						this.showAdvertisingFlagStory = true
 						return
 						// this.$parent.showDialog()
 					}
 					//需要封装 重新吊起
-					if (this.endingFlag) {
-						if (nowFloor ==  0) {
-							d = [] 
-						}else {
-							d.push(this.finduexTreeByPkDetailId(a.pkDetailId)+1)
-						}
-					}					
-					uni.setStorageSync("multipleResultLine", d);
+					uni.setStorageSync("multipleResultLine", moreEndingHistory);
 					// 修改 storage 的播放历史
-					uni.setStorageSync("pkDetailIds", b);
+					uni.setStorageSync("pkDetailIds", playHistory);
 					this.$refs.uToast.show({
-						title: '选中跳转到' + a.selectTitle ,
+						title: '选中跳转到' + onNode.selectTitle,
 						type: 'success',
 					})
 					//使用组件跳转方式 传参
-					this.$emit("goPlay",{
-						 'pkArtworkId': this.pkArtworkId,
-						 'pkDetailId': a.pkDetailId,
-						 'jumpFlag':jumpFlag
-						 })
+					this.$emit("goPlay", {
+						'pkArtworkId': this.pkArtworkId,
+						'pkDetailId': onNode.pkDetailId,
+						'jumpFlag': jumpFlag
+					})
 				} else {
 					this.showToast('请滑动至选择中心位进行跳转')
 				}
@@ -320,35 +323,36 @@
 					type: 'error',
 				})
 			},
-			finduexTreeByPkDetailId (pkDetailId) {
-			  const newNodeData =  uni.getStorageSync("mainArtworkTree")
-			  let a 
-			  finduexTree(pkDetailId, newNodeData)
-			  return  a
-			  function finduexTree (pkDetileId, newNodeData) {
-			    if (newNodeData.pkDetileId == pkDetileId) {
-			       a = -1
-			    } else {
-			      if (newNodeData.childs != null) {
-			        newNodeData.childs.forEach( (v,i) => {
-			          if (v.pkDetailId == pkDetileId) {
-						a = i
-			            // return i
-			          }else{
-						  finduexTree( pkDetileId, v)
-					  }
-			        })
-			      }
-			    }
-			  }
-			 
+			finduexTreeByPkDetailId(pkDetailId) {
+				const newNodeData = uni.getStorageSync("mainArtworkTree")
+				let a
+				finduexTree(pkDetailId, newNodeData)
+				return a
+
+				function finduexTree(pkDetileId, newNodeData) {
+					if (newNodeData.pkDetileId == pkDetileId) {
+						a = -1
+					} else {
+						if (newNodeData.childs != null) {
+							newNodeData.childs.forEach((v, i) => {
+								if (v.pkDetailId == pkDetileId) {
+									a = i
+									// return i
+								} else {
+									finduexTree(pkDetileId, v)
+								}
+							})
+						}
+					}
+				}
+
 			},
 			//关闭广告框
 			closeDialog() {
 				this.showAdvertisingFlagStory = false
 			},
 			// 观看激励广告
-			openAdvertising () {
+			openAdvertising() {
 				this.showAdvertisingFlagStory = false
 				this.advertising = wx.createRewardedVideoAd({
 					adUnitId: 'adunit-7423fd1b2c7c5724'
@@ -357,61 +361,51 @@
 				this.advertising.onError(err => {
 					uni.showToast({
 						icon: 'none',
-						title:'获取激励视频失败，请重试'
+						title: '获取激励视频失败，请重试'
 					})
-					if(this.isVideoEndFlag){
-						if(this.isPosition == 1){
-							this.showCanvasFlag = true
-						}
-					}
 				})
 				// 激励广告显示并加载
 				if (this.advertising) {
 					this.advertising.load().then(() => {
-						this.advertising.show().then(() => {
-						})
+						this.advertising.show().then(() => {})
 					}).catch(() => {
-						if(this.isVideoEndFlag){
-							if(this.isPosition == 1){
-								this.showCanvasFlag = true
-							}
-						}
 						this.advertising.load().then(() => {
 							this.advertising.show().then(() => {
+
 							})
 						}).catch(() => {
-							if(this.isVideoEndFlag){
-								if(this.isPosition == 1){
-									this.showCanvasFlag = true
-								}
-							}
 							uni.showToast({
 								icon: 'none',
-								title:'激励视频加载失败，请重试'
+								title: '激励视频加载失败，请重试'
 							})
 						})
 					})
 				}
 				// 监听激励广告关闭
 				this.advertising.onClose((status) => {
-					if(this.isVideoEndFlag){
-						if(this.isPosition == 1){
-							this.showCanvasFlag = true
-						}
-					}else{
-						this.videoContext.play()
-					}
 					if (status.isEnded) {
-						if(this.conditionState[this.optionIndex] == 1){
-							//成功播放完广告
-							// this.customLightSuccessCallBack(this.optionIndex)
-							console.log('我可以去了')
-						}else{
-							console.log('给光')
-							globalBus.$emit('requestOfAES')
-						}
+
+						uni.setStorageSync("multipleResultLine", this.moreEndingHistory);
+						// 修改 storage 的播放历史
+						uni.setStorageSync("pkDetailIds", this.playHistory);
+						this.$refs.uToast.show({
+							title: '选中跳转到' + this.onNode.selectTitle,
+							type: 'success',
+						})
+						//使用组件跳转方式 传参
+						this.$emit("goPlay", {
+							'pkArtworkId': this.pkArtworkId,
+							'pkDetailId': this.onNode.pkDetailId,
+							'jumpFlag': this.jumpFlag
+						})
+						console.log('给光')
+
+
 					} else {
-						console.log('憨批用户不给光')
+						uni.showToast({
+							icon: 'none',
+							title: '未观看完广告无法跳转'
+						})
 					}
 					this.advertising.offClose()
 				})

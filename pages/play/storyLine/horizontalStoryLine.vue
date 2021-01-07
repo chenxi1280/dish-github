@@ -12,6 +12,20 @@
 <!-- 		<view class="cpt-mask-tips-bottom"> </view>
 		<view class="cpt-mask-tips-top"> </view> -->
 		<u-toast ref="uToast" />
+		<view>
+			<u-modal v-model="showAdvertisingFlagStory" title="温馨提示" :show-confirm-button="false" z-index="999">
+				<view class="slot-content">
+					<view style="padding: 0 20rpx;padding-top: 40rpx;">
+						<view>完整观看激励视频才可以跳转到该节点</view>
+						<view @click="openAdvertising" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
+							<image src="../../../static/icon/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
+							<view style="display: inline-block;margin-left: 10rpx;color: #fff;transform: translateY(-4rpx);">立即获取</view>
+						</view>
+						<view @click="closeDialog" style="position: absolute;right: 20rpx; top: 20rpx;width: 40rpx;height: 40rpx;text-align: center;line-height: 40rpx;font-size: 40rpx;">x</view>
+					</view>
+				</view>
+			</u-modal>
+		</view>
 	</view>
 </template>
 
@@ -53,7 +67,8 @@
 				isNumberFlag:false,
 				resData:[],
 				endingFlag: false,
-				lockEndingFloor: -1
+				lockEndingFloor: -1,
+				showAdvertisingFlagStory: false
 
 			}
 		},
@@ -218,96 +233,86 @@
 			goPlay(index, nowFloor) {
 				if (nowFloor == this.onfloor && index == this.oncolumn) {
 				
-					// 跳转的 节点
-					let a = this.floorList[nowFloor][index]
+					let onNode = this.floorList[nowFloor][index]
 					// 播放记录 
-					let b = uni.getStorageSync("pkDetailIds")
-					// 选中楼层的 第一个节点 
-					let c = this.floorList[nowFloor][0]
-					// 多节点播放记录  
-					let d = uni.getStorageSync("multipleResultLine")
-					// let mainArtworkTree  = uni.getStorageSync("mainArtworkTree")
+					let playHistory = uni.getStorageSync("pkDetailIds")
+					// 当前选中楼层的 播放的节点 
+					let playNode = this.floorList[nowFloor][0]
+					// 多节点播放记录
+					let moreEndingHistory = uni.getStorageSync("multipleResultLine")
 					
-					console.log(d)					
-					if (a.parentId == -1) {
+					if (onNode.parentId == -1) {
 						this.showToast('请选择上面有选项的进行跳转！')
 						return
 					}
 					if (this.endingFlag) {
-						if (nowFloor == this.lockEndingFloor){
+						if (nowFloor == this.lockEndingFloor) {
 							this.showToast('请选择上面一级跳转！')
 							return
 						}
 					}
-					
-					
-					if (a.isNumberSelect != null ) {
-							this.isNumberFlag = a.isNumberSelect + 0 == 1 
-					}
-
-					if (a.isNumberSelect != null) {
-						if ((a.isNumberSelect - 0) === 1) {
-							console.log('isNumberSelect:'+ a.isNumberSelect)
-							if (index != 0 ) {
+					if (onNode.isNumberSelect != null) {
+						if ((onNode.isNumberSelect - 0) === 1) {
+							if (index != 0) {
 								this.showToast('本选项数值选项，无法直接跳转，请在上级进行跳转')
-								return 
-							} 
-						}	
+								return
+							}
+						}
 					}
-						
-					// let jumpFlag = 0
+					console.log(onNode.pkDetailId)
+					console.log(playHistory)
+					// 是否跳转自己
 					let jumpFlag = false
-					b.forEach( v => {
-						if(v == a.pkDetailId  ) {
-							jumpFlag  = true
+					playHistory.forEach(v => {
+						if (v == onNode.pkDetailId) {
+							jumpFlag = true
 						}
 					})
+					console.log(jumpFlag)
 					// 父节点跳转
-					for (let i = 0; i < b.length; i++) {
-						if (b[i] == c.pkDetailId) {
-							b.splice(i)
-							if ( i != 0) {
-								if (d !=null && d.length > 0) {
-									d.splice(i -1 )
+					for (let i = 0; i < playHistory.length; i++) {
+						if (playHistory[i] == playNode.pkDetailId) {
+							playHistory.splice(i)
+							if (i != 0) {
+								if (moreEndingHistory != null && moreEndingHistory.length > 0) {
+									moreEndingHistory.splice(i - 1)
 								}
 							}
-							
+					
 						}
 					}
-					// console.log(a.pkDetailId)
-					// // console.log("递归结果："+ this.finduexTreeByPkDetailId(a.pkDetailId))
-					// console.log(nowFloor)
 					if (this.endingFlag) {
-						if (nowFloor ==  0) {
-							d = [] 
-						}else {
-							d.push(this.finduexTreeByPkDetailId(a.pkDetailId)+1)
+						if (nowFloor == 0) {
+							moreEndingHistory = []
+						} else {
+							moreEndingHistory.push(this.finduexTreeByPkDetailId(onNode.pkDetailId) + 1)
 						}
-					}	
-					
-					// this.resData.forEach( v => {
-					// 	if (c.pkDetailId == v.pkDetailId ) {
-					// 		v.brotherNode.forEach( (n,i)=> {
-					// 			if ( a.pkDetailId == n.pkDetailId ) {
-									// d.push(i+1)
-					// 			}
-					// 		})
-					// 	}
-					// })
-
-					uni.setStorageSync("multipleResultLine", d);
-					uni.setStorageSync("pkDetailIds", b);
+					}
+					if (onNode.conditionState && !jumpFlag) {
+						console.log('我进来了')
+						this.moreEndingHistory = moreEndingHistory
+						this.playHistory = playHistory
+						this.onNode = onNode
+						this.jumpFlag = jumpFlag
+						this.showAdvertisingFlagStory = true
+						return
+						// this.$parent.showDialog()
+					}
+					//需要封装 重新吊起
+					uni.setStorageSync("multipleResultLine", moreEndingHistory);
+					// 修改 storage 的播放历史
+					uni.setStorageSync("pkDetailIds", playHistory);
 					this.$refs.uToast.show({
-						title: '选中跳转到' + a.selectTitle ,
+						title: '选中跳转到' + onNode.selectTitle,
 						type: 'success',
 					})
-					
 					//使用组件跳转方式 传参
-					this.$emit("goPlay",{
-					'pkArtworkId': this.pkArtworkId,
-					'pkDetailId': a.pkDetailId,
-					'jumpFlag':jumpFlag
+					this.$emit("goPlay", {
+						'pkArtworkId': this.pkArtworkId,
+						'pkDetailId': onNode.pkDetailId,
+						'jumpFlag': jumpFlag
 					})
+					
 				} else {
 					this.showToast('请滑动至选择中心位进行跳转')
 				}
@@ -340,6 +345,68 @@
 			    }
 			  }
 			 
+			},
+			closeDialog() {
+				this.showAdvertisingFlagStory = false
+			},
+			// 观看激励广告
+			openAdvertising() {
+				this.showAdvertisingFlagStory = false
+				this.advertising = wx.createRewardedVideoAd({
+					adUnitId: 'adunit-7423fd1b2c7c5724'
+				})
+				//捕捉错误
+				this.advertising.onError(err => {
+					uni.showToast({
+						icon: 'none',
+						title: '获取激励视频失败，请重试'
+					})
+				})
+				// 激励广告显示并加载
+				if (this.advertising) {
+					this.advertising.load().then(() => {
+						this.advertising.show().then(() => {})
+					}).catch(() => {
+						this.advertising.load().then(() => {
+							this.advertising.show().then(() => {
+			
+							})
+						}).catch(() => {
+							uni.showToast({
+								icon: 'none',
+								title: '激励视频加载失败，请重试'
+							})
+						})
+					})
+				}
+				// 监听激励广告关闭
+				this.advertising.onClose((status) => {
+					if (status.isEnded) {
+			
+						uni.setStorageSync("multipleResultLine", this.moreEndingHistory);
+						// 修改 storage 的播放历史
+						uni.setStorageSync("pkDetailIds", this.playHistory);
+						this.$refs.uToast.show({
+							title: '选中跳转到' + this.onNode.selectTitle,
+							type: 'success',
+						})
+						//使用组件跳转方式 传参
+						this.$emit("goPlay", {
+							'pkArtworkId': this.pkArtworkId,
+							'pkDetailId': this.onNode.pkDetailId,
+							'jumpFlag': this.jumpFlag
+						})
+						console.log('给光')
+			
+			
+					} else {
+						uni.showToast({
+							icon: 'none',
+							title: '未观看完广告无法跳转'
+						})
+					}
+					this.advertising.offClose()
+				})
 			}
 		}
 	}
