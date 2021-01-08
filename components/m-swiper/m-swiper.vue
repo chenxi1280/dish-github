@@ -22,7 +22,9 @@
 					}">
 					<view v-show="!item.isWatch && !(isBig && (uCurrent == index)) " style="font-size:200rpx; padding-left: 36rpx;">?</view>
 					<view v-show="!item.isWatch && (isBig && (uCurrent == index))" style="font-size:200rpx; text-align: center;">?</view>
-						<text>{{ item.title }}</text>
+					<view v-if="item.conditionState == 1 && index != 0"  class="u-ad-tips" > AD </view>
+					<!-- <view v-if="index != 0 " style="padding-left: 4rpx; padding-right: 4rpx;border: 2rpx solid white;display: inline-block;margin-right: 8rpx;color: #FFF;font-size: 24rpx;" > AD </view> -->
+					<text>{{ item.title }}</text>
 					</view>
 				</view>
 			</swiper-item>
@@ -232,9 +234,6 @@
 </script>
 
 <style lang="scss" scoped>
-	.demo {
-		
-	}
 
 	.u-swiper-wrap {
 		position: relative;
@@ -343,4 +342,16 @@
 		width: 117px !important;
 		margin-left: 150rpx;
 	}
+	.u-ad-tips {
+		padding-left: 4rpx;
+		padding-right: 4rpx;
+		border: 2rpx solid white;
+		display: inline-block;
+		margin-right: 8rpx;
+		color: #FFF;
+		font-size: 24rpx;
+		
+	}
+	
+	
 </style>

@@ -25,6 +25,7 @@
 						<view class="u-swiper-title"   :style="{ height :  item.isWatch ? '50px': '117px',left: item.isWatch ? '-84px': '-45px'}" >	
 							<view v-show="!item.isWatch && !(isBig && (uCurrent == index))" style="font-size:106rpx; text-align: center;">?</view>
 							<view v-show="!item.isWatch &&  (isBig && (uCurrent == index))" style="font-size:106rpx; text-align: center;">?</view>
+							<view v-if="item.conditionState == 1 && index != 0"  class="u-ad-tips" > AD </view>
 							<text style="margin-left: 8px; margin-top: 0px;">{{ item.title }}</text>
 						</view>
 				</view>
@@ -303,5 +304,15 @@
 		height: 208px !important;
 		margin-left: 170rpx;
 		// border: 1px solid;
+	}
+	.u-ad-tips {
+		padding-left: 4rpx;
+		padding-right: 4rpx;
+		border: 2rpx solid white;
+		display: inline-block;
+		margin-right: 8rpx;
+		color: #FFF;
+		font-size: 24rpx;
+		
 	}
 </style>
