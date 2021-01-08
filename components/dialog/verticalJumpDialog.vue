@@ -17,19 +17,27 @@
 		props: {
 			imageUrl: {
 				type: String,
-				default: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605600100857%E5%9C%86%E5%BD%A2%E7%94%A8JPG.jpg'
+				default: null
 			},
 			navigatorUrl: {
 				type: String,
-				default: 'pages/index/index'
+				default: null
 			},
 			appId: {
 				type: String,
-				default: 'wx25e1eb19e2d9e715'
+				default: null
 			},
-			artworkName:{
+			artworkId:{
 				type: String,
-				default: '灵巫'
+				default: null
+			},
+			popupPosition: {
+				type: Number,
+				default: 2
+			},
+			artworkTree: {
+				type: Object,
+				default: null
 			}
 		},
 		onReady() {
@@ -41,25 +49,32 @@
 		methods: {
 			closeDialog(){
 				this.verticalJumpDialogFlag = false
+				if(this.popupPosition == 1){
+					this.$emit("videoEnd",true)
+				}else{
+					this.$emit("initPlayData",this.artworkTree,true)
+				}
 			},
 			JumpToOtherApplets(){
 				console.log("进来跳转了")
-				uni.navigateToMiniProgram({
-					appId: this.appId,
-					path: this.navigatorUrl,
-					envVersion: 'release',
-					extraData: {
-					          source:'CandleWitches',
-					          miniProgramName:'灵巫互动',
-					          artwork: this.artworkName
-					},
-					success(res){
-						console.log('跳转成功')
-					},
-					fail(res){
-						console.log('跳转失败: ',res)
-					}
-				})
+				if(this.appId && this.navigatorUrl){
+					uni.navigateToMiniProgram({
+						appId: this.appId,
+						path: this.navigatorUrl,
+						envVersion: 'release',
+						extraData: {
+						          source:'CandleWitches',
+						          miniProgramName:'灵巫互动',
+						          artwork: this.artworkId
+						},
+						success(res){
+							console.log('跳转成功')
+						},
+						fail(res){
+							console.log('跳转失败: ',res)
+						}
+					})
+				}
 			}
 		}
 	}
