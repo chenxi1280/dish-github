@@ -17,7 +17,8 @@
 			<u-modal v-model="showAdvertisingFlag" title="温馨提示" :show-confirm-button="false" z-index="999">
 				<view class="slot-content">
 					<view style="padding: 0 20rpx;padding-top: 40rpx;">
-						<view>完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view>
+						<view v-if="isHaveLight">观看作品过程中会消耗光，完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view>
+						<view v-if="!isHaveLight">当前光的数量不足，完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view>
 						<view @click="openAdvertising" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
 							<image src="../../static/icon/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
 							<view style="display: inline-block;margin-left: 10rpx;color: #fff;transform: translateY(-4rpx);">立即获取</view>
@@ -31,7 +32,8 @@
 			<u-modal v-model="showAdvertisingFlag" title="温馨提示" :show-confirm-button="false" z-index="999">
 				<view class="slot-content">
 					<view style="padding: 0 20rpx;padding-top: 40rpx;">
-						<view>完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view>
+						<view v-if="isHaveLight">观看作品过程中会消耗光，完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view>
+						<view v-if="!isHaveLight">当前光的数量不足，完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view>
 						<view @click="openAdvertising" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
 							<image src="../../static/icon/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
 							<view style="display: inline-block;margin-left: 10rpx;color: #fff;transform: translateY(-4rpx);">立即获取</view>
@@ -265,11 +267,11 @@
 			ref="horizontalJumpDialog">
 			</horizontal-jump-dialog>
 		</view>
-		<view v-if="popupNameState">
-			<view class="verticalPopupNameBox" v-if="!isPosition">
+		<view v-if="popupTotalNumber > 0 ? true : false">
+			<view class="verticalPopupNameBox" v-if="!playMode">
 				<text>{{popupName+": "+popupCountNumber+"/"+popupTotalNumber}}</text>
 			</view>
-			<view class="horizontalPopupNameBox" v-if="isPosition">
+			<view class="horizontalPopupNameBox" v-if="playMode">
 				<text>{{popupName+": "+popupCountNumber+"/"+popupTotalNumber}}</text>
 			</view>
 		</view>
@@ -295,6 +297,8 @@
 		},
 		data() {
 			return {
+				// 是否有光
+				isHaveLight: true,
 				//定位选项标志
 				isPosition: 0,
 				//定位选项数据
@@ -680,6 +684,11 @@
 					})
 					if(this.isVideoEndFlag){
 						if(this.isPosition == 1){
+							if(this.playMode == 1){
+								this.initHorizontalCanvas()
+							}else{
+								this.initVerticalCanvas()
+							}
 							this.showCanvasFlag = true
 						}
 					}
@@ -708,6 +717,16 @@
 								icon: 'none',
 								title:'激励视频加载失败，请重试'
 							})
+							if(this.isVideoEndFlag){
+								if(this.isPosition == 1){
+									if(this.playMode == 1){
+										this.initHorizontalCanvas()
+									}else{
+										this.initVerticalCanvas()
+									}
+									this.showCanvasFlag = true
+								}
+							}
 						})
 					})
 				}
@@ -715,6 +734,11 @@
 				this.advertising.onClose((status) => {
 					if(this.isVideoEndFlag){
 						if(this.isPosition == 1){
+							if(this.playMode == 1){
+								this.initHorizontalCanvas()
+							}else{
+								this.initVerticalCanvas()
+							}
 							this.showCanvasFlag = true
 						}
 					}else{
@@ -739,6 +763,16 @@
 							}
 						}
 					} else {
+						if(this.isVideoEndFlag){
+							if(this.isPosition == 1){
+								if(this.playMode == 1){
+									this.initHorizontalCanvas()
+								}else{
+									this.initVerticalCanvas()
+								}
+								this.showCanvasFlag = true
+							}
+						}
 						console.log('憨批用户不给光')
 					}
 					this.advertising.offClose()
@@ -848,6 +882,12 @@
 			},
 			//对节点播放数据进行筛选和提取
 			initPlayData(artworkTree, isJumpDialogCallbackFlag){
+				if(artworkTree.parentId === 0 ){
+					if(this.popupTotalNumber > 0){
+						this.popupName = artworkTree.popupName
+					}
+				}
+				this.detailId = artworkTree.pkDetailId
 				//获取用户的弹窗弹出数量
 				let popupWindowRecord = uni.getStorageSync('popupWindowRecord')
 				//存储弹窗跳回传参用
@@ -855,14 +895,14 @@
 				//初始化条件设置的容器
 				this.conditionState = []
 				//初始化是否显示弹窗
-				this.popupState = artworkTree.popupState
+				this.popupState = uni.getStorageSync('popupState')
+				console.log('this.popupState: ',this.popupState)
 				if(this.popupState == 1){
-					this.popupSettings = artworkTree.ecmArtworkNodePopupSettings
+					this.popupSettings = uni.getStorageSync('popupSettings')
 					this.handlePopupSettings()
 				}
 				console.log('isJumpDialogCallbackFlag: ',isJumpDialogCallbackFlag)
 				if(!isJumpDialogCallbackFlag && this.popupPosition == 0 && this.popupState == 1){
-					console.log('isJumpDialogCallbackFlag: ',0)
 					this.popupWindowByPopupPositonEqualsZero()
 					return
 				}
@@ -890,7 +930,6 @@
 				const uuid = Math.random().toString(36).substring(2)
 				//初始化视频及选项
 				this.videoUrl = artworkTree.videoUrl+'?uuid='+uuid
-				this.detailId = artworkTree.pkDetailId
 				this.parentId = artworkTree.parentId
 				this.imageSrc = artworkTree.nodeLastImgUrl
 				//如果是根节点初始化存储节点分值的容器
@@ -921,14 +960,14 @@
 							this.calculateOptionScore(childs[i])
 						}else{
 							//普通选项
+							let conditionState = childs[i].conditionState
+							if(conditionState == 1){
+								this.conditionState.push(1)
+							}else{
+								this.conditionState.push(0)
+							}
 							this.option.push(childs[i].selectTitle)
 							this.childs.push(childs[i])
-						}
-						let conditionState = childs[i].conditionState
-						if(conditionState == 1){
-							this.conditionState.push(1)
-						}else{
-							this.conditionState.push(0)
 						}
 					}
 					console.log('this.conditionState: ',this.conditionState)
@@ -1041,39 +1080,40 @@
 			savaPopupWindowRecord(){
 				let popupWindowRecord = uni.getStorageSync('popupWindowRecord')
 				let value = []
-				value.push(this.detailId)
+				let detailId = uni.getStorageSync('pkDetailId')
+				value.push(detailId)
 				this.popupRecord[this.artworkId] = value
 				// console.log('artworkId: ',this.artworkId)
-				// console.log('detailId: ',this.detailId)
-				if(this.detailId != null && this.popupState == 1){
+				// console.log('detailId: ',detailId)
+				if(detailId != null && this.popupState == 1){
 					if(!popupWindowRecord){
 						uni.setStorageSync('popupWindowRecord', this.popupRecord)
 					}else{
 						let currentPopupWindowRecord = popupWindowRecord[this.artworkId]
 						if(!currentPopupWindowRecord){
-							uni.setStorageSync('popupWindowRecord', this.popupRecord)
+							popupWindowRecord[this.artworkId] = this.popupRecord[Object.keys(this.popupRecord)]
+							uni.setStorageSync('popupWindowRecord', popupWindowRecord)
 						}else{
-							let checkResult = currentPopupWindowRecord.indexOf(this.detailId)
+							let checkResult = currentPopupWindowRecord.indexOf(detailId)
 							if(checkResult > -1){
 								//当前弹窗弹出已记录了不需要再记录
 							}else{
 								//当前弹窗未记录
-								currentPopupWindowRecord.push(this.detailId)
+								currentPopupWindowRecord.push(detailId)
 								this.popupRecord[this.artworkId] = currentPopupWindowRecord
-								uni.setStorageSync('popupWindowRecord', this.popupRecord)
+								popupWindowRecord[this.artworkId] = this.popupRecord[Object.keys(this.popupRecord)]
+								uni.setStorageSync('popupWindowRecord', popupWindowRecord)
 							}
 						}
 					}
 				}
 			},
 			handlePopupSettings(){
-				//弹窗所需要的三个参数 暂时缺少appid
+				this.popupPosition = this.popupSettings.popupPosition
+				this.popupContextState = this.popupSettings.popupContextStates
+				this.popupNameState = this.popupSettings.popupNameState
 				this.navigatorUrl = this.popupSettings.popupSkip
 				this.popupImageUrl = this.popupSettings.popupContext
-				this.popupPosition = this.popupSettings.popupPosition
-				this.popupContextState = this.popupSettings.popupContextState
-				this.popupName = this.popupSettings.popupName
-				this.popupNameState = this.popupSettings.popupNameState
 				this.appId = this.popupSettings.popupAppId
 			},
 			// 计算选项分数判断是否显示
@@ -1103,6 +1143,12 @@
 				}
 				if(optionFlag){
 					//分值检测通过将数据装入容器待展示
+					let conditionState = child.conditionState
+					if(conditionState == 1){
+						this.conditionState.push(1)
+					}else{
+						this.conditionState.push(0)
+					}
 					this.childs.push(child)
 					this.option.push(child.selectTitle)
 				}else{
@@ -1149,6 +1195,8 @@
 				});
 			},
 			async customLightByUserId(eventId){
+				// 默认假设有光
+				this.isHaveLight = true
 				//故事线消费的eventId = 3
 				//初次播放消费eventId = 4
 				await uni.request ({
@@ -1165,6 +1213,7 @@
 							this.setLight(result.data.data)
 							this.customLightSuccessCallBack(this.optionIndex)
 						}else if(result.data.status == 10086){
+							this.isHaveLight = false
 							this.showCanvasFlag = false
 							this.showAdvertisingFlag = true
 						}
@@ -1245,7 +1294,9 @@
 							uni.setStorageSync("artworkTree",res.data.data);
 							uni.setStorageSync('playMode',res.data.data.playMode);
 							uni.setStorageSync('isEndings',res.data.data.isEndings ); 
+							uni.setStorageSync('popupState',res.data.data.popupState)
 							this.popupState = res.data.data.popupState
+							uni.setStorageSync('popupSettings',res.data.data.ecmArtworkNodePopupSettings)
 							// console.log('storyPopupState',	this.popupState)
 							this.initPlayData(res.data.data, false);
 						}else{
@@ -1423,8 +1474,11 @@
 				//获取用户的弹窗弹出数量
 				let popupWindowRecord = uni.getStorageSync('popupWindowRecord')
 				console.log('isJumpDialogCallbackFlag: ',isJumpDialogCallbackFlag)
-				this.percent = 100
-				this.isVideoEndFlag = true
+				this.popupState = uni.getStorageSync('popupState');
+				console.log('this.popupState: ',this.popupState)
+				console.log('this.popupPosition: ',this.popupPosition)
+				uni.removeStorageSync('popupState')
+				uni.removeStorageSync('popupSettings')
 				if(!isJumpDialogCallbackFlag && this.popupState == 1 && this.popupPosition == 1){
 					console.log('isJumpDialogCallbackFlag: ',1)
 					this.popupWindowByPopupPositonEqualsOne()
@@ -1440,6 +1494,8 @@
 						this.popupCountNumber = currentPopupWindowRecord.length
 					}
 				}
+				this.percent = 100
+				this.isVideoEndFlag = true
 				if(this.endFlag){
 					if(this.isPosition == 1){
 						this.chooseTipsShowFlag = false
@@ -1604,10 +1660,24 @@
 						this.chooseTipsShowFlag = false
 						this.chooseTipsMaskFlag = false
 						uni.setStorageSync('userScore', userScore)
+						let popupState = this.childs[index].popupState
+						if(popupState == 1){
+							uni.setStorageSync('pkDetailId', this.childs[index].pkDetailId)
+						}
+						let popupSettings = this.childs[index].ecmArtworkNodePopupSettings
+						uni.setStorageSync('popupState',popupState)
+						uni.setStorageSync('popupSettings',popupSettings)
 						this.initPlayData(this.childs[index], false)
 					}else{
 						this.chooseTipsShowFlag = false
 						this.chooseTipsMaskFlag = false
+						let popupState = this.childs[index].popupState
+						let popupSettings = this.childs[index].ecmArtworkNodePopupSettings
+						if(popupState == 1){
+							uni.setStorageSync('pkDetailId', this.childs[index].pkDetailId)
+						}
+						uni.setStorageSync('popupState',popupState)
+						uni.setStorageSync('popupSettings',popupSettings)
 						this.initPlayData(this.childs[index], false)
 					}
 				}
@@ -2100,7 +2170,7 @@
 			// canvas的touchEnd事件
 			canvasTouchendEvent(){
 				console.log('this.touchRectNum: '+this.touchRectNum)
-				if(this.touchRectNum == 0){
+				if(this.touchRectNum == 0){ 
 					this.clickPositionOptionTodo()
 				}else if(this.touchRectNum == 1){
 					this.clickPositionOptionTodo()
@@ -2171,9 +2241,23 @@
 						}
 						this.showCanvasFlag = false
 						uni.setStorageSync('userScore', userScore)
+						let popupState = this.childs[this.touchRectNum].popupState
+						if(popupState == 1){
+							uni.setStorageSync('pkDetailId', this.childs[this.touchRectNum].pkDetailId)
+						}
+						let popupSettings = this.childs[this.touchRectNum].ecmArtworkNodePopupSettings
+						uni.setStorageSync('popupState',popupState)
+						uni.setStorageSync('popupSettings',popupSettings)
 						this.initPlayData(this.childs[this.touchRectNum], false)
 					}else{
 						this.showCanvasFlag = false
+						let popupState = this.childs[this.touchRectNum].popupState
+						let popupSettings = this.childs[this.touchRectNum].ecmArtworkNodePopupSettings
+						if(popupState == 1){
+							uni.setStorageSync('pkDetailId', this.childs[this.touchRectNum].pkDetailId)
+						}
+						uni.setStorageSync('popupState',popupState)
+						uni.setStorageSync('popupSettings',popupSettings)
 						this.initPlayData(this.childs[this.touchRectNum], false)
 					}
 				}
@@ -2649,6 +2733,7 @@
 			border-radius: 30rpx;
 			text-align: left;
 			text{
+				padding: 20rpx;
 				font-size: 30rpx;
 				color: white;
 				line-height: 60rpx;
@@ -2665,6 +2750,7 @@
 			border-radius: 30rpx;
 			text-align: left;
 			text{
+				padding: 20rpx;
 				font-size: 30rpx;
 				color: white;
 				line-height: 60rpx;

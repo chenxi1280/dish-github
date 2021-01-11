@@ -90,16 +90,16 @@
 			width: 100%;
 			height: 100%;
 			background-color: rgba(0, 0, 0, .8);
-			z-index: 10;
+			z-index: 17;
 			image{
 				position: absolute;
 				left: 50%;
 				top: 50%;
 				transform: translate(-50%, -50%);
-				width: 400rpx;
-				height: 400rpx;
-				border-radius: 40rpx;
-				z-index: 15;
+				width: 500rpx;
+				height: 500rpx;
+				// border-radius: 40rpx;
+				z-index: 18;
 			}
 			icon{
 				position: absolute;
@@ -109,7 +109,7 @@
 				height: 60rpx;
 				background: url(../../static/icon/dialogClose.png) no-repeat center;
 				background-size: 60rpx;
-				z-index: 15;
+				z-index: 18;
 			}
 		}
 	}

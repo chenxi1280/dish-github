@@ -97,9 +97,9 @@
 				left: 50%;
 				top: 50%;
 				transform: translate(-50%, -50%) rotateZ(90deg);
-				width: 400rpx;
-				height: 400rpx;
-				border-radius: 40rpx;
+				width: 500rpx;
+				height: 500rpx;
+				// border-radius: 40rpx;
 				z-index: 18;
 			}
 			icon{
