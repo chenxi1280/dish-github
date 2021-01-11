@@ -1173,6 +1173,21 @@
 					}
 				}
 			},
+			async savaOptionSelectionRecord(){
+				await uni.request ({
+					url: baseURL + "",
+					method: 'POST',
+					dataType: 'json',
+					data: {
+						pkArtworkId: this.artworkId,
+						parentId: this.parentId,
+						pkDetailId: this.detailId
+					},
+					success: result=> {
+						
+					}
+				});
+			},
 			async getUserIdByArtwordId(a){
 				await uni.request ({
 					url: baseURL + "/wxPlay/getUserIdByArtwordId",
