@@ -49,10 +49,25 @@
 		methods: {
 			closeDialog(){
 				this.verticalJumpDialogFlag = false
-				if(this.popupPosition == 1){
-					this.$emit("videoEnd",true)
+				let isEndings = uni.getStorageSync('isEndings')
+				if(!uni.getStorageSync('replay')){
+					if(isEndings == 1 && uni.getStorageSync('isEndingsJump')){
+						uni.setStorageSync('isEndingsJump',false)
+						if(this.popupPosition == 1){
+							this.$emit("videoEnd",true)
+						}else{
+							this.$emit("multipleResultCallbackTodo",true)
+						}
+					}else{
+						if(this.popupPosition == 1){
+							this.$emit("videoEnd",true)
+						}else{
+							this.$emit("initPlayData",this.artworkTree,true)
+						}
+					}
 				}else{
-					this.$emit("initPlayData",this.artworkTree,true)
+					uni.setStorageSync('replay',false)
+					this.$emit("closeChooseTips",true)
 				}
 			},
 			JumpToOtherApplets(){
