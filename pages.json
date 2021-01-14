@@ -4,6 +4,12 @@
 	},
 	"pages": [
 		{
+			"path": "pages/ad/adPage",
+			"style": {
+				"navigationBarTitleText": "广告"
+			}
+		},
+		{
 			"path": "pages/dishover/dishover",
 			"style": {
 				"navigationBarTitleText": "发现"
@@ -59,12 +65,7 @@
 		{
 			"path": "pages/mine/verfied"
 		},
-		{
-			"path": "pages/ad/adPage",
-			"style": {
-				"navigationBarTitleText": "广告"
-			}
-		},
+		
 		{
 			"path": "pages/search/result/result",
 			"style": {
