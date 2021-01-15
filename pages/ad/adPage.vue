@@ -1,17 +1,16 @@
 <template>
 	<view>
-		<view class="playBox" >
-			<view class="play" >
+		<view class="playBox">
+			<view class="play">
 				<!-- 定位选项画布 -->
 				<view class="container" v-show="showCanvasFlag" :style="{'width': videoWide+'px', 'height': videoHigh+'px'}">
-					<canvas type="2d" id='posterCanvas' :style="{'width': videoWide+'px', 'height': videoHigh+'px'}" ></canvas>
+					<canvas type="2d" id='posterCanvas' style="width: 100%; height: 100%;"></canvas>
 				</view>
 				<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" -->
 				<view class="videoBox">
-					<video :src="videoUrl" :loop="true" @timeupdate="getNewVideoPlayTime"
-					 :autoplay="true"  :style="{'width': videoWide+'px', 'height': videoHigh+'px'}"></video>
+					<video :src="videoUrl" :loop="true" @timeupdate="getNewVideoPlayTime" :autoplay="true" :style="{'width': videoWide+'px', 'height': videoHigh+'px'}"></video>
 					<!-- 视频播放结束触发事件显示最后一帧截图 -->
-	<!-- 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
+					<!-- 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
 						'background-repeat':'no-repeat', backgroundSize:'100% 100%'}"></view> -->
 				</view>
 			</view>
@@ -30,189 +29,303 @@
 				playGestureFlag: true,
 				//是否开启进度控制手势开关
 				progressGestureFlag: true,
-				showCanvasFlag:false,
+				showCanvasFlag: false,
 				videoHigh: 603,
 				videoWide: 375,
 				videoUrl: '',
 				ecmArtworkNodeBuoy: {
 					buoyWide: 0.3,
-					buoyHigh:0.1,
-					buoyOpacity:0.4,
-					buoySectionTime:0,
+					buoyHigh: 0.1,
+					buoyOpacity: 0.4,
+					buoySectionTime: 0,
 					buoyCoordinateX: 0.46,
-					buoyCoordinateY:0.42,
+					buoyCoordinateY: 0.42,
 					buoyType: 0
 				},
-				ecmArtworkNodeBuoyList:[
-					
+				ecmArtworkNodeBuoyList:[ [
+
+					{
+						buoyWide: 0.1,
+						buoyHigh: 0.1,
+						buoyOpacity: 0.4,
+						buoySectionTime: 1,
+						buoyCoordinateX: 0.10,
+						buoyCoordinateY: 0.0,
+						buoyType: 0,
+						nodeId: 1
+					},
+					{
+						buoyWide: 0.1,
+						buoyHigh:0.1,
+						buoyOpacity:0.4,
+						buoySectionTime: 5,
+						buoyCoordinateX: 0.90,
+						buoyCoordinateY:0.90,
+						buoyType: 1,
+						nodeId: 1
+					},
 					{
 						buoyWide: 0.3,
 						buoyHigh:0.1,
 						buoyOpacity:0.4,
-						buoySectionTime:1,
+						buoySectionTime:8,
+						buoyCoordinateX: 0.60,
+						buoyCoordinateY:0.40,
+						buoyType: 1 ,
+						nodeId: 1	
+					},
+					{
+						buoyWide: 0.3,
+						buoyHigh:0.1,
+						buoyOpacity:0.4,
+						buoySectionTime:12,
+						buoyCoordinateX: 0.40,
+						buoyCoordinateY:0.50,
+						buoyType: 1	,
+						nodeId: 1
+					},
+					{
+						buoyWide: 0.3,
+						buoyHigh:0.1,
+						buoyOpacity:0.4,
+						buoySectionTime:24,
 						buoyCoordinateX: 0.40,
 						buoyCoordinateY:0.30,
-						buoyType: 0
+						buoyType: 1,
+						nodeId: 1
 					}
-					// ,
-					// {
-					// 	buoyWide: 0.3,
-					// 	buoyHigh:0.1,
-					// 	buoyOpacity:0.4,
-					// 	buoySectionTime:2,
-					// 	buoyCoordinateX: 0.50,
-					// 	buoyCoordinateY:0.50,
-					// 	buoyType: 1
-					// },
-					// {
-					// 	buoyWide: 0.3,
-					// 	buoyHigh:0.1,
-					// 	buoyOpacity:0.4,
-					// 	buoySectionTime:3,
-					// 	buoyCoordinateX: 0.60,
-					// 	buoyCoordinateY:0.40,
-					// 	buoyType: 1 	
-					// },
-					// {
-					// 	buoyWide: 0.3,
-					// 	buoyHigh:0.1,
-					// 	buoyOpacity:0.4,
-					// 	buoySectionTime:4,
-					// 	buoyCoordinateX: 0.40,
-					// 	buoyCoordinateY:0.50,
-					// 	buoyType: 1	
-					// },
-					// {
-					// 	buoyWide: 0.3,
-					// 	buoyHigh:0.1,
-					// 	buoyOpacity:0.4,
-					// 	buoySectionTime:5,
-					// 	buoyCoordinateX: 0.40,
-					// 	buoyCoordinateY:0.30,
-					// 	buoyType: 1
-					// }
-					
-				]
+
+				] ],
+				ctx: null,
+				canvas: null,
+				buoyRectList:[]
 
 			}
 		},
 
 		onReady(option) {
-			
+
 		},
 		onLoad() {
 			this.canvasWidth = this.videoWide
 			this.canvasHeight = this.videoHigh
-			setTimeout( () => {			
-				this.getVideoUrl()
-				this.showCanvasFlag = true
-				this.initVerticalCanvas() 
-			},50)
-
+			this.initVerticalCanvas()
+			this.getVideoUrl()
+			this.showCanvasFlag = true
 		},
 		methods: {
-			getVideoUrl(){
-				
-				this.videoUrl = 'http://1500001548.vod2.myqcloud.com/438200a2vodtranscq1500001548/75f8d9f45285890810335596738/v.f100020.mp4'
-			
+			getVideoUrl() {
+				this.videoUrl =
+					'http://1500001548.vod2.myqcloud.com/438200a2vodtranscq1500001548/75f8d9f45285890810335596738/v.f100020.mp4'
 			},
 			//初始化竖屏canvas画布
-			initVerticalCanvas(){
-				this.rectArray = []
+			initVerticalCanvas() {
 				// const ctx = wx.getContext('myCanvas')
 				// // console.log('画布的宽: ',this.canvasWidth)
 				// // console.log('画布的高: ',this.canvasHeight)
 				// ctx.clearRect(0 , 0 , this.canvasWidth, this.canvasHeight)
-				
-				 const query = wx.createSelectorQuery()
-				    query.select('#posterCanvas')
-				      .fields({ node: true, size: true })
-				      .exec( (res) => {
-				        const canvas = res[0].node;
+				const query = wx.createSelectorQuery()
+				query.select('#posterCanvas')
+					.fields({
+						node: true,
+						size: true
+					})
+					.exec((res) => {
+						const canvas = res[0].node;
+						this.canvas = canvas
+						canvas.width = this.canvasWidth
+						canvas.height = this.canvasHeight
 						const ctx = canvas.getContext('2d')
+						this.ctx = ctx
+						console.log(canvas)
+						// this.initializationBuoyList()
+						// canvas.requestAnimationFrame(this.draw())
+
+						// 设置 canvas 坐标原点
+						// ctx.translate(width/2, height * 2 / 3);
+						// ctx.scale(dpr, dpr)
+						// this.initializationBuoyBall()
+						// this.ball.draw()
+						// canvas.addEventListener('mouseover', function(e){
+						// });
+						// ball.draw();
 						
-						//初始化 浮标  demo 只有一个
-						this.ecmArtworkNodeBuoyList.forEach( (v,index) => {
-							let rectOpacity =v.buoyOpacity + 0
-							
-							let rectX = parseInt(((v.buoyCoordinateX+0)*this.canvasWidth).toFixed(0)) 
-							// console.log('矩形框的x轴坐标: ',rectX)
-							let rectY = parseInt(((v.buoyCoordinateY+0)*this.canvasHeight).toFixed(0))
-							// console.log('矩形框的y轴坐标: ',rectY)
-							//矩形框高度
-							let rectH = parseInt(((v.buoyHigh+0)*this.canvasHeight).toFixed(0))
-							// console.log('矩形框的高: ',rectH)
-							//矩形框宽度
-							let rectW = parseInt(((v.buoyWide+0)*this.canvasWidth).toFixed(0))
-							// console.log('矩形框的宽: ',rectW)
-							//画矩形
-							console.log(ctx, rectX, rectY, rectW, rectH)
-							this.drawTransparentRect(ctx, rectX, rectY, rectW, rectH, rectOpacity,index)
-							// canvas.requestAnimationFrame(this.run(ctx, rectX, rectY, rectW, rectH, rectOpacity))
-							
+						
+						// this.initializationBuoyList()
+						// canvas.requestAnimationFrame( () => this.draw())
+					})
 
-							// setInterval(() => {
-							// 	this.run(ctx, rectX, rectY, rectW, rectH, rectOpacity)
-							// 	rectX = rectX - 5;
-								
-							// }, 16);
-							
-						})
-						console.log(ctx)
-				
-						})
-				// query.requestAnimationFrame(a())
+			},
+			draw() {
+				// console.log(this.rect)
+				this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+				this.buoyRectList.forEach( (v,index) => {
 					
-				
-
-				
-				
+					if (v.y + v.vy > this.canvas.height || v.y + v.vy < 0) {
+						v.vy = - v.vy;
+					}
+					if (v.x + v.vx > this.canvas.width || v.x + v.vx < 0) {
+						v.vx = - v.vx;
+					}
+					v.draw();
+					v.x += v.vx;
+					v.y += v.vy;
+				})
+				this.canvas.requestAnimationFrame(() => this.draw());
 			},
-			drawTransparentRect(ctx, x, y, width, height, rectOpacity, i){
-				// ctx.beginPath()
-				//校准，因为获取到的矩形框坐标是矩形框的中轴点的坐标，而绘制矩形传入的是左上角的坐标 故需要校正 横纵坐标减去矩形框宽高的一半
-			
-				//将坐标收纳成对象保存到数组，为绑定事件做准备
-				let rect={
-					x: x,
-					y: y,
-					w: width,
-					h: height
+			// 初始化 浮标对象
+			initializationBuoy(rectX, rectY, rectH, rectW,vx,vy,rectOpacity,nodeId) {
+				// 默认 透明度0.9
+				rectOpacity = 0.9
+				return   {
+					x: rectX,
+					y: rectY,
+					rectH: rectH,
+					rectW: rectW,
+					vx: 1,
+					vy: 1,
+					opacity: rectOpacity,
+					ctx: this.ctx,
+					nodeId: nodeId,
+					draw: function() {
+						// 开始路径
+						this.ctx.beginPath();
+						this.ctx.rect(this.x, this.y, this.rectH, this.rectW)
+						// 闭合路径
+						this.ctx.closePath();
+						// this.ctx.fillRect(255, 255, 255,0.5);
+						this.ctx.fillStyle = "rgba(255, 255, 255,"+ this.opacity +")";
+						this.ctx.fill()
+					}
 				}
-				this.rectArray.push(rect)
-				console.log(x, y, width, height)
-				ctx.rect(x, y, width, height)
-				// ctx.rect(10, 10, 150, 75)
-				ctx.fillStyle = "red"
-				ctx.fill()
-				// ctx.draw()
-				
-				// ctx.fillRect(50, 50, 150, 100)
-				// ctx.fill()
-				//开始描绘
-				// ctx.stroke()
-				// ctx.draw()
 			},
-			run(ctx,rectX, rectY, rectW, rectH, rectOpacity) {
-				ctx.rect(0 , 0 , this.canvasWidth, this.canvasHeight)
-				this.drawTransparentRect(ctx, rectX, rectY, rectW, rectH, rectOpacity)
-				
+			// 初始化浮标 对象 List 
+			initializationBuoyList() {
+				let canvas = this.canvas
+				//初始化 浮标  demo 只有一个
+				this.ecmArtworkNodeBuoyList.forEach((v, index) => {
+					let rectOpacity = v.buoyOpacity + 0
+
+					let rectX = parseInt(((v.buoyCoordinateX + 0) * this.canvasWidth).toFixed(0))
+					// console.log('矩形框的x轴坐标: ',rectX)
+					let rectY = parseInt(((v.buoyCoordinateY + 0) * this.canvasHeight).toFixed(0))
+					// console.log('矩形框的y轴坐标: ',rectY)
+					//矩形框高度
+					let rectH = parseInt(((v.buoyHigh + 0) * this.canvasHeight).toFixed(0))
+					// console.log('矩形框的高: ',rectH)
+					//矩形框宽度
+					let rectW = parseInt(((v.buoyWide + 0) * this.canvasWidth).toFixed(0))
+					// console.log('矩形框的宽: ',rectW)
+
+					
+					this.buoyRectList.push(this.initializationBuoy(rectX, rectY, rectW, rectH))  
+					// this.createRect(this.ctx, rectX, rectY, rectW, rectH, rectOpacity, index)
+					// canvas.requestAnimationFrame(() => {
+
+					// 	this.run(this.ctx, 0, rectY, rectW, rectH, rectOpacity)
+					// })
+
+					// setInterval(() => {
+					// 	this.run(ctx, rectX, rectY, rectW, rectH, rectOpacity)
+					// 	rectX = rectX - 5;
+
+					// }, 16);
+
+				})
 			},
-			getNewVideoPlayTime (e) {
+			//、 获取当前播放视频时间
+			getNewVideoPlayTime(e) {
 				//获取视频当前时间
 				this.currentTime = e.detail.currentTime
-				//获取视频当前时间
-				if(this.duration -this.currentTime > 0.4){
-					this.percent = parseInt(this.currentTime/this.duration*100)
-				}else{
-					this.percent = 100
-				}
+				this.ecmArtworkNodeBuoyList.forEach((nodeBuoyList, index) => { 
+					// console.log(nodeBuoyList)
+					nodeBuoyList.forEach( (v,i) => {
+						console.log(v.buoySectionTime === Math.ceil( this.currentTime))
+						if (v.buoySectionTime ===Math.ceil( this.currentTime )) {
+							//判断 buoyRectList 是否有当前 浮标对象
+							let  a  = true
+							this.buoyRectList.forEach( rect => {
+								if (rect.nodeId === v.nodeId ) {
+									console.log('时间',this.currentTime)
+									a = false
+									rect = this.buoyToCanvasClass(rect)
+								}
+							})
+							if (a) {
+								this.buoyRectList.push(this.buoyToCanvasClass(rect))
+							}
+						}
+					})
+				})
+				
+			},
+			// 浮标对象 装车 canvas 对象 
+			buoyToCanvasClass(v) {
+				let rectOpacity = v.buoyOpacity + 0
+				
+				let rectX = parseInt(((v.buoyCoordinateX + 0) * this.canvasWidth).toFixed(0))
+				// console.log('矩形框的x轴坐标: ',rectX)
+				let rectY = parseInt(((v.buoyCoordinateY + 0) * this.canvasHeight).toFixed(0))
+				// console.log('矩形框的y轴坐标: ',rectY)
+				//矩形框高度
+				let rectH = parseInt(((v.buoyHigh + 0) * this.canvasHeight).toFixed(0))
+				// console.log('矩形框的高: ',rectH)
+				//矩形框宽度
+				let rectW = parseInt(((v.buoyWide + 0) * this.canvasWidth).toFixed(0))
+				
+				return this.initializationBuoy(rectX, rectY, rectW, rectH)
 			},
 			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			initializationBuoyBall() {
+				this.ball = {
+					x: 100,
+					y: 100,
+					vx: 1,
+					vy: 1,
+					radius: 25,
+					color: 'blue',
+					ctx: this.ctx,
+					draw: function() {
+						this.ctx.beginPath();
+						this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+						this.ctx.closePath();
+						this.ctx.fillStyle = this.color;
+						this.ctx.fill();
+					}
+				}
+			
+			},
+			drawBall() {
+				if (this.ball.y + this.ball.vy > this.canvas.height || this.ball.y + this.ball.vy < 0) {
+					this.ball.vy = - this.ball.vy;
+				}
+				if (this.ball.x + this.ball.vx > this.canvas.width || this.ball.x + this.ball.vx < 0) {
+					this.ball.vx = - this.ball.vx;
+				}
+				this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+				this.ball.draw();
+				this.ball.x += this.ball.vx;
+				this.ball.y += this.ball.vy;
+				this.canvas.requestAnimationFrame( () => this.drawBall());
+			},
+
 
 		}
 	}
-
 </script>
 
 <style lang="scss">
