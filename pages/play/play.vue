@@ -272,15 +272,13 @@
 		<view v-if="verticalJumpDialogFlag">
 			<vertical-jump-dialog :imageUrl="popupImageUrl" :navigatorUrl="navigatorUrl" :appId="appId" :artworkId="artworkId" 
 			:popupPosition="popupPosition" v-on:videoEnd="videoEnd" v-on:initPlayData="initPlayData" :artworkTree="artworkTree"
-			ref="verticalJumpDialog" v-on:multipleResultCallbackTodo="multipleResultCallbackTodo" :videoContext="videoContext"
-			v-on:closeChooseTips="closeChooseTips" >
+			ref="verticalJumpDialog" v-on:multipleResultCallbackTodo="multipleResultCallbackTodo" >
 			</vertical-jump-dialog>
 		</view>
 		<view v-if="horizontalJumpDialogFlag">
 			<horizontal-jump-dialog :imageUrl="popupImageUrl" :navigatorUrl="navigatorUrl" :appId="appId" :artworkId="artworkId" 
 			:popupPosition="popupPosition" v-on:videoEnd="videoEnd" v-on:initPlayData="initPlayData" :artworkTree="artworkTree"
-			ref="horizontalJumpDialog" v-on:multipleResultCallbackTodo="multipleResultCallbackTodo" :videoContext="videoContext"
-			v-on:closeChooseTips="closeChooseTips" >
+			ref="horizontalJumpDialog" v-on:multipleResultCallbackTodo="multipleResultCallbackTodo">
 			</horizontal-jump-dialog>
 		</view>
 		<view v-if="popupNameState && popupTotalNumber > 0 ? true : false">
@@ -532,11 +530,16 @@
 				isGetMultipleFlag: false,
 				//多结局查看广告的弹窗
 				multipleResultAdvertiseShow: false,
-				//重播时是否弹弹窗
-				isPopupByReplay: false
+				//重播标志
+				isReplayPopupWindow: false
 			}
 		},
 		onReady(){
+			//重置重播状态
+			uni.setStorageSync('isReplay',false)
+			//重置弹窗状态
+			uni.removeStorageSync('popupState')
+			uni.removeStorageSync('popupSettings')
 			// 监听是否重新获取光的数量
 			this.isGetLight()
 			//重置开关状态到初始值
@@ -695,54 +698,10 @@
 			},
 			// 观看激励广告
 			openAdvertising () {
-				if (this.isCustom) {
-					this.$emit('customConfirmEvent')
-					return false
-				}
 				this.showAdvertisingFlag = false
 				this.advertising = wx.createRewardedVideoAd({
-					adUnitId: 'adunit-7423fd1b2c7c5724'
-				})
-				//捕捉错误
-				this.advertising.onError(err => {
-					uni.showToast({
-						icon: 'none',
-						title:'获取激励视频失败，请重试'
-					})
-				})
-				// 激励广告显示并加载
-				if (this.advertising) {
-					this.advertising.load().then(() => {
-						this.advertising.show().then(() => {
-						})
-					}).catch(() => {
-						this.advertising.load().then(() => {
-							this.advertising.show().then(() => {
-							})
-						}).catch(() => {
-							uni.showToast({
-								icon: 'none',
-								title:'激励视频加载失败，请重试'
-							})
-						})
-					})
-				}
-				// 监听激励广告关闭
-				this.advertising.onClose((status) => {
-					if (status.isEnded) {
-						// console.log('给光')
-						globalBus.$emit('requestOfAES')
-					} else {
-						// console.log('憨批用户不给光')
-					}
-					this.advertising.offClose()
-					/* this.advertising.destroy() */
-				})
-			},
-			openAdvertising1 () {
-				this.showAdvertisingFlag = false
-				this.advertising = wx.createRewardedVideoAd({
-					adUnitId: 'adunit-7423fd1b2c7c5724'
+					adUnitId: 'adunit-7423fd1b2c7c5724',
+					multiton: true
 				})
 				//捕捉错误
 				this.advertising.onError(err => {
@@ -819,8 +778,8 @@
 					}else{
 						this.videoContext.play()
 					}
-					//true
-					if(true){
+					//status.isEnded
+					if(status.isEnded){
 						if(this.isPosition == 1){
 							if(this.isGetMultipleFlag){
 								this.multipleResultAdvertiseShow = false
@@ -864,7 +823,7 @@
 						}
 						console.log('憨批用户不给光')
 					}
-					this.advertising.offClose()
+					this.advertising.destroy()
 				})
 			},
 			//故事线跳转播放页
@@ -976,7 +935,7 @@
 						this.popupName = artworkTree.popupName
 					}
 				}else{
-					// this.savaOptionSelectionRecord(artworkTree.pkDetailId,artworkTree.parentId)
+					this.savaOptionSelectionRecord(artworkTree.pkDetailId,artworkTree.parentId)
 				}
 				this.detailId = artworkTree.pkDetailId
 				//获取用户的弹窗弹出数量
@@ -988,11 +947,11 @@
 				//初始化是否显示弹窗
 				this.popupState = uni.getStorageSync('popupState')
 				if(this.popupState == 1){
-					this.isPopupByReplay = true
 					this.popupSettings = uni.getStorageSync('popupSettings')
 					this.handlePopupSettings()
+					this.isReplayPopupWindow = true
 				}else{
-					this.isPopupByReplay = false
+					this.isReplayPopupWindow = false
 				}
 				if(!isJumpDialogCallbackFlag && this.popupPosition == 0 && this.popupState == 1){
 					this.popupWindowByPopupPositonEqualsZero()
@@ -1075,7 +1034,9 @@
 						//存储跳转目标节点的detailId
 						this.linkNodeId = linkId
 						const mainTree = uni.getStorageSync("mainArtworkTree")
-						this.playedHistoryArray.push(artworkTree.pkDetailId)
+						if(!uni.getStorageSync('isReplay')){
+							this.playedHistoryArray.push(artworkTree.pkDetailId)
+						}
 						/* //不需要去重 记录故事线走向方便数值选项分数计算
 						this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray)); */
 						uni.setStorageSync("pkDetailIds",this.playedHistoryArray)
@@ -1088,7 +1049,9 @@
 				//非跳转节点的目标节点存播放记录
 				if (this.linkNodeId != this.detailId) {
 					// 将作品detailId留存提供给故事线
-					this.playedHistoryArray.push(artworkTree.pkDetailId);
+					if(!uni.getStorageSync('isReplay')){
+						this.playedHistoryArray.push(artworkTree.pkDetailId);
+					}
 					/* //不需要去重 记录故事线走向方便数值选项分数计算
 					this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray)); */
 					uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
@@ -1758,6 +1721,7 @@
 				}
 			},
 			clickCommonOptionTodo(index){
+				uni.setStorageSync('isReplay',false)
 				if(this.conditionState[index] == 1){
 					console.log('作者让你看广告啊，跟我没关系')
 					this.openAdvertising()
@@ -1856,22 +1820,16 @@
 				}
 			}, */
 			//点击选项关闭按钮触发事件
-			closeChooseTips(isDialogJump){
+			closeChooseTips(){
 				this.chooseTipsShowFlag = false
 				this.chooseTipsMaskFlag = false
 				this.hiddenBtnFlag = true
-				console.log('isDialogJump: ',isDialogJump)
-				console.log('popupState: ',this.popupState)
-				if(this.isPopupByReplay && !isDialogJump){
-					uni.setStorageSync('replay',true)
-					if(this.popupPosition == 1){
-						this.popupWindowByPopupPositonEqualsOne()
-					}else{
-						this.popupWindowByPopupPositonEqualsZero()
-					}
-					return
+				uni.setStorageSync('isReplay',true)
+				if(this.isReplayPopupWindow){
+					uni.setStorageSync('popupState',1)
+					uni.setStorageSync('popupSettings', this.artworkTree.ecmArtworkNodePopupSettings)
 				}
-				this.videoContext.play()
+				this.initPlayData(this.artworkTree,false)
 			},
 			//点击故事线关闭按钮触发事件
 			closeStoryLineContent(){
@@ -2357,6 +2315,7 @@
 				}
 			},
 			clickPositionOptionTodo(){
+				uni.setStorageSync('isReplay',false)
 				if(this.conditionState[this.touchRectNum] == 1){
 					console.log('作者让你看广告啊，跟我没关系')
 					this.openAdvertising()
