@@ -828,6 +828,11 @@
 			},
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option){
+				//清除弹窗信息
+				uni.removeStorageSync('popupState')
+				uni.removeStorageSync('popupSettings')
+				//重置重播状态
+				uni.setStorageSync('isReplay',false)
 				this.iscustomLightFlag = false
 				//故事线跳转重置跳转节点的目标节点的id
 				this.linkNodeId = null
@@ -1597,8 +1602,6 @@
 				this.popupState = uni.getStorageSync('popupState');
 				console.log('this.popupState: ',this.popupState)
 				console.log('this.popupPosition: ',this.popupPosition)
-				uni.removeStorageSync('popupState')
-				uni.removeStorageSync('popupSettings')
 				if(!isJumpDialogCallbackFlag && this.popupState == 1 && this.popupPosition == 1){
 					console.log('isJumpDialogCallbackFlag: ',1)
 					this.popupWindowByPopupPositonEqualsOne()
@@ -1721,6 +1724,8 @@
 				}
 			},
 			clickCommonOptionTodo(index){
+				uni.removeStorageSync('popupState')
+				uni.removeStorageSync('popupSettings')
 				uni.setStorageSync('isReplay',false)
 				if(this.conditionState[index] == 1){
 					console.log('作者让你看广告啊，跟我没关系')
@@ -1825,10 +1830,10 @@
 				this.chooseTipsMaskFlag = false
 				this.hiddenBtnFlag = true
 				uni.setStorageSync('isReplay',true)
-				if(this.isReplayPopupWindow){
+				/* if(this.isReplayPopupWindow){
 					uni.setStorageSync('popupState',1)
 					uni.setStorageSync('popupSettings', this.artworkTree.ecmArtworkNodePopupSettings)
-				}
+				} */
 				this.initPlayData(this.artworkTree,false)
 			},
 			//点击故事线关闭按钮触发事件
@@ -2315,6 +2320,8 @@
 				}
 			},
 			clickPositionOptionTodo(){
+				uni.removeStorageSync('popupState')
+				uni.removeStorageSync('popupSettings')
 				uni.setStorageSync('isReplay',false)
 				if(this.conditionState[this.touchRectNum] == 1){
 					console.log('作者让你看广告啊，跟我没关系')
