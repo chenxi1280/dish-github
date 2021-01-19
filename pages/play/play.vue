@@ -1480,10 +1480,6 @@
 			multipleResultCallbackTodo(isJumpDialogCallbackFlag){
 				//多结局作品的结局视频关闭故事线的回调标志
 				this.multipleResultReplayFlag = true
-				//关闭故事线回调
-				if(this.closeStoryLineReplayFlag){
-					this.videoShowFlag = true
-				}
 				//获取最后一个视频的弹窗信息
 				this.popupState = this.artworkTree.popupState
 				if(this.popupState == 1){
@@ -1509,6 +1505,10 @@
 					}else{
 						this.popupCountNumber = currentPopupWindowRecord.length
 					}
+				}
+				//关闭故事线回调
+				if(this.closeStoryLineReplayFlag){
+					this.videoShowFlag = true
 				}
 				//清空路线容器
 				this.multipleResultLine = []
