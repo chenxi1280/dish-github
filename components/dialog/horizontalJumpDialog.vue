@@ -53,7 +53,8 @@
 				let isEndings = uni.getStorageSync('isEndings')
 				if(isEndings == 1 && uni.getStorageSync('isEndingsJump')){
 					uni.setStorageSync('isEndingsJump',false)
-					if(this.popupPosition == 1 && isGetMultipleFlag){
+					//&& isGetMultipleFlag
+					if(this.popupPosition == 1){
 						this.$emit("videoEnd",true)
 					}else{
 						this.$emit("multipleResultCallbackTodo",true)

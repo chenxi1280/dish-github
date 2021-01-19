@@ -289,6 +289,17 @@
 				<text>{{popupName+": "+popupCountNumber+"/"+popupTotalNumber}}</text>
 			</view>
 		</view>
+		<!-- 多结局作品结局视频播放前弹窗背景不符合需求用蒙版挡起来 -->
+		<view v-if="multipleResultFlag" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform}" class="multipleResultPlayEndMask">
+		</view>
+		<!-- 选项百分比 -->
+		<view class="optionPercentagesBox" v-if="optionPercentageFlag" style="pointer-events: none;">
+			<view class="optionPercentages" v-for="(item, index) in optionPercentageNames" :key="index">
+				<view class="optionPercentageBox">
+					<view class="optionPercentage">{{optionPercentageNames[index]}}{{' : '}}{{optionPercentageValues[index]}}</view>
+				</view>
+			</view>
+		</view>
 	</view>
 </template>
 
@@ -531,7 +542,19 @@
 				//多结局查看广告的弹窗
 				multipleResultAdvertiseShow: false,
 				//重播标志
-				isReplayPopupWindow: false
+				isReplayPopupWindow: false,
+				//多结局结局视频标志
+				isMultipleResultPlayEnd: false,
+				//多结局作品的最后一个视频的前一个视频的蒙板
+				multipleResultFlag: false,
+				//选项百分比名称
+				optionPercentageNames: [],
+				//选项百分比开关
+				optionPercentageFlag: false,
+				//百分比延时函数
+				optionPercentageFunction: Function,
+				//选项百分比的值
+				optionPercentageValues: []
 			}
 		},
 		onReady(){
@@ -657,6 +680,18 @@
 			}
 		},
 		methods: {
+			//截取选项的名称
+			getOptionPercentageNames(){
+				for(let i = 0; i < this.option.length; i++){
+					let len = this.option[i].length;
+					if(len > 3){
+						let name = this.option[i].substring(0,3)
+						this.optionPercentageNames.push(name+"...")
+					}else{
+						this.optionPercentageNames.push(this.option[i])
+					}
+				}
+			},
 			//调出广告
 			goAdvertisement(){
 				this.openAdvertising()
@@ -841,6 +876,8 @@
 				this.storyLineJumpFlag = true
 				//故事线跳转时清除好感度延时函数
 				clearTimeout(this.likabilityDelayFunction)
+				//故事线跳转时清除选项百分比延时函数
+				clearTimeout(this.optionPercentageFunction)
 				//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
 				this.endFlag = true;
 				//重置用户选项分数
@@ -997,8 +1034,6 @@
 					}else{
 						uni.setStorageSync('appearConditionMap', appearConditionMap)
 					}
-				}else{
-					// this.getOptionSelectionRecord(artworkTree.pkDetailId,artworkTree.parentId)
 				}
 				// 将选项置空 避免选项中出现上一次选项的情况
 				this.option = []
@@ -1061,6 +1096,11 @@
 					this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray)); */
 					uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
 					this.linkNodeId = null
+				}
+				//获取百分比的名称和数据
+				if(artworkTree.percentageState == 1 && artworkTree.parentId != 0){
+					this.getOptionSelectionRecord(artworkTree.pkDetailId,artworkTree.parentId)
+					this.getOptionPercentageNames()
 				}
 			},
 			popupWindowByPopupPositonEqualsOne(){
@@ -1252,7 +1292,11 @@
 						detailId: detailId
 					},
 					success: result=> {
-						//不做操作影响正常流程就好
+						if(result.data.status == 200){
+							for(let i=0; i<result.data.data.length; i++){
+								this.optionPercentageValues.push(result.data.data[i])
+							}
+						}
 					}
 				});
 			},
@@ -1310,6 +1354,7 @@
 				}else{
 					this.iscustomLightFlag = true
 				}
+				clearTimeout(this.optionPercentageFunction)
 				this.likabilityArray = []
 				clearTimeout(this.likabilityDelayFunction)
 				this.likabilityFlag = false
@@ -1422,21 +1467,16 @@
 			},
 			multipleResultCallbackTodo(isJumpDialogCallbackFlag){
 				//获取最后一个视频的弹窗信息
-				let popupState = this.artworkTree.popupState
-				this.popupState = popupState
-				if(popupState == 1){
+				this.popupState = this.artworkTree.popupState
+				if(this.popupState == 1){
 					uni.setStorageSync('pkDetailId', this.artworkTree.fkNodeId)
-					let popupSettings = this.artworkTree.ecmArtworkNodePopupSettings
-					this.popupSettings = popupSettings
+					this.popupSettings = this.artworkTree.ecmArtworkNodePopupSettings
 					this.handlePopupSettings()
 				}
-				if(this.popupState == 1 && !isJumpDialogCallbackFlag){
+				if(this.popupState == 1 && !isJumpDialogCallbackFlag && this.popupPosition == 0){
 					uni.setStorageSync('isEndingsJump',true)
-					if(this.popupPosition == 1){
-						this.popupWindowByPopupPositonEqualsOne()
-					}else{
-						this.popupWindowByPopupPositonEqualsZero()
-					}
+					this.multipleResultFlag  = true
+					this.popupWindowByPopupPositonEqualsZero()
 					return
 				}
 				//获取用户的弹窗弹出数量
@@ -1462,6 +1502,7 @@
 				uni.setStorageSync("fkNodeId",this.artworkTree.fkNodeId)
 				this.playedHistoryArray.push(this.artworkTree.fkNodeId)
 				this.parentId = this.artworkTree.parentId
+				this.isMultipleResultPlayEnd = true
 				//存储多结局的结局视频播放历史
 				uni.setStorageSync("pkDetailIds",this.playedHistoryArray)
 				//保存播放记录
@@ -1599,7 +1640,13 @@
 				//获取用户的弹窗弹出数量
 				let popupWindowRecord = uni.getStorageSync('popupWindowRecord')
 				console.log('isJumpDialogCallbackFlag: ',isJumpDialogCallbackFlag)
-				this.popupState = uni.getStorageSync('popupState');
+				if(!this.isMultipleResultPlayEnd){
+					//不是多结局作品的结局视频从storage获取弹窗标志
+					this.popupState = uni.getStorageSync('popupState')	
+				}else{
+					//多结局作品的结局视频在请求结束后弹窗标志就被赋值了，此处只需要重置多结局作品的结局视频的播放结束开关
+					this.isMultipleResultPlayEnd = true
+				}
 				console.log('this.popupState: ',this.popupState)
 				console.log('this.popupPosition: ',this.popupPosition)
 				if(!isJumpDialogCallbackFlag && this.popupState == 1 && this.popupPosition == 1){
@@ -1654,6 +1701,7 @@
 				}
 			},
 			videoPlay(){
+				this.multipleResultFlag = false
 				this.isVideoEndFlag = false
 				this.isGetMultipleFlag = false
 			},
@@ -1742,6 +1790,7 @@
 						this.background.splice(index,1,"")
 						this.likabilityFlag = false
 						// 播放结束清除延时函数
+						clearTimeout(this.optionPercentageFunction)
 						clearTimeout(this.likabilityDelayFunction)
 						this.optionTouchendTodo(index)
 						//保存有效观看记录
@@ -2336,6 +2385,7 @@
 						}
 					}else{
 						this.likabilityArray = []
+						clearTimeout(this.optionPercentageFunction)
 						clearTimeout(this.likabilityDelayFunction)
 						this.screenshotShowFlag = false
 						this.canvasTouchendEventTodo()
@@ -2569,6 +2619,12 @@
 				})
 			},
 			loadeddata(e){
+				if(this.artworkTree.percentageState == 1 && this.artworkTree.parentId != 0){
+					this.optionPercentageFlag = true
+					this.optionPercentageFunction= setTimeout(()=>{
+						this.optionPercentageFlag = false
+					},5000)
+				}
 				this.duration = e.detail.duration
 				let date = this.formatDate(this.duration)
 				this.durationStr = date
@@ -2872,6 +2928,39 @@
 	.playBox{
 		width: 100%;
 		height: 100%;
+		.optionPercentagesBox{
+			position: fixed;
+			right: 5%;
+			top: 12%;
+			height: 600rpx;
+			width: 290rpx;
+			z-index: 15;
+			// background-color: rgba(255,255,255,.5);
+			.optionPercentages{
+				height: 50rpx;
+				width: 100%;
+				.optionPercentageBox{
+					margin-top: 10rpx;
+					padding: 10rpx 20rpx;
+					height: 50rpx;
+					border-radius: 20rpx;
+					background-color: rgba(0,0,0,.3);
+					text-align: left;
+					.optionPercentage{
+						color: white;
+						font-size: 30rpx;
+						line-height: 30rpx;
+					}
+				}
+			}
+		}
+		.multipleResultPlayEndMask{
+			position: fixed;
+			left: 50%;
+			top: 50%;
+			background-color: black;
+			z-index: 8;
+		}
 		.verticalPopupNameBox{
 			position: fixed;
 			left: 5%;
