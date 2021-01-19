@@ -293,13 +293,13 @@
 		<view v-if="multipleResultFlag" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform}" class="multipleResultPlayEndMask">
 		</view>
 		<!-- 选项百分比 -->
-		<view class="optionPercentagesBox" v-if="optionPercentageFlag" style="pointer-events: none;">
+		<!-- <view class="optionPercentagesBox" v-if="optionPercentageFlag" style="pointer-events: none;">
 			<view class="optionPercentages" v-for="(item, index) in optionPercentageNames" :key="index">
 				<view class="optionPercentageBox">
-					<view class="optionPercentage">{{optionPercentageNames[index]}}{{' : '}}{{optionPercentageValues[index]}}</view>
+					<view class="optionPercentage">{{optionPercentageNames[index]}}{{' : '}}{{optionPercentageValues[index]}}{{'%'}}</view>
 				</view>
 			</view>
-		</view>
+		</view> -->
 	</view>
 </template>
 
@@ -554,7 +554,13 @@
 				//百分比延时函数
 				optionPercentageFunction: Function,
 				//选项百分比的值
-				optionPercentageValues: []
+				optionPercentageValues: [],
+				//百分比是否展示开关
+				isShowOptionPercentageFlag: false,
+				//故事线关闭重播开关
+				closeStoryLineReplayFlag: false,
+				//是否是对多结局作品的结局视频的回调
+				multipleResultReplayFlag: false
 			}
 		},
 		onReady(){
@@ -682,6 +688,7 @@
 		methods: {
 			//截取选项的名称
 			getOptionPercentageNames(){
+				this.optionPercentageNames = []
 				for(let i = 0; i < this.option.length; i++){
 					let len = this.option[i].length;
 					if(len > 3){
@@ -863,6 +870,8 @@
 			},
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option){
+				//多结局作品结局视频回调开关只有在重新进入作品和故事线跳转时需要重置
+				this.multipleResultFlag = false
 				//清除弹窗信息
 				uni.removeStorageSync('popupState')
 				uni.removeStorageSync('popupSettings')
@@ -877,7 +886,7 @@
 				//故事线跳转时清除好感度延时函数
 				clearTimeout(this.likabilityDelayFunction)
 				//故事线跳转时清除选项百分比延时函数
-				clearTimeout(this.optionPercentageFunction)
+				// clearTimeout(this.optionPercentageFunction)
 				//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
 				this.endFlag = true;
 				//重置用户选项分数
@@ -973,6 +982,9 @@
 			//对节点播放数据进行筛选和提取
 			initPlayData(artworkTree, isJumpDialogCallbackFlag){
 				if(artworkTree.parentId === 0 ){
+					/* if(artworkTree.percentageState == 1){
+						this.isShowOptionPercentageFlag = true
+					} */
 					if(this.popupTotalNumber > 0){
 						this.popupName = artworkTree.popupName
 					}
@@ -1090,17 +1102,16 @@
 				if (this.linkNodeId != this.detailId) {
 					// 将作品detailId留存提供给故事线
 					if(!uni.getStorageSync('isReplay')){
-						this.playedHistoryArray.push(artworkTree.pkDetailId);
+						if(!this.closeStoryLineReplayFlag){
+							this.playedHistoryArray.push(artworkTree.pkDetailId);
+						}else{
+							this.closeStoryLineReplayFlag = false
+						}
 					}
 					/* //不需要去重 记录故事线走向方便数值选项分数计算
 					this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray)); */
 					uni.setStorageSync("pkDetailIds",this.playedHistoryArray);
 					this.linkNodeId = null
-				}
-				//获取百分比的名称和数据
-				if(artworkTree.percentageState == 1 && artworkTree.parentId != 0){
-					this.getOptionSelectionRecord(artworkTree.pkDetailId,artworkTree.parentId)
-					this.getOptionPercentageNames()
 				}
 			},
 			popupWindowByPopupPositonEqualsOne(){
@@ -1289,10 +1300,11 @@
 					data: {
 						pkArtworkId: this.artworkId,
 						parentId: parentId,
-						detailId: detailId
+						detailId: this.detailId
 					},
 					success: result=> {
 						if(result.data.status == 200){
+							this.optionPercentageValues = []
 							for(let i=0; i<result.data.data.length; i++){
 								this.optionPercentageValues.push(result.data.data[i])
 							}
@@ -1354,7 +1366,7 @@
 				}else{
 					this.iscustomLightFlag = true
 				}
-				clearTimeout(this.optionPercentageFunction)
+				// clearTimeout(this.optionPercentageFunction)
 				this.likabilityArray = []
 				clearTimeout(this.likabilityDelayFunction)
 				this.likabilityFlag = false
@@ -1466,6 +1478,12 @@
 				})
 			},
 			multipleResultCallbackTodo(isJumpDialogCallbackFlag){
+				//多结局作品的结局视频关闭故事线的回调标志
+				this.multipleResultReplayFlag = true
+				//关闭故事线回调
+				if(this.closeStoryLineReplayFlag){
+					this.videoShowFlag = true
+				}
 				//获取最后一个视频的弹窗信息
 				this.popupState = this.artworkTree.popupState
 				if(this.popupState == 1){
@@ -1500,7 +1518,11 @@
 				this.videoUrl = this.artworkTree.videoUrl+'?uuid='+uuid
 				uni.setStorageSync("detailId",this.artworkTree.fkNodeId)
 				uni.setStorageSync("fkNodeId",this.artworkTree.fkNodeId)
-				this.playedHistoryArray.push(this.artworkTree.fkNodeId)
+				if(!this.closeStoryLineReplayFlag){
+					this.playedHistoryArray.push(this.artworkTree.fkNodeId)
+				}else{
+					this.closeStoryLineReplayFlag = false
+				}
 				this.parentId = this.artworkTree.parentId
 				this.isMultipleResultPlayEnd = true
 				//存储多结局的结局视频播放历史
@@ -1772,6 +1794,12 @@
 				}
 			},
 			clickCommonOptionTodo(index){
+				//获取百分比的名称和数据
+				/* if(this.isShowOptionPercentageFlag && this.artworkTree.parentId != 0){
+					this.getOptionSelectionRecord(this.artworkTree.pkDetailId,this.artworkTree.parentId)
+					this.getOptionPercentageNames()
+				} */
+				//清除storage中缓存的节点的弹窗信息
 				uni.removeStorageSync('popupState')
 				uni.removeStorageSync('popupSettings')
 				uni.setStorageSync('isReplay',false)
@@ -1790,7 +1818,7 @@
 						this.background.splice(index,1,"")
 						this.likabilityFlag = false
 						// 播放结束清除延时函数
-						clearTimeout(this.optionPercentageFunction)
+						// clearTimeout(this.optionPercentageFunction)
 						clearTimeout(this.likabilityDelayFunction)
 						this.optionTouchendTodo(index)
 						//保存有效观看记录
@@ -1888,10 +1916,28 @@
 			//点击故事线关闭按钮触发事件
 			closeStoryLineContent(){
 				if(uni.getStorageSync('isEndings') == 1){
-					this.videoShowFlag = true
+					if(this.multipleResultReplayFlag){
+						this.storyLineContentFlag = false
+						this.closeStoryLineReplayFlag = true
+						this.multipleResultCallbackTodo(false)
+					}else{
+						this.storyLineContentFlag = false
+						this.closeStoryLineReplayFlag = true
+						this.initPlayData(this.artworkTree,false)
+					}
+				}else{
+					if(this.isVideoEndFlag){
+						this.storyLineContentFlag = false
+						this.closeStoryLineReplayFlag = true
+						this.initPlayData(this.artworkTree,false)
+					}else{
+						if(uni.getStorageSync('isEndings') == 1){
+							this.videoShowFlag = true
+						}
+						this.storyLineContentFlag = false
+						this.videoContext.play()
+					}
 				}
-				this.storyLineContentFlag = false
-				this.videoContext.play()
 			},
 			//点击举报关闭按钮触发事件
 			closeReportContent(){
@@ -2385,7 +2431,7 @@
 						}
 					}else{
 						this.likabilityArray = []
-						clearTimeout(this.optionPercentageFunction)
+						// clearTimeout(this.optionPercentageFunction)
 						clearTimeout(this.likabilityDelayFunction)
 						this.screenshotShowFlag = false
 						this.canvasTouchendEventTodo()
@@ -2619,12 +2665,12 @@
 				})
 			},
 			loadeddata(e){
-				if(this.artworkTree.percentageState == 1 && this.artworkTree.parentId != 0){
+				/* if(this.isShowOptionPercentageFlag){
 					this.optionPercentageFlag = true
 					this.optionPercentageFunction= setTimeout(()=>{
 						this.optionPercentageFlag = false
 					},5000)
-				}
+				} */
 				this.duration = e.detail.duration
 				let date = this.formatDate(this.duration)
 				this.durationStr = date
