@@ -28,7 +28,7 @@
 
 <script>
 	import {globalBus} from '../../common/js/util.js'
-	import CryptoJS from 'crypto-js'
+	// import CryptoJS from 'crypto-js'
 	import baseURL from '../../pages/login/config/config.js'
 	export default {
 		data() {
@@ -137,21 +137,21 @@
 				}
 			},
 			// 加密
-			encrypt(plaintText) {
-				// 秘钥
-				const COUNT = "1&&2$*$2&&1**##$"
-				const UNCOUNT  = CryptoJS.enc.Utf8.parse(COUNT);//Latin1 w8m31+Yy/Nw6thPsMpO5fg==
-				const SUNJIEJIE = CryptoJS.enc.Utf8.parse(plaintText);
-				const CHENXIDA = CryptoJS.AES.encrypt(SUNJIEJIE, UNCOUNT, {mode:CryptoJS.mode.ECB,padding: CryptoJS.pad.Pkcs7});
-				return CHENXIDA.toString();
-			},
+			// encrypt(plaintText) {
+			// 	// 秘钥
+			// 	const COUNT = "1&&2$*$2&&1**##$"
+			// 	const UNCOUNT  = CryptoJS.enc.Utf8.parse(COUNT);//Latin1 w8m31+Yy/Nw6thPsMpO5fg==
+			// 	const SUNJIEJIE = CryptoJS.enc.Utf8.parse(plaintText);
+			// 	const CHENXIDA = CryptoJS.AES.encrypt(SUNJIEJIE, UNCOUNT, {mode:CryptoJS.mode.ECB,padding: CryptoJS.pad.Pkcs7});
+			// 	return CHENXIDA.toString();
+			// },
 			// 解密
-			decrypt(word){
-				const CRYPTOJSKEY= "1&&2$*$2&&1**##$"
-				const key  = CryptoJS.enc.Utf8.parse(CRYPTOJSKEY);//Latin1 w8m31+Yy/Nw6thPsMpO5fg==
-				const decrypt = CryptoJS.AES.decrypt(word, key, {mode:CryptoJS.mode.ECB,padding: CryptoJS.pad.Pkcs7});
-				return CryptoJS.enc.Utf8.stringify(decrypt).toString();
-			},
+			// decrypt(word){
+			// 	const CRYPTOJSKEY= "1&&2$*$2&&1**##$"
+			// 	const key  = CryptoJS.enc.Utf8.parse(CRYPTOJSKEY);//Latin1 w8m31+Yy/Nw6thPsMpO5fg==
+			// 	const decrypt = CryptoJS.AES.decrypt(word, key, {mode:CryptoJS.mode.ECB,padding: CryptoJS.pad.Pkcs7});
+			// 	return CryptoJS.enc.Utf8.stringify(decrypt).toString();
+			// },
 			// 观看激励广告
 			openAdvertising () {
 				// const timer = uni.getStorageSync('userId') + new Date().getTime() + ''
