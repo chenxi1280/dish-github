@@ -50,10 +50,21 @@
 		methods: {
 			closeDialog(){
 				this.horizontalJumpDialogFlag = false
-				if(this.popupPosition == 1){
-					this.$emit("videoEnd",true)
+				let isEndings = uni.getStorageSync('isEndings')
+				if(isEndings == 1 && uni.getStorageSync('isEndingsJump')){
+					uni.setStorageSync('isEndingsJump',false)
+					//&& isGetMultipleFlag
+					if(this.popupPosition == 1){
+						this.$emit("videoEnd",true)
+					}else{
+						this.$emit("multipleResultCallbackTodo",true)
+					}
 				}else{
-					this.$emit("initPlayData",this.artworkTree,true)
+					if(this.popupPosition == 1){
+						this.$emit("videoEnd",true)
+					}else{
+						this.$emit("initPlayData",this.artworkTree,true)
+					}
 				}
 			},
 			JumpToOtherApplets(){
