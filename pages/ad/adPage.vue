@@ -4,11 +4,12 @@
 			<view class="play">
 				<!-- 定位选项画布 -->
 				<view class="container" v-show="showCanvasFlag" :style="{'width': videoWide+'px', 'height': videoHigh+'px'}">
-					<canvas type="2d" id='posterCanvas' style="width: 100%; height: 100%;"></canvas>
+					<canvas type="2d" id='posterCanvas' style="width: 100%; height: 100%;" @touchstart="canvasTouchstart" @touchend="canvasTouchend"></canvas>
 				</view>
 				<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" -->
 				<view class="videoBox">
-					<video :src="videoUrl" :loop="true" @timeupdate="getNewVideoPlayTime" :autoplay="true" :style="{'width': videoWide+'px', 'height': videoHigh+'px'}"></video>
+					<video :src="videoUrl" :loop="true" @timeupdate="getNewVideoPlayTime" :autoplay="true" @loadedmetadata="loadedmetadata"
+					 :style="{'width': videoWide+'px', 'height': videoHigh+'px'}"></video>
 					<!-- 视频播放结束触发事件显示最后一帧截图 -->
 					<!-- 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
 						'background-repeat':'no-repeat', backgroundSize:'100% 100%'}"></view> -->
@@ -23,16 +24,18 @@
 
 		data() {
 			return {
-				//是否自动播放标志
+				// 是否自动播放标志
 				autopalyFlag: true,
-				//是否开启手势标志
+				// 是否开启手势标志
 				playGestureFlag: true,
-				//是否开启进度控制手势开关
+				// 是否开启进度控制手势开关
 				progressGestureFlag: true,
+				currentTime: 0,
 				showCanvasFlag: false,
 				videoHigh: 603,
 				videoWide: 375,
 				videoUrl: '',
+
 				ecmArtworkNodeBuoy: {
 					buoyWide: 0.3,
 					buoyHigh: 0.1,
@@ -42,64 +45,125 @@
 					buoyCoordinateY: 0.42,
 					buoyType: 0
 				},
-				ecmArtworkNodeBuoyList:[ [
+				// 后台数据
+				ecmArtworkNodeBuoyList: [
+					[
 
-					{
-						buoyWide: 0.1,
-						buoyHigh: 0.1,
-						buoyOpacity: 0.4,
-						buoySectionTime: 1,
-						buoyCoordinateX: 0.10,
-						buoyCoordinateY: 0.0,
-						buoyType: 0,
-						nodeId: 1
-					},
-					{
-						buoyWide: 0.1,
-						buoyHigh:0.1,
-						buoyOpacity:0.4,
-						buoySectionTime: 5,
-						buoyCoordinateX: 0.90,
-						buoyCoordinateY:0.90,
-						buoyType: 1,
-						nodeId: 1
-					},
-					{
-						buoyWide: 0.3,
-						buoyHigh:0.1,
-						buoyOpacity:0.4,
-						buoySectionTime:8,
-						buoyCoordinateX: 0.60,
-						buoyCoordinateY:0.40,
-						buoyType: 1 ,
-						nodeId: 1	
-					},
-					{
-						buoyWide: 0.3,
-						buoyHigh:0.1,
-						buoyOpacity:0.4,
-						buoySectionTime:12,
-						buoyCoordinateX: 0.40,
-						buoyCoordinateY:0.50,
-						buoyType: 1	,
-						nodeId: 1
-					},
-					{
-						buoyWide: 0.3,
-						buoyHigh:0.1,
-						buoyOpacity:0.4,
-						buoySectionTime:24,
-						buoyCoordinateX: 0.40,
-						buoyCoordinateY:0.30,
-						buoyType: 1,
-						nodeId: 1
-					}
+						{
+							buoyWide: 0.1,
+							buoyHigh: 0.1,
+							buoyOpacity: 0.4,
+							buoySectionTime: 0,
+							buoyCoordinateX: 0.10,
+							buoyCoordinateY: 0.10,
+							buoyType: 0,
+							nodeId: 1
+						},
+						{
+							buoyWide: 0.1,
+							buoyHigh: 0.1,
+							buoyOpacity: 0.4,
+							buoySectionTime: 5,
+							buoyCoordinateX: 0.90,
+							buoyCoordinateY: 0.10,
+							buoyType: 1,
+							nodeId: 1
+						},
+						{
+							buoyWide: 0.1,
+							buoyHigh: 0.1,
+							buoyOpacity: 0.4,
+							buoySectionTime: 12,
+							buoyCoordinateX: 0.90,
+							buoyCoordinateY: 0.90,
+							buoyType: 1,
+							nodeId: 1
+						},
+						{
+							buoyWide: 0.1,
+							buoyHigh: 0.1,
+							buoyOpacity: 0.4,
+							buoySectionTime: 25,
+							buoyCoordinateX: 0.10,
+							buoyCoordinateY: 0.90,
+							buoyType: 1,
+							nodeId: 1
+						},
+						{
+							buoyWide: 0.1,
+							buoyHigh: 0.1,
+							buoyOpacity: 0.4,
+							buoySectionTime: 40,
+							buoyCoordinateX: 0.10,
+							buoyCoordinateY: 0.10,
+							buoyType: 2,
+							nodeId: 1
+						}
 
-				] ],
+					],
+					[
+
+						{
+							buoyWide: 0.1,
+							buoyHigh: 0.1,
+							buoyOpacity: 0.4,
+							buoySectionTime: 1,
+							buoyCoordinateX: 0.1,
+							buoyCoordinateY: 0.1,
+							buoyType: 0,
+							nodeId: 2
+						},
+						{
+							buoyWide: 0.1,
+							buoyHigh: 0.1,
+							buoyOpacity: 0.4,
+							buoySectionTime: 7,
+							buoyCoordinateX: 0.90,
+							buoyCoordinateY: 0.90,
+							buoyType: 1,
+							nodeId: 2
+						},
+						{
+							buoyWide: 0.1,
+							buoyHigh: 0.1,
+							buoyOpacity: 0.4,
+							buoySectionTime: 15,
+							buoyCoordinateX: 0.90,
+							buoyCoordinateY: 0.10,
+							buoyType: 1,
+							nodeId: 2
+						},
+						{
+							buoyWide: 0.1,
+							buoyHigh: 0.1,
+							buoyOpacity: 0.4,
+							buoySectionTime: 24,
+							buoyCoordinateX: 0.10,
+							buoyCoordinateY: 0.90,
+							buoyType: 1,
+							nodeId: 2
+						},
+						{
+							buoyWide: 0.1,
+							buoyHigh: 0.1,
+							buoyOpacity: 0.4,
+							buoySectionTime: 35,
+							buoyCoordinateX: 0.10,
+							buoyCoordinateY: 0.10,
+							buoyType: 2,
+							nodeId: 2
+						}
+
+					]
+				],
 				ctx: null,
 				canvas: null,
-				buoyRectList:[]
-
+				// 重绘 canvas 数组  1维，为 正在canvas 上的 对象数组
+				buoyRectList: [],
+				// canvas 对象 数组，为 后台数据 初始化完成后 储存的 canvas 对象 数组
+				canvasNodeBuoyList: [],
+				raf: null,
+				start: 0
 			}
 		},
 
@@ -112,6 +176,7 @@
 			this.initVerticalCanvas()
 			this.getVideoUrl()
 			this.showCanvasFlag = true
+			// this.initializationBuoy(0, 0, 0, 0)
 		},
 		methods: {
 			getVideoUrl() {
@@ -138,55 +203,59 @@
 						const ctx = canvas.getContext('2d')
 						this.ctx = ctx
 						console.log(canvas)
-						// this.initializationBuoyList()
-						// canvas.requestAnimationFrame(this.draw())
 
-						// 设置 canvas 坐标原点
-						// ctx.translate(width/2, height * 2 / 3);
-						// ctx.scale(dpr, dpr)
-						// this.initializationBuoyBall()
-						// this.ball.draw()
-						// canvas.addEventListener('mouseover', function(e){
-						// });
-						// ball.draw();
-						
-						
-						// this.initializationBuoyList()
-						// canvas.requestAnimationFrame( () => this.draw())
 					})
 
 			},
+			// 移动函数
 			draw() {
+				// 关闭 动画 
+				this.canvas.cancelAnimationFrame(this.ref)
 				// console.log(this.rect)
 				this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-				this.buoyRectList.forEach( (v,index) => {
-					
-					if (v.y + v.vy > this.canvas.height || v.y + v.vy < 0) {
-						v.vy = - v.vy;
-					}
-					if (v.x + v.vx > this.canvas.width || v.x + v.vx < 0) {
-						v.vx = - v.vx;
-					}
+				this.buoyRectList.forEach((v, index) => {
+
+					// if (v.y + v.vy > this.canvas.height || v.y + v.vy < 0) {
+					// 	v.vy = -v.vy;
+					// }
+					// if (v.x + v.vx > this.canvas.width || v.x + v.vx < 0) {
+					// 	v.vx = -v.vx;
+					// }
 					v.draw();
 					v.x += v.vx;
 					v.y += v.vy;
+
 				})
-				this.canvas.requestAnimationFrame(() => this.draw());
+				// console.log('这是第',this.start)
+				// this.start +=1
+
+				this.ref = this.canvas.requestAnimationFrame(() => this.draw());
 			},
 			// 初始化 浮标对象
-			initializationBuoy(rectX, rectY, rectH, rectW,vx,vy,rectOpacity,nodeId) {
+			initializationBuoy(rectX, rectY, rectH, rectW, vx, vy, rectOpacity, nodeId, buoySectionTime, buoyType) {
 				// 默认 透明度0.9
-				rectOpacity = 0.9
-				return   {
+				// rectOpacity = 0.9
+				return {
+					// x 位置
 					x: rectX,
+					// y 位置
 					y: rectY,
+					// 宽
 					rectH: rectH,
+					// 高
 					rectW: rectW,
-					vx: 1,
-					vy: 1,
+					//移动速度 x
+					vx: vx,
+					// 移动速度y
+					vy: vy,
+					// 透明度
 					opacity: rectOpacity,
+					// canvase 2d
 					ctx: this.ctx,
 					nodeId: nodeId,
+					buoySectionTime: buoySectionTime,
+					//当前 移动对象的  类型是否为最后一个
+					buoyType: buoyType,
 					draw: function() {
 						// 开始路径
 						this.ctx.beginPath();
@@ -194,75 +263,16 @@
 						// 闭合路径
 						this.ctx.closePath();
 						// this.ctx.fillRect(255, 255, 255,0.5);
-						this.ctx.fillStyle = "rgba(255, 255, 255,"+ this.opacity +")";
+						this.ctx.fillStyle = "rgba(255, 255, 255," + this.opacity + ")";
 						this.ctx.fill()
 					}
 				}
 			},
-			// 初始化浮标 对象 List 
-			initializationBuoyList() {
-				let canvas = this.canvas
-				//初始化 浮标  demo 只有一个
-				this.ecmArtworkNodeBuoyList.forEach((v, index) => {
-					let rectOpacity = v.buoyOpacity + 0
 
-					let rectX = parseInt(((v.buoyCoordinateX + 0) * this.canvasWidth).toFixed(0))
-					// console.log('矩形框的x轴坐标: ',rectX)
-					let rectY = parseInt(((v.buoyCoordinateY + 0) * this.canvasHeight).toFixed(0))
-					// console.log('矩形框的y轴坐标: ',rectY)
-					//矩形框高度
-					let rectH = parseInt(((v.buoyHigh + 0) * this.canvasHeight).toFixed(0))
-					// console.log('矩形框的高: ',rectH)
-					//矩形框宽度
-					let rectW = parseInt(((v.buoyWide + 0) * this.canvasWidth).toFixed(0))
-					// console.log('矩形框的宽: ',rectW)
-
-					
-					this.buoyRectList.push(this.initializationBuoy(rectX, rectY, rectW, rectH))  
-					// this.createRect(this.ctx, rectX, rectY, rectW, rectH, rectOpacity, index)
-					// canvas.requestAnimationFrame(() => {
-
-					// 	this.run(this.ctx, 0, rectY, rectW, rectH, rectOpacity)
-					// })
-
-					// setInterval(() => {
-					// 	this.run(ctx, rectX, rectY, rectW, rectH, rectOpacity)
-					// 	rectX = rectX - 5;
-
-					// }, 16);
-
-				})
-			},
-			//、 获取当前播放视频时间
-			getNewVideoPlayTime(e) {
-				//获取视频当前时间
-				this.currentTime = e.detail.currentTime
-				this.ecmArtworkNodeBuoyList.forEach((nodeBuoyList, index) => { 
-					// console.log(nodeBuoyList)
-					nodeBuoyList.forEach( (v,i) => {
-						console.log(v.buoySectionTime === Math.ceil( this.currentTime))
-						if (v.buoySectionTime ===Math.ceil( this.currentTime )) {
-							//判断 buoyRectList 是否有当前 浮标对象
-							let  a  = true
-							this.buoyRectList.forEach( rect => {
-								if (rect.nodeId === v.nodeId ) {
-									console.log('时间',this.currentTime)
-									a = false
-									rect = this.buoyToCanvasClass(rect)
-								}
-							})
-							if (a) {
-								this.buoyRectList.push(this.buoyToCanvasClass(rect))
-							}
-						}
-					})
-				})
-				
-			},
-			// 浮标对象 装车 canvas 对象 
+			// 浮标对象 转化 canvas移动对象
 			buoyToCanvasClass(v) {
 				let rectOpacity = v.buoyOpacity + 0
-				
+
 				let rectX = parseInt(((v.buoyCoordinateX + 0) * this.canvasWidth).toFixed(0))
 				// console.log('矩形框的x轴坐标: ',rectX)
 				let rectY = parseInt(((v.buoyCoordinateY + 0) * this.canvasHeight).toFixed(0))
@@ -272,56 +282,138 @@
 				// console.log('矩形框的高: ',rectH)
 				//矩形框宽度
 				let rectW = parseInt(((v.buoyWide + 0) * this.canvasWidth).toFixed(0))
-				
-				return this.initializationBuoy(rectX, rectY, rectW, rectH)
+
+				return this.initializationBuoy(rectX, rectY, rectW, rectH, rectOpacity)
 			},
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			initializationBuoyBall() {
-				this.ball = {
-					x: 100,
-					y: 100,
-					vx: 1,
-					vy: 1,
-					radius: 25,
-					color: 'blue',
-					ctx: this.ctx,
-					draw: function() {
-						this.ctx.beginPath();
-						this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
-						this.ctx.closePath();
-						this.ctx.fillStyle = this.color;
-						this.ctx.fill();
+			//、 获取当前播放视频时间
+			getNewVideoPlayTime(e) {
+				// 当前时间
+				let newTime = Math.floor(e.detail.currentTime)
+				this.newTime = e.detail.currentTime
+				// console.log('tie',e.detail.currentTime,'newTime',newTime)
+				// 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
+				if (this.currentTime == newTime || newTime == 0) {
+					// this.canvas.requestAnimationFrame(() => this.draw())
+					return
+				}
+				//获取视频当前时间
+				this.currentTime = newTime
+				// 遍历 初始化后的可直接用于画图的 类canvas对象2维数组 index 位置下表
+				this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
+					// 变量 为几号位置 数组 
+					nodeBuoyList.forEach((nodeBuoy) => {
+
+						//当时间相等时
+						if (nodeBuoy.buoySectionTime === newTime) {
+							// 遍历画图的 暂存对象数组 
+							this.buoyRectList.forEach((buoyRect, i) => {
+								// 当位置 不为空时说明 有以前的对象
+								if (this.buoyRectList[index] != null) {
+									if (nodeBuoy.nodeId === buoyRect.nodeId && index === i) {
+										this.buoyRectList[index] = nodeBuoy
+									}
+
+								}
+								//为空时说明应该加入新的对象
+								else {
+									this.buoyRectList.push(nodeBuoy)
+								}
+							})
+						}
+					})
+					this.ref = this.canvas.requestAnimationFrame(() => this.draw())
+				})
+			},
+			// 初始化浮标 对象 List
+			initializationBuoyList() {
+
+				this.ecmArtworkNodeBuoyList.forEach((nodeBuoyList, index) => {
+					let aList = []
+					nodeBuoyList.forEach((v, i) => {
+						if (v.buoyType != 2) {
+							let rectOpacity = v.buoyOpacity + 0
+
+							let rectX = parseInt(((v.buoyCoordinateX + 0) * this.canvasWidth).toFixed(0))
+							// console.log('矩形框的x轴坐标: ',rectX)
+							let rectY = parseInt(((v.buoyCoordinateY + 0) * this.canvasHeight).toFixed(0))
+							// console.log('矩形框的y轴坐标: ',rectY)
+							//矩形框高度
+							let rectH = parseInt(((v.buoyHigh + 0) * this.canvasHeight).toFixed(0))
+							// console.log('矩形框的高: ',rectH)
+							//矩形框宽度
+							let rectW = parseInt(((v.buoyWide + 0) * this.canvasWidth).toFixed(0))
+
+							let vTime = parseInt(nodeBuoyList[i + 1].buoySectionTime + 0) - parseInt(v.buoySectionTime + 0)
+							let vx = (parseInt(((nodeBuoyList[i + 1].buoyCoordinateX + 0) * this.canvasWidth).toFixed(0)) - rectX) / ((
+								vTime) * 58)
+							let vy = (parseInt(((nodeBuoyList[i + 1].buoyCoordinateY + 0) * this.canvasHeight).toFixed(0)) - rectY) / ((
+								vTime) * 58)
+							let buoy = this.initializationBuoy(rectX, rectY, rectW, rectH, vx, vy, rectOpacity, v.nodeId, v.buoySectionTime,
+								v.buoyType)
+							if (v.buoySectionTime == 0) {
+								this.buoyRectList.push(buoy)
+								// this.canvas.cancelAnimationFrame(this.ref)
+								this.ref = this.canvas.requestAnimationFrame(() => this.draw())
+							}
+							aList.push(buoy)
+						} else {
+							let buoy = this.initializationBuoy(0, 0, 0, 0, 0, 0, 0, v.nodeId, v.buoySectionTime, v.buoyType)
+							aList.push(buoy)
+						}
+
+					})
+					this.canvasNodeBuoyList.push(aList)
+					console.log(this.canvasNodeBuoyList)
+
+
+				})
+			},
+			// 视频加载完成
+			loadedmetadata() {
+				this.initializationBuoyList()
+			},
+			// 深拷贝 方法
+			deepCopy(o) {
+				return JSON.parse(JSON.stringify(o))
+			},
+			// canvas 触摸事件 
+			canvasTouchstart(e) {
+				// 获取当前的xy
+				let newX = e.changedTouches[0].x
+				// 获取 当前y
+				let newY = e.changedTouches[0].y
+				// 获取当前 移动对象的 数组
+				let nowBuoyRectList = this.deepCopy(this.buoyRectList)
+				// console.log('nowBuoyRectList',nowBuoyRectList)
+				// console.log('newY',newY)
+				// console.log('newX',newX)
+				nowBuoyRectList.forEach((v, i) => {
+					if (v.x <= newX && (v.x + v.rectW) >= newX) {
+						// 加10 增加判定区域
+						if (v.y <= newY && (v.y + v.rectH + 10) >= newY) {
+							console.log('y进了')
+							console.log(111111)
+							console.log(v.nodeId)
+						}
 					}
-				}
-			
+				})
+
 			},
-			drawBall() {
-				if (this.ball.y + this.ball.vy > this.canvas.height || this.ball.y + this.ball.vy < 0) {
-					this.ball.vy = - this.ball.vy;
-				}
-				if (this.ball.x + this.ball.vx > this.canvas.width || this.ball.x + this.ball.vx < 0) {
-					this.ball.vx = - this.ball.vx;
-				}
-				this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-				this.ball.draw();
-				this.ball.x += this.ball.vx;
-				this.ball.y += this.ball.vy;
-				this.canvas.requestAnimationFrame( () => this.drawBall());
+			getBuoyXyByTime(t) {
+
 			},
+			canvasTouchend(e) {},
+
+
+
+
+
+
+
+
+
+
+
 
 
 		}
