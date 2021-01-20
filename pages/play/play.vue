@@ -1936,17 +1936,17 @@
 						this.initPlayData(this.artworkTree,false)
 					}
 				}else{
-					if(this.isVideoEndFlag){
+					// if(this.isVideoEndFlag){
 						this.storyLineContentFlag = false
 						this.closeStoryLineReplayFlag = true
 						this.initPlayData(this.artworkTree,false)
-					}else{
+					/*} else{
 						if(uni.getStorageSync('isEndings') == 1){
 							this.videoShowFlag = true
 						}
 						this.storyLineContentFlag = false
 						this.videoContext.play()
-					}
+					} */
 				}
 			},
 			//点击举报关闭按钮触发事件
