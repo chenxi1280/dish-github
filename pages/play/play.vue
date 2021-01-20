@@ -293,13 +293,13 @@
 		<view v-if="multipleResultFlag" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform}" class="multipleResultPlayEndMask">
 		</view>
 		<!-- 选项百分比 -->
-		<!-- <view class="optionPercentagesBox" v-if="optionPercentageFlag" style="pointer-events: none;">
+		<view class="optionPercentagesBox" v-if="optionPercentageFlag" style="pointer-events: none;">
 			<view class="optionPercentages" v-for="(item, index) in optionPercentageNames" :key="index">
 				<view class="optionPercentageBox">
 					<view class="optionPercentage">{{optionPercentageNames[index]}}{{' : '}}{{optionPercentageValues[index]}}{{'%'}}</view>
 				</view>
 			</view>
-		</view> -->
+		</view>
 	</view>
 </template>
 
@@ -687,15 +687,15 @@
 		},
 		methods: {
 			//截取选项的名称
-			getOptionPercentageNames(){
+			getOptionPercentageNames(option){
 				this.optionPercentageNames = []
-				for(let i = 0; i < this.option.length; i++){
-					let len = this.option[i].length;
+				for(let i = 0; i < option.length; i++){
+					let len = option[i].length;
 					if(len > 3){
-						let name = this.option[i].substring(0,3)
+						let name = option[i].substring(0,3)
 						this.optionPercentageNames.push(name+"...")
 					}else{
-						this.optionPercentageNames.push(this.option[i])
+						this.optionPercentageNames.push(option[i])
 					}
 				}
 			},
@@ -984,9 +984,9 @@
 			//对节点播放数据进行筛选和提取
 			initPlayData(artworkTree, isJumpDialogCallbackFlag){
 				if(artworkTree.parentId === 0 ){
-					/* if(artworkTree.percentageState == 1){
+					if(artworkTree.percentageState == 1){
 						this.isShowOptionPercentageFlag = true
-					} */
+					}
 					if(this.popupTotalNumber > 0){
 						this.popupName = artworkTree.popupName
 					}
@@ -1663,7 +1663,6 @@
 				//根据是否是最后一个视频标志 最后一个视频播放结束弹出故事线 endFlag = true 表示不是最后一个视频
 				//获取用户的弹窗弹出数量
 				let popupWindowRecord = uni.getStorageSync('popupWindowRecord')
-				console.log('isJumpDialogCallbackFlag: ',isJumpDialogCallbackFlag)
 				if(!this.isMultipleResultPlayEnd){
 					//不是多结局作品的结局视频从storage获取弹窗标志
 					this.popupState = uni.getStorageSync('popupState')	
@@ -1671,8 +1670,6 @@
 					//多结局作品的结局视频在请求结束后弹窗标志就被赋值了，此处只需要重置多结局作品的结局视频的播放结束开关
 					this.isMultipleResultPlayEnd = true
 				}
-				console.log('this.popupState: ',this.popupState)
-				console.log('this.popupPosition: ',this.popupPosition)
 				if(!isJumpDialogCallbackFlag && this.popupState == 1 && this.popupPosition == 1){
 					console.log('isJumpDialogCallbackFlag: ',1)
 					this.popupWindowByPopupPositonEqualsOne()
@@ -1800,8 +1797,8 @@
 			clickCommonOptionTodo(index){
 				//获取百分比的名称和数据
 				if(this.isShowOptionPercentageFlag && this.artworkTree.parentId != 0){
-					this.getOptionSelectionRecord(this.artworkTree.pkDetailId,this.artworkTree.parentId)
-					this.getOptionPercentageNames()
+					this.getOptionSelectionRecord(this.childs[index].pkDetailId,this.childs[index].parentId)
+					this.getOptionPercentageNames(this.option)
 				}
 				//重置关闭故事线是否保存播放记录的开关
 				this.closeStoryLineReplayFlag = false
@@ -1924,13 +1921,11 @@
 				//新需求统一逻辑故事线关闭需要重头播放并且展示视频的前后弹窗
 				if(uni.getStorageSync('isEndings') == 1){
 					if(this.multipleResultReplayFlag){
-						console.log(1)
 						this.storyLineContentFlag = false
 						//是否存放播放记录的标志 开关故事线重播但是不保存播放记录
 						this.closeStoryLineReplayFlag = true
 						this.multipleResultCallbackTodo(false)
 					}else{
-						console.log(2)
 						this.storyLineContentFlag = false
 						this.closeStoryLineReplayFlag = true
 						this.initPlayData(this.artworkTree,false)
