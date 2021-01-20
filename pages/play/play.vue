@@ -870,6 +870,8 @@
 			},
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option){
+				//重置是否展示百分比开关
+				this.optionPercentageFlag = false
 				//故事线跳回重置多结局作品的结局视频关闭故事线的回调标志
 				this.multipleResultReplayFlag = false
 				//多结局作品结局视频回调开关只有在重新进入作品和故事线跳转时需要重置
@@ -879,6 +881,7 @@
 				uni.removeStorageSync('popupSettings')
 				//重置重播状态
 				uni.setStorageSync('isReplay',false)
+				//重置是否重播开关
 				this.iscustomLightFlag = false
 				//故事线跳转重置跳转节点的目标节点的id
 				this.linkNodeId = null
@@ -918,15 +921,12 @@
 				this.playedHistoryArray = uni.getStorageSync("pkDetailIds")
 				//重置多结局数组（故事线跳回时进行重组直接获取就好了）
 				this.multipleResultLine = uni.getStorageSync("multipleResultLine")
-				/* let multipleResultLine = uni.getStorageSync("multipleResultLine")
-				multipleResultLine.splice(this.playedHistoryArray.length,multipleResultLine.length -(this.playedHistoryArray.length))
-				console.log('数组截取的起始长度: ',this.playedHistoryArray.length)
-				console.log('数组截取的长度: ',multipleResultLine.length -(this.playedHistoryArray.length))
-				this.multipleResultLine = multipleResultLine
-				console.log("multipleResultLine: ", this.multipleResultLine)
-				uni.setStorageSync("multipleResultLine",multipleResultLine) */
 				//获取存放节点数值的容器
 				let appearConditionMap = uni.getStorageSync('appearConditionMap')
+				//故事线跳回获取百分比数据
+				if(this.isShowOptionPercentageFlag && !this.isPlayedFlag){
+					this.getOptionSelectionRecord(option.pkDetailId,null)
+				}
 				//不能判断是普通选项的跳转还是数值选项的跳转了 因为数值选项中也可能存在普通选项会导致误判
 				//所以不管是普通选项还是数值选项都要做一次分数的重新计算
 				//appearConditionMap != null 说明一定是树中含有数值选项的跳转 appearConditionMap == null 说明所有节点都是普通选项的跳转
@@ -990,8 +990,6 @@
 					if(this.popupTotalNumber > 0){
 						this.popupName = artworkTree.popupName
 					}
-				}else{
-					this.savaOptionSelectionRecord(artworkTree.pkDetailId,artworkTree.parentId)
 				}
 				this.detailId = artworkTree.pkDetailId
 				//获取用户的弹窗弹出数量
@@ -1077,9 +1075,7 @@
 							this.childs.push(childs[i])
 						}
 					}
-					// console.log('this.conditionState: ',this.conditionState)
 					this.tipsArray.length = this.option.length
-					// console.log('this.tipsArray.length: ',this.tipsArray.length)
 				}else{
 					//islink不是null且值为1说明该节点是跳转节点 需要注意叶子节点的孩子也是空的可能会走进else故要考虑过是否是叶子节点
 					if(artworkTree.isLink != null && artworkTree.isLink === 1){
@@ -1302,13 +1298,21 @@
 					data: {
 						pkArtworkId: this.artworkId,
 						parentId: parentId,
-						detailId: this.detailId
+						detailId: detailId
 					},
 					success: result=> {
 						if(result.data.status == 200){
-							this.optionPercentageValues = []
-							for(let i=0; i<result.data.data.length; i++){
-								this.optionPercentageValues.push(result.data.data[i])
+							if(!parentId){
+								this.optionPercentageValues = []
+								for(let i=0; i<result.data.data.percent.length; i++){
+									this.optionPercentageValues.push(result.data.data.percent[i])
+								}
+								this.getOptionPercentageNames(result.data.data.option)
+							}else{
+								this.optionPercentageValues = []
+								for(let i=0; i<result.data.data.percent.length; i++){
+									this.optionPercentageValues.push(result.data.data.percent[i])
+								}
 							}
 						}
 					}
@@ -1795,8 +1799,10 @@
 				}
 			},
 			clickCommonOptionTodo(index){
+				//保存用户的选择记录
+				this.savaOptionSelectionRecord(this.childs[index].pkDetailId,this.childs[index].parentId)
 				//获取百分比的名称和数据
-				if(this.isShowOptionPercentageFlag && this.artworkTree.parentId != 0){
+				if(this.isShowOptionPercentageFlag){
 					this.getOptionSelectionRecord(this.childs[index].pkDetailId,this.childs[index].parentId)
 					this.getOptionPercentageNames(this.option)
 				}
@@ -2672,7 +2678,8 @@
 				})
 			},
 			loadeddata(e){
-				if(this.isShowOptionPercentageFlag){
+				console.log('this.isPlayedFlag: ', this.isPlayedFlag)
+				if(this.isShowOptionPercentageFlag && !this.isPlayedFlag){
 					this.optionPercentageFlag = true
 					this.optionPercentageFunction= setTimeout(()=>{
 						this.optionPercentageFlag = false
