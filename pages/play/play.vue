@@ -888,7 +888,7 @@
 				//故事线跳转时清除好感度延时函数
 				clearTimeout(this.likabilityDelayFunction)
 				//故事线跳转时清除选项百分比延时函数
-				// clearTimeout(this.optionPercentageFunction)
+				clearTimeout(this.optionPercentageFunction)
 				//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
 				this.endFlag = true;
 				//重置用户选项分数
@@ -1368,7 +1368,7 @@
 				}else{
 					this.iscustomLightFlag = true
 				}
-				// clearTimeout(this.optionPercentageFunction)
+				clearTimeout(this.optionPercentageFunction)
 				this.likabilityArray = []
 				clearTimeout(this.likabilityDelayFunction)
 				this.likabilityFlag = false
@@ -1799,10 +1799,10 @@
 			},
 			clickCommonOptionTodo(index){
 				//获取百分比的名称和数据
-				/* if(this.isShowOptionPercentageFlag && this.artworkTree.parentId != 0){
+				if(this.isShowOptionPercentageFlag && this.artworkTree.parentId != 0){
 					this.getOptionSelectionRecord(this.artworkTree.pkDetailId,this.artworkTree.parentId)
 					this.getOptionPercentageNames()
-				} */
+				}
 				//重置关闭故事线是否保存播放记录的开关
 				this.closeStoryLineReplayFlag = false
 				//清除storage中缓存的节点的弹窗信息
@@ -1824,7 +1824,7 @@
 						this.background.splice(index,1,"")
 						this.likabilityFlag = false
 						// 播放结束清除延时函数
-						// clearTimeout(this.optionPercentageFunction)
+						clearTimeout(this.optionPercentageFunction)
 						clearTimeout(this.likabilityDelayFunction)
 						this.optionTouchendTodo(index)
 						//保存有效观看记录
@@ -2443,7 +2443,7 @@
 						}
 					}else{
 						this.likabilityArray = []
-						// clearTimeout(this.optionPercentageFunction)
+						clearTimeout(this.optionPercentageFunction)
 						clearTimeout(this.likabilityDelayFunction)
 						this.screenshotShowFlag = false
 						this.canvasTouchendEventTodo()
@@ -2677,12 +2677,12 @@
 				})
 			},
 			loadeddata(e){
-				/* if(this.isShowOptionPercentageFlag){
+				if(this.isShowOptionPercentageFlag){
 					this.optionPercentageFlag = true
 					this.optionPercentageFunction= setTimeout(()=>{
 						this.optionPercentageFlag = false
 					},5000)
-				} */
+				}
 				this.duration = e.detail.duration
 				let date = this.formatDate(this.duration)
 				this.durationStr = date
