@@ -1803,6 +1803,8 @@
 					this.getOptionSelectionRecord(this.artworkTree.pkDetailId,this.artworkTree.parentId)
 					this.getOptionPercentageNames()
 				} */
+				//重置关闭故事线是否保存播放记录的开关
+				this.closeStoryLineReplayFlag = false
 				//清除storage中缓存的节点的弹窗信息
 				uni.removeStorageSync('popupState')
 				uni.removeStorageSync('popupSettings')
@@ -1924,6 +1926,7 @@
 					if(this.multipleResultReplayFlag){
 						console.log(1)
 						this.storyLineContentFlag = false
+						//是否存放播放记录的标志 开关故事线重播但是不保存播放记录
 						this.closeStoryLineReplayFlag = true
 						this.multipleResultCallbackTodo(false)
 					}else{
@@ -2422,6 +2425,8 @@
 				}
 			},
 			clickPositionOptionTodo(){
+				//重置关闭故事线是否保存播放记录的开关
+				this.closeStoryLineReplayFlag = false
 				uni.removeStorageSync('popupState')
 				uni.removeStorageSync('popupSettings')
 				uni.setStorageSync('isReplay',false)
