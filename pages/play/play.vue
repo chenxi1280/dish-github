@@ -1918,6 +1918,7 @@
 				if(uni.getStorageSync('isEndings') == 1){
 					if(this.multipleResultReplayFlag){
 						this.storyLineContentFlag = false
+						//是否存放播放记录的标志 开关故事线重播但是不保存播放记录 
 						this.closeStoryLineReplayFlag = true
 						this.multipleResultCallbackTodo(false)
 					}else{
