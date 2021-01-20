@@ -564,7 +564,7 @@
 			}
 		},
 		onReady(){
-			//重置重播状态
+			//重置重播
 			uni.setStorageSync('isReplay',false)
 			//重置弹窗状态
 			uni.removeStorageSync('popupState')
@@ -870,6 +870,8 @@
 			},
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option){
+				//故事线跳回重置多结局作品的结局视频关闭故事线的回调标志
+				this.multipleResultReplayFlag = false
 				//多结局作品结局视频回调开关只有在重新进入作品和故事线跳转时需要重置
 				this.multipleResultFlag = false
 				//清除弹窗信息
@@ -1007,7 +1009,7 @@
 				}else{
 					this.isReplayPopupWindow = false
 				}
-				if(!isJumpDialogCallbackFlag && this.popupPosition == 0 && this.popupState == 1){
+				if(!isJumpDialogCallbackFlag && this.popupPosition == 0 && this.popupState == 1 && !this.isPlayedFlag){
 					this.popupWindowByPopupPositonEqualsZero()
 					return
 				}
@@ -1737,6 +1739,8 @@
 				if(uni.getStorageSync('isEndings') == 1){
 					this.videoShowFlag = false
 				}
+				//需求要求统一逻辑故事线打开关闭都需要重新播放
+				this.videoContext.seek(0)
 				//暂停视屏
 				this.videoContext.pause()
 			},
@@ -1799,6 +1803,8 @@
 					this.getOptionSelectionRecord(this.artworkTree.pkDetailId,this.artworkTree.parentId)
 					this.getOptionPercentageNames()
 				} */
+				//重置关闭故事线是否保存播放记录的开关
+				this.closeStoryLineReplayFlag = false
 				//清除storage中缓存的节点的弹窗信息
 				uni.removeStorageSync('popupState')
 				uni.removeStorageSync('popupSettings')
@@ -1915,13 +1921,16 @@
 			},
 			//点击故事线关闭按钮触发事件
 			closeStoryLineContent(){
+				//新需求统一逻辑故事线关闭需要重头播放并且展示视频的前后弹窗
 				if(uni.getStorageSync('isEndings') == 1){
 					if(this.multipleResultReplayFlag){
+						console.log(1)
 						this.storyLineContentFlag = false
-						//是否存放播放记录的标志 开关故事线重播但是不保存播放记录 
+						//是否存放播放记录的标志 开关故事线重播但是不保存播放记录
 						this.closeStoryLineReplayFlag = true
 						this.multipleResultCallbackTodo(false)
 					}else{
+						console.log(2)
 						this.storyLineContentFlag = false
 						this.closeStoryLineReplayFlag = true
 						this.initPlayData(this.artworkTree,false)
@@ -2416,6 +2425,8 @@
 				}
 			},
 			clickPositionOptionTodo(){
+				//重置关闭故事线是否保存播放记录的开关
+				this.closeStoryLineReplayFlag = false
 				uni.removeStorageSync('popupState')
 				uni.removeStorageSync('popupSettings')
 				uni.setStorageSync('isReplay',false)
@@ -2676,7 +2687,7 @@
 				let date = this.formatDate(this.duration)
 				this.durationStr = date
 				//判断是不是故事线跳转过来的第一个视频 第一个视频需要快进到结尾进行播放
-				if(this.isPlayedFlag && this.popupState == 0){
+				if(this.isPlayedFlag){
 					this.videoContext.seek(parseInt((this.duration-3).toFixed(0)))
 					this.isPlayedFlag = false
 				}
