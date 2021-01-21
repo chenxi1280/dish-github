@@ -197,8 +197,15 @@
 					if (status.isEnded) {
 						// console.log('给光')
 						globalBus.$emit('requestOfAES')
+						
 					} else {
 						// console.log('憨批用户不给光')
+						
+					}
+					console.log("广告被关闭",this.isCustom)
+					// 浮标修改
+					if (this.isCustom) {
+						this.$parent.recoveryBuoyDraw()
 					}
 					this.advertising.offClose()
 					/* this.advertising.destroy() */
@@ -206,8 +213,11 @@
 			},
 			// 关闭激励广告确认框
 			closeDialog () {
+				console.log("广告被关闭",this.isCustom)
 				if (this.isCustom) {
 					this.$emit('customCloseEvent')
+					// 浮标修改
+					this.$parent.recoveryBuoyDraw()
 				} else {
 					this.showAdvertisingFlag = false
 				}
