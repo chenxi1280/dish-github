@@ -46,6 +46,11 @@
 						if(res.data.data != null){
 							res.data.data.forEach(v => {
 								v.high = 287.1
+								if (v.logoPath != null) {
+									if (v.logoPath.indexOf( '/common') == -1) {
+										v.logoPath = v.logoPath + '/common'
+									}
+								}
 								this.flowList.push(v)
 							})
 							if(res.data.data.length < this.limit){
