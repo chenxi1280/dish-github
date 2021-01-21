@@ -10,6 +10,7 @@
 			<Advertising ref="verticalAdvertising" isCustom @customAddEvent="showDialog" @customConfirmEvent="openAdvertising" @customCloseEvent="closeDialog"
 			 :lightNumber="lightNumber" :ecmUserLightUpLimit="ecmUserLightUpLimit"></Advertising>
 		</view>
+
 		<view v-if="playMode" :style="{transform: transform, position: 'fixed', right: '-200rpx', top:'140rpx', zIndex: '9'}">
 			<Advertising ref="horizontalAdvertising" isCustom @customAddEvent="showDialog" @customConfirmEvent="openAdvertising" @customCloseEvent="closeDialog"
 			 :lightNumber="lightNumber" :ecmUserLightUpLimit="ecmUserLightUpLimit"></Advertising>
@@ -3329,33 +3330,66 @@
 					let aList = []
 					nodeBuoyList.forEach((v, i) => {
 						if (v.buoyType != 2) {
-							let rectOpacity = v.buoyOpacity - 0
-			
-							let rectX = parseInt(((v.buoyCoordinateX - 0) * this.canvasWidth).toFixed(0))
-							// console.log('矩形框的x轴坐标: ',rectX)
-							let rectY = parseInt(((v.buoyCoordinateY - 0) * this.canvasHeight).toFixed(0))
-							// console.log('矩形框的y轴坐标: ',rectY)
-							//矩形框高度
-							let rectH = parseInt(((v.buoyHigh - 0) * this.canvasHeight).toFixed(0))
-							// console.log('矩形框的高: ',rectH)
-							//矩形框宽度
-							let rectW = parseInt(((v.buoyWide - 0) * this.canvasWidth).toFixed(0))
-			
-							let buoySectionTime =  parseInt(v.buoySectionTime - 0)
-			
-							let vTime = parseInt(nodeBuoyList[i + 1].buoySectionTime - 0) - buoySectionTime
-							let vx = (parseInt(((nodeBuoyList[i + 1].buoyCoordinateX - 0) * this.canvasWidth).toFixed(0)) - rectX) / ((
-								vTime) * 60)
-							let vy = (parseInt(((nodeBuoyList[i + 1].buoyCoordinateY - 0) * this.canvasHeight).toFixed(0)) - rectY) / ((
-								vTime) * 60)
-							let buoy = this.initializationBuoy(rectX, rectY, rectW, rectH, vx, vy, rectOpacity, v.fkNodeId, buoySectionTime,
-								v.buoyType)
-							if (buoySectionTime === 0) {
-								this.buoyRectList.push(buoy)
-								// this.clearAnimation()
-								this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+							if (uni.getStorageSync('playMode')) {
+								let rectOpacity = (v.buoyOpacity - 0) /100
+										
+								let rectX = parseInt(( (1 - (v.buoyCoordinateY - 0)  - (v.buoyHigh - 0))* this.canvasWidth).toFixed(0))
+								// console.log('矩形框的x轴坐标: ',rectX)
+								let rectY = parseInt(((v.buoyCoordinateX  - 0) * this.canvasHeight).toFixed(0))
+								console.log('矩形框的y轴坐标: ',rectY)
+								console.log('矩形框的x轴坐标: ',rectX)
+								//矩形框高度
+								let rectH = parseInt(((v.buoyHigh - 0) * this.canvasWidth).toFixed(0))
+								// console.log('矩形框的高: ',rectH)
+								//矩形框宽度
+								let rectW = parseInt(((v.buoyWide - 0) * this.canvasHeight).toFixed(0))
+										
+								let buoySectionTime =  parseInt(v.buoySectionTime - 0)
+										
+								let vTime = parseInt(nodeBuoyList[i + 1].buoySectionTime - 0) - buoySectionTime
+								
+								let vx = ( parseInt(( (1 - (nodeBuoyList[i + 1].buoyCoordinateY - 0)  - (nodeBuoyList[i + 1].buoyHigh - 0))* this.canvasWidth).toFixed(0)) - rectX) / ((
+									vTime) * 60)
+								let vy = (parseInt(((nodeBuoyList[i + 1].buoyCoordinateX  - 0) * this.canvasHeight).toFixed(0)) - rectY) / ((
+									vTime) * 60)
+								let buoy = this.initializationBuoy(rectX, rectY, rectW, rectH, vx, vy, rectOpacity, v.fkNodeId, buoySectionTime,
+									v.buoyType)
+								if (buoySectionTime === 0) {
+									this.buoyRectList.push(buoy)
+									// this.clearAnimation()
+									this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+								}
+								aList.push(buoy)
+							}else {
+								let rectOpacity = (v.buoyOpacity - 0) /100
+										
+								let rectX = parseInt(((v.buoyCoordinateX - 0) * this.canvasWidth).toFixed(0))
+								// console.log('矩形框的x轴坐标: ',rectX)
+								let rectY = parseInt(((v.buoyCoordinateY - 0) * this.canvasHeight).toFixed(0))
+								// console.log('矩形框的y轴坐标: ',rectY)
+								//矩形框高度
+								let rectH = parseInt(((v.buoyHigh - 0) * this.canvasHeight).toFixed(0))
+								// console.log('矩形框的高: ',rectH)
+								//矩形框宽度
+								let rectW = parseInt(((v.buoyWide - 0) * this.canvasWidth).toFixed(0))
+										
+								let buoySectionTime =  parseInt(v.buoySectionTime - 0)
+										
+								let vTime = parseInt(nodeBuoyList[i + 1].buoySectionTime - 0) - buoySectionTime
+								let vx = (parseInt(((nodeBuoyList[i + 1].buoyCoordinateX - 0) * this.canvasWidth).toFixed(0)) - rectX) / ((
+									vTime) * 60)
+								let vy = (parseInt(((nodeBuoyList[i + 1].buoyCoordinateY - 0) * this.canvasHeight).toFixed(0)) - rectY) / ((
+									vTime) * 60)
+								let buoy = this.initializationBuoy(rectX, rectY, rectW, rectH, vx, vy, rectOpacity, v.fkNodeId, buoySectionTime,
+									v.buoyType)
+								if (buoySectionTime === 0) {
+									this.buoyRectList.push(buoy)
+									// this.clearAnimation()
+									this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+								}
+								aList.push(buoy)
 							}
-							aList.push(buoy)
+						
 						} else {
 							let buoy = this.initializationBuoy(0, 0, 0, 0, 0, 0, 0, v.fkNodeId,  parseInt(v.buoySectionTime - 0) , v.buoyType)
 							aList.push(buoy)
@@ -3389,7 +3423,6 @@
 						}
 					}
 				})
-				
 				if (this.storyLineBoxWidthMin<= newX && this.storyLineBoxWidthMax>= newX) {
 					if (this.storyLineBoxHeightMin <= newY && this.storyLineBoxHeightMax >= newY) {
 						console.log('故事线被点击了')
@@ -3416,7 +3449,7 @@
 						console.log('更多被点击了')
 						// this.clearNodeBuoyInfo()
 						this.goDiscover()
-						// this.stopBuoyDraw()
+						this.stopBuoyDraw()
 						return
 					}
 				}
@@ -3459,7 +3492,35 @@
 				let cw = ((ww - this.canvasWidth) * 0.5)
 				let ch = ((wh - this.canvasHeight) * 0.5)
 				console.log('初始化playMode',uni.getStorageSync('playMode'))
-				if (uni.getStorageSync('playMode') === 1) {
+				if (uni.getStorageSync('playMode')) {
+					console.log('cw',cw,'ch',ch)
+					// 故事线 图标位置
+					this.storyLineBoxWidthMin = ww - cw - this.getPxbyRpx(140) 
+					this.storyLineBoxWidthMax =  this.storyLineBoxWidthMin + this.getPxbyRpx(80) 
+					this.storyLineBoxHeightMin = (wh * 0.7) - ch - this.getPxbyRpx(60) 
+
+					this.storyLineBoxHeightMax = this.storyLineBoxHeightMin + this.getPxbyRpx(100)
+					
+					// 举报   图标位置
+					this.reportBoxWidthMin = this.storyLineBoxWidthMin
+					this.reportBoxWidthMax = this.storyLineBoxWidthMax
+					this.reportBoxHeightMin = (wh * 0.8) - ch - this.getPxbyRpx(60) 
+					this.reportBoxHeightMax = this.reportBoxHeightMin + this.getPxbyRpx(100)
+					
+					// 更多   图标位置
+					this.seeMoreBoxWidthMin = this.storyLineBoxWidthMin
+					this.seeMoreBoxWidthMax = this.storyLineBoxWidthMax
+					this.seeMoreBoxHeightMin = (wh * 0.9) - ch - this.getPxbyRpx(60) 
+					this.seeMoreBoxHeightMax = this.seeMoreBoxHeightMin + this.getPxbyRpx(100)
+					
+					// 广告 位置
+					this.advertisingDivWidthMin = ww - this.getPxbyRpx(80) - ch
+					this.advertisingDivWidthMax = this.advertisingDivWidthMin + this.getPxbyRpx(60)
+					this.advertisingDivHeightMin= this.getPxbyRpx(40)- cw
+					this.advertisingDivHeightMax = this.advertisingDivHeightMin  + this.getPxbyRpx(250)
+					
+					console.log("宽",this.advertisingDivWidthMin  ,this.advertisingDivWidthMax  )
+					console.log("高",this.advertisingDivHeightMin ,this.advertisingDivHeightMax )
 					
 				}else {
 					console.log('cw',cw,'ch',ch)
@@ -3482,13 +3543,10 @@
 					this.seeMoreBoxHeightMax = this.seeMoreBoxHeightMin + this.getPxbyRpx(80)
 					
 					// 广告 位置
-					this.advertisingDivWidthMin = this.getPxbyRpx(80) - cw
+					this.advertisingDivWidthMin = this.getPxbyRpx(160) - cw
 					this.advertisingDivWidthMax = this.advertisingDivWidthMin + this.getPxbyRpx(250)
 					this.advertisingDivHeightMin= this.getPxbyRpx(40)- ch
 					this.advertisingDivHeightMax = this.advertisingDivHeightMin + this.getPxbyRpx(60)
-					
-					
-					console.log('storyLineBoxWidthMin', this.storyLineBoxWidthMin)
 					
 					
 				}
