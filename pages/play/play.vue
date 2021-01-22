@@ -7,13 +7,13 @@
 			<image src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1609384346693loading2.gif"></image>
 		</view>
 		<view v-if="!playMode" :style="{transform: transform, position: 'fixed', left: '160rpx', top:'40rpx',zIndex: '9'}">
-			<Advertising ref="verticalAdvertising" isCustom @customAddEvent="showDialog" @customConfirmEvent="openAdvertising" @customCloseEvent="closeDialog"
-			 :lightNumber="lightNumber" :ecmUserLightUpLimit="ecmUserLightUpLimit"></Advertising>
+			<Advertising ref="verticalAdvertising" isCustom @customAddEvent="showDialog" @customConfirmEvent="openAdvertising"
+			 @customCloseEvent="closeDialog" :lightNumber="lightNumber" :ecmUserLightUpLimit="ecmUserLightUpLimit"></Advertising>
 		</view>
 
 		<view v-if="playMode" :style="{transform: transform, position: 'fixed', right: '-200rpx', top:'140rpx', zIndex: '9'}">
-			<Advertising ref="horizontalAdvertising" isCustom @customAddEvent="showDialog" @customConfirmEvent="openAdvertising" @customCloseEvent="closeDialog"
-			 :lightNumber="lightNumber" :ecmUserLightUpLimit="ecmUserLightUpLimit"></Advertising>
+			<Advertising ref="horizontalAdvertising" isCustom @customAddEvent="showDialog" @customConfirmEvent="openAdvertising"
+			 @customCloseEvent="closeDialog" :lightNumber="lightNumber" :ecmUserLightUpLimit="ecmUserLightUpLimit"></Advertising>
 		</view>
 		<!-- 确认观看激励视频广告的弹窗 -->
 		<view v-if="playMode">
@@ -48,11 +48,11 @@
 		</view>
 		<view class="play" :style="{'width': mobilePhoneWidth+'px', 'height': mobilePhoneHeight+'px'}">
 			<!-- 定位选项画布 -->
-			<view class="container"  v-show="showCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px'}">
-				  <canvas canvas-id="myCanvas" @touchstart="getTouchPosition" @touchend="canvasTouchendEvent"></canvas>
+			<view class="container" v-show="showCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px'}">
+				<canvas canvas-id="myCanvas" @touchstart="getTouchPosition" @touchend="canvasTouchendEvent"></canvas>
 			</view>
 			<view class="container" v-show="showBuoyCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px'}">
-				<canvas type="2d" id='posterCanvas' @touchstart="canvasBuoyTouchstart" ></canvas>
+				<canvas type="2d" id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas>
 			</view>
 			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" -->
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform}">
@@ -65,7 +65,7 @@
 				'background-repeat':'no-repeat', backgroundSize:'100% 100%'}"></view>
 			</view>
 			<!-- 普通选项 -->
-			<view class="chooseTipsMask15"  v-if="chooseTipsMaskFlag">
+			<view class="chooseTipsMask15" v-if="chooseTipsMaskFlag">
 				<view class="chooseTipsMask16" v-if="chooseTipsShowFlag" :style="{'transform': transform}">
 					<view class="chooseTips">
 						<view class="tips" v-for="(item, index) in tipsArray" :key="index">
@@ -89,7 +89,7 @@
 				</view>
 			</view>
 			<!-- 好感度 -->
-			<view :style="showStyleFlag?'display: block':'display: none'"  class="verticalLikabilityBox">
+			<view :style="showStyleFlag?'display: block':'display: none'" class="verticalLikabilityBox">
 				<view class="likabilityTips" v-if="likabilityFlag" style="pointer-events: none;">
 					<view class="lbtips" v-for="(item, index) in likabilityArray" :key="index">
 						<view class="likabilityBox">
@@ -98,7 +98,7 @@
 					</view>
 				</view>
 			</view>
-			<view :style="!showStyleFlag?'display: block':'display: none'"  class="horizontalLikabilityBox">
+			<view :style="!showStyleFlag?'display: block':'display: none'" class="horizontalLikabilityBox">
 				<view class="likabilityTips" v-if="likabilityFlag" style="pointer-events: none;">
 					<view class="lbtips" v-for="(item, index) in likabilityArray" :key="index">
 						<view class="likabilityBox">
@@ -120,7 +120,7 @@
 			<!-- 故事线和举报 -->
 			<!-- :style="hiddenBtnFlag?'display: block':'display: none'" -->
 			<!-- 竖屏 -->
-			<view v-if="hiddenBtnFlag" :style="showStyleFlag?'display: block':'display: none'" class= "verticalBox">
+			<view v-if="hiddenBtnFlag" :style="showStyleFlag?'display: block':'display: none'" class="verticalBox">
 				<view class="reportBox" @click="showReportContent">
 					<view class="reportIconBox">
 						<icon class="reportIcon"></icon>
@@ -141,7 +141,7 @@
 				</view>
 			</view>
 			<!-- 横屏 -->
-			<view v-if="hiddenBtnFlag" :style="!showStyleFlag?'display: block':'display: none'" class= "horizontalBox">
+			<view v-if="hiddenBtnFlag" :style="!showStyleFlag?'display: block':'display: none'" class="horizontalBox">
 				<view class="reportBox" @click="showReportContent">
 					<view class="reportIconBox">
 						<icon class="reportIcon"></icon>
@@ -176,7 +176,7 @@
 					</view>
 				</view>
 			</view>
-				<!-- 举报内容呈现在蒙板之上 -->
+			<!-- 举报内容呈现在蒙板之上 -->
 			<view class="reportContentMask16" v-if="reportContentFlag">
 				<view class="reportContentBox">
 					<view class="closeBox" @click="closeReportContent">
@@ -2931,7 +2931,7 @@
 				
 				//获取视频当前时间
 				this.currentTime = e.detail.currentTime
-				//获取视频当前时间
+								//获取视频当前时间
 				if(this.duration -this.currentTime > 0.4){
 					this.percent = parseInt(this.currentTime/this.duration*100)
 				}else{
@@ -2942,12 +2942,14 @@
 					// 当前时间
 					let newTime = Math.floor(this.currentTime)
 					this.buoyNewTime = this.currentTime
+					//速度校准
 					// console.log('tie',e.detail.currentTime,'newTime',newTime)
 					// 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
 					if (this.buoyCurrentTime == newTime || newTime == 0) {
 						// this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
 						return
 					}
+					this.buoySpeedCalibration()
 					//获取视频当前时间
 					this.buoyCurrentTime = newTime
 					// 遍历 初始化后的可直接用于画图的 类canvas对象2维数组 index 位置下表
@@ -3264,11 +3266,11 @@
 				this.buoyCtx.clearRect(0, 0, this.buoyCanvas.width, this.buoyCanvas.height);
 				this.buoyRectList.forEach((v, index) => {
 			
-					// if (v.y + v.vy > this.canvas.height || v.y + v.vy < 0) {
-					// 	v.vy = -v.vy;
+					// if (v.x >= v.targetX) {
+					// 	v.x = v.targetX;
 					// }
-					// if (v.x + v.vx > this.canvas.width || v.x + v.vx < 0) {
-					// 	v.vx = -v.vx;
+					// if (v.y >= v.targetY) {
+					// 	v.y = v.targetY;
 					// }
 					v.draw();
 					v.x += v.vx;
@@ -3281,7 +3283,7 @@
 				this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw());
 			},
 			// 初始化 浮标对象
-			initializationBuoy(rectX, rectY, rectH, rectW, vx, vy, rectOpacity, nodeId, buoySectionTime, buoyType) {
+			initializationBuoy(rectX, rectY, rectH, rectW, vx, vy, rectOpacity, nodeId, buoySectionTime, buoyType,targetX,targetY,targetTime) {
 				// 默认 透明度0.9
 				// rectOpacity = 0.9
 				return {
@@ -3305,6 +3307,12 @@
 					buoySectionTime: buoySectionTime ,
 					//当前 移动对象的  类型是否为最后一个
 					buoyType: buoyType,
+					// 目标位置 X
+					targetX:targetX,
+					//目标位置Y
+					targetY:targetY,
+					// 目标时间 
+					targetTime:targetTime,
 					draw: function() {
 						// 开始路径
 						this.ctx.beginPath();
@@ -3314,26 +3322,10 @@
 						// this.ctx.fillRect(255, 255, 255,0.5);
 						this.ctx.fillStyle = "rgba(255, 255, 255," + this.opacity + ")";
 						this.ctx.fill()
-			}
-		}
+					}
+				}
 			},
 			
-			// 浮标对象 转化 canvas移动对象
-			buoyToCanvasClass(v) {
-				let rectOpacity = v.buoyOpacity + 0
-			
-				let rectX = parseInt(((v.buoyCoordinateX + 0) * this.canvasWidth).toFixed(0))
-				// console.log('矩形框的x轴坐标: ',rectX)
-				let rectY = parseInt(((v.buoyCoordinateY + 0) * this.canvasHeight).toFixed(0))
-				// console.log('矩形框的y轴坐标: ',rectY)
-				//矩形框高度
-				let rectH = parseInt(((v.buoyHigh + 0) * this.canvasHeight).toFixed(0))
-				// console.log('矩形框的高: ',rectH)
-				//矩形框宽度
-				let rectW = parseInt(((v.buoyWide + 0) * this.canvasWidth).toFixed(0))
-			
-				return this.initializationBuoy(rectX, rectY, rectW, rectH, rectOpacity)
-			},
 			// 获取当前播放视频时间
 			getNewVideoPlayTime(e) {
 				// 当前时间
@@ -3344,7 +3336,7 @@
 				if (this.buoyCurrentTime == newTime || newTime == 0) {
 					// this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
 					return
-	}
+				}
 				//获取视频当前时间
 				this.buoyCurrentTime = newTime
 				// 遍历 初始化后的可直接用于画图的 类canvas对象2维数组 index 位置下表
@@ -3402,15 +3394,24 @@
 								let rectW = parseInt(((v.buoyWide - 0) * this.canvasHeight).toFixed(0))
 										
 								let buoySectionTime =  parseInt(v.buoySectionTime - 0)
+								// 目标时间
+								let targetTime = parseInt(nodeBuoyList[i + 1].buoySectionTime - 0) 
 										
-								let vTime = parseInt(nodeBuoyList[i + 1].buoySectionTime - 0) - buoySectionTime
+								let vTime = targetTime- buoySectionTime
 								
-								let vx = ( parseInt(( (1 - (nodeBuoyList[i + 1].buoyCoordinateY - 0)  - (nodeBuoyList[i + 1].buoyHigh - 0))* this.canvasWidth).toFixed(0)) - rectX) / ((
+								// 目标位置 X
+								let targetX = parseInt(( (1 - (nodeBuoyList[i + 1].buoyCoordinateY - 0)  - (nodeBuoyList[i + 1].buoyHigh - 0))* this.canvasWidth).toFixed(0))
+								// 目标位置 Y
+								let targetY = parseInt(((nodeBuoyList[i + 1].buoyCoordinateX  - 0) * this.canvasHeight).toFixed(0))
+								
+						
+								
+								let vx = ( targetX - rectX) / ((
 									vTime) * 60)
-								let vy = (parseInt(((nodeBuoyList[i + 1].buoyCoordinateX  - 0) * this.canvasHeight).toFixed(0)) - rectY) / ((
+								let vy = (targetY - rectY) / ((
 									vTime) * 60)
 								let buoy = this.initializationBuoy(rectX, rectY, rectW, rectH, vx, vy, rectOpacity, v.fkNodeId, buoySectionTime,
-									v.buoyType)
+									v.buoyType,targetX,targetY,targetTime)
 								if (buoySectionTime === 0) {
 									this.buoyRectList.push(buoy)
 									// this.clearAnimation()
@@ -3431,14 +3432,22 @@
 								let rectW = parseInt(((v.buoyWide - 0) * this.canvasWidth).toFixed(0))
 										
 								let buoySectionTime =  parseInt(v.buoySectionTime - 0)
-										
-								let vTime = parseInt(nodeBuoyList[i + 1].buoySectionTime - 0) - buoySectionTime
-								let vx = (parseInt(((nodeBuoyList[i + 1].buoyCoordinateX - 0) * this.canvasWidth).toFixed(0)) - rectX) / ((
+									
+								// 目标时间
+								let targetTime = parseInt(nodeBuoyList[i + 1].buoySectionTime - 0) 
+								
+								// 目标位置 X
+								let targetX = parseInt(((nodeBuoyList[i + 1].buoyCoordinateX - 0) * this.canvasWidth).toFixed(0))
+								// 目标位置 Y
+								let targetY = parseInt(((nodeBuoyList[i + 1].buoyCoordinateY - 0) * this.canvasHeight).toFixed(0))
+									
+								let vTime = targetTime  - buoySectionTime
+								let vx = (targetX - rectX) / ((
 									vTime) * 60)
-								let vy = (parseInt(((nodeBuoyList[i + 1].buoyCoordinateY - 0) * this.canvasHeight).toFixed(0)) - rectY) / ((
+								let vy = ( targetY - rectY) / ((
 									vTime) * 60)
 								let buoy = this.initializationBuoy(rectX, rectY, rectW, rectH, vx, vy, rectOpacity, v.fkNodeId, buoySectionTime,
-									v.buoyType)
+									v.buoyType,targetX,targetY,targetTime)
 								if (buoySectionTime === 0) {
 									this.buoyRectList.push(buoy)
 									// this.clearAnimation()
@@ -3448,7 +3457,7 @@
 							}
 						
 						} else {
-							let buoy = this.initializationBuoy(0, 0, 0, 0, 0, 0, 0, v.fkNodeId,  parseInt(v.buoySectionTime - 0) , v.buoyType)
+							let buoy = this.initializationBuoy(0, 0, 0, 0, 0, 0, 0, v.fkNodeId,  parseInt(v.buoySectionTime - 0) , v.buoyType,0,0,0)
 							aList.push(buoy)
 						}
 			
@@ -3670,7 +3679,17 @@
 
 			},
 			// 速度校准方法
-			
+			buoySpeedCalibration(){
+				// 时间  当前位置  距离  =》  新的 速度 
+				// 
+				console.log( this.currentTime)
+				this.buoyRectList.forEach( (buoyRect,index) => {
+					if ((buoyRect.targetTime - this.currentTime ) > 0) {
+						buoyRect.vx =( buoyRect.targetX - buoyRect.x) /( (buoyRect.targetTime - this.currentTime )  * 15)
+						buoyRect.vy = (buoyRect.targetY - buoyRect.y)/ ( (buoyRect.targetTime  - this.currentTime )  * 15)
+					}
+				})
+			}
 			
 		}
 	}
