@@ -2955,14 +2955,14 @@
 					// 遍历 初始化后的可直接用于画图的 类canvas对象2维数组 index 位置下表
 					this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
 						// 变量 为几号位置 数组
-						// console.log(index)
+						// console.log("nodeBuoyList",nodeBuoyList,"index",index)
 						nodeBuoyList.forEach((nodeBuoy) => {
 								
 							//当时间相等时
 							// console.log('时间',nodeBuoy.buoySectionTime === newTime)
 							// console.log(newTime)
 							if (nodeBuoy.buoySectionTime === newTime) {
-								// console.log(this.buoyRectList)
+								
 								this.buoyRectList[index] = nodeBuoy
 								// 遍历画图的 暂存对象数组
 								// this.buoyRectList.forEach((buoyRect, i) => {
@@ -3413,11 +3413,7 @@
 									vTime) * 60)
 								let buoy = this.initializationBuoy(rectX, rectY, rectW, rectH, vx, vy, rectOpacity, v.fkNodeId, buoySectionTime,
 									v.buoyType,targetX,targetY,targetTime)
-								if (buoySectionTime === 0) {
-									this.buoyRectList.push(buoy)
-									// this.clearAnimation()
-									this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
-								}
+								
 								aList.push(buoy)
 							}else {
 								let rectOpacity = (v.buoyOpacity - 0) /100
@@ -3449,11 +3445,7 @@
 									vTime) * 60)
 								let buoy = this.initializationBuoy(rectX, rectY, rectW, rectH, vx, vy, rectOpacity, v.fkNodeId, buoySectionTime,
 									v.buoyType,targetX,targetY,targetTime)
-								if (buoySectionTime === 0) {
-									this.buoyRectList.push(buoy)
-									// this.clearAnimation()
-									this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
-								}
+								
 								aList.push(buoy)
 							}
 						
@@ -3464,7 +3456,7 @@
 			
 					})
 					this.canvasNodeBuoyList.push(aList)
-					// console.log(this.canvasNodeBuoyList)
+					console.log("这是初始化",this.canvasNodeBuoyList[0])
 			
 			
 				})
@@ -3477,17 +3469,22 @@
 				let newY = e.changedTouches[0].y
 				// 获取当前 移动对象的 数组
 				let nowBuoyRectList = this.deepCopy(this.buoyRectList)
+				
+				let stopFlag = false 
 				// console.log('nowBuoyRectList',nowBuoyRectList)
 				console.log('newY',newY,'newX',newX)
 				console.log('nowBuoyRectList',nowBuoyRectList)
+
 				nowBuoyRectList.forEach((v, i) => {
 					if (v != null) {
 						if(uni.getStorageSync('playMode')) {
 							if (v.x <= newX && (v.x + v.rectH) >= newX) {
 								// 加10 增加判定区域
 								if (v.y <= newY && (v.y + v.rectW + 10) >= newY) {
+									console.log("我出发了选项点击")
 									this.optionIndex = i
 									this.clickCommonOptionTodo(i)
+									stopFlag= true
 									return
 								}
 							}
@@ -3495,19 +3492,24 @@
 							if (v.x <= newX && (v.x + v.rectW) >= newX) {
 								// 加10 增加判定区域
 								if (v.y <= newY && (v.y + v.rectH + 10) >= newY) {
+									console.log("我出发了选项点击")
 									this.optionIndex = i
 									this.clickCommonOptionTodo(i)
+									stopFlag= true
 									return
 								}
 							}
 						}
-						
-						
 					}
 				})
+				
+				if(stopFlag) {
+					return
+				}
+				
 				if (this.storyLineBoxWidthMin<= newX && this.storyLineBoxWidthMax>= newX) {
 					if (this.storyLineBoxHeightMin <= newY && this.storyLineBoxHeightMax >= newY) {
-				
+						console.log("故事线")
 						this.showBuoyCanvasFlag = false
 						// this.clearNodeBuoyInfo()
 						this.stopBuoyDraw()
@@ -3517,7 +3519,7 @@
 				}
 				if (this.reportBoxWidthMin<= newX && this.reportBoxWidthMax>= newX) {
 					if (this.reportBoxHeightMin <= newY && this.reportBoxHeightMax >= newY) {
-				
+						console.log("举报")
 						this.showBuoyCanvasFlag = false
 						// this.clearNodeBuoyInfo()
 						this.stopBuoyDraw()
@@ -3528,7 +3530,7 @@
 				if (this.seeMoreBoxWidthMin<= newX && this.seeMoreBoxWidthMax>= newX) {
 					if (this.seeMoreBoxHeightMin <= newY && this.seeMoreBoxHeightMax >= newY) {
 						this.showBuoyCanvasFlag = false
-		
+						console.log("更多")
 						// this.clearNodeBuoyInfo()
 						this.goDiscover()
 						this.stopBuoyDraw()
@@ -3537,7 +3539,7 @@
 				}
 				if (this.advertisingDivWidthMin <= newX && this.advertisingDivWidthMax>= newX) {
 					if (this.advertisingDivHeightMin <= newY && this.advertisingDivHeightMax >= newY) {
-	
+						console.log("广告")
 						this.showBuoyCanvasFlag = false
 						this.showDialog()
 						// this.$refs.verticalAdvertising.showAdvertising()
