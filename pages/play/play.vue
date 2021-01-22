@@ -3297,11 +3297,12 @@
 					// if (v.y >= v.targetY) {
 					// 	v.y = v.targetY;
 					// }
-					
-					v.draw();
-					v.x += v.vx;
-					v.y += v.vy;
-			
+					if(v != null) {
+						v.draw();
+						v.x += v.vx;
+						v.y += v.vy;
+					}
+								
 				})
 				// console.log('这是第',this.start)
 				// this.start +=1
@@ -3411,13 +3412,12 @@
 								let rectX = parseInt(( (1 - (v.buoyCoordinateY - 0)  - (v.buoyHigh - 0))* this.canvasWidth).toFixed(0))
 								// console.log('矩形框的x轴坐标: ',rectX)
 								let rectY = parseInt(((v.buoyCoordinateX  - 0) * this.canvasHeight).toFixed(0))
-								console.log('矩形框的y轴坐标: ',rectY)
-								console.log('矩形框的x轴坐标: ',rectX)
+								console.log('矩形框的y轴坐标: ',rectY,'矩形框的x轴坐标: ',rectX)
 								//矩形框高度
-								let rectH = parseInt(((v.buoyHigh - 0) * this.canvasWidth).toFixed(0))
+								let  rectW= parseInt(((v.buoyHigh - 0) * this.canvasWidth).toFixed(0))
 								// console.log('矩形框的高: ',rectH)
 								//矩形框宽度
-								let rectW = parseInt(((v.buoyWide - 0) * this.canvasHeight).toFixed(0))
+								let  rectH= parseInt(((v.buoyWide - 0) * this.canvasHeight).toFixed(0))
 										
 								let buoySectionTime =  parseInt(v.buoySectionTime - 0)
 								// 目标时间
@@ -3489,7 +3489,7 @@
 			
 					})
 					this.canvasNodeBuoyList.push(aList)
-					console.log(this.canvasNodeBuoyList)
+					// console.log(this.canvasNodeBuoyList)
 			
 			
 				})
@@ -3503,21 +3503,36 @@
 				// 获取当前 移动对象的 数组
 				let nowBuoyRectList = this.deepCopy(this.buoyRectList)
 				// console.log('nowBuoyRectList',nowBuoyRectList)
-				console.log('newY',newY)
-				console.log('newX',newX)
+				console.log('newY',newY,'newX',newX)
+				console.log('nowBuoyRectList',nowBuoyRectList)
 				nowBuoyRectList.forEach((v, i) => {
-					if (v.x <= newX && (v.x + v.rectW) >= newX) {
-						// 加10 增加判定区域
-						if (v.y <= newY && (v.y + v.rectH + 10) >= newY) {
-							this.optionIndex = i
-							this.clickCommonOptionTodo(i)
-							return
+					if (v != null) {
+						if(uni.getStorageSync('playMode')) {
+							if (v.x <= newX && (v.x + v.rectH) >= newX) {
+								// 加10 增加判定区域
+								if (v.y <= newY && (v.y + v.rectW + 10) >= newY) {
+									this.optionIndex = i
+									this.clickCommonOptionTodo(i)
+									return
+								}
+							}
+						}else{
+							if (v.x <= newX && (v.x + v.rectW) >= newX) {
+								// 加10 增加判定区域
+								if (v.y <= newY && (v.y + v.rectH + 10) >= newY) {
+									this.optionIndex = i
+									this.clickCommonOptionTodo(i)
+									return
+								}
+							}
 						}
+						
+						
 					}
 				})
 				if (this.storyLineBoxWidthMin<= newX && this.storyLineBoxWidthMax>= newX) {
 					if (this.storyLineBoxHeightMin <= newY && this.storyLineBoxHeightMax >= newY) {
-						console.log('故事线被点击了')
+				
 						this.showBuoyCanvasFlag = false
 						// this.clearNodeBuoyInfo()
 						this.stopBuoyDraw()
@@ -3527,7 +3542,7 @@
 				}
 				if (this.reportBoxWidthMin<= newX && this.reportBoxWidthMax>= newX) {
 					if (this.reportBoxHeightMin <= newY && this.reportBoxHeightMax >= newY) {
-						console.log('举报被点击了')
+				
 						this.showBuoyCanvasFlag = false
 						// this.clearNodeBuoyInfo()
 						this.stopBuoyDraw()
@@ -3538,7 +3553,7 @@
 				if (this.seeMoreBoxWidthMin<= newX && this.seeMoreBoxWidthMax>= newX) {
 					if (this.seeMoreBoxHeightMin <= newY && this.seeMoreBoxHeightMax >= newY) {
 						this.showBuoyCanvasFlag = false
-						console.log('更多被点击了')
+		
 						// this.clearNodeBuoyInfo()
 						this.goDiscover()
 						this.stopBuoyDraw()
@@ -3547,7 +3562,7 @@
 				}
 				if (this.advertisingDivWidthMin <= newX && this.advertisingDivWidthMax>= newX) {
 					if (this.advertisingDivHeightMin <= newY && this.advertisingDivHeightMax >= newY) {
-						console.log('广告被点击了')
+	
 						this.showBuoyCanvasFlag = false
 						this.showDialog()
 						// this.$refs.verticalAdvertising.showAdvertising()
@@ -3583,9 +3598,9 @@
 				let wh =  windowSize.windowHeight
 				let cw = ((ww - this.canvasWidth) * 0.5)
 				let ch = ((wh - this.canvasHeight) * 0.5)
-				console.log('初始化playMode',uni.getStorageSync('playMode'))
+
 				if (uni.getStorageSync('playMode')) {
-					console.log('cw',cw,'ch',ch)
+					// console.log('cw',cw,'ch',ch)
 					// 故事线 图标位置
 					this.storyLineBoxWidthMin = ww - cw - this.getPxbyRpx(140) 
 					this.storyLineBoxWidthMax =  this.storyLineBoxWidthMin + this.getPxbyRpx(80) 
@@ -3611,11 +3626,11 @@
 					this.advertisingDivHeightMin= this.getPxbyRpx(40)- ch
 					this.advertisingDivHeightMax = this.advertisingDivHeightMin  + this.getPxbyRpx(250)
 					
-					console.log("宽",this.advertisingDivWidthMin  ,this.advertisingDivWidthMax  )
-					console.log("高",this.advertisingDivHeightMin ,this.advertisingDivHeightMax )
+					// console.log("宽",this.advertisingDivWidthMin  ,this.advertisingDivWidthMax  )
+					// console.log("高",this.advertisingDivHeightMin ,this.advertisingDivHeightMax )
 					
 				}else {
-					console.log('cw',cw,'ch',ch)
+					// console.log('cw',cw,'ch',ch)
 					// 故事线 图标位置
 					this.storyLineBoxWidthMax = (ww * 0.94) - cw
 					this.storyLineBoxHeightMin = (wh * 0.37) - ch
@@ -3640,8 +3655,8 @@
 					this.advertisingDivHeightMin= this.getPxbyRpx(40)- ch
 					this.advertisingDivHeightMax = this.advertisingDivHeightMin + this.getPxbyRpx(60)
 					
-					console.log("宽",this.advertisingDivWidthMin  ,this.advertisingDivWidthMax  )
-					console.log("高",this.advertisingDivHeightMin ,this.advertisingDivHeightMax )
+					// console.log("宽",this.advertisingDivWidthMin  ,this.advertisingDivWidthMax  )
+					// console.log("高",this.advertisingDivHeightMin ,this.advertisingDivHeightMax )
 					
 				}
 				
@@ -3691,7 +3706,7 @@
 				// 	console.log(v)
 				// 	this.buoyRectList.push(this.initializationBuoy(v.x,v.y,v.rectW,v.rectH,v.vx,v.vy,v.opacity,v.nodeId,v.buoySectionTime,v.buoyType))
 				// })
-				console.log('this.buoyRectList111 ',this.buoyRectList )
+				// console.log('this.buoyRectList111 ',this.buoyRectList )
 				//视频回复
 				this.videoContext.play()
 				//canvas 回来
