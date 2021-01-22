@@ -3283,7 +3283,7 @@
 			// 初始化 浮标对象
 			initializationBuoy(rectX, rectY, rectH, rectW, vx, vy, rectOpacity, nodeId, buoySectionTime, buoyType) {
 				// 默认 透明度0.9
-				rectOpacity = 0.9
+				// rectOpacity = 0.9
 				return {
 					// x 位置
 					x: rectX,
