@@ -63,7 +63,9 @@
 		{
 			"path": "pages/mine/verfied"
 		},
-		
+		{
+			"path": "pages/play/buoyPreviewPlay"
+		},
 		
 		{
 			"path": "pages/search/result/result",

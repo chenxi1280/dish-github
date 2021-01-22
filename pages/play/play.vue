@@ -3272,11 +3272,12 @@
 					// if (v.y >= v.targetY) {
 					// 	v.y = v.targetY;
 					// }
-					
-					v.draw();
-					v.x += v.vx;
-					v.y += v.vy;
-			
+					if(v != null) {
+						v.draw();
+						v.x += v.vx;
+						v.y += v.vy;
+					}
+								
 				})
 				// console.log('这是第',this.start)
 				// this.start +=1
@@ -3480,13 +3481,28 @@
 				console.log('newY',newY,'newX',newX)
 				console.log('nowBuoyRectList',nowBuoyRectList)
 				nowBuoyRectList.forEach((v, i) => {
-					if (v.x <= newX && (v.x + v.rectW) >= newX) {
-						// 加10 增加判定区域
-						if (v.y <= newY && (v.y + v.rectH + 10) >= newY) {
-							this.optionIndex = i
-							this.clickCommonOptionTodo(i)
-							return
+					if (v != null) {
+						if(uni.getStorageSync('playMode')) {
+							if (v.x <= newX && (v.x + v.rectH) >= newX) {
+								// 加10 增加判定区域
+								if (v.y <= newY && (v.y + v.rectW + 10) >= newY) {
+									this.optionIndex = i
+									this.clickCommonOptionTodo(i)
+									return
+								}
+							}
+						}else{
+							if (v.x <= newX && (v.x + v.rectW) >= newX) {
+								// 加10 增加判定区域
+								if (v.y <= newY && (v.y + v.rectH + 10) >= newY) {
+									this.optionIndex = i
+									this.clickCommonOptionTodo(i)
+									return
+								}
+							}
 						}
+						
+						
 					}
 				})
 				if (this.storyLineBoxWidthMin<= newX && this.storyLineBoxWidthMax>= newX) {
