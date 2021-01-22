@@ -2949,7 +2949,7 @@
 						// this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
 						return
 					}
-					this.buoySpeedCalibration()
+					// this.buoySpeedCalibration()
 					//获取视频当前时间
 					this.buoyCurrentTime = newTime
 					// 遍历 初始化后的可直接用于画图的 类canvas对象2维数组 index 位置下表
@@ -3272,6 +3272,7 @@
 					// if (v.y >= v.targetY) {
 					// 	v.y = v.targetY;
 					// }
+					
 					v.draw();
 					v.x += v.vx;
 					v.y += v.vy;
