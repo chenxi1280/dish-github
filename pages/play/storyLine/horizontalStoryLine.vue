@@ -76,7 +76,7 @@
 		onReady(option) {
 			
 			this.onfloor = this.pkDetailIds.length - 1
-			let userId = uni.getStorageSync("userId")
+			let token = uni.getStorageSync("token")
 			let pkArtworkEndingNodeId = uni.getStorageSync("fkNodeId")
 			this.endingFlag =  uni.getStorageSync("isEndings")
 			uni.request({
@@ -86,7 +86,7 @@
 				data: {
 					pkArtworkId: this.pkArtworkId,
 					intVideoId: this.pkDetailIds[this.onfloor],
-					fkUserid: userId,
+					token: token,
 					pkArtworkEndingNodeId: pkArtworkEndingNodeId,
 					endingFlag:this.endingFlag
 				},

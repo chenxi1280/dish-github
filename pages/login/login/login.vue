@@ -134,8 +134,7 @@
 					if (res.data.status === 200) {
 						// console.log(res)
 						globalBus.$emit('getLight')
-						uni.setStorageSync('token', res.data.data.token)
-						uni.setStorageSync('userId', res.data.data.userId)
+						uni.setStorageSync('token', res.data.data)
 						uni.showToast({
 							title: '登录成功'
 						})
