@@ -299,8 +299,16 @@
 		<!-- 多结局作品结局视频播放前弹窗背景不符合需求用蒙版挡起来 -->
 		<view v-if="multipleResultFlag" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform}" class="multipleResultPlayEndMask">
 		</view>
-		<!-- 选项百分比 -->
-		<view class="optionPercentagesBox" v-if="optionPercentageFlag" style="pointer-events: none;">
+		<!-- 竖屏选项百分比 -->
+		<view class="verticalOptionPercentagesBox" v-if="verticalOptionPercentageFlag" style="pointer-events: none;">
+			<view class="optionPercentages" v-for="(item, index) in optionPercentageNames" :key="index">
+				<view class="optionPercentageBox">
+					<view class="optionPercentage">{{optionPercentageNames[index]}}{{' : '}}{{optionPercentageValues[index]}}{{'%'}}</view>
+				</view>
+			</view>
+		</view>
+		<!-- 横屏选项百分比 -->
+		<view class="horizontalOptionPercentagesBox" v-if="horizontalOptionPercentageFlag" style="pointer-events: none;">
 			<view class="optionPercentages" v-for="(item, index) in optionPercentageNames" :key="index">
 				<view class="optionPercentageBox">
 					<view class="optionPercentage">{{optionPercentageNames[index]}}{{' : '}}{{optionPercentageValues[index]}}{{'%'}}</view>
@@ -556,15 +564,14 @@
 				multipleResultFlag: false,
 				//选项百分比名称
 				optionPercentageNames: [],
-				//选项百分比开关
-				optionPercentageFlag: false,
+				//竖屏选项百分比开关
+				verticalOptionPercentageFlag: false,
+				//横屏选项百分比开关
+				horizontalOptionPercentageFlag: false,
 				//百分比延时函数
 				optionPercentageFunction: Function,
 				//选项百分比的值
 				optionPercentageValues: [],
-				
-				
-				
 				// 后台数据
 				ecmArtworkNodeBuoyList:[],
 				// canvas context 对象
@@ -952,7 +959,8 @@
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option){
 				//重置是否展示百分比开关
-				this.optionPercentageFlag = false
+				this.verticalOptionPercentageFlag = false
+				this.horizontalOptionPercentageFlag = false
 				//故事线跳回重置多结局作品的结局视频关闭故事线的回调标志
 				this.multipleResultReplayFlag = false
 				//多结局作品结局视频回调开关只有在重新进入作品和故事线跳转时需要重置
@@ -2606,6 +2614,13 @@
 				}
 			},
 			clickPositionOptionTodo(){
+				//保存用户的选择记录
+				this.savaOptionSelectionRecord(this.childs[this.touchRectNum].pkDetailId,this.childs[this.touchRectNum].parentId)
+				//获取百分比的名称和数据
+				if(this.isShowOptionPercentageFlag){
+					this.getOptionSelectionRecord(this.childs[this.touchRectNum].pkDetailId,this.childs[this.touchRectNum].parentId)
+					this.getOptionPercentageNames(this.option)
+				}
 				//重置关闭故事线是否保存播放记录的开关
 				this.closeStoryLineReplayFlag = false
 				uni.removeStorageSync('popupState')
@@ -2860,9 +2875,17 @@
 			loadeddata(e){
 				console.log('this.isPlayedFlag: ', this.isPlayedFlag)
 				if(this.isShowOptionPercentageFlag && !this.isPlayedFlag){
-					this.optionPercentageFlag = true
+					if(uni.getStorageSync('playMode') == 1){
+						this.horizontalOptionPercentageFlag = true
+					}else{
+						this.verticalOptionPercentageFlag = true
+					}
 					this.optionPercentageFunction= setTimeout(()=>{
-						this.optionPercentageFlag = false
+						if(uni.getStorageSync('playMode') == 1){
+							this.horizontalOptionPercentageFlag = false
+						}else{
+							this.verticalOptionPercentageFlag = false
+						}
 					},5000)
 				}
 				this.duration = e.detail.duration
@@ -2870,14 +2893,16 @@
 				this.durationStr = date
 				console.log('需要重投开始播放吗',this.bouyNodeFlage)
 				// 浮标修改
-				if(!this.bouyNodeFlage)  {
-				//判断是不是故事线跳转过来的第一个视频 第一个视频需要快进到结尾进行播放
+				console.log("!this.bouyNodeFlage",!this.bouyNodeFlage)
+				if(!this.bouyNodeFlage) {
+					//判断是不是故事线跳转过来的第一个视频 第一个视频需要快进到结尾进行播放
 					if(this.isPlayedFlag){
 						this.videoContext.seek(parseInt((this.duration-3).toFixed(0)))
 						this.isPlayedFlag = false
 					}
+				}else{
+					this.isPlayedFlag = false
 				}
-				
 				//加载完成将入场loading关闭
 				this.videoloadFlag = false
 				//展示故事线和举报
@@ -3717,12 +3742,39 @@
 	.playBox{
 		width: 100%;
 		height: 100%;
-		.optionPercentagesBox{
+		.verticalOptionPercentagesBox{
 			position: fixed;
 			right: 5%;
 			top: 12%;
 			height: 600rpx;
 			width: 290rpx;
+			z-index: 15;
+			// background-color: rgba(255,255,255,.5);
+			.optionPercentages{
+				height: 50rpx;
+				width: 100%;
+				.optionPercentageBox{
+					margin-top: 10rpx;
+					padding: 10rpx 20rpx;
+					height: 50rpx;
+					border-radius: 20rpx;
+					background-color: rgba(0,0,0,.3);
+					text-align: left;
+					.optionPercentage{
+						color: white;
+						font-size: 30rpx;
+						line-height: 30rpx;
+					}
+				}
+			}
+		}
+		.horizontalOptionPercentagesBox{
+			position: fixed;
+			left: 40%;
+			top: 81%;
+			height: 600rpx;
+			width: 290rpx;
+			transform: translate(-50%, -50%) rotateZ(90deg);
 			z-index: 15;
 			// background-color: rgba(255,255,255,.5);
 			.optionPercentages{
