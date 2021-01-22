@@ -3,6 +3,10 @@
 		"^u-(.*)": "@/uview-ui/components/u-$1/u-$1.vue"
 	},
 	"pages": [
+
+		// {
+		// 	"path": "pages/ad/adPage"
+		// },
 		{
 			"path": "pages/dishover/dishover",
 			"style": {
@@ -59,12 +63,8 @@
 		{
 			"path": "pages/mine/verfied"
 		},
-		{
-			"path": "pages/ad/adPage",
-			"style": {
-				"navigationBarTitleText": "广告"
-			}
-		},
+		
+		
 		{
 			"path": "pages/search/result/result",
 			"style": {

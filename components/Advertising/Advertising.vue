@@ -28,7 +28,7 @@
 
 <script>
 	import {globalBus} from '../../common/js/util.js'
-	// import CryptoJS from 'crypto-js'
+
 	import baseURL from '../../pages/login/config/config.js'
 	export default {
 		data() {
@@ -136,7 +136,7 @@
 					this.numberUrlOne = this.lightIconUrl.number[numberOne]
 				}
 			},
-			// 加密
+			// // 加密
 			// encrypt(plaintText) {
 			// 	// 秘钥
 			// 	const COUNT = "1&&2$*$2&&1**##$"
@@ -145,7 +145,7 @@
 			// 	const CHENXIDA = CryptoJS.AES.encrypt(SUNJIEJIE, UNCOUNT, {mode:CryptoJS.mode.ECB,padding: CryptoJS.pad.Pkcs7});
 			// 	return CHENXIDA.toString();
 			// },
-			// 解密
+			// // 解密
 			// decrypt(word){
 			// 	const CRYPTOJSKEY= "1&&2$*$2&&1**##$"
 			// 	const key  = CryptoJS.enc.Utf8.parse(CRYPTOJSKEY);//Latin1 w8m31+Yy/Nw6thPsMpO5fg==
@@ -197,8 +197,15 @@
 					if (status.isEnded) {
 						// console.log('给光')
 						globalBus.$emit('requestOfAES')
+						
 					} else {
 						// console.log('憨批用户不给光')
+						
+					}
+					console.log("广告被关闭",this.isCustom)
+					// 浮标修改
+					if (this.isCustom) {
+						this.$parent.recoveryBuoyDraw()
 					}
 					this.advertising.offClose()
 					/* this.advertising.destroy() */
@@ -206,8 +213,11 @@
 			},
 			// 关闭激励广告确认框
 			closeDialog () {
+				console.log("广告被关闭",this.isCustom)
 				if (this.isCustom) {
 					this.$emit('customCloseEvent')
+					// 浮标修改
+					this.$parent.recoveryBuoyDraw()
 				} else {
 					this.showAdvertisingFlag = false
 				}
