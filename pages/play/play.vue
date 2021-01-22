@@ -3600,11 +3600,13 @@
 					this.seeMoreBoxHeightMax = this.seeMoreBoxHeightMin + this.getPxbyRpx(80)
 					
 					// 广告 位置
-					this.advertisingDivWidthMin = this.getPxbyRpx(160) - cw
+					this.advertisingDivWidthMin = this.getPxbyRpx(60) - cw
 					this.advertisingDivWidthMax = this.advertisingDivWidthMin + this.getPxbyRpx(250)
 					this.advertisingDivHeightMin= this.getPxbyRpx(40)- ch
 					this.advertisingDivHeightMax = this.advertisingDivHeightMin + this.getPxbyRpx(60)
 					
+					console.log("宽",this.advertisingDivWidthMin  ,this.advertisingDivWidthMax  )
+					console.log("高",this.advertisingDivHeightMin ,this.advertisingDivHeightMax )
 					
 				}
 				
