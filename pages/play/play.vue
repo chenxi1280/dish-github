@@ -652,7 +652,7 @@
 				let b = arr[3] - 0
 				//b=1 表示用户扫描的预览的二维码
 				if(b == 1){
-					this.getUserIdByArtwordId(a)
+					this.checkUserIdInfos(a)
 				}else{
 					this.artworkId = a;
 				}
@@ -1437,20 +1437,25 @@
 					}
 				});
 			},
-			async getUserIdByArtwordId(a){
+			async checkUserIdInfos(a){
+				const token = uni.getStorageSync('token')
 				await uni.request ({
-					url: baseURL + "/wxPlay/getUserIdByArtwordId",
+					url: baseURL + "/wxPlay/checkUserIdInfos",
 					method: 'POST',
 					dataType: 'json',
 					data: {
-						pkArtworkId: a
+						pkArtworkId: a,
+						token: token
 					},
 					success: result=> {
 						if(result.data.status == 200){
-							const userId = uni.getStorageSync('userId')
-							if(result.data.data == userId){
+							console.log(result.data.msg)
+							if(result.data.msg === "success"){
 								this.artworkId = a
-							}else{
+							}
+						}else{
+							console.log(result.data.msg)
+							if(result.data.msg === "fail"){
 								uni.setStorageSync('previewArtworkId', a)
 								this.previewShow = true
 							}
@@ -1468,7 +1473,7 @@
 					method: 'POST',
 					dataType: 'json',
 					data: {
-						userId: uni.getStorageSync('userId'),
+						token: uni.getStorageSync('token'),
 						eventId: eventId
 					},
 					success: result=> {
@@ -1530,7 +1535,7 @@
 					dataType: 'json',
 					data: {
 						pkArtworkId: this.artworkId,
-						userId: uni.getStorageSync("userId")
+						token: uni.getStorageSync("token")
 					},
 					success: res=> {
 						if(res.data.status == 200){
@@ -1560,7 +1565,7 @@
 					data: {
 						pkArtworkId: this.artworkId,
 						detailId:  this.pkDetailId,
-						userId: uni.getStorageSync("userId")
+						token: uni.getStorageSync("token")
 					},
 					success: res=> {
 						if(res.data.status == 200){
@@ -1664,13 +1669,13 @@
 			},
 			//异步请求保存播放记录
 			async savaPlayRecord(){
-				let userId = uni.getStorageSync("userId")
+				let token = uni.getStorageSync("token")
 				if(uni.getStorageSync("openid")){
-					if(!userId){
+					if(!token){
 						if(this.savaRecordCount > 2){
 							this.savaRecordCount == 0
-							//三次都未请求到userID
-							userId = -1
+							//三次都未请求到token
+							token = -1
 						}else{
 							setTimeout(()=>{
 								this.savaPlayRecord()
@@ -1682,7 +1687,7 @@
 					}
 				}else{
 					//朋友圈点击
-					userId = -2
+					token = -2
 				}
 				await uni.request({
 					url: baseURL + "/wxPlay/savaPlayRecord",
@@ -1690,7 +1695,7 @@
 					dataType: 'json',
 					data: {
 						pkArtworkId: this.artworkId,
-						userId: userId,
+						token: token,
 						detailId: this.detailId
 					},
 					success: res=> {
@@ -1718,13 +1723,13 @@
 			},
 			//统计有效的播放记录（进入播放页面并点击了选项（只记录第一次选项的点击）
 			async statisticsPlayRecord(){
-				let userId = uni.getStorageSync("userId")
+				let token = uni.getStorageSync("token")
 				if(uni.getStorageSync("openid")){
-					if(!userId){
+					if(!token){
 						if(this.savaRecordCount > 2){
 							this.savaRecordCount == 0
-							//三次都未请求到userID
-							userId = -1
+							//三次都未请求到token
+							token = -1
 						}else{
 							this.statisticsPlayRecord()
 							this.savaRecordCount++
@@ -1734,7 +1739,7 @@
 					}
 				}else{
 					//朋友圈点击
-					userId = -2
+					token = -2
 				}
 				await uni.request({
 					url: baseURL + "/wxPlay/statisticsPlayRecord",
@@ -1742,7 +1747,7 @@
 					dataType: 'json',
 					data: {
 						fkArtworkId: this.artworkId,
-						fkUserId: userId,
+						token: token,
 						fkArtworkDetailId: this.detailId
 					},
 					success: res=> {
@@ -1754,13 +1759,13 @@
 			},
 			//统计故事线自然呈现记录（自然播放结束）
 			async statisticsStorylineNaturalshow(){
-				let userId = uni.getStorageSync("userId")
+				let token = uni.getStorageSync("token")
 				if(uni.getStorageSync("openid")){
-					if(!userId){
+					if(!token){
 						if(this.savaRecordCount > 2){
 							this.savaRecordCount == 0
-							//三次都未请求到userID
-							userId = -1
+							//三次都未请求到token
+							token = -1
 						}else{
 							this.statisticsStorylineNaturalshow()
 							this.savaRecordCount++
@@ -1770,7 +1775,7 @@
 					}
 				}else{
 					//朋友圈点击
-					userId = -2
+					token = -2
 				}
 				await uni.request({
 					url: baseURL + "/wxPlay/statisticsStorylineNaturalshow",
@@ -1778,7 +1783,7 @@
 					dataType: 'json',
 					data: {
 						fkArtworkId: this.artworkId,
-						fkUserId: userId,
+						token: token,
 						fkArtworkDetailId: this.detailId
 					},
 					success: res=> {
@@ -3074,7 +3079,7 @@
 						imgUrl: this.headImage,
 						content: this.textareaContent,
 						reportStatue: this.reportType,
-						fkUserid: uni.getStorageSync("userId"),
+						token: uni.getStorageSync("token"),
 						fkArtworkNodeId: uni.getStorageSync("detailId"),
 						fkArtworkId: this.artworkId
 					},

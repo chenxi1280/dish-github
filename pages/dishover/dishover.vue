@@ -175,8 +175,7 @@
 		onReady () {
 			this.isRequestAes()
 			this.isGetLight()
-		 	// TODO
-			if (uni.getStorageSync('userId')) {
+			if (uni.getStorageSync('token')) {
 				this.getLight()
 				this.getAddLightCount()
 			}
@@ -198,11 +197,10 @@
 					method:'post',
 					data: {
 						fkEcmUserLightEventId: 2,
-						// TODO
-						fkUserId: uni.getStorageSync('userId')
+						token: uni.getStorageSync('token')
 					},
 					success: (res) => {
-						const rewardLightStr = res.data.data.rewardLight || '+3'
+						const rewardLightStr = res.data.data && res.data.data.rewardLight ? res.data.data.rewardLight : '+3'
 						const rewardLight = rewardLightStr.split('+' || '-')[1] - 0 || 0
 						uni.setStorageSync('rewardLight', rewardLight)
 					}
@@ -229,7 +227,7 @@
 						method: 'POST',
 						dataType: 'json',
 						data: {
-							userId: uni.getStorageSync('userId'),
+							token: uni.getStorageSync('token'),
 							eventId: 2
 						},
 						success: res => {
@@ -248,8 +246,7 @@
 					method: 'POST',
 					dataType: 'json',
 					data: {
-						token: uni.getStorageSync('token'),
-						fkUserId: uni.getStorageSync('userId')
+						token: uni.getStorageSync('token')
 					},
 					header: {
 						'Authorization': uni.getStorageSync('token')

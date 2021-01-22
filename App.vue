@@ -66,11 +66,11 @@
                     },
                     success: (res) => {
                         if (res.data.status == 200) {
-													uni.setStorageSync("userId",res.data.data)
-													uni.reLaunch({
-															url: 'pages/dishover/dishover'
-													})
-													globalBus.$emit('getLightOfAppReady')
+							uni.setStorageSync("token",res.data.data)
+							uni.reLaunch({
+									url: 'pages/dishover/dishover'
+							})
+							globalBus.$emit('getLightOfAppReady')
                         }
                     }
                    

@@ -77,7 +77,7 @@
 			this.onfloor = this.pkDetailIds.length - 1
 			this.endingFlag = uni.getStorageSync("isEndings")
 			
-			let userId = uni.getStorageSync("userId")
+			let token = uni.getStorageSync("token")
 			let pkArtworkEndingNodeId = uni.getStorageSync("fkNodeId")
 			uni.request({
 				url: baseURL + '/Ecmartwork/getArtWorkNodes',
@@ -86,7 +86,7 @@
 				data: {
 					pkArtworkId: this.pkArtworkId,
 					intVideoId: this.pkDetailIds[this.onfloor],
-					fkUserid: userId,
+					token: token,
 					pkArtworkEndingNodeId: pkArtworkEndingNodeId,
 					endingFlag: this.endingFlag
 				},

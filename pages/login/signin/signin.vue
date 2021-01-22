@@ -147,7 +147,6 @@
 								uni.showToast({
 									title: '注册成功!'
 								})
-								uni.setStorageSync("userId",res.data.data)
 								// 注册清空表单
 								this.password = ''
 								this.username = ''
