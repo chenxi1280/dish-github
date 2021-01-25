@@ -790,7 +790,7 @@
 					//浮标改动
 					if (this.bouyNodeFlage) {
 						this.stopBuoyDraw()
-				}
+					}
 				}
 				
 			},
@@ -1494,7 +1494,8 @@
 							this.isHaveLight = false
 							this.showCanvasFlag = false
 							this.showAdvertisingFlag = true
-							// this.showDialog()
+							// 视频暂停
+							this.showDialog() 
 						}
 					}
 				});
@@ -1964,6 +1965,8 @@
 		
 				if(this.conditionState[index] == 1){
 					console.log('作者让你看广告啊，跟我没关系')
+					this.stopBuoyDraw()
+					
 					this.openAdvertising()
 				}else{
 					if(!this.iscustomLightFlag){
@@ -3406,7 +3409,8 @@
 					let aList = []
 					nodeBuoyList.forEach((v, i) => {
 						if (v.buoyType != 2) {
-							if (uni.getStorageSync('playMode')) {
+							if (uni.getStorageSync('playMode') == 1) {
+								console.log("横屏")
 								let rectOpacity = (v.buoyOpacity - 0) /100
 										
 								let rectX = parseInt(( (1 - (v.buoyCoordinateY - 0)  - (v.buoyHigh - 0))* this.canvasWidth).toFixed(0))
@@ -3441,6 +3445,7 @@
 								
 								aList.push(buoy)
 							}else {
+								console.log("竖屏")
 								let rectOpacity = (v.buoyOpacity - 0) /100
 										
 								let rectX = parseInt(((v.buoyCoordinateX - 0) * this.canvasWidth).toFixed(0))
@@ -3502,29 +3507,44 @@
 
 				nowBuoyRectList.forEach((v, i) => {
 					if (v != null) {
-						if(uni.getStorageSync('playMode')) {
-							if (v.x <= newX && (v.x + v.rectH) >= newX) {
-								// 加10 增加判定区域
-								if (v.y <= newY && (v.y + v.rectW + 10) >= newY) {
-									console.log("我出发了选项点击")
-									this.optionIndex = i
-									this.clickCommonOptionTodo(i)
-									stopFlag= true
-									return
-								}
-							}
-						}else{
-							if (v.x <= newX && (v.x + v.rectW) >= newX) {
-								// 加10 增加判定区域
-								if (v.y <= newY && (v.y + v.rectH + 10) >= newY) {
-									console.log("我出发了选项点击")
-									this.optionIndex = i
-									this.clickCommonOptionTodo(i)
-									stopFlag= true
-									return
-								}
+						
+						
+						if (v.x <= newX && (v.x + v.rectH) >= newX) {
+							// 加10 增加判定区域
+							if (v.y <= newY && (v.y + v.rectW + 10) >= newY) {
+								// console.log("我出发了选项点击")
+								this.optionIndex = i
+								this.clickCommonOptionTodo(i)
+								stopFlag= true
+								return
 							}
 						}
+						
+						// if(uni.getStorageSync('playMode') === 1) {
+						// 	console.log("横屏")
+						// 	if (v.x <= newX && (v.x + v.rectH) >= newX) {
+						// 		// 加10 增加判定区域
+						// 		if (v.y <= newY && (v.y + v.rectW + 10) >= newY) {
+						// 			console.log("我出发了选项点击")
+						// 			this.optionIndex = i
+						// 			this.clickCommonOptionTodo(i)
+						// 			stopFlag= true
+						// 			return
+						// 		}
+						// 	}
+						// }else{
+						// 	console.log("竖屏")
+						// 	if (v.x <= newX && (v.x + v.rectH) >= newX) {
+						// 		// 加10 增加判定区域
+						// 		if (v.y <= newY && (v.y + v.rectW + 10) >= newY) {
+						// 			console.log("我出发了选项点击")
+						// 			this.optionIndex = i
+						// 			this.clickCommonOptionTodo(i)
+						// 			stopFlag= true
+						// 			return
+						// 		}
+						// 	}
+						// }
 					}
 				})
 				
