@@ -11,13 +11,16 @@
 			</view>
 		</view>
 		<incentive :lightNumber="lightNumber" :ecmUserLightUpLimit="ecmUserLightUpLimit"></incentive>
-		<u-subsection :list="items" :current="0" @change="sectionChange"></u-subsection>
+		
+		<!-- <u-subsection :list="items" :current="0" @change="sectionChange"></u-subsection> -->
 		<view class="content">
-			<view v-if="current === 0">
+			<waterfall :flowList="hotList" :status="hotloadStatus"></waterfall>
+			<u-loadmore :bg-color="'#f2f2f2'" :status="hotLoadStatus"  :icon="true" :icon-type="'circle'" :load-text="loadText" />
+<!-- 			<view v-if="current === 0">
 				<waterfall :flowList="hotList" :status="hotloadStatus"></waterfall>
 				<u-loadmore :bg-color="'#f2f2f2'" :status="hotLoadStatus"  :icon="true" :icon-type="'circle'" :load-text="loadText" />
-			</view>
-			<view v-if="current === 1">
+			</view> -->
+			<!-- <view v-if="current === 1">
 
 				<u-sticky :bg-color="'#ffffff'">
 					<u-subsection :list="list" :current="currentsort" @change="changeSort" :mode="'button'" :bold="false"
@@ -59,7 +62,7 @@
 					</swiper>
 				</view>
 
-			</view>
+			</view> -->
 			<u-back-top :scroll-top="scrollTop"></u-back-top>
 		</view>
 
