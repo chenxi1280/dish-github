@@ -787,10 +787,14 @@
 			},
 			closeConditionDialog(){
 				this.showConditionAdvertisingFlag = false 
-				//随机数
-				const uuid = Math.random().toString(36).substring(2)
-				//初始化视频及选项
-				this.videoUrl = this.videoUrl+'?uuid='+uuid
+				if(this.isVideoEndFlag){
+					//随机数
+					const uuid = Math.random().toString(36).substring(2)
+					//初始化视频及选项
+					this.videoUrl = this.videoUrl+'?uuid='+uuid
+				}else {
+					this.recoveryBuoyDraw()
+				}
 				// this.clickCommonOptionTodo(this.optionIndex)
 				// this.videoContext.play()
 				// // 浮标修改
