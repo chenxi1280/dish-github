@@ -83,6 +83,7 @@
 		},
 		methods: {
 			initPageInfo() {
+				console.log(this.option.scene)
 				if(this.option.scene){
 						let scene = decodeURIComponent(this.option.scene);
 						var arr = scene.split('=')
@@ -405,14 +406,15 @@
 		
 			//异步请求获取作品树 by ArtworkId
 			async getArtworkTreeByArtworkId(){
+				this.artworkId = 10210;
 				console.log( this.artworkId)
 				await uni.request({
 					url: baseURL  + "/wxPlay/playArtWorkByChildTree",
 					method: 'POST',
 					dataType: 'json',
 					data: {
-						pkArtworkId: 10210,
-						pkDetailId: null,
+						pkArtworkId: this.artworkId,
+						pkDetailId: this.pkDetailId,
 						userId: uni.getStorageSync("userId"),
 						token: uni.getStorageSync("token")
 					},
