@@ -590,7 +590,7 @@
 				optionPercentageFunction: Function,
 				//选项百分比的值
 				optionPercentageValues: [],
-				// 浮标
+				// 浮标 
 				// 后台数据
 				ecmArtworkNodeBuoyList:[],
 				// canvas context 对象
