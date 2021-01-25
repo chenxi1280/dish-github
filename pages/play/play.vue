@@ -1467,8 +1467,8 @@
 					},
 					success: result=> {
 						if(result.data.status == 200){
-							console.log('data: ',)
-							this.optionPercentageValues = [result.data.data]
+							console.log('data: ',result.data.data)
+							this.optionPercentageValues = []
 							for(let i=0; i<result.data.data.percent.length; i++){
 								this.optionPercentageValues.push(result.data.data.percent[i])
 							}
