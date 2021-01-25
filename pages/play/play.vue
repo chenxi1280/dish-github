@@ -31,6 +31,7 @@
 				</view>
 			</u-modal>
 		</view>
+		
 		<view v-if="!playMode">
 			<u-modal v-model="showAdvertisingFlag" title="温馨提示" :show-confirm-button="false" z-index="999">
 				<view class="slot-content">
@@ -46,6 +47,23 @@
 				</view>
 			</u-modal>
 		</view>
+		
+		<view >
+			<u-modal v-model="showConditionAdvertisingFlag" title="温馨提示" :show-confirm-button="false" z-index="999">
+				<view class="slot-content">
+					<view style="padding: 0 20rpx;padding-top: 40rpx;">
+						<view >此选项作者设置必须观看广告才能观看哦</view>
+						<!-- <view v-if="!isHaveLight">当前光的数量不足，完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view> -->
+						<view @click="openAdvertising" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
+							<image src="../../static/icon/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
+							<view style="display: inline-block;margin-left: 10rpx;color: #fff;transform: translateY(-4rpx);">立即观看</view>
+						</view>
+						<view @click="closeConditionDialog" style="position: absolute;right: 20rpx; top: 20rpx;width: 40rpx;height: 40rpx;text-align: center;line-height: 40rpx;font-size: 40rpx;">x</view>
+					</view>
+				</view>
+			</u-modal>
+		</view>
+		
 		<view class="play" :style="{'width': mobilePhoneWidth+'px', 'height': mobilePhoneHeight+'px'}">
 			<!-- 定位选项画布 -->
 			<view class="container" v-show="showCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px'}">
@@ -337,6 +355,8 @@
 		},
 		data() {
 			return {
+				// 浮标广告弹窗
+				showConditionAdvertisingFlag:false,
 				//用户身份唯一识别符
 				token: null,
 				// 是否有光
@@ -765,6 +785,21 @@
 				this.lightNumber = uni.getStorageSync('lightNumber') || 0
 				this.ecmUserLightUpLimit = uni.getStorageSync('ecmUserLightUpLimit') || 0
 			},
+			closeConditionDialog(){
+				this.showConditionAdvertisingFlag = false 
+				//随机数
+				const uuid = Math.random().toString(36).substring(2)
+				//初始化视频及选项
+				this.videoUrl = this.videoUrl+'?uuid='+uuid
+				// this.clickCommonOptionTodo(this.optionIndex)
+				// this.videoContext.play()
+				// // 浮标修改
+				// if (this.bouyNodeFlage) {
+					
+				// 	// this.recoveryBuoyDraw()
+				// }
+				
+			},
 			// 关闭激励广告确认框
 			closeDialog () {
 				this.showAdvertisingFlag = false
@@ -777,9 +812,10 @@
 					// 浮标修改
 					if (this.bouyNodeFlage) {
 						this.recoveryBuoyDraw()
-				}
+					}
 				}
 			},
+			
 			// 显示激励广告确认弹窗
 			showDialog () {
 				console.log('我们显示激励广告确认弹窗  被调用')
@@ -874,14 +910,20 @@
 								this.showCanvasFlag = true
 							}
 						}else{
-							this.videoContext.play()
+							console.log('我进上面了')
 							// 浮标修改
-							if (this.bouyNodeFlage) {
+							if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
+								console.log('我进上面了111')
 								this.recoveryBuoyDraw()
+							}else {
+								this.videoContext.play()
+							}
 						}
-					}
 					//status.isEnded
 					if(status.isEnded){
+						// 关闭条件浮标 弹窗
+						this.showConditionAdvertisingFlag = false
+						
 						if(this.isPosition == 1){
 							//获取多结局作品开关
 							if(this.isGetMultipleFlag){
@@ -890,6 +932,7 @@
 							}else{
 								if(this.conditionState[this.touchRectNum] == 1){
 									//成功播放完广告
+									
 									this.customLightSuccessCallBack(this.touchRectNum)
 								}else{
 									console.log('给光')
@@ -897,15 +940,17 @@
 									
 									// 浮标修改
 									if (this.bouyNodeFlage) {
+										
 										this.recoveryBuoyDraw()
+									}
 								}
-							}
 							}
 						}else{
 							if(this.isGetMultipleFlag){
 								this.multipleResultAdvertiseShow = false
 								this.multipleResultCallbackTodo(false)
 							}else{
+								
 								// 条件 广告
 								if(this.conditionState[this.optionIndex] == 1){
 									//成功播放完广告
@@ -917,7 +962,6 @@
 									//浮标改动不稳定
 									if(this.isVideoEndFlag){
 										if(this.isVideoEndFlag){
-											console.log("浮标，自动选择 index 1")
 											this.optionIndex = 0
 											setTimeout(() => {
 												this.clickCommonOptionTodo(0)
@@ -942,18 +986,20 @@
 								}
 								this.showCanvasFlag = true
 							}
-							if(this.isVideoEndFlag){
+							console.log('我进下面了')
+							if(this.bouyNodeFlage && !this.showConditionAdvertisingFlag){
 								console.log("浮标，自动选择 index 1")
 								this.optionIndex = 0
 								this.clickCommonOptionTodo(0)
-						}
+							}
+							
 						}
 						// 浮标 结尾 广告 未看完 时间添加 
 						console.log('憨批用户不给光')
 						// 浮标修改
-						if (this.bouyNodeFlage) {
+						if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
 							this.recoveryBuoyDraw()
-					}
+						}
 					}
 					this.advertising.destroy()
 				})
@@ -1967,9 +2013,19 @@
 		
 				if(this.conditionState[index] == 1){
 					console.log('作者让你看广告啊，跟我没关系')
-					this.stopBuoyDraw()
+
+					// this.videoContext.play()
+					// 浮标修改
+					if (this.bouyNodeFlage) {
+						// this.recoveryBuoyDraw()
+						//视频暂停
+						this.videoContext.pause()
+						this.stopBuoyDraw()
+						this.showConditionAdvertisingFlag = true 
+					}else {
+						this.openAdvertising()
+					}
 					
-					this.openAdvertising()
 				}else{
 					if(!this.iscustomLightFlag){
 						if(this.storyLineJumpFlag){
@@ -2902,7 +2958,7 @@
 				if(!this.bouyNodeFlage) {
 					//判断是不是故事线跳转过来的第一个视频 第一个视频需要快进到结尾进行播放
 					if(this.isPlayedFlag){
-						this.videoContext.seek(parseInt((this.duration-3).toFixed(0)))
+						this.videoContext.seek(parseInt((this.duration -3).toFixed(0)))
 						this.isPlayedFlag = false
 					}
 				}else{
