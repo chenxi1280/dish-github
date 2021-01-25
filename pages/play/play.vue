@@ -3264,7 +3264,6 @@
 					})
 					.exec((res) => {
 						const canvas = res[0].node;
-						console.log(canvas)
 						this.buoyCanvas = canvas
 						canvas.width = this.canvasWidth
 						canvas.height = this.canvasHeight
@@ -3273,7 +3272,7 @@
 						// canvas.height =  603
 						
 						
-						console.log('this.canvasWidth',this.canvasWidth,'this.canvasHeight',this.canvasHeight)
+						// console.log('this.canvasWidth',this.canvasWidth,'this.canvasHeight',this.canvasHeight)
 						
 						const ctx = canvas.getContext('2d')
 						this.buoyCtx = ctx
@@ -3404,19 +3403,19 @@
 			},
 			// 初始化浮标 对象 List
 			initializationBuoyList() {
-				console.log(this.ecmArtworkNodeBuoyList)
+				// console.log(this.ecmArtworkNodeBuoyList)
 				this.ecmArtworkNodeBuoyList.forEach((nodeBuoyList, index) => {
 					let aList = []
 					nodeBuoyList.forEach((v, i) => {
 						if (v.buoyType != 2) {
 							if (uni.getStorageSync('playMode') == 1) {
-								console.log("横屏")
+								// console.log("横屏")
 								let rectOpacity = (v.buoyOpacity - 0) /100
 										
 								let rectX = parseInt(( (1 - (v.buoyCoordinateY - 0)  - (v.buoyHigh - 0))* this.canvasWidth).toFixed(0))
 								// console.log('矩形框的x轴坐标: ',rectX)
 								let rectY = parseInt(((v.buoyCoordinateX  - 0) * this.canvasHeight).toFixed(0))
-								console.log('矩形框的y轴坐标: ',rectY,'矩形框的x轴坐标: ',rectX)
+								// console.log('矩形框的y轴坐标: ',rectY,'矩形框的x轴坐标: ',rectX)
 								//矩形框高度
 								let  rectW= parseInt(((v.buoyHigh - 0) * this.canvasWidth).toFixed(0))
 								// console.log('矩形框的高: ',rectH)
@@ -3445,7 +3444,7 @@
 								
 								aList.push(buoy)
 							}else {
-								console.log("竖屏")
+								// console.log("竖屏")
 								let rectOpacity = (v.buoyOpacity - 0) /100
 										
 								let rectX = parseInt(((v.buoyCoordinateX - 0) * this.canvasWidth).toFixed(0))
@@ -3486,7 +3485,7 @@
 			
 					})
 					this.canvasNodeBuoyList.push(aList)
-					console.log("这是初始化",this.canvasNodeBuoyList[0])
+					// console.log("这是初始化",this.canvasNodeBuoyList[0])
 			
 			
 				})
@@ -3502,8 +3501,8 @@
 				
 				let stopFlag = false 
 				// console.log('nowBuoyRectList',nowBuoyRectList)
-				console.log('newY',newY,'newX',newX)
-				console.log('nowBuoyRectList',nowBuoyRectList)
+				// console.log('newY',newY,'newX',newX)
+				// console.log('nowBuoyRectList',nowBuoyRectList)
 
 				nowBuoyRectList.forEach((v, i) => {
 					if (v != null) {
@@ -3745,7 +3744,7 @@
 			buoySpeedCalibration(){
 				// 时间  当前位置  距离  =》  新的 速度 
 				// 
-				console.log( this.currentTime)
+				// console.log( this.currentTime)
 				this.buoyRectList.forEach( (buoyRect,index) => {
 					if ((buoyRect.targetTime - this.currentTime ) > 0) {
 						buoyRect.vx =( buoyRect.targetX - buoyRect.x) /( (buoyRect.targetTime - this.currentTime )  * 15)
