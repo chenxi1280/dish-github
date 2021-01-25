@@ -1465,7 +1465,13 @@
 						detailId: detailId
 					},
 					success: result=> {
-						//不做操作影响正常流程就好
+						if(result.data.status == 200){
+							console.log('data: ',)
+							this.optionPercentageValues = [result.data.data]
+							for(let i=0; i<result.data.data.percent.length; i++){
+								this.optionPercentageValues.push(result.data.data.percent[i])
+							}
+						}
 					}
 				});
 			},
@@ -1482,16 +1488,12 @@
 					success: result=> {
 						if(result.data.status == 200){
 							if(!parentId){
+								console.log('故事线跳回我去查询了百分比')
 								this.optionPercentageValues = []
 								for(let i=0; i<result.data.data.percent.length; i++){
 									this.optionPercentageValues.push(result.data.data.percent[i])
 								}
 								this.getOptionPercentageNames(result.data.data.option)
-							}else{
-								this.optionPercentageValues = []
-								for(let i=0; i<result.data.data.percent.length; i++){
-									this.optionPercentageValues.push(result.data.data.percent[i])
-								}
 							}
 						}
 					}
@@ -2005,7 +2007,6 @@
 				this.savaOptionSelectionRecord(this.childs[index].pkDetailId,this.childs[index].parentId)
 				//获取百分比的名称和数据
 				if(this.isShowOptionPercentageFlag){
-					this.getOptionSelectionRecord(this.childs[index].pkDetailId,this.childs[index].parentId)
 					this.getOptionPercentageNames(this.option)
 				}
 				//重置关闭故事线是否保存播放记录的开关
@@ -2683,7 +2684,6 @@
 				this.savaOptionSelectionRecord(this.childs[this.touchRectNum].pkDetailId,this.childs[this.touchRectNum].parentId)
 				//获取百分比的名称和数据
 				if(this.isShowOptionPercentageFlag){
-					this.getOptionSelectionRecord(this.childs[this.touchRectNum].pkDetailId,this.childs[this.touchRectNum].parentId)
 					this.getOptionPercentageNames(this.option)
 				}
 				//重置关闭故事线是否保存播放记录的开关
