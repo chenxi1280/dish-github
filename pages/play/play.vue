@@ -864,21 +864,21 @@
 				}
 				// 监听激励广告关闭
 				this.advertising.onClose((status) => {
-					if(this.isVideoEndFlag){
-						if(this.isPosition == 1){
-							if(this.playMode == 1){
-								this.initHorizontalCanvas()
-							}else{
-								this.initVerticalCanvas()
+						if(this.isVideoEndFlag){
+							if(this.isPosition == 1){
+								if(this.playMode == 1){
+									this.initHorizontalCanvas()
+								}else{
+									this.initVerticalCanvas()
+								}
+								this.showCanvasFlag = true
 							}
-							this.showCanvasFlag = true
+						}else{
+							this.videoContext.play()
+							// 浮标修改
+							if (this.bouyNodeFlage) {
+								this.recoveryBuoyDraw()
 						}
-					}else{
-						this.videoContext.play()
-						// 浮标修改
-						if (this.bouyNodeFlage) {
-							this.recoveryBuoyDraw()
-					}
 					}
 					//status.isEnded
 					if(status.isEnded){
@@ -922,9 +922,11 @@
 											setTimeout(() => {
 												this.clickCommonOptionTodo(0)
 											},1000)
+										}
+									}else{
+										this.clickCommonOptionTodo(this.optionIndex)
+									}
 								}
-							}
-						}
 							}
 						}
 					} else {
@@ -3312,7 +3314,7 @@
 				this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw());
 			},
 			// 初始化 浮标对象
-			initializationBuoy(rectX, rectY, rectH, rectW, vx, vy, rectOpacity, nodeId, buoySectionTime, buoyType,targetX,targetY,targetTime) {
+			initializationBuoy(rectX, rectY, rectW, rectH, vx, vy, rectOpacity, nodeId, buoySectionTime, buoyType,targetX,targetY,targetTime) {
 				// 默认 透明度0.9
 				// rectOpacity = 0.9
 				return {
@@ -3345,7 +3347,7 @@
 					draw: function() {
 						// 开始路径
 						this.ctx.beginPath();
-						this.ctx.rect(this.x, this.y, this.rectH, this.rectW)
+						this.ctx.rect(this.x, this.y, this.rectW, this.rectH)
 						// 闭合路径
 						this.ctx.closePath();
 						// this.ctx.fillRect(255, 255, 255,0.5);
@@ -3508,9 +3510,9 @@
 					if (v != null) {
 						
 						
-						if (v.x <= newX && (v.x + v.rectH) >= newX) {
+						if (v.x <= newX && (v.x + v.rectW) >= newX) {
 							// 加10 增加判定区域
-							if (v.y <= newY && (v.y + v.rectW + 10) >= newY) {
+							if (v.y <= newY && (v.y + v.rectH) >= newY) {
 								// console.log("我出发了选项点击")
 								this.optionIndex = i
 								this.clickCommonOptionTodo(i)
@@ -3531,6 +3533,7 @@
 						// 			return
 						// 		}
 						// 	}
+						
 						// }else{
 						// 	console.log("竖屏")
 						// 	if (v.x <= newX && (v.x + v.rectH) >= newX) {
