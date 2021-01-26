@@ -995,7 +995,10 @@
 
 						}else {
 							// 浮标修改
-							if (this.bouyNodeFlage ) {
+							if (this.bouyNodeFlage) {
+								if (this.showConditionAdvertisingFlag) {
+									this.showConditionAdvertisingFlag = false
+								}
 								this.recoveryBuoyDraw()
 							}
 						}
