@@ -1028,10 +1028,12 @@
 				this.linkNodeId = null
 				//初始化是否此视频是否播放过开关
 				this.isPlayedFlag = option.jumpFlag
-				// 浮标修改
-				if (this.isPlayedFlag) {
-					this.clearNodeBuoyInfo()
-				}
+				// 浮标修改 清楚信息
+				this.clearNodeBuoyInfo()
+				// if (this.isPlayedFlag) {
+				// 	this.clearNodeBuoyInfo()
+				// }
+				
 				this.storyLineJumpFlag = true
 				//故事线跳转时清除好感度延时函数
 				clearTimeout(this.likabilityDelayFunction)
