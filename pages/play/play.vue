@@ -911,10 +911,10 @@
 								this.showCanvasFlag = true
 							}
 						}else{
-							console.log('我进上面了')
+							
 							// 浮标修改
 							if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
-								console.log('我进上面了111')
+								
 								this.recoveryBuoyDraw()
 							}else {
 								this.videoContext.play()
@@ -1187,7 +1187,7 @@
 					this.ecmArtworkNodeBuoyList = artworkTree.ecmArtworkNodeBuoyVOList
 					this.bouyNodeFlage = true
 					this.showBuoyCanvasFlag = true
-					console.log('我进来了')
+					// console.log('我进来了')
 
 				}
 
@@ -2093,8 +2093,8 @@
 					uni.setStorageSync('multipleResultLine', this.multipleResultLine)
 					this.chooseTipsShowFlag = false
 					this.chooseTipsMaskFlag = false
-					console.log(' this.childs[index]', this.childs[index])
-					console.log(index)
+					// console.log(' this.childs[index]', this.childs[index])
+					// console.log(index)
 					// let child = this.childs[index]
 					// let popupState = this.childs[index].popupState
 					// if(popupState == 1){
@@ -3031,7 +3031,7 @@
 					}
 				// 浮标改动
 				}else if (this.isPosition === 2) {
-					console.log('我又进来了')
+					// console.log('我又进来了')
 					this.showBuoyCanvasFlag = true
 					this.initVerticalBuoyCanvas()
 				}
