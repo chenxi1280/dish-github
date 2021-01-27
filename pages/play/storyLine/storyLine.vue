@@ -277,11 +277,8 @@
 									moreEndingHistory.splice(i - 1)
 								}
 							}
-
 						}
 					}
-
-
 					if (this.endingFlag) {
 						if (nowFloor == 0) {
 							moreEndingHistory = []

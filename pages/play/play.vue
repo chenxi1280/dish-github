@@ -805,9 +805,15 @@
 			closeDialog () {
 				this.showAdvertisingFlag = false
 				if(this.isVideoEndFlag){
+					if(this.bouyNodeFlage) {
+						this.buoyRectList = []
+						this.canvasNodeBuoyList = []
+						this.againPlayVideo()
+					}
 					if(this.isPosition == 1){
 						this.showCanvasFlag = true
 					}
+					
 				}else{
 					this.videoContext.play()
 					// 浮标修改
@@ -819,6 +825,7 @@
 
 			// 显示激励广告确认弹窗
 			showDialog () {
+				// this.clearNodeBuoyInfo()
 				console.log('我们显示激励广告确认弹窗  被调用')
 				if(!this.isVideoEndFlag){
 					this.showCanvasFlag = false
@@ -827,6 +834,13 @@
 					//浮标改动
 					if (this.bouyNodeFlage) {
 						this.stopBuoyDraw()
+					}
+				
+				}else {
+					//浮标改动
+					if (this.bouyNodeFlage) {
+						this.stopBuoyDraw()
+						// this.clearNodeBuoyInfo()
 					}
 				}
 
@@ -3679,11 +3693,12 @@
 			},
 			// 清除浮标
 			clearNodeBuoyInfo() {
-
+				this.clearAnimation()
 				// 关闭 canvas
 				this.showBuoyCanvasFlag = false
 				//清空节点 浮标 标记
 				this.bouyNodeFlage = false
+				
 				//清空 所有数据
 				this.buoyRectList = []
 				this.canvasNodeBuoyList = []
