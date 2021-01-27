@@ -157,6 +157,12 @@
 					</view>
 					<view class="seeMore">看更多</view>
 				</view>
+				<view class="returnToPreviousBox" @click="returnToPrevious">
+					<view class="returnToPreviousIconBox">
+						<icon class="returnToPreviousIcon"></icon>
+					</view>
+					<view class="returnToPrevious">返回上级</view>
+				</view>
 			</view>
 			<!-- 横屏 -->
 			<view v-if="hiddenBtnFlag" :style="!showStyleFlag?'display: block':'display: none'" class="horizontalBox">
@@ -177,6 +183,12 @@
 						<icon class="seeMoreIcon"></icon>
 					</view>
 					<view class="seeMore">看更多</view>
+				</view>
+				<view class="returnToPreviousBox" @click="returnToPrevious">
+					<view class="returnToPreviousIconBox">
+						<icon class="returnToPreviousIcon"></icon>
+					</view>
+					<view class="returnToPrevious">返回上级</view>
 				</view>
 			</view>
 			<!-- 故事线内容呈现在蒙板之上 -->
@@ -263,6 +275,18 @@
 					<view @click="goAdvertisement" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
 						<image src="../../static/icon/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
 						<view style="display: inline-block;margin-left: 10rpx;color: #fff;transform: translateY(-4rpx);">查看结果</view>
+					</view>
+				</view>
+			</view>
+		</u-modal>
+		<u-modal v-model="returnToPreviouShow" title="温馨提示" :show-confirm-button="false" z-index="999">
+			<view class="slot-content">
+				<view style="padding: 0 20rpx;padding-top: 40rpx;">
+					<view style="text-align: center;">
+						<view >别点了，真的回不去了</view>
+					</view>
+					<view @click="returnToPreviouConfirm" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
+						<view style="display: inline-block;margin-left: 10rpx;color: #fff;transform: translateY(-4rpx);">确定</view>
 					</view>
 				</view>
 			</view>
@@ -626,6 +650,8 @@
 				seeMoreBoxHeightMax : 0,
 				// 浮标广告弹窗
 				showConditionAdvertisingFlag:false,
+				//是否展示返回上一级提示弹窗
+				returnToPreviouShow: false
 
 			}
 		},
@@ -753,6 +779,36 @@
 			}
 		},
 		methods: {
+			//返回上一级弹窗的确认事件
+			returnToPreviouConfirm(){
+				this.returnToPreviouShow = false
+			},
+			//返回上级
+			returnToPrevious(){
+				//若parentId是0或-1时点击返回上一级弹框提示（parentId为0根节点为-1多结局作品的结局视频）
+				if(this.parentId == -1 || this.parentId == 0){
+					return this.returnToPreviouShow = true
+				}
+				//返回上一级清除好感度延时函数
+				clearTimeout(this.likabilityDelayFunction)
+				//返回上一级清除选项百分比延时函数
+				clearTimeout(this.optionPercentageFunction)
+				//返回上一级需要重新拉取百分比
+				console.log("isShowOptionPercentageFlag: ",this.isShowOptionPercentageFlag)
+				if(this.isShowOptionPercentageFlag){
+					this.getOptionSelectionRecord(this.parentId,null)
+				}
+				//从parentId处砍掉播放记录
+				let pkDetailIds = uni.getStorageSync("pkDetailIds")
+				console.log("parentId: ",this.parentId)
+				console.log("detailIdArray1: ",pkDetailIds)
+				let index = pkDetailIds.indexOf(this.parentId)
+				console.log("index: ",index)
+				pkDetailIds.splice(index+1)
+				console.log("detailIdArray2: ",pkDetailIds)
+				// uni.setStorageSync("pkDetailIds",pkDetailIds)
+				this.getArtworkTreeByDetailId(this.parentId)
+			},
 			//截取选项的名称
 			getOptionPercentageNames(option){
 				this.optionPercentageNames = []
@@ -1062,7 +1118,7 @@
 				//请求获取主树
 				this.getArtworkTreeByArtworkId()
 				//请求获取子树
-				this.getArtworkTreeByDetailId()
+				this.getArtworkTreeByDetailId(option.pkDetailId)
 				//获取播放历史记录
 				this.playedHistoryArray = uni.getStorageSync("pkDetailIds")
 				//重置多结局数组（故事线跳回时进行重组直接获取就好了）
@@ -1620,7 +1676,7 @@
 				})
 			},
 			//异步请求获取作品树 by DetailId
-			async getArtworkTreeByDetailId(){
+			async getArtworkTreeByDetailId(detailId){
 				console.log( this.artworkId)
 				await uni.request({
 					url: baseURL + "/wxPlay/playArtWorkByChildTree",
@@ -1628,14 +1684,14 @@
 					dataType: 'json',
 					data: {
 						pkArtworkId: this.artworkId,
-						detailId:  this.pkDetailId,
+						detailId:  detailId,
 						token: uni.getStorageSync("token")
 					},
 					success: res=> {
 						if(res.data.status == 200){
 							uni.setStorageSync("artworkTree",res.data.data);
 							uni.setStorageSync('playMode',res.data.data.playMode);
-							uni.setStorageSync('isEndings',res.data.data.isEndings );
+							uni.setStorageSync('isEndings',res.data.data.isEndings);
 							uni.setStorageSync('popupState',res.data.data.popupState)
 							this.popupState = res.data.data.popupState
 							uni.setStorageSync('popupSettings',res.data.data.ecmArtworkNodePopupSettings)
@@ -4362,12 +4418,39 @@
 						line-height: 30rpx;
 					}
 				}
+				.returnToPreviousBox{
+					position: fixed;
+					right: 6%;
+					top: 61%;
+					height: 80rpx;
+					width: 100rpx;
+					z-index: 15;
+					background-color: rgba(0,0,0,.3);
+					border-radius: 20rpx;
+					.returnToPreviousIconBox{
+						width: 100rpx;
+						height: 50rpx;
+						text-align: center;
+						.returnToPreviousIcon{
+							width: 50rpx;
+							height: 50rpx;
+							background: url(../../static/icon/returnToPrevious.png) no-repeat center;
+							background-size: 50rpx;
+						}
+					}
+					.returnToPrevious{
+						text-align: center;
+						color: white;
+						font-size: 20rpx;
+						line-height: 30rpx;
+					}
+				}
 			}
 			.horizontalBox{
 				.storyLineBox{
 					position: fixed;
 					right: 0;
-					top: 70%;
+					top: 60%;
 					height: 80rpx;
 					width: 100rpx;
 					transform: translate(-50%, -50%) rotateZ(90deg);
@@ -4395,7 +4478,7 @@
 				.reportBox{
 					position: fixed;
 					right: 0;
-					top: 80%;
+					top: 70%;
 					transform: translate(-50%, -50%) rotateZ(90deg);
 					height: 80rpx;
 					width: 100rpx;
@@ -4423,7 +4506,7 @@
 				.seeMoreBox{
 					position: fixed;
 					right: 0;
-					top: 90%;
+					top: 80%;
 					transform: translate(-50%, -50%) rotateZ(90deg);
 					height: 80rpx;
 					width: 100rpx;
@@ -4442,6 +4525,34 @@
 						}
 					}
 					.seeMore{
+						text-align: center;
+						color: white;
+						font-size: 20rpx;
+						line-height: 30rpx;
+					}
+				}
+				.returnToPreviousBox{
+					position: fixed;
+					right: 0;
+					top: 90%;
+					transform: translate(-50%, -50%) rotateZ(90deg);
+					height: 80rpx;
+					width: 100rpx;
+					z-index: 15;
+					background-color: rgba(0,0,0,.3);
+					border-radius: 20rpx;
+					.returnToPreviousIconBox{
+						width: 100rpx;
+						height: 50rpx;
+						text-align: center;
+						.returnToPreviousIcon{
+							width: 50rpx;
+							height: 50rpx;
+							background: url(../../static/icon/returnToPrevious.png) no-repeat center;
+							background-size: 50rpx;
+						}
+					}
+					.returnToPrevious{
 						text-align: center;
 						color: white;
 						font-size: 20rpx;
