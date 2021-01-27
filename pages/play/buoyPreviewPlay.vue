@@ -104,7 +104,7 @@
 				// // console.log('画布的宽: ',this.canvasWidth)
 				// // console.log('画布的高: ',this.canvasHeight)
 				// buoyCtx.clearRect(0 , 0 , this.canvasWidth, this.canvasHeight)
-				const query = wx.createSelectorQuery()
+				const query = tt.createSelectorQuery()
 				query.select('#posterCanvas')
 					.fields({
 						node: true,

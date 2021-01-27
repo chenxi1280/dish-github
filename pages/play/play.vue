@@ -789,21 +789,17 @@
 			closeConditionDialog(){
 				this.showConditionAdvertisingFlag = false
 				if(this.isVideoEndFlag){
-					//随机数
-					const uuid = Math.random().toString(36).substring(2)
-					//初始化视频及选项
-					this.videoUrl = this.videoUrl+'?uuid='+uuid
+					this.againPlayVideo()
 				}else {
 					this.recoveryBuoyDraw()
 				}
-				// this.clickCommonOptionTodo(this.optionIndex)
-				// this.videoContext.play()
-				// // 浮标修改
-				// if (this.bouyNodeFlage) {
 
-				// 	// this.recoveryBuoyDraw()
-				// }
-
+			},
+			againPlayVideo(){
+				//随机数
+				const uuid = Math.random().toString(36).substring(2)
+				//初始化视频及选项
+				this.videoUrl = this.videoUrl+'?uuid='+uuid
 			},
 			// 关闭激励广告确认框
 			closeDialog () {
@@ -915,10 +911,10 @@
 								this.showCanvasFlag = true
 							}
 						}else{
-							console.log('我进上面了')
+							
 							// 浮标修改
 							if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
-								console.log('我进上面了111')
+								
 								this.recoveryBuoyDraw()
 							}else {
 								this.videoContext.play()
@@ -991,20 +987,23 @@
 								}
 								this.showCanvasFlag = true
 							}
-							console.log('我进下面了')
-							if(this.bouyNodeFlage && !this.showConditionAdvertisingFlag){
-								console.log("浮标，自动选择 index 1")
-								this.optionIndex = 0
-								this.clickCommonOptionTodo(0)
+							// console.log('我进下面了')
+							if(this.bouyNodeFlage ){
+								console.log('重新播放')
+								this.againPlayVideo()
 							}
 
+						}else {
+							// 浮标修改
+							if (this.bouyNodeFlage) {
+								if (this.showConditionAdvertisingFlag) {
+									this.showConditionAdvertisingFlag = false
+								}
+								this.recoveryBuoyDraw()
+							}
 						}
 						// 浮标 结尾 广告 未看完 时间添加
 						console.log('憨批用户不给光')
-						// 浮标修改
-						if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
-							this.recoveryBuoyDraw()
-						}
 					}
 					this.advertising.destroy()
 				})
@@ -1029,10 +1028,12 @@
 				this.linkNodeId = null
 				//初始化是否此视频是否播放过开关
 				this.isPlayedFlag = option.jumpFlag
-				// 浮标修改
-				if (this.isPlayedFlag) {
-					this.clearNodeBuoyInfo()
-				}
+				// 浮标修改 清楚信息
+				this.clearNodeBuoyInfo()
+				// if (this.isPlayedFlag) {
+				// 	this.clearNodeBuoyInfo()
+				// }
+				
 				this.storyLineJumpFlag = true
 				//故事线跳转时清除好感度延时函数
 				clearTimeout(this.likabilityDelayFunction)
@@ -1186,7 +1187,7 @@
 					this.ecmArtworkNodeBuoyList = artworkTree.ecmArtworkNodeBuoyVOList
 					this.bouyNodeFlage = true
 					this.showBuoyCanvasFlag = true
-					console.log('我进来了')
+					// console.log('我进来了')
 
 				}
 
@@ -1273,38 +1274,56 @@
 			},
 			//视频 播放后弹窗
 			popupWindowByPopupPositonEqualsOne(){
-				if(this.isPosition == 1 && uni.getStorageSync('playMode') == 1){
+				// 浮标 改动
+				if( uni.getStorageSync('playMode') == 1){
 					try{
+						this.stopBuoyDraw()
 						this.horizontalJumpDialogFlag = true
 						this.$refs.horizontalJumpDialog.horizontalJumpDialogFlag = true
 					}catch(e){
 					}
-					this.savaPopupWindowRecord()
 				}
-				if(this.isPosition == 1 && uni.getStorageSync('playMode') == 0){
+				if(uni.getStorageSync('playMode') == 0){
 					try{
+						this.stopBuoyDraw()
 						this.verticalJumpDialogFlag = true
 						this.$refs.verticalJumpDialog.verticalJumpDialogFlag = true
 					}catch(e){
 					}
-					this.savaPopupWindowRecord()
 				}
-				if(this.isPosition == 0 && uni.getStorageSync('playMode') == 1){
-					try{
-						this.horizontalJumpDialogFlag = true
-						this.$refs.horizontalJumpDialog.horizontalJumpDialogFlag = true
-					}catch(e){
-					}
-					this.savaPopupWindowRecord()
-				}
-				if(this.isPosition == 0 && uni.getStorageSync('playMode') == 0){
-					try{
-						this.verticalJumpDialogFlag = true
-						this.$refs.verticalJumpDialog.verticalJumpDialogFlag = true
-					}catch(e){
-					}
-					this.savaPopupWindowRecord()
-				}
+				this.savaPopupWindowRecord()
+				// if(this.isPosition == 1 && uni.getStorageSync('playMode') == 1){
+				// 	try{
+				// 		this.horizontalJumpDialogFlag = true
+				// 		this.$refs.horizontalJumpDialog.horizontalJumpDialogFlag = true
+				// 	}catch(e){
+				// 	}
+				// 	this.savaPopupWindowRecord()
+				// }
+				// if(this.isPosition == 1 && uni.getStorageSync('playMode') == 0){
+				// 	try{
+				// 		this.verticalJumpDialogFlag = true
+				// 		this.$refs.verticalJumpDialog.verticalJumpDialogFlag = true
+				// 	}catch(e){
+				// 	}
+				// 	this.savaPopupWindowRecord()
+				// }
+				// if(this.isPosition == 0 && uni.getStorageSync('playMode') == 1){
+				// 	try{
+				// 		this.horizontalJumpDialogFlag = true
+				// 		this.$refs.horizontalJumpDialog.horizontalJumpDialogFlag = true
+				// 	}catch(e){
+				// 	}
+				// 	this.savaPopupWindowRecord()
+				// }
+				// if(this.isPosition == 0 && uni.getStorageSync('playMode') == 0){
+				// 	try{
+				// 		this.verticalJumpDialogFlag = true
+				// 		this.$refs.verticalJumpDialog.verticalJumpDialogFlag = true
+				// 	}catch(e){
+				// 	}
+				// 	this.savaPopupWindowRecord()
+				// }
 			},
 			// 视频播放器 弹窗
 			popupWindowByPopupPositonEqualsZero(){
@@ -1325,7 +1344,7 @@
 					}catch(e){
 					}
 				}
-					this.savaPopupWindowRecord()
+				this.savaPopupWindowRecord()
 
 				// if(this.isPosition == 1 && uni.getStorageSync('playMode') == 1){
 				// 	try{
@@ -2074,8 +2093,8 @@
 					uni.setStorageSync('multipleResultLine', this.multipleResultLine)
 					this.chooseTipsShowFlag = false
 					this.chooseTipsMaskFlag = false
-					console.log(' this.childs[index]', this.childs[index])
-					console.log(index)
+					// console.log(' this.childs[index]', this.childs[index])
+					// console.log(index)
 					// let child = this.childs[index]
 					// let popupState = this.childs[index].popupState
 					// if(popupState == 1){
@@ -3012,7 +3031,7 @@
 					}
 				// 浮标改动
 				}else if (this.isPosition === 2) {
-					console.log('我又进来了')
+					// console.log('我又进来了')
 					this.showBuoyCanvasFlag = true
 					this.initVerticalBuoyCanvas()
 				}
@@ -3564,7 +3583,7 @@
 
 				let stopFlag = false
 				// console.log('nowBuoyRectList',nowBuoyRectList)
-				// console.log('newY',newY,'newX',newX)
+				console.log('newY',newY,'newX',newX)
 				// console.log('nowBuoyRectList',nowBuoyRectList)
 
 				nowBuoyRectList.forEach((v, i) => {
@@ -3768,8 +3787,9 @@
 			stopBuoyDraw(){
 				//视频暂停
 				this.videoContext.pause()
-
+				// 关闭canvas
 				this.showBuoyCanvasFlag = false
+
 				// this.stopBuoyRectList = this.deepCopy(this.buoyRectList )
 				// this.showBuoyCanvasFlag = false
 				//清空动画
