@@ -659,8 +659,6 @@
 				returnToPreviouShow: false,
 				//开场节点的detailId
 				startDetailId: 0,
-				//是否返回了开场
-				isReturnToStart: false
 			}
 		},
 		onReady(){
@@ -800,7 +798,6 @@
 				//返回上一级时如果是开场不去获取百分比
 				if(this.startDetailId == this.parentId){
 					this.isShowOptionPercentageFlag = false
-					this.isReturnToStart = true
 				}
 				//从parentId处砍掉播放记录
 				let pkDetailIds = uni.getStorageSync("pkDetailIds")
@@ -2239,9 +2236,9 @@
 							let popupSettings = this.childs[index].ecmArtworkNodePopupSettings
 							uni.setStorageSync('popupState',popupState)
 							uni.setStorageSync('popupSettings',popupSettings)
-					console.log(popupSettings)
+							console.log(popupSettings)
 						}
-				console.log("重新吊起initPlayData",this.childs[index])
+						console.log("重新吊起initPlayData",this.childs[index])
 						this.initPlayData(this.childs[index], false)
 			},
 			/* findmultipleResultChild(){
@@ -3038,22 +3035,18 @@
 			loadeddata(e){
 				console.log('this.isPlayedFlag: ', this.isPlayedFlag)
 				if(this.isShowOptionPercentageFlag && !this.isPlayedFlag && this.artworkTree.parentId != 0){
-					if(!this.isReturnToStart){
-						if(uni.getStorageSync('playMode') == 1){
-							this.horizontalOptionPercentageFlag = true
-						}else{
-							this.verticalOptionPercentageFlag = true
-						}
-						this.optionPercentageFunction= setTimeout(()=>{
-							if(uni.getStorageSync('playMode') == 1){
-								this.horizontalOptionPercentageFlag = false
-							}else{
-								this.verticalOptionPercentageFlag = false
-							}
-						},5000)	
+					if(uni.getStorageSync('playMode') == 1){
+						this.horizontalOptionPercentageFlag = true
 					}else{
-						this.isReturnToStart = false
+						this.verticalOptionPercentageFlag = true
 					}
+					this.optionPercentageFunction= setTimeout(()=>{
+						if(uni.getStorageSync('playMode') == 1){
+							this.horizontalOptionPercentageFlag = false
+						}else{
+							this.verticalOptionPercentageFlag = false
+						}
+					},5000)	
 				}else{
 					if(this.bouyNodeFlage  && this.artworkTree.parentId != 0){
 						if(uni.getStorageSync('playMode') == 1){
