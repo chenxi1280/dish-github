@@ -852,29 +852,31 @@
 			closeConditionDialog(){
 				this.showConditionAdvertisingFlag = false
 				if(this.isVideoEndFlag){
-					//随机数
-					const uuid = Math.random().toString(36).substring(2)
-					//初始化视频及选项
-					this.videoUrl = this.videoUrl+'?uuid='+uuid
+					this.againPlayVideo()
 				}else {
 					this.recoveryBuoyDraw()
 				}
-				// this.clickCommonOptionTodo(this.optionIndex)
-				// this.videoContext.play()
-				// // 浮标修改
-				// if (this.bouyNodeFlage) {
 
-				// 	// this.recoveryBuoyDraw()
-				// }
-
+			},
+			againPlayVideo(){
+				this.buoyRectList = []
+				this.canvasNodeBuoyList = []
+				//随机数
+				const uuid = Math.random().toString(36).substring(2)
+				//初始化视频及选项
+				this.videoUrl = this.videoUrl+'?uuid='+uuid
 			},
 			// 关闭激励广告确认框
 			closeDialog () {
 				this.showAdvertisingFlag = false
 				if(this.isVideoEndFlag){
+					if(this.bouyNodeFlage) {
+						this.againPlayVideo()
+					}
 					if(this.isPosition == 1){
 						this.showCanvasFlag = true
 					}
+					
 				}else{
 					this.videoContext.play()
 					// 浮标修改
@@ -886,6 +888,7 @@
 
 			// 显示激励广告确认弹窗
 			showDialog () {
+				// this.clearNodeBuoyInfo()
 				console.log('我们显示激励广告确认弹窗  被调用')
 				if(!this.isVideoEndFlag){
 					this.showCanvasFlag = false
@@ -894,6 +897,13 @@
 					//浮标改动
 					if (this.bouyNodeFlage) {
 						this.stopBuoyDraw()
+					}
+				
+				}else {
+					//浮标改动
+					if (this.bouyNodeFlage) {
+						this.stopBuoyDraw()
+						// this.clearNodeBuoyInfo()
 					}
 				}
 
@@ -978,10 +988,10 @@
 								this.showCanvasFlag = true
 							}
 						}else{
-							console.log('我进上面了')
+							
 							// 浮标修改
 							if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
-								console.log('我进上面了111')
+								
 								this.recoveryBuoyDraw()
 							}else {
 								this.videoContext.play()
@@ -1054,20 +1064,24 @@
 								}
 								this.showCanvasFlag = true
 							}
-							console.log('我进下面了')
-							if(this.bouyNodeFlage && !this.showConditionAdvertisingFlag){
-								console.log("浮标，自动选择 index 1")
-								this.optionIndex = 0
-								this.clickCommonOptionTodo(0)
+							// console.log('我进下面了')
+							if(this.bouyNodeFlage ){
+								this.buoyRectList = []
+								this.canvasNodeBuoyList = []
+								console.log('重新播放')
+								this.againPlayVideo()
 							}
-
+						}else {
+							// 浮标修改
+							if (this.bouyNodeFlage) {
+								if (this.showConditionAdvertisingFlag) {
+									this.showConditionAdvertisingFlag = false
+								}
+								this.recoveryBuoyDraw()
+							}
 						}
 						// 浮标 结尾 广告 未看完 时间添加
 						console.log('憨批用户不给光')
-						// 浮标修改
-						if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
-							this.recoveryBuoyDraw()
-						}
 					}
 					this.advertising.destroy()
 				})
@@ -1092,10 +1106,12 @@
 				this.linkNodeId = null
 				//初始化是否此视频是否播放过开关
 				this.isPlayedFlag = option.jumpFlag
-				// 浮标修改
-				if (this.isPlayedFlag) {
-					this.clearNodeBuoyInfo()
-				}
+				// 浮标修改 清楚信息
+				this.clearNodeBuoyInfo()
+				// if (this.isPlayedFlag) {
+				// 	this.clearNodeBuoyInfo()
+				// }
+				
 				this.storyLineJumpFlag = true
 				//故事线跳转时清除好感度延时函数
 				clearTimeout(this.likabilityDelayFunction)
@@ -1249,7 +1265,7 @@
 					this.ecmArtworkNodeBuoyList = artworkTree.ecmArtworkNodeBuoyVOList
 					this.bouyNodeFlage = true
 					this.showBuoyCanvasFlag = true
-					console.log('我进来了')
+					// console.log('我进来了')
 
 				}
 
@@ -1336,38 +1352,56 @@
 			},
 			//视频 播放后弹窗
 			popupWindowByPopupPositonEqualsOne(){
-				if(this.isPosition == 1 && uni.getStorageSync('playMode') == 1){
+				// 浮标 改动
+				if( uni.getStorageSync('playMode') == 1){
 					try{
+						this.stopBuoyDraw()
 						this.horizontalJumpDialogFlag = true
 						this.$refs.horizontalJumpDialog.horizontalJumpDialogFlag = true
 					}catch(e){
 					}
-					this.savaPopupWindowRecord()
 				}
-				if(this.isPosition == 1 && uni.getStorageSync('playMode') == 0){
+				if(uni.getStorageSync('playMode') == 0){
 					try{
+						this.stopBuoyDraw()
 						this.verticalJumpDialogFlag = true
 						this.$refs.verticalJumpDialog.verticalJumpDialogFlag = true
 					}catch(e){
 					}
-					this.savaPopupWindowRecord()
 				}
-				if(this.isPosition == 0 && uni.getStorageSync('playMode') == 1){
-					try{
-						this.horizontalJumpDialogFlag = true
-						this.$refs.horizontalJumpDialog.horizontalJumpDialogFlag = true
-					}catch(e){
-					}
-					this.savaPopupWindowRecord()
-				}
-				if(this.isPosition == 0 && uni.getStorageSync('playMode') == 0){
-					try{
-						this.verticalJumpDialogFlag = true
-						this.$refs.verticalJumpDialog.verticalJumpDialogFlag = true
-					}catch(e){
-					}
-					this.savaPopupWindowRecord()
-				}
+				this.savaPopupWindowRecord()
+				// if(this.isPosition == 1 && uni.getStorageSync('playMode') == 1){
+				// 	try{
+				// 		this.horizontalJumpDialogFlag = true
+				// 		this.$refs.horizontalJumpDialog.horizontalJumpDialogFlag = true
+				// 	}catch(e){
+				// 	}
+				// 	this.savaPopupWindowRecord()
+				// }
+				// if(this.isPosition == 1 && uni.getStorageSync('playMode') == 0){
+				// 	try{
+				// 		this.verticalJumpDialogFlag = true
+				// 		this.$refs.verticalJumpDialog.verticalJumpDialogFlag = true
+				// 	}catch(e){
+				// 	}
+				// 	this.savaPopupWindowRecord()
+				// }
+				// if(this.isPosition == 0 && uni.getStorageSync('playMode') == 1){
+				// 	try{
+				// 		this.horizontalJumpDialogFlag = true
+				// 		this.$refs.horizontalJumpDialog.horizontalJumpDialogFlag = true
+				// 	}catch(e){
+				// 	}
+				// 	this.savaPopupWindowRecord()
+				// }
+				// if(this.isPosition == 0 && uni.getStorageSync('playMode') == 0){
+				// 	try{
+				// 		this.verticalJumpDialogFlag = true
+				// 		this.$refs.verticalJumpDialog.verticalJumpDialogFlag = true
+				// 	}catch(e){
+				// 	}
+				// 	this.savaPopupWindowRecord()
+				// }
 			},
 			// 视频播放器 弹窗
 			popupWindowByPopupPositonEqualsZero(){
@@ -1388,7 +1422,7 @@
 					}catch(e){
 					}
 				}
-					this.savaPopupWindowRecord()
+				this.savaPopupWindowRecord()
 
 				// if(this.isPosition == 1 && uni.getStorageSync('playMode') == 1){
 				// 	try{
@@ -2137,8 +2171,8 @@
 					uni.setStorageSync('multipleResultLine', this.multipleResultLine)
 					this.chooseTipsShowFlag = false
 					this.chooseTipsMaskFlag = false
-					console.log(' this.childs[index]', this.childs[index])
-					console.log(index)
+					// console.log(' this.childs[index]', this.childs[index])
+					// console.log(index)
 					// let child = this.childs[index]
 					// let popupState = this.childs[index].popupState
 					// if(popupState == 1){
@@ -3003,7 +3037,7 @@
 			},
 			loadeddata(e){
 				console.log('this.isPlayedFlag: ', this.isPlayedFlag)
-				if(this.isShowOptionPercentageFlag && !this.isPlayedFlag){
+				if(this.isShowOptionPercentageFlag && !this.isPlayedFlag && this.artworkTree.parentId != 0){
 					if(!this.isReturnToStart){
 						if(uni.getStorageSync('playMode') == 1){
 							this.horizontalOptionPercentageFlag = true
@@ -3019,6 +3053,21 @@
 						},5000)	
 					}else{
 						this.isReturnToStart = false
+					}
+				}else{
+					if(this.bouyNodeFlage  && this.artworkTree.parentId != 0){
+						if(uni.getStorageSync('playMode') == 1){
+							this.horizontalOptionPercentageFlag = true
+						}else{
+							this.verticalOptionPercentageFlag = true
+						}
+						this.optionPercentageFunction= setTimeout(()=>{
+							if(uni.getStorageSync('playMode') == 1){
+								this.horizontalOptionPercentageFlag = false
+							}else{
+								this.verticalOptionPercentageFlag = false
+							}
+						},5000)
 					}
 				}
 				this.duration = e.detail.duration
@@ -3079,7 +3128,7 @@
 					}
 				// 浮标改动
 				}else if (this.isPosition === 2) {
-					console.log('我又进来了')
+					// console.log('我又进来了')
 					this.showBuoyCanvasFlag = true
 					this.initVerticalBuoyCanvas()
 				}
@@ -3728,7 +3777,6 @@
 						this.showBuoyCanvasFlag = false
 						this.showDialog()
 						// this.$refs.verticalAdvertising.showAdvertising()
-
 						return
 					}
 				}
@@ -3737,11 +3785,12 @@
 			},
 			// 清除浮标
 			clearNodeBuoyInfo() {
-
+				this.clearAnimation()
 				// 关闭 canvas
 				this.showBuoyCanvasFlag = false
 				//清空节点 浮标 标记
 				this.bouyNodeFlage = false
+				
 				//清空 所有数据
 				this.buoyRectList = []
 				this.canvasNodeBuoyList = []
@@ -3857,7 +3906,7 @@
 			stopBuoyDraw(){
 				//视频暂停
 				this.videoContext.pause()
-
+				// 关闭canvas
 				this.showBuoyCanvasFlag = false
 				// this.stopBuoyRectList = this.deepCopy(this.buoyRectList )
 				// this.showBuoyCanvasFlag = false
