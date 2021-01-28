@@ -796,6 +796,8 @@
 
 			},
 			againPlayVideo(){
+				this.buoyRectList = []
+				this.canvasNodeBuoyList = []
 				//随机数
 				const uuid = Math.random().toString(36).substring(2)
 				//初始化视频及选项
@@ -806,8 +808,6 @@
 				this.showAdvertisingFlag = false
 				if(this.isVideoEndFlag){
 					if(this.bouyNodeFlage) {
-						this.buoyRectList = []
-						this.canvasNodeBuoyList = []
 						this.againPlayVideo()
 					}
 					if(this.isPosition == 1){
