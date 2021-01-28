@@ -2974,7 +2974,7 @@
 			},
 			loadeddata(e){
 				console.log('this.isPlayedFlag: ', this.isPlayedFlag)
-				if(this.isShowOptionPercentageFlag && !this.isPlayedFlag){
+				if(this.isShowOptionPercentageFlag && !this.isPlayedFlag && this.artworkTree.parentId != 0){
 					if(uni.getStorageSync('playMode') == 1){
 						this.horizontalOptionPercentageFlag = true
 					}else{
