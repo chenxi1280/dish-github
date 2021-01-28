@@ -3685,7 +3685,6 @@
 						this.showBuoyCanvasFlag = false
 						this.showDialog()
 						// this.$refs.verticalAdvertising.showAdvertising()
-
 						return
 					}
 				}
