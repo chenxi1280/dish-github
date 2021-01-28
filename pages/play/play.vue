@@ -1003,10 +1003,11 @@
 							}
 							// console.log('我进下面了')
 							if(this.bouyNodeFlage ){
+								this.buoyRectList = []
+								this.canvasNodeBuoyList = []
 								console.log('重新播放')
 								this.againPlayVideo()
 							}
-
 						}else {
 							// 浮标修改
 							if (this.bouyNodeFlage) {
