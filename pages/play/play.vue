@@ -2987,6 +2987,21 @@
 							this.verticalOptionPercentageFlag = false
 						}
 					},5000)
+				}else{
+					if(this.bouyNodeFlage  && this.artworkTree.parentId != 0){
+						if(uni.getStorageSync('playMode') == 1){
+							this.horizontalOptionPercentageFlag = true
+						}else{
+							this.verticalOptionPercentageFlag = true
+						}
+						this.optionPercentageFunction= setTimeout(()=>{
+							if(uni.getStorageSync('playMode') == 1){
+								this.horizontalOptionPercentageFlag = false
+							}else{
+								this.verticalOptionPercentageFlag = false
+							}
+						},5000)
+					}
 				}
 				this.duration = e.detail.duration
 				let date = this.formatDate(this.duration)
