@@ -638,21 +638,29 @@
 				storyLineBoxHeightMin: 0,
 				storyLineBoxWidthMin : 0,
 				storyLineBoxHeightMax : 0,
-				// 图标位置
+				// 举报位置
 				reportBoxWidthMin: 0,
 				reportBoxWidthMax: 0,
 				reportBoxHeightMin: 0,
 				reportBoxHeightMax: 0,
-				// 图标位置
+				// 看更多位置
 				seeMoreBoxWidthMin : 0,
 				seeMoreBoxWidthMax : 0,
 				seeMoreBoxHeightMin: 0,
 				seeMoreBoxHeightMax : 0,
+				// 看更多位置
+				returnToPreviouWidthMin : 0,
+				returnToPreviouWidthMax : 0,
+				returnToPreviouHeightMin: 0,
+				returnToPreviouHeightMax : 0,
 				// 浮标广告弹窗
 				showConditionAdvertisingFlag:false,
 				//是否展示返回上一级提示弹窗
-				returnToPreviouShow: false
-
+				returnToPreviouShow: false,
+				//开场节点的detailId
+				startDetailId: 0,
+				//是否返回了开场
+				isReturnToStart: false
 			}
 		},
 		onReady(){
@@ -789,25 +797,24 @@
 				if(this.parentId == -1 || this.parentId == 0){
 					return this.returnToPreviouShow = true
 				}
-				//返回上一级清除好感度延时函数
-				clearTimeout(this.likabilityDelayFunction)
-				//返回上一级清除选项百分比延时函数
-				clearTimeout(this.optionPercentageFunction)
-				//返回上一级需要重新拉取百分比
-				console.log("isShowOptionPercentageFlag: ",this.isShowOptionPercentageFlag)
-				if(this.isShowOptionPercentageFlag){
-					this.getOptionSelectionRecord(this.parentId,null)
+				//返回上一级时如果是开场不去获取百分比
+				if(this.startDetailId == this.parentId){
+					this.isShowOptionPercentageFlag = false
+					this.isReturnToStart = true
 				}
 				//从parentId处砍掉播放记录
 				let pkDetailIds = uni.getStorageSync("pkDetailIds")
-				console.log("parentId: ",this.parentId)
-				console.log("detailIdArray1: ",pkDetailIds)
 				let index = pkDetailIds.indexOf(this.parentId)
-				console.log("index: ",index)
-				pkDetailIds.splice(index+1)
-				console.log("detailIdArray2: ",pkDetailIds)
-				// uni.setStorageSync("pkDetailIds",pkDetailIds)
-				this.getArtworkTreeByDetailId(this.parentId)
+				pkDetailIds.splice(index,pkDetailIds.length-index)
+				this.playedHistoryArray = pkDetailIds
+				uni.setStorageSync("pkDetailIds",this.playedHistoryArray)
+				//走故事线逻辑 组装option参数
+				let option = {
+					"pkArtworkId": this.artworkId,
+					"pkDetailId": this.parentId
+				}
+				this.storyLineJumpPlayTodo(option)
+				
 			},
 			//截取选项的名称
 			getOptionPercentageNames(option){
@@ -1185,8 +1192,8 @@
 			},
 			//对节点播放数据进行筛选和提取
 			initPlayData(artworkTree, isJumpDialogCallbackFlag){
-
 				if(artworkTree.parentId === 0 ){
+					this.startDetailId = artworkTree.pkDetailId
 					if(artworkTree.percentageState == 1){
 						this.isShowOptionPercentageFlag = true
 					}
@@ -2997,18 +3004,22 @@
 			loadeddata(e){
 				console.log('this.isPlayedFlag: ', this.isPlayedFlag)
 				if(this.isShowOptionPercentageFlag && !this.isPlayedFlag){
-					if(uni.getStorageSync('playMode') == 1){
-						this.horizontalOptionPercentageFlag = true
-					}else{
-						this.verticalOptionPercentageFlag = true
-					}
-					this.optionPercentageFunction= setTimeout(()=>{
+					if(!this.isReturnToStart){
 						if(uni.getStorageSync('playMode') == 1){
-							this.horizontalOptionPercentageFlag = false
+							this.horizontalOptionPercentageFlag = true
 						}else{
-							this.verticalOptionPercentageFlag = false
+							this.verticalOptionPercentageFlag = true
 						}
-					},5000)
+						this.optionPercentageFunction= setTimeout(()=>{
+							if(uni.getStorageSync('playMode') == 1){
+								this.horizontalOptionPercentageFlag = false
+							}else{
+								this.verticalOptionPercentageFlag = false
+							}
+						},5000)	
+					}else{
+						this.isReturnToStart = false
+					}
 				}
 				this.duration = e.detail.duration
 				let date = this.formatDate(this.duration)
@@ -3701,6 +3712,16 @@
 						return
 					}
 				}
+				if (this.returnToPreviouWidthMin<= newX && this.returnToPreviouWidthMax>= newX) {
+					if (this.returnToPreviouHeightMin <= newY && this.returnToPreviouHeightMax >= newY) {
+						this.showBuoyCanvasFlag = false
+						console.log("返回上级")
+						// this.clearNodeBuoyInfo()
+						this.returnToPrevious()
+						this.stopBuoyDraw()
+						return
+					}
+				}
 				if (this.advertisingDivWidthMin <= newX && this.advertisingDivWidthMax>= newX) {
 					if (this.advertisingDivHeightMin <= newY && this.advertisingDivHeightMax >= newY) {
 						console.log("广告")
@@ -3745,21 +3766,27 @@
 					// 故事线 图标位置
 					this.storyLineBoxWidthMin = ww - cw - this.getPxbyRpx(140)
 					this.storyLineBoxWidthMax =  this.storyLineBoxWidthMin + this.getPxbyRpx(80)
-					this.storyLineBoxHeightMin = (wh * 0.7) - ch - this.getPxbyRpx(60)
+					this.storyLineBoxHeightMin = (wh * 0.6) - ch - this.getPxbyRpx(60)
 
 					this.storyLineBoxHeightMax = this.storyLineBoxHeightMin + this.getPxbyRpx(100)
 
 					// 举报   图标位置
 					this.reportBoxWidthMin = this.storyLineBoxWidthMin
 					this.reportBoxWidthMax = this.storyLineBoxWidthMax
-					this.reportBoxHeightMin = (wh * 0.8) - ch - this.getPxbyRpx(60)
+					this.reportBoxHeightMin = (wh * 0.7) - ch - this.getPxbyRpx(60)
 					this.reportBoxHeightMax = this.reportBoxHeightMin + this.getPxbyRpx(100)
 
 					// 更多   图标位置
 					this.seeMoreBoxWidthMin = this.storyLineBoxWidthMin
 					this.seeMoreBoxWidthMax = this.storyLineBoxWidthMax
-					this.seeMoreBoxHeightMin = (wh * 0.9) - ch - this.getPxbyRpx(60)
+					this.seeMoreBoxHeightMin = (wh * 0.8) - ch - this.getPxbyRpx(60)
 					this.seeMoreBoxHeightMax = this.seeMoreBoxHeightMin + this.getPxbyRpx(100)
+					
+					// 返回上一级   图标位置
+					this.returnToPreviouWidthMin = this.storyLineBoxWidthMin
+					this.returnToPreviouWidthMax = this.storyLineBoxWidthMax
+					this.returnToPreviouHeightMin = (wh * 0.9) - ch - this.getPxbyRpx(60)
+					this.returnToPreviouHeightMax = this.returnToPreviouHeightMin + this.getPxbyRpx(100)
 
 					// 广告 位置
 					this.advertisingDivWidthMin = ww - this.getPxbyRpx(80) - cw
@@ -3789,6 +3816,12 @@
 					this.seeMoreBoxWidthMax = this.storyLineBoxWidthMax
 					this.seeMoreBoxHeightMin = (wh * 0.53) - ch
 					this.seeMoreBoxHeightMax = this.seeMoreBoxHeightMin + this.getPxbyRpx(80)
+					
+					//返回上一级   图标位置
+					this.returnToPreviouWidthMin = this.storyLineBoxWidthMin
+					this.returnToPreviouWidthMax = this.storyLineBoxWidthMax
+					this.returnToPreviouHeightMin = (wh * 0.61) - ch
+					this.returnToPreviouHeightMax = this.returnToPreviouHeightMin + this.getPxbyRpx(80)
 
 					// 广告 位置
 					this.advertisingDivWidthMin = this.getPxbyRpx(60) - cw
