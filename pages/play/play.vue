@@ -871,6 +871,9 @@
 							}
 							this.showCanvasFlag = true
 						}
+						if(this.bouyNodeFlage) {
+							this.againPlayVideo()
+						}
 					}
 				})
 				// 激励广告显示并加载
@@ -908,6 +911,9 @@
 										this.initVerticalCanvas()
 									}
 									this.showCanvasFlag = true
+								}
+								if(this.bouyNodeFlage) {
+									this.againPlayVideo()
 								}
 							}
 						})
