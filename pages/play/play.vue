@@ -1001,7 +1001,7 @@
 											this.optionIndex = 0
 											setTimeout(() => {
 												this.clickCommonOptionTodo(0)
-											},1000)
+											},500)
 										}
 									}else{
 										this.clickCommonOptionTodo(this.optionIndex)
