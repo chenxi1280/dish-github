@@ -614,7 +614,7 @@
 				optionPercentageFunction: Function,
 				//选项百分比的值
 				optionPercentageValues: [],
-				// 浮标 
+				// 浮标
 				// 后台数据
 				ecmArtworkNodeBuoyList:[],
 				// canvas context 对象
@@ -811,7 +811,7 @@
 					"pkDetailId": this.parentId
 				}
 				this.storyLineJumpPlayTodo(option)
-				
+
 			},
 			//截取选项的名称
 			getOptionPercentageNames(option){
@@ -873,7 +873,7 @@
 					if(this.isPosition == 1){
 						this.showCanvasFlag = true
 					}
-					
+
 				}else{
 					this.videoContext.play()
 					// 浮标修改
@@ -885,7 +885,6 @@
 
 			// 显示激励广告确认弹窗
 			showDialog () {
-				// this.clearNodeBuoyInfo()
 				console.log('我们显示激励广告确认弹窗  被调用')
 				if(!this.isVideoEndFlag){
 					this.showCanvasFlag = false
@@ -895,12 +894,11 @@
 					if (this.bouyNodeFlage) {
 						this.stopBuoyDraw()
 					}
-				
+
 				}else {
 					//浮标改动
 					if (this.bouyNodeFlage) {
 						this.stopBuoyDraw()
-						// this.clearNodeBuoyInfo()
 					}
 				}
 
@@ -930,6 +928,13 @@
 								this.initVerticalCanvas()
 							}
 							this.showCanvasFlag = true
+						}
+						if(this.bouyNodeFlage) {
+							this.againPlayVideo()
+						}
+					}else {
+						if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
+							this.recoveryBuoyDraw()
 						}
 					}
 					//广告拉取失败销毁对象
@@ -971,6 +976,13 @@
 									}
 									this.showCanvasFlag = true
 								}
+								if(this.bouyNodeFlage) {
+									this.againPlayVideo()
+								}
+							}else{
+								if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
+									this.recoveryBuoyDraw()
+								}
 							}
 							//广告拉取失败销毁对象
 							this.advertising.destroy()
@@ -989,10 +1001,9 @@
 								this.showCanvasFlag = true
 							}
 						}else{
-							
+
 							// 浮标修改
 							if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
-								
 								this.recoveryBuoyDraw()
 							}else {
 								this.videoContext.play()
@@ -1111,10 +1122,7 @@
 				this.isPlayedFlag = option.jumpFlag
 				// 浮标修改 清楚信息
 				this.clearNodeBuoyInfo()
-				// if (this.isPlayedFlag) {
-				// 	this.clearNodeBuoyInfo()
-				// }
-				
+
 				this.storyLineJumpFlag = true
 				//故事线跳转时清除好感度延时函数
 				clearTimeout(this.likabilityDelayFunction)
@@ -1998,7 +2006,6 @@
 					// 浮标修改
 					else if (this.isPosition  === 2){
 						// 默认选A
-						// this.clearNodeBuoyInfo()
 						this.optionIndex = 0
 						this.clickCommonOptionTodo(0)
 						// console.log(this.buoyRectList)
@@ -2241,9 +2248,9 @@
 							let popupSettings = this.childs[index].ecmArtworkNodePopupSettings
 							uni.setStorageSync('popupState',popupState)
 							uni.setStorageSync('popupSettings',popupSettings)
-							console.log(popupSettings)
+					console.log(popupSettings)
 						}
-						console.log("重新吊起initPlayData",this.childs[index])
+				console.log("重新吊起initPlayData",this.childs[index])
 						this.initPlayData(this.childs[index], false)
 			},
 			/* findmultipleResultChild(){
@@ -3040,19 +3047,19 @@
 			loadeddata(e){
 				console.log('this.isPlayedFlag: ', this.isPlayedFlag)
 				if(this.isShowOptionPercentageFlag && !this.isPlayedFlag && this.artworkTree.parentId != 0){
-					if(uni.getStorageSync('playMode') == 1){
-						this.horizontalOptionPercentageFlag = true
-					}else{
-						this.verticalOptionPercentageFlag = true
-					}
-					this.optionPercentageFunction= setTimeout(()=>{
 						if(uni.getStorageSync('playMode') == 1){
-							this.horizontalOptionPercentageFlag = false
+							this.horizontalOptionPercentageFlag = true
 						}else{
-							this.verticalOptionPercentageFlag = false
+							this.verticalOptionPercentageFlag = true
 						}
+						this.optionPercentageFunction= setTimeout(()=>{
+							if(uni.getStorageSync('playMode') == 1){
+								this.horizontalOptionPercentageFlag = false
+							}else{
+								this.verticalOptionPercentageFlag = false
+							}
 					},5000)	
-				}else{
+					}else{
 					if(this.bouyNodeFlage  && this.artworkTree.parentId != 0){
 						if(uni.getStorageSync('playMode') == 1){
 							this.horizontalOptionPercentageFlag = true
@@ -3733,7 +3740,7 @@
 					if (this.storyLineBoxHeightMin <= newY && this.storyLineBoxHeightMax >= newY) {
 						console.log("故事线")
 						this.showBuoyCanvasFlag = false
-						// this.clearNodeBuoyInfo()
+
 						this.stopBuoyDraw()
 						this.showStoryLineContent()
 						return
@@ -3743,7 +3750,7 @@
 					if (this.reportBoxHeightMin <= newY && this.reportBoxHeightMax >= newY) {
 						console.log("举报")
 						this.showBuoyCanvasFlag = false
-						// this.clearNodeBuoyInfo()
+
 						this.stopBuoyDraw()
 						this.showReportContent()
 						return
@@ -3753,7 +3760,7 @@
 					if (this.seeMoreBoxHeightMin <= newY && this.seeMoreBoxHeightMax >= newY) {
 						this.showBuoyCanvasFlag = false
 						console.log("更多")
-						// this.clearNodeBuoyInfo()
+
 						this.goDiscover()
 						this.stopBuoyDraw()
 						return
@@ -3763,7 +3770,6 @@
 					if (this.returnToPreviouHeightMin <= newY && this.returnToPreviouHeightMax >= newY) {
 						this.showBuoyCanvasFlag = false
 						console.log("返回上级")
-						// this.clearNodeBuoyInfo()
 						this.returnToPrevious()
 						this.stopBuoyDraw()
 						return
@@ -3788,7 +3794,7 @@
 				this.showBuoyCanvasFlag = false
 				//清空节点 浮标 标记
 				this.bouyNodeFlage = false
-				
+
 				//清空 所有数据
 				this.buoyRectList = []
 				this.canvasNodeBuoyList = []
@@ -3828,7 +3834,7 @@
 					this.seeMoreBoxWidthMax = this.storyLineBoxWidthMax
 					this.seeMoreBoxHeightMin = (wh * 0.8) - ch - this.getPxbyRpx(60)
 					this.seeMoreBoxHeightMax = this.seeMoreBoxHeightMin + this.getPxbyRpx(100)
-					
+
 					// 返回上一级   图标位置
 					this.returnToPreviouWidthMin = this.storyLineBoxWidthMin
 					this.returnToPreviouWidthMax = this.storyLineBoxWidthMax
@@ -3863,7 +3869,7 @@
 					this.seeMoreBoxWidthMax = this.storyLineBoxWidthMax
 					this.seeMoreBoxHeightMin = (wh * 0.53) - ch
 					this.seeMoreBoxHeightMax = this.seeMoreBoxHeightMin + this.getPxbyRpx(80)
-					
+
 					//返回上一级   图标位置
 					this.returnToPreviouWidthMin = this.storyLineBoxWidthMin
 					this.returnToPreviouWidthMax = this.storyLineBoxWidthMax
