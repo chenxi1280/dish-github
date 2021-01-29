@@ -658,6 +658,7 @@
 			this.likabilityArray = []
 			//获取一颗作品树
 			this.getArtworkTreeByArtworkId();
+			this.isBouyClickCommonOptionTodo()
 		},
 		onLoad(option) {
 			//初始化video对象
@@ -848,6 +849,7 @@
 				}
 
 			},
+			
 			// 观看激励广告
 			openAdvertising () {
 				this.showAdvertisingFlag = false
@@ -994,18 +996,9 @@
 								}else{
 									console.log('给光')
 									globalBus.$emit('requestOfAES')
-
-									//浮标改动不稳定
-									if(this.isVideoEndFlag){
-										if(this.isVideoEndFlag){
-											this.optionIndex = 0
-											setTimeout(() => {
-												this.clickCommonOptionTodo(0)
-											},500)
-										}
-									}else{
-										this.clickCommonOptionTodo(this.optionIndex)
-									}
+									
+									
+									
 								}
 							}
 						}
@@ -3886,7 +3879,25 @@
 						buoyRect.vy = (buoyRect.targetY - buoyRect.y)/ ( (buoyRect.targetTime  - this.currentTime )  * 15)
 					}
 				})
-			}
+			},
+			bouyClickCommonOptionTodo() {
+				if (this.bouyNodeFlage ) {
+					// 浮标改动不稳定
+					if(this.isVideoEndFlag){
+						if(this.isVideoEndFlag){
+							this.optionIndex = 0
+							this.clickCommonOptionTodo(0)
+						}
+					}else{
+						this.clickCommonOptionTodo(this.optionIndex)
+					}
+				}
+			},
+			isBouyClickCommonOptionTodo(){
+				globalBus.$on('bouyClickCommonOptionTodo',() => {
+					this.bouyClickCommonOptionTodo()
+				})
+			},
 
 		}
 	}
