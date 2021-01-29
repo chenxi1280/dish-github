@@ -1595,14 +1595,13 @@
 				});
 			},
 			async checkUserIdInfos(a){
-				const token = uni.getStorageSync('token')
 				await uni.request ({
 					url: baseURL + "/wxPlay/checkUserIdInfos",
 					method: 'POST',
 					dataType: 'json',
 					data: {
 						pkArtworkId: a,
-						token: token
+						token: this.token
 					},
 					success: result=> {
 						if(result.data.status == 200){
@@ -1630,7 +1629,7 @@
 					method: 'POST',
 					dataType: 'json',
 					data: {
-						token: uni.getStorageSync('token'),
+						token: this.token,
 						eventId: eventId
 					},
 					success: result=> {
@@ -1693,7 +1692,7 @@
 					dataType: 'json',
 					data: {
 						pkArtworkId: this.artworkId,
-						token: uni.getStorageSync("token")
+						token: this.token
 					},
 					success: res=> {
 						if(res.data.status == 200){
@@ -1723,7 +1722,7 @@
 					data: {
 						pkArtworkId: this.artworkId,
 						detailId:  detailId,
-						token: uni.getStorageSync("token")
+						token: this.token
 					},
 					success: res=> {
 						if(res.data.status == 200){
@@ -3281,7 +3280,7 @@
 						imgUrl: this.headImage,
 						content: this.textareaContent,
 						reportStatue: this.reportType,
-						token: uni.getStorageSync("token"),
+						token: this.token,
 						fkArtworkNodeId: uni.getStorageSync("detailId"),
 						fkArtworkId: this.artworkId
 					},
