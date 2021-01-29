@@ -1043,6 +1043,8 @@
 			},
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option){
+				//故事线跳回重置关闭故事重播不去保存播放记录的开关closeStoryLineReplayFlag为true不去保存播放记录
+				this.closeStoryLineReplayFlag = false
 				//重置是否展示百分比开关
 				this.verticalOptionPercentageFlag = false
 				this.horizontalOptionPercentageFlag = false
