@@ -238,6 +238,7 @@
 								title: '恭喜成功获得光'
 							})
 							globalBus.$emit('getLight', res.data.data)
+							globalBus.$emit('bouyClickCommonOptionTodo')
 						}
 					})
 				})
