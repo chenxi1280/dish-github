@@ -932,6 +932,8 @@
 							this.showCanvasFlag = true
 						}
 					}
+					//广告拉取失败销毁对象
+					this.advertising.destroy()
 				})
 				// 激励广告显示并加载
 				if (this.advertising) {
@@ -970,6 +972,8 @@
 									this.showCanvasFlag = true
 								}
 							}
+							//广告拉取失败销毁对象
+							this.advertising.destroy()
 						})
 					})
 				}
