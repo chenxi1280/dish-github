@@ -932,6 +932,10 @@
 						if(this.bouyNodeFlage) {
 							this.againPlayVideo()
 						}
+					}else {
+						if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
+							this.recoveryBuoyDraw()
+						}
 					}
 				})
 				// 激励广告显示并加载
@@ -970,6 +974,13 @@
 									}
 									this.showCanvasFlag = true
 								}
+								if(this.bouyNodeFlage) {
+									this.againPlayVideo()
+								}
+							}else{
+								if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
+									this.recoveryBuoyDraw()
+								}
 							}
 						})
 					})
@@ -989,7 +1000,6 @@
 
 							// 浮标修改
 							if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
-
 								this.recoveryBuoyDraw()
 							}else {
 								this.videoContext.play()
