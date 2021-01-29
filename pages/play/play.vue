@@ -798,10 +798,13 @@
 			againPlayVideo(){
 				this.buoyRectList = []
 				this.canvasNodeBuoyList = []
-				//随机数
-				const uuid = Math.random().toString(36).substring(2)
-				//初始化视频及选项
-				this.videoUrl = this.videoUrl+'?uuid='+uuid
+				// //随机数
+				// const uuid = Math.random().toString(36).substring(2)
+				// //初始化视频及选项
+				// this.videoUrl = this.videoUrl+'?uuid='+uuid
+				this.closeChooseTips()
+				
+				
 			},
 			// 关闭激励广告确认框
 			closeDialog () {
