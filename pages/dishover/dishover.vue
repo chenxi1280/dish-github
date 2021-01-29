@@ -237,7 +237,9 @@
 							uni.showToast({
 								title: '恭喜成功获得光'
 							})
+							globalBus.$emit('bouyClickCommonOptionTodo')
 							globalBus.$emit('getLight', res.data.data)
+							
 						}
 					})
 				})

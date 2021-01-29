@@ -690,6 +690,7 @@
 			this.likabilityArray = []
 			//获取一颗作品树
 			this.getArtworkTreeByArtworkId();
+			this.isBouyClickCommonOptionTodo()
 		},
 		onLoad(option) {
 			//初始化video对象
@@ -787,12 +788,18 @@
 		methods: {
 			//返回上一级弹窗的确认事件
 			returnToPreviouConfirm(){
+				if(this.bouyNodeFlage){
+					this.recoveryBuoyDraw()
+				}
 				this.returnToPreviouShow = false
 			},
 			//返回上级
 			returnToPrevious(){
 				//若parentId是0或-1时点击返回上一级弹框提示（parentId为0根节点为-1多结局作品的结局视频）
 				if(this.parentId == -1 || this.parentId == 0){
+					if(this.bouyNodeFlage){
+						this.stopBuoyDraw()
+					}
 					return this.returnToPreviouShow = true
 				}
 				//返回上一级时如果是开场不去获取百分比
@@ -1030,7 +1037,6 @@
 
 									// 浮标修改
 									if (this.bouyNodeFlage) {
-
 										this.recoveryBuoyDraw()
 									}
 								}
@@ -1048,18 +1054,6 @@
 								}else{
 									console.log('给光')
 									globalBus.$emit('requestOfAES')
-
-									//浮标改动不稳定
-									if(this.isVideoEndFlag){
-										if(this.isVideoEndFlag){
-											this.optionIndex = 0
-											setTimeout(() => {
-												this.clickCommonOptionTodo(0)
-											},1000)
-										}
-									}else{
-										this.clickCommonOptionTodo(this.optionIndex)
-									}
 								}
 							}
 						}
@@ -3784,8 +3778,6 @@
 						return
 					}
 				}
-
-
 			},
 			// 清除浮标
 			clearNodeBuoyInfo() {
@@ -3957,7 +3949,25 @@
 						buoyRect.vy = (buoyRect.targetY - buoyRect.y)/ ( (buoyRect.targetTime  - this.currentTime )  * 15)
 					}
 				})
-			}
+			},
+			bouyClickCommonOptionTodo() {
+				if (this.bouyNodeFlage ) {
+					// 浮标改动不稳定
+					if(this.isVideoEndFlag){
+						if(this.isVideoEndFlag){
+							this.optionIndex = 0
+							this.clickCommonOptionTodo(0)
+						}
+					}else{
+						this.clickCommonOptionTodo(this.optionIndex)
+					}
+				}
+			},
+			isBouyClickCommonOptionTodo(){
+				globalBus.$on('bouyClickCommonOptionTodo',() => {
+					this.bouyClickCommonOptionTodo()
+				})
+			},
 
 		}
 	}
