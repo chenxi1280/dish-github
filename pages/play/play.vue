@@ -874,6 +874,10 @@
 						if(this.bouyNodeFlage) {
 							this.againPlayVideo()
 						}
+					}else{
+						if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
+							this.recoveryBuoyDraw()
+						}
 					}
 					//加载失败销毁对象
 					this.advertising.destroy()
@@ -916,6 +920,10 @@
 								}
 								if(this.bouyNodeFlage) {
 									this.againPlayVideo()
+								}
+							}else{
+								if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
+									this.recoveryBuoyDraw()
 								}
 							}
 							//加载失败销毁对象
