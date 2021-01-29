@@ -659,8 +659,6 @@
 				returnToPreviouShow: false,
 				//开场节点的detailId
 				startDetailId: 0,
-				//是否返回了开场
-				isReturnToStart: false
 			}
 		},
 		onReady(){
@@ -800,7 +798,6 @@
 				//返回上一级时如果是开场不去获取百分比
 				if(this.startDetailId == this.parentId){
 					this.isShowOptionPercentageFlag = false
-					this.isReturnToStart = true
 				}
 				//从parentId处砍掉播放记录
 				let pkDetailIds = uni.getStorageSync("pkDetailIds")
@@ -1596,14 +1593,13 @@
 				});
 			},
 			async checkUserIdInfos(a){
-				const token = uni.getStorageSync('token')
 				await uni.request ({
 					url: baseURL + "/wxPlay/checkUserIdInfos",
 					method: 'POST',
 					dataType: 'json',
 					data: {
 						pkArtworkId: a,
-						token: token
+						token: this.token
 					},
 					success: result=> {
 						if(result.data.status == 200){
@@ -1631,7 +1627,7 @@
 					method: 'POST',
 					dataType: 'json',
 					data: {
-						token: uni.getStorageSync('token'),
+						token: this.token,
 						eventId: eventId
 					},
 					success: result=> {
@@ -1694,7 +1690,7 @@
 					dataType: 'json',
 					data: {
 						pkArtworkId: this.artworkId,
-						token: uni.getStorageSync("token")
+						token: this.token
 					},
 					success: res=> {
 						if(res.data.status == 200){
@@ -1724,7 +1720,7 @@
 					data: {
 						pkArtworkId: this.artworkId,
 						detailId:  detailId,
-						token: uni.getStorageSync("token")
+						token: this.token
 					},
 					success: res=> {
 						if(res.data.status == 200){
@@ -3035,7 +3031,6 @@
 			loadeddata(e){
 				console.log('this.isPlayedFlag: ', this.isPlayedFlag)
 				if(this.isShowOptionPercentageFlag && !this.isPlayedFlag && this.artworkTree.parentId != 0){
-					if(!this.isReturnToStart){
 						if(uni.getStorageSync('playMode') == 1){
 							this.horizontalOptionPercentageFlag = true
 						}else{
@@ -3047,11 +3042,8 @@
 							}else{
 								this.verticalOptionPercentageFlag = false
 							}
-						},5000)
+					},5000)	
 					}else{
-						this.isReturnToStart = false
-					}
-				}else{
 					if(this.bouyNodeFlage  && this.artworkTree.parentId != 0){
 						if(uni.getStorageSync('playMode') == 1){
 							this.horizontalOptionPercentageFlag = true
@@ -3285,7 +3277,7 @@
 						imgUrl: this.headImage,
 						content: this.textareaContent,
 						reportStatue: this.reportType,
-						token: uni.getStorageSync("token"),
+						token: this.token,
 						fkArtworkNodeId: uni.getStorageSync("detailId"),
 						fkArtworkId: this.artworkId
 					},
