@@ -875,6 +875,8 @@
 							this.againPlayVideo()
 						}
 					}
+					//加载失败销毁对象
+					this.advertising.destroy()
 				})
 				// 激励广告显示并加载
 				if (this.advertising) {
@@ -916,6 +918,8 @@
 									this.againPlayVideo()
 								}
 							}
+							//加载失败销毁对象
+							this.advertising.destroy()
 						})
 					})
 				}
