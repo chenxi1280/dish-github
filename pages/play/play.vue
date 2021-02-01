@@ -1102,6 +1102,8 @@
 			},
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option){
+				//清除视频的画面缓存直接删除video控件
+				this.videoShowFlag = false
 				//故事线跳回重置关闭故事重播不去保存播放记录的开关closeStoryLineReplayFlag为true不去保存播放记录
 				this.closeStoryLineReplayFlag = false
 				//重置是否展示百分比开关
@@ -1742,6 +1744,7 @@
 					},
 					success: res=> {
 						if(res.data.status == 200){
+							this.videoShowFlag = true
 							uni.setStorageSync("artworkTree",res.data.data);
 							uni.setStorageSync('playMode',res.data.data.playMode);
 							uni.setStorageSync('isEndings',res.data.data.isEndings);
