@@ -406,8 +406,9 @@
 		
 			//异步请求获取作品树 by ArtworkId
 			async getArtworkTreeByArtworkId(){
-				this.artworkId = 10210;
+				// this.artworkId = 10210;
 				console.log( this.artworkId)
+				let t = uni.getStorageSync("token")
 				await uni.request({
 					url: baseURL  + "/wxPlay/playArtWorkByChildTree",
 					method: 'POST',

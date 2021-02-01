@@ -913,10 +913,18 @@
 			// 观看激励广告
 			openAdvertising () {
 				this.showAdvertisingFlag = false
-				this.advertising = wx.createRewardedVideoAd({
-					adUnitId: 'adunit-7423fd1b2c7c5724',
-					multiton: true
-				})
+				if (this.advertising == null) {
+					this.advertising = wx.createRewardedVideoAd({
+						adUnitId: 'adunit-7423fd1b2c7c5724',
+						multiton: true
+					})
+				}else {
+					this.advertising.destroy() 
+					this.advertising = wx.createRewardedVideoAd({
+						adUnitId: 'adunit-8d7f7b5a86ac5537',
+						multiton: true
+					})
+				}
 				//捕捉错误
 				this.advertising.onError(err => {
 					console.log(err)
