@@ -3963,6 +3963,7 @@
 						buoyRect.vy = (buoyRect.targetY - buoyRect.y)/ ( (buoyRect.targetTime  - this.currentTime )  * 15)
 					}
 				})
+				
 			},
 			bouyClickCommonOptionTodo() {
 				if (this.bouyNodeFlage ) {
