@@ -790,6 +790,8 @@
 			returnToPreviouConfirm(){
 				if(this.bouyNodeFlage){
 					this.recoveryBuoyDraw()
+				}else{
+					this.videoContext.play()
 				}
 				this.returnToPreviouShow = false
 			},
@@ -799,6 +801,8 @@
 				if(this.parentId == -1 || this.parentId == 0){
 					if(this.bouyNodeFlage){
 						this.stopBuoyDraw()
+					}else{
+						this.videoContext.pause()
 					}
 					return this.returnToPreviouShow = true
 				}
@@ -812,6 +816,11 @@
 				pkDetailIds.splice(index,pkDetailIds.length-index)
 				this.playedHistoryArray = pkDetailIds
 				uni.setStorageSync("pkDetailIds",this.playedHistoryArray)
+				//将多结局作品的路径砍掉 对照着播放历史截取
+				let multipleResultLine = uni.getStorageSync("multipleResultLine")
+				multipleResultLine.splice(index,multipleResultLine.length-index)
+				this.multipleResultLine = multipleResultLine
+				uni.setStorageSync("multipleResultLine",this.multipleResultLine)
 				//走故事线逻辑 组装option参数
 				let option = {
 					"pkArtworkId": this.artworkId,
