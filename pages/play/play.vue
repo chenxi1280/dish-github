@@ -945,6 +945,7 @@
 							this.showCanvasFlag = true
 						}
 						if(this.bouyNodeFlage) {
+							this.showConditionAdvertisingFlag = false
 							this.againPlayVideo()
 						}
 					}else {
@@ -952,6 +953,7 @@
 							this.recoveryBuoyDraw()
 						}
 					}
+
 					//广告拉取失败销毁对象
 					this.advertising.destroy()
 				})
@@ -992,6 +994,7 @@
 									this.showCanvasFlag = true
 								}
 								if(this.bouyNodeFlage) {
+									this.showConditionAdvertisingFlag = false
 									this.againPlayVideo()
 								}
 							}else{
@@ -999,6 +1002,7 @@
 									this.recoveryBuoyDraw()
 								}
 							}
+							
 							//广告拉取失败销毁对象
 							this.advertising.destroy()
 						})
@@ -1006,6 +1010,7 @@
 				}
 				// 监听激励广告关闭
 				this.advertising.onClose((status) => {
+					this.showConditionAdvertisingFlag = false
 						if(this.isVideoEndFlag){
 							if(this.isPosition == 1){
 								if(this.playMode == 1){
@@ -1016,7 +1021,6 @@
 								this.showCanvasFlag = true
 							}
 						}else{
-
 							// 浮标修改
 							if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
 								this.recoveryBuoyDraw()
@@ -1028,7 +1032,6 @@
 					if(status.isEnded){
 						// 关闭条件浮标 弹窗
 						this.showConditionAdvertisingFlag = false
-
 						if(this.isPosition == 1){
 							//获取多结局作品开关
 							if(this.isGetMultipleFlag){
@@ -2138,7 +2141,7 @@
 						//视频暂停
 						this.videoContext.pause()
 						this.stopBuoyDraw()
-						this.showConditionAdvertisingFlag = true
+						this.showConditionAdvertisingFlag = true	
 					}else {
 						this.openAdvertising()
 					}
