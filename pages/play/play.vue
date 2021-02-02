@@ -1115,6 +1115,9 @@
 					this.advertising.destroy()
 				})
 			},
+			openVideoShowFlag(){
+				this.videoShowFlag = true
+			},
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option){
 				//清除视频的画面缓存直接删除video控件
@@ -1264,10 +1267,12 @@
 				}else{
 					this.isReplayPopupWindow = false
 				}
+				console.log('this.videoShowFlag',this.videoShowFlag)
 				if(!isJumpDialogCallbackFlag && this.popupPosition == 0 && this.popupState == 1 && !this.isPlayedFlag){
-					this.popupWindowByPopupPositonEqualsZero()
-					return
+					this.videoShowFlag = false
+					return this.popupWindowByPopupPositonEqualsZero()
 				}
+				console.log('这里不应该被执行')
 				if(!popupWindowRecord){
 					this.popupCountNumber = 0
 				}else{
@@ -1438,25 +1443,25 @@
 			},
 			// 视频播放器 弹窗
 			popupWindowByPopupPositonEqualsZero(){
+				console.log('视频暂停被启用过')
+			
 				// 浮标修改
 				if (uni.getStorageSync('playMode') == 1) {
 					try{
 						this.stopBuoyDraw()
 						this.horizontalJumpDialogFlag = true
 						this.$refs.horizontalJumpDialog.horizontalJumpDialogFlag = true
-
-					}catch(e){
-					}
+					}catch(e){}
 				}else {
 					try{
 						this.stopBuoyDraw()
 						this.verticalJumpDialogFlag = true
 						this.$refs.verticalJumpDialog.verticalJumpDialogFlag = true
-					}catch(e){
-					}
+					}catch(e){}
 				}
 				this.savaPopupWindowRecord()
-
+				
+				
 				// if(this.isPosition == 1 && uni.getStorageSync('playMode') == 1){
 				// 	try{
 				// 		this.horizontalJumpDialogFlag = true
@@ -2188,7 +2193,6 @@
 			},
 			// 选项touchend事件触发时所做的操作
 			optionTouchendTodo(index){
-
 				console.log('touchend我被触发了')
 				// 浮标修改
 				if(this.bouyNodeFlage) {
@@ -3068,6 +3072,8 @@
 				})
 			},
 			loadeddata(e){
+				
+				console.log('this.videoShowFlag: ', this.videoShowFlag)
 				console.log('this.isPlayedFlag: ', this.isPlayedFlag)
 				if(this.isShowOptionPercentageFlag && !this.isPlayedFlag && this.artworkTree.parentId != 0){
 						if(uni.getStorageSync('playMode') == 1){
@@ -3081,7 +3087,7 @@
 							}else{
 								this.verticalOptionPercentageFlag = false
 							}
-					},5000)	
+						},5000)	
 					}else{
 					if(this.bouyNodeFlage  && this.artworkTree.parentId != 0){
 						if(uni.getStorageSync('playMode') == 1){

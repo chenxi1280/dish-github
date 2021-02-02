@@ -50,6 +50,7 @@
 		methods: {
 			closeDialog(){
 				this.horizontalJumpDialogFlag = false
+				this.$parent.openVideoShowFlag()
 				let isEndings = uni.getStorageSync('isEndings')
 				if(isEndings == 1 && uni.getStorageSync('isEndingsJump')){
 					uni.setStorageSync('isEndingsJump',false)
