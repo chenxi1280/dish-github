@@ -95,6 +95,13 @@
 					this.resData = res.data.data
 					this.pkDetailIds.forEach(v => {
 						res.data.data.forEach(node => {
+							
+							// if (node.nodeImgUrl != null) {
+							// 	if (node.nodeImgUrl.indexOf( '/common') == -1) {
+							// 		node.nodeImgUrl = node.nodeImgUrl + '/common'
+							// 	}
+							// }
+							
 							if (v === node.pkDetailId) {
 								// 是否为 跳转节点
 								if (node.isLink == 1) {
