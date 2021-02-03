@@ -659,7 +659,7 @@
 				returnToPreviouShow: false,
 				//开场节点的detailId
 				startDetailId: 0,
-				//返回上一级触发了的标识
+				//是否返回上一级
 				returnToPreviousFlag: false
 			}
 		},
@@ -746,7 +746,7 @@
 		},
 		onUnload(){
 			uni.navigateBack({
-			    delta: 1 ,
+			    delta: 1,
 				animationDuration: 10,
 				animationType: null
 			});
@@ -800,8 +800,6 @@
 			},
 			//返回上级
 			returnToPrevious(){
-				//TODO如果返回了上一级那么就不应该存储这次的播放记录
-				this.returnToPreviousFlag = true
 				//若parentId是0或-1时点击返回上一级弹框提示（parentId为0根节点为-1多结局作品的结局视频）
 				if(this.parentId == -1 || this.parentId == 0){
 					if(this.bouyNodeFlage){
@@ -815,21 +813,30 @@
 				if(this.startDetailId == this.parentId){
 					this.isShowOptionPercentageFlag = false
 				}
-				//从parentId处砍掉播放记录
 				let pkDetailIds = uni.getStorageSync("pkDetailIds")
-				let index = pkDetailIds.indexOf(this.parentId)
-				pkDetailIds.splice(index,pkDetailIds.length-index)
+				// console.log("************pkDetailIds: ",pkDetailIds)
+				//返回上一级不使用parentId 使用播放历史记录的倒数第二个detailid
+				let currentDetailId = pkDetailIds[pkDetailIds.length-2]
+				// console.log("************currentDetailId: ",currentDetailId)
+				//砍掉倒数两个detailId 因为播放时会再存一次当前的播放记录
+				pkDetailIds.splice(pkDetailIds.length-2,2)
+				// console.log("************pkDetailIds: ",pkDetailIds)
 				this.playedHistoryArray = pkDetailIds
+				// console.log("************playedHistoryArray: ",this.playedHistoryArray)
 				uni.setStorageSync("pkDetailIds",this.playedHistoryArray)
 				//将多结局作品的路径砍掉 对照着播放历史截取
-				let multipleResultLine = uni.getStorageSync("multipleResultLine")
-				multipleResultLine.splice(index,multipleResultLine.length-index)
-				this.multipleResultLine = multipleResultLine
-				uni.setStorageSync("multipleResultLine",this.multipleResultLine)
+				if(uni.getStorageSync('isEndings') == 1){
+					let multipleResultLine = uni.getStorageSync("multipleResultLine")
+					//砍掉倒数第一个多结局作品的线路记录
+					multipleResultLine.splice(multipleResultLine.length-1,1)
+					this.multipleResultLine = multipleResultLine
+					uni.setStorageSync("multipleResultLine",this.multipleResultLine)
+				}
 				//走故事线逻辑 组装option参数
 				let option = {
 					"pkArtworkId": this.artworkId,
-					"pkDetailId": this.parentId
+					"pkDetailId": currentDetailId,
+					"jumpFlag": true
 				}
 				this.storyLineJumpPlayTodo(option)
 			},
@@ -1358,10 +1365,8 @@
 						//存储跳转目标节点的detailId
 						this.linkNodeId = linkId
 						const mainTree = uni.getStorageSync("mainArtworkTree")
-						if(!uni.getStorageSync('isReplay') && !this.returnToPreviousFlag){
+						if(!uni.getStorageSync('isReplay')){
 							this.playedHistoryArray.push(artworkTree.pkDetailId)
-						}else{
-							this.returnToPreviousFlag = false
 						}
 						/* //不需要去重 记录故事线走向方便数值选项分数计算
 						this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray)); */
@@ -1376,11 +1381,10 @@
 				if (this.linkNodeId != this.detailId) {
 					// 将作品detailId留存提供给故事线
 					if(!uni.getStorageSync('isReplay')){
-						if(!this.closeStoryLineReplayFlag && !this.returnToPreviousFlag){
+						if(!this.closeStoryLineReplayFlag){
 							this.playedHistoryArray.push(artworkTree.pkDetailId);
 						}else{
 							this.closeStoryLineReplayFlag = false
-							this.returnToPreviousFlag = false
 						}
 					}
 					/* //不需要去重 记录故事线走向方便数值选项分数计算
