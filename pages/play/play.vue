@@ -3617,9 +3617,14 @@
 			// 初始化浮标 对象 List
 			initializationBuoyList() {
 				// console.log(this.ecmArtworkNodeBuoyList)
+				let hList = []
 				this.ecmArtworkNodeBuoyList.forEach((nodeBuoyList, index) => {
 					let aList = []
+				
 					nodeBuoyList.forEach((v, i) => {
+						if (v.buoyType == 0) {
+							hList.push(v)
+						}
 						if (v.buoyType != 2) {
 							if (uni.getStorageSync('playMode') == 1) {
 								// console.log("横屏")
@@ -3699,9 +3704,9 @@
 					})
 					this.canvasNodeBuoyList.push(aList)
 					// console.log("这是初始化",this.canvasNodeBuoyList[0])
-
-
 				})
+				uni.setStorageSync('historyNodeBuoyList',hList)
+				
 			},
 			// canvas 触摸事件
 			canvasBuoyTouchstart(e) {
