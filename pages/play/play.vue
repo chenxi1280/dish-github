@@ -3618,9 +3618,14 @@
 			initializationBuoyList() {
 				// console.log(this.ecmArtworkNodeBuoyList)
 				let hList = []
+				let hLists = uni.getStorageSync('historyNodeBuoyList')
+				if (hLists != null && hLists.length > 0 ) {
+					hList = hLists
+				}
 				this.ecmArtworkNodeBuoyList.forEach((nodeBuoyList, index) => {
+					
 					let aList = []
-				
+					
 					nodeBuoyList.forEach((v, i) => {
 						if (v.buoyType == 0) {
 							hList.push(v)
