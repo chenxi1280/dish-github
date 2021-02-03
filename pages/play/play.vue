@@ -660,7 +660,9 @@
 				//开场节点的detailId
 				startDetailId: 0,
 				//是否返回上一级
-				returnToPreviousFlag: false
+				returnToPreviousFlag: false,
+				//浮标作品选项浮标开始渲染时间点
+				bouySectionTime: 0
 			}
 		},
 		onReady(){
@@ -799,6 +801,18 @@
 			},
 			//返回上级
 			returnToPrevious(){
+				//获取浮标视频的选项初始渲染时间
+				let historyNodeBuoyList = uni.getStorageSync("historyNodeBuoyList")
+				for (let i = 0; i < historyNodeBuoyList.length; i++) {
+					let currentId = historyNodeBuoyList[i].fkNodeId
+					if(this.currentId == this.detailId){
+						this.bouySectionTime = historyNodeBuoyList[i].bouySectionTime
+						console.log("*************bouySectionTime: ",this.bouySectionTime)
+						break
+					}
+				}
+				//设置返回上一级开关 给是否快进视频做标识
+				this.returnToPreviousFlag = true
 				//若parentId是0或-1时点击返回上一级弹框提示（parentId为0根节点为-1多结局作品的结局视频）
 				if(this.parentId == -1 || this.parentId == 0){
 					if(this.bouyNodeFlage){
@@ -3076,7 +3090,6 @@
 				})
 			},
 			loadeddata(e){
-				
 				console.log('this.videoShowFlag: ', this.videoShowFlag)
 				console.log('this.isPlayedFlag: ', this.isPlayedFlag)
 				if(this.isShowOptionPercentageFlag && !this.isPlayedFlag && this.artworkTree.parentId != 0){
@@ -3170,7 +3183,9 @@
 					this.showBuoyCanvasFlag = true
 					this.initVerticalBuoyCanvas()
 				}
-
+				if(this.returnToPreviousFlag){
+					
+				}
 			},
 			videoTimeupdate(e){
 
