@@ -664,6 +664,7 @@
 			}
 		},
 		onReady(){
+			uni.setStorageSync('historyNodeBuoyList',[])
 			//重置重播
 			uni.setStorageSync('isReplay',false)
 			//重置弹窗状态
@@ -3173,7 +3174,7 @@
 				//获取视频当前时间
 				this.currentTime = e.detail.currentTime
 								//获取视频当前时间
-				if(this.duration -this.currentTime > 0.4){
+				if(this.duration - this.currentTime > 0.4){
 					this.percent = parseInt(this.currentTime/this.duration*100)
 				}else{
 					this.percent = 100
@@ -3205,22 +3206,8 @@
 							if (nodeBuoy.buoySectionTime === newTime) {
 
 								this.buoyRectList[index] = nodeBuoy
-								// 遍历画图的 暂存对象数组
-								// this.buoyRectList.forEach((buoyRect, i) => {
-								// 	// 当位置 不为空时说明 有以前的对象
-								// 	// if (this.buoyRectList[index] != null) {
-								// 	// 	if (nodeBuoy.nodeId === buoyRect.nodeId && index === i) {
-								// 	// 		this.buoyRectList[index] = nodeBuoy
-								// 	// 	}
-
-								// 	// }
-								// 	// //为空时说明应该加入新的对象
-								// 	// else {
-								// 	// 	console.log('推送，inde',index)
-								// 	// 	// this.buoyRectList.push(nodeBuoy)
-								// 	// 	this.buoyRectList[index] = nodeBuoy
-								// 	// }
-								// })
+								
+								
 							}
 						})
 						this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
@@ -3567,7 +3554,6 @@
 					}
 				}
 			},
-
 			// 获取当前播放视频时间
 			getNewVideoPlayTime(e) {
 				// 当前时间
@@ -3644,7 +3630,7 @@
 								// console.log('矩形框的高: ',rectH)
 								//矩形框宽度
 								let  rectH= parseInt(((v.buoyWide - 0) * this.canvasHeight).toFixed(0))
-
+								// 浮标出现的时间 
 								let buoySectionTime =  parseInt(v.buoySectionTime - 0)
 								// 目标时间
 								let targetTime = parseInt(nodeBuoyList[i + 1].buoySectionTime - 0)
@@ -3655,16 +3641,13 @@
 								let targetX = parseInt(( (1 - (nodeBuoyList[i + 1].buoyCoordinateY - 0)  - (nodeBuoyList[i + 1].buoyHigh - 0))* this.canvasWidth).toFixed(0))
 								// 目标位置 Y
 								let targetY = parseInt(((nodeBuoyList[i + 1].buoyCoordinateX  - 0) * this.canvasHeight).toFixed(0))
-
-
-
+								
 								let vx = ( targetX - rectX) / ((
 									vTime) * 60)
 								let vy = (targetY - rectY) / ((
 									vTime) * 60)
 								let buoy = this.initializationBuoy(rectX, rectY, rectW, rectH, vx, vy, rectOpacity, v.fkNodeId, buoySectionTime,
 									v.buoyType,targetX,targetY,targetTime)
-
 								aList.push(buoy)
 							}else {
 								// console.log("竖屏")
@@ -3697,7 +3680,6 @@
 									vTime) * 60)
 								let buoy = this.initializationBuoy(rectX, rectY, rectW, rectH, vx, vy, rectOpacity, v.fkNodeId, buoySectionTime,
 									v.buoyType,targetX,targetY,targetTime)
-
 								aList.push(buoy)
 							}
 
@@ -3986,8 +3968,8 @@
 			// 速度校准方法
 			buoySpeedCalibration(){
 				// 时间  当前位置  距离  =》  新的 速度
-				//
-				// console.log( this.currentTime)
+				
+				console.log('当前时间',this.currentTime)
 				this.buoyRectList.forEach( (buoyRect,index) => {
 					if ((buoyRect.targetTime - this.currentTime ) > 0) {
 						buoyRect.vx =( buoyRect.targetX - buoyRect.x) /( (buoyRect.targetTime - this.currentTime )  * 15)
