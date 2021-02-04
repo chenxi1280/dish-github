@@ -817,17 +817,20 @@
 				if(this.startDetailId == this.parentId){
 					this.isShowOptionPercentageFlag = false
 				}
+				let pkDetailIds = uni.getStorageSync("pkDetailIds")
 				//获取浮标视频的选项初始渲染时间
 				let historyNodeBuoyList = uni.getStorageSync("historyNodeBuoyList")
 				for (let i = 0; i < historyNodeBuoyList.length; i++) {
 					let currentId = historyNodeBuoyList[i].fkNodeId
-					if(currentId == this.detailId){
+					let detailId = pkDetailIds[pkDetailIds.length-1]
+					// console.log("************detailId: ",detailId)
+					//此处还是不能使用this.detailId来对比要使用历史记录的来对比 因为返回的节点可能是跳转节点
+					if(currentId == detailId){
 						this.buoySectionTime = historyNodeBuoyList[i].buoySectionTime
 						console.log("*************bouySectionTime: ",this.buoySectionTime)
 						break
 					}
 				}
-				let pkDetailIds = uni.getStorageSync("pkDetailIds")
 				// console.log("************pkDetailIds: ",pkDetailIds)
 				//返回上一级不使用parentId 使用播放历史记录的倒数第二个detailid
 				let currentDetailId = pkDetailIds[pkDetailIds.length-2]
@@ -1263,6 +1266,7 @@
 			},
 			//对节点播放数据进行筛选和提取
 			initPlayData(artworkTree, isJumpDialogCallbackFlag){
+				console.log("***********************pkDetailId: ",artworkTree.pkDetailId)
 				if(artworkTree.parentId === 0 ){
 					this.startDetailId = artworkTree.pkDetailId
 					if(artworkTree.percentageState == 1){
