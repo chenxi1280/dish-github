@@ -802,16 +802,6 @@
 			},
 			//返回上级
 			returnToPrevious(){
-				//获取浮标视频的选项初始渲染时间
-				let historyNodeBuoyList = uni.getStorageSync("historyNodeBuoyList")
-				for (let i = 0; i < historyNodeBuoyList.length; i++) {
-					let currentId = historyNodeBuoyList[i].fkNodeId
-					if(this.currentId == this.detailId){
-						this.bouySectionTime = historyNodeBuoyList[i].bouySectionTime
-						console.log("*************bouySectionTime: ",this.bouySectionTime)
-						break
-					}
-				}
 				//设置返回上一级开关 给是否快进视频做标识
 				this.returnToPreviousFlag = true
 				//若parentId是0或-1时点击返回上一级弹框提示（parentId为0根节点为-1多结局作品的结局视频）
@@ -826,6 +816,16 @@
 				//返回上一级时如果是开场不去获取百分比
 				if(this.startDetailId == this.parentId){
 					this.isShowOptionPercentageFlag = false
+				}
+				//获取浮标视频的选项初始渲染时间
+				let historyNodeBuoyList = uni.getStorageSync("historyNodeBuoyList")
+				for (let i = 0; i < historyNodeBuoyList.length; i++) {
+					let currentId = historyNodeBuoyList[i].fkNodeId
+					if(currentId == this.detailId){
+						this.buoySectionTime = historyNodeBuoyList[i].buoySectionTime
+						console.log("*************bouySectionTime: ",this.buoySectionTime)
+						break
+					}
 				}
 				let pkDetailIds = uni.getStorageSync("pkDetailIds")
 				// console.log("************pkDetailIds: ",pkDetailIds)
@@ -3185,7 +3185,9 @@
 					this.initVerticalBuoyCanvas()
 				}
 				if(this.returnToPreviousFlag){
-					
+					console.log("************bouySectionTime: ",this.buoySectionTime)
+					this.videoContext.seek(parseInt(this.buoySectionTime))
+					this.returnToPreviousFlag = false
 				}
 			},
 			videoTimeupdate(e){
