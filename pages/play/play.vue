@@ -52,7 +52,7 @@
 			<u-modal v-model="showConditionAdvertisingFlag" title="温馨提示" :show-confirm-button="false" z-index="999">
 				<view class="slot-content">
 					<view style="padding: 0 20rpx;padding-top: 40rpx;">
-						<view >此选项作者设置必须观看广告才能观看哦</view>
+						<view >此选项作者设置必须观看激励视频才能播放哦</view>
 						<!-- <view v-if="!isHaveLight">当前光的数量不足，完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view> -->
 						<view @click="openAdvertising" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
 							<image src="../../static/icon/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
@@ -77,7 +77,7 @@
 				<video :src="videoUrl" :autoplay="autopalyFlag" :show-mute-btn="true" :show-fullscreen-btn="false" id="myVideo"
 				 :enable-play-gesture="playGestureFlag" :enable-progress-gesture="progressGestureFlag" @ended="videoEnd(false)"
 				 @pause="videoPause" @loadedmetadata="loadeddata" @touchend="videoTouchend" @touchstart="videoTouchstart" v-if="videoShowFlag"
-				 @timeupdate="videoTimeupdate" :controls="controlsFlag" @play="videoPlay"></video>
+				 @timeupdate="videoTimeupdate" :controls="controlsFlag" @play="videoPlay" @waiting="waitingVideo"></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
 				'background-repeat':'no-repeat', backgroundSize:'100% 100%'}"></view>
@@ -633,6 +633,7 @@
 				showBuoyCanvasFlag: false,
 				// 是否为 浮标视频
 				bouyNodeFlage:false,
+				waitingVideoFlag: false,
 				// 故事线位置
 				storyLineBoxWidthMax: 0,
 				storyLineBoxHeightMin: 0,
@@ -653,6 +654,7 @@
 				returnToPreviouWidthMax : 0,
 				returnToPreviouHeightMin: 0,
 				returnToPreviouHeightMax : 0,
+				
 				// 浮标广告弹窗
 				showConditionAdvertisingFlag:false,
 				//是否展示返回上一级提示弹窗
@@ -1023,8 +1025,8 @@
 								}
 							}
 							
-							//广告拉取失败销毁对象
-							this.advertising.destroy()
+							// //广告拉取失败销毁对象
+							// this.advertising.destroy()
 						})
 					})
 				}
@@ -1120,7 +1122,7 @@
 						// 浮标 结尾 广告 未看完 时间添加
 						console.log('憨批用户不给光')
 					}
-					this.advertising.destroy()
+					//  this.advertising.destroy()
 				})
 			},
 			openVideoShowFlag(){
@@ -2072,6 +2074,15 @@
 				this.multipleResultFlag = false
 				this.isVideoEndFlag = false
 				this.isGetMultipleFlag = false
+				
+				if (this.waitingVideoFlag) {
+					if (this.bouyNodeFlage) {
+						console.log('play里面的  recoveryBuoyDraw 被启动了')
+						this.recoveryBuoyDraw()
+					}
+				}
+				
+				
 			},
 			//视屏暂停操作
 			videoPause(){
@@ -3189,13 +3200,13 @@
 					let newTime = Math.floor(this.currentTime)
 					this.buoyNewTime = this.currentTime
 					//速度校准
-					// console.log('tie',e.detail.currentTime,'newTime',newTime)
+					this.buoySpeedCalibration()
 					// 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
 					if (this.buoyCurrentTime == newTime || newTime == 0) {
 						// this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
 						return
 					}
-					// this.buoySpeedCalibration()
+					
 					//获取视频当前时间
 					this.buoyCurrentTime = newTime
 					// 遍历 初始化后的可直接用于画图的 类canvas对象2维数组 index 位置下表
@@ -3496,13 +3507,33 @@
 				// console.log(this.rect)
 				this.buoyCtx.clearRect(0, 0, this.buoyCanvas.width, this.buoyCanvas.height);
 				this.buoyRectList.forEach((v, index) => {
-
-					// if (v.x >= v.targetX) {
-					// 	v.x = v.targetX;
+					
+					// if (this.playMode) {
+						
+					// }else {
+						// 阻止移动出 指定位置
+						if (v.vx > 0) {
+							if (v.x >= v.targetX) {
+								v.vx = 0
+							}
+						}
+						if (v.vx < 0) {
+							if (v.x <= v.targetX) {
+								v.vx = 0
+							}
+						}
+						if (v.vy > 0 ) {
+							if (v.y >= v.targetY){
+								v.vy = 0 
+							}
+						}
+						if (v.vy < 0 ) {
+							if (v.y <= v.targetY){
+								v.vy = 0 
+							}
+						}
 					// }
-					// if (v.y >= v.targetY) {
-					// 	v.y = v.targetY;
-					// }
+					
 					if(v != null) {
 						v.draw();
 						v.x += v.vx;
@@ -3618,7 +3649,15 @@
 					
 					nodeBuoyList.forEach((v, i) => {
 						if (v.buoyType == 0) {
-							hList.push(v)
+							let hFlage = true
+							hList.forEach( hBuoy => {
+								if (v.nodeId == hBuoy.nodeId) {
+									hFlage = false
+								}
+							})
+							if (hFlage) {
+								hList.push(v)
+							}
 						}
 						if (v.buoyType != 2) {
 							if (uni.getStorageSync('playMode') == 1) {
@@ -3973,15 +4012,26 @@
 			buoySpeedCalibration(){
 				// 时间  当前位置  距离  =》  新的 速度
 				
-				console.log('当前时间',this.currentTime)
+				// console.log('当前时间',this.currentTime)
+				this.clearAnimation()
+				// this.currentTime 
 				this.buoyRectList.forEach( (buoyRect,index) => {
 					if ((buoyRect.targetTime - this.currentTime ) > 0) {
-						buoyRect.vx =( buoyRect.targetX - buoyRect.x) /( (buoyRect.targetTime - this.currentTime )  * 15)
-						buoyRect.vy = (buoyRect.targetY - buoyRect.y)/ ( (buoyRect.targetTime  - this.currentTime )  * 15)
+						buoyRect.vx =( buoyRect.targetX - buoyRect.x)/( (buoyRect.targetTime - this.currentTime )  * 58)
+						buoyRect.vy = (buoyRect.targetY - buoyRect.y)/ ( (buoyRect.targetTime  - this.currentTime )  * 58)
 					}
 				})
-				
+
+				this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
 			},
+			//视频进入 缓冲
+			waitingVideo() {
+				if (this.bouyNodeFlage) {
+					this.waitingVideoFlag = true
+					this.stopBuoyDraw()
+				}
+			},
+			// 浮标 加光回调
 			bouyClickCommonOptionTodo() {
 				if (this.bouyNodeFlage ) {
 					// 浮标改动不稳定
@@ -3995,6 +4045,7 @@
 					}
 				}
 			},
+			// 浮标 加光回调 监听
 			isBouyClickCommonOptionTodo(){
 				globalBus.$on('bouyClickCommonOptionTodo',() => {
 					this.bouyClickCommonOptionTodo()
