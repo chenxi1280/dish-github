@@ -3665,26 +3665,15 @@
 			// 初始化浮标 对象 List
 			initializationBuoyList() {
 				// console.log(this.ecmArtworkNodeBuoyList)
-				let hList = []
-				let hLists = uni.getStorageSync('historyNodeBuoyList')
-				if (hLists != null && hLists.length > 0 ) {
-					hList = hLists
-				}
+				let hList = uni.getStorageSync('historyNodeBuoyList')
+
 				this.ecmArtworkNodeBuoyList.forEach((nodeBuoyList, index) => {
 					
 					let aList = []
 					
 					nodeBuoyList.forEach((v, i) => {
 						if (v.buoyType == 0) {
-							let hFlage = true
-							hList.forEach( hBuoy => {
-								if (v.nodeId == hBuoy.nodeId) {
-									hFlage = false
-								}
-							})
-							if (hFlage) {
-								hList.push(v)
-							}
+							hList.push(v)
 						}
 						if (v.buoyType != 2) {
 							if (uni.getStorageSync('playMode') == 1) {
