@@ -3709,6 +3709,12 @@
 									vTime) * 60)
 								let buoy = this.initializationBuoy(rectX, rectY, rectW, rectH, vx, vy, rectOpacity, v.fkNodeId, buoySectionTime,
 									v.buoyType,targetX,targetY,targetTime)
+									
+								if (buoySectionTime == 0) {
+									this.buoyRectList.push(buoy)
+									// this.clearAnimation()
+									this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+								}
 								aList.push(buoy)
 							}else {
 								// console.log("竖屏")
@@ -3741,6 +3747,11 @@
 									vTime) * 60)
 								let buoy = this.initializationBuoy(rectX, rectY, rectW, rectH, vx, vy, rectOpacity, v.fkNodeId, buoySectionTime,
 									v.buoyType,targetX,targetY,targetTime)
+								if (buoySectionTime == 0) {
+									this.buoyRectList.push(buoy)
+									// this.clearAnimation()
+									this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+								}
 								aList.push(buoy)
 							}
 
