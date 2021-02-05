@@ -1096,7 +1096,6 @@
 								this.multipleResultAdvertiseShow = false
 								this.multipleResultCallbackTodo(false)
 							}else{
-
 								// 条件 广告
 								if(this.conditionState[this.optionIndex] == 1){
 									//成功播放完广告
@@ -1106,6 +1105,7 @@
 									globalBus.$emit('requestOfAES')
 								}
 							}
+							this.advertising.destroy()
 						}
 					} else {
 						if(this.isVideoEndFlag){
@@ -1138,8 +1138,12 @@
 						}
 						// 浮标 结尾 广告 未看完 时间添加
 						console.log('憨批用户不给光')
+						
+						if (this.pkDetailId % 2 == 1) {
+							this.advertising.destroy()
+						}
 					}
-					//  this.advertising.destroy()
+					
 				})
 			},
 			openVideoShowFlag(){
