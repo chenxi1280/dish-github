@@ -3666,24 +3666,16 @@
 			initializationBuoyList() {
 				// console.log(this.ecmArtworkNodeBuoyList)
 				let hList = uni.getStorageSync('historyNodeBuoyList')
+				let aFlag = true 
+				if (hList.length > 0 ) {
+					aFlag = false
+				}
 				
 				this.ecmArtworkNodeBuoyList.forEach((nodeBuoyList, index) => {
 					let aList = []
-					// let aFlag = true
 					nodeBuoyList.forEach((v, i) => {
-						// aFlag = true
-						if (v.buoyType == 0) {
-							// for(let j = 0; j< hList.length;j++) {
-							// 	if (v.nodeId == hList[j].nodeId) {
-							// 		aFlag = false
-							// 		break
-							// 	}
-							// }
-							// console.log('想要进去',aFlag)
-							// if (aFlag) {
-							// 	console.log('我去存了浮标',i)
-								hList.push(v)
-							// }
+						if (v.buoyType == 0 && aFlag) {
+							hList.push(v)
 						}
 						if (v.buoyType != 2) {
 							if (uni.getStorageSync('playMode') == 1) {
