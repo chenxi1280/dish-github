@@ -825,7 +825,7 @@
 				for (let i = 0; i < historyNodeBuoyList.length; i++) {
 					let currentId = historyNodeBuoyList[i].fkNodeId
 					let detailId = pkDetailIds[pkDetailIds.length-1]
-					// console.log("************detailId: ",detailId)
+					console.log("************detailId return: ",detailId)
 					//此处还是不能使用this.detailId来对比要使用历史记录的来对比 因为返回的节点可能是跳转节点
 					if(currentId == detailId){
 						this.buoySectionTime = historyNodeBuoyList[i].buoySectionTime
