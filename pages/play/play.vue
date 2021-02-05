@@ -2097,9 +2097,9 @@
 					if (this.bouyNodeFlage) {
 						console.log('play里面的  recoveryBuoyDraw 被启动了')
 						this.recoveryBuoyDraw()
+						this.waitingVideoFlag = false
 					}
 				}
-				
 				
 			},
 			//视屏暂停操作
@@ -3217,11 +3217,13 @@
 				}
 
 				if (this.bouyNodeFlage) {
+					//速度校准
+					this.buoySpeedCalibration()
+					
 					// 当前时间
 					let newTime = Math.floor(this.currentTime)
 					this.buoyNewTime = this.currentTime
-					//速度校准
-					this.buoySpeedCalibration()
+
 					// 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
 					if (this.buoyCurrentTime == newTime || newTime == 0) {
 						// this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
@@ -4040,10 +4042,31 @@
 					if ((buoyRect.targetTime - this.currentTime ) > 0) {
 						buoyRect.vx =( buoyRect.targetX - buoyRect.x)/( (buoyRect.targetTime - this.currentTime )  * 58)
 						buoyRect.vy = (buoyRect.targetY - buoyRect.y)/ ( (buoyRect.targetTime  - this.currentTime )  * 58)
+					}else {
+						// 当前时间
+						let newTime = Math.floor(this.currentTime)
+						this.buoyNewTime = this.currentTime
+						// 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
+						if (this.buoyCurrentTime == newTime || newTime == 0) {
+							return
+						}
+						
+						//获取视频当前时间
+						this.buoyCurrentTime = newTime
+						// 遍历 初始化后的可直接用于画图的 类canvas对象2维数组 index 位置下表
+						this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
+							// 变量 为几号位置 数组
+							// console.log("nodeBuoyList",nodeBuoyList,"index",index)
+							nodeBuoyList.forEach((nodeBuoy) => {
+								if (nodeBuoy.buoySectionTime === newTime) { this.buoyRectList[index] = nodeBuoy }
+							})
+						})
+						
 					}
 				})
-
-				this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+				if (this.buoyCanvas != null) {
+					this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+				}
 			},
 			//视频进入 缓冲
 			waitingVideo() {

@@ -96,11 +96,7 @@
 		onLoad(option) {
 			console.log(option.scene)
 			this.option = option
-			
 			this.initPageInfo()
-			
-
-
 			
 			// this.initializationBuoy(0, 0, 0, 0)
 		},
