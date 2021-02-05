@@ -828,8 +828,8 @@
 					console.log("************detailId return: ",detailId)
 					//此处还是不能使用this.detailId来对比要使用历史记录的来对比 因为返回的节点可能是跳转节点
 					if(currentId == detailId){
-						this.buoySectionTime = historyNodeBuoyList[i].buoySectionTime
-						console.log("*************bouySectionTime: ",this.buoySectionTime)
+						this.bouySectionTime = historyNodeBuoyList[i].buoySectionTime
+						console.log("*************bouySectionTime1: ",this.bouySectionTime)
 						break
 					}
 				}
@@ -3204,8 +3204,8 @@
 					this.initVerticalBuoyCanvas()
 				}
 				if(this.returnToPreviousFlag){
-					console.log("************bouySectionTime: ",this.buoySectionTime)
-					this.videoContext.seek(parseInt(this.buoySectionTime))
+					console.log("************bouySectionTime2s: ",this.bouySectionTime)
+					this.videoContext.seek(parseInt(this.bouySectionTime))
 					this.returnToPreviousFlag = false
 				}
 			},
