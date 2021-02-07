@@ -751,6 +751,14 @@
 				this.getPlayArtworkInfo(this.artworkId)
 			}
 		},
+		onHide() {
+			console.log('离开play！！！！')
+			globalBus.$off('bouyClickCommonOptionTodo')
+		},
+		onShow() {
+			console.log('进入play！！！！')
+			
+		},
 		onUnload(){
 			uni.navigateBack({
 			    delta: 1,
@@ -761,6 +769,8 @@
 			uni.setStorageSync('isNumericalOptions',0)
 			//关闭页面时重置节点分数容器
 			uni.setStorageSync('appearConditionMap',null)
+			console.log('离开play！！！！')
+			globalBus.$off('bouyClickCommonOptionTodo')
 		},
 		onShareAppMessage (res) {
 			let artworkInfo = uni.getStorageSync('artworkInfo')
@@ -955,14 +965,15 @@
 			// 观看激励广告
 			openAdvertising () {
 				this.showAdvertisingFlag = false
-				if (this.advertising == null) {
+				if (this.advertising != null ){
 					this.advertising.destroy() 
+				} 
+				if ((Math.random() * 10) > 5 ) {
 					this.advertising = wx.createRewardedVideoAd({
 						adUnitId: 'adunit-7423fd1b2c7c5724',
 						multiton: true
 					})
 				}else {
-					this.advertising.destroy() 
 					this.advertising = wx.createRewardedVideoAd({
 						adUnitId: 'adunit-8d7f7b5a86ac5537',
 						multiton: true
@@ -992,16 +1003,13 @@
 							this.againPlayVideo()
 						}
 					}else {
+					
 						if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
 							this.recoveryBuoyDraw()
 						}
+						this.videoContext.play()
 					}
-					
-						console.log('憨批用户不给光')
-						//广告拉取失败销毁对象
-						if ((Math.random() * 10) > 5 )  {
-							this.advertising.destroy()
-						}
+					this.advertising.destroy()
 					
 				})
 				// 激励广告显示并加载
@@ -1048,12 +1056,10 @@
 								if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
 									this.recoveryBuoyDraw()
 								}
-							}
-							//广告拉取失败销毁对象
-							if ((Math.random() * 10) > 5 )  {
-								this.advertising.destroy()
+								this.videoContext.play()
 							}
 						})
+						this.advertising.destroy()
 					})
 				}
 				// 监听激励广告关闭
@@ -1114,8 +1120,8 @@
 									globalBus.$emit('requestOfAES')
 								}
 							}
-							this.advertising.destroy()
 						}
+						this.advertising.destroy()
 					} else {
 						if(this.isVideoEndFlag){
 							if(this.isGetMultipleFlag){
@@ -1148,9 +1154,8 @@
 						// 浮标 结尾 广告 未看完 时间添加
 						console.log('憨批用户不给光')
 						//广告拉取失败销毁对象
-						if ((Math.random() * 10) > 5 )  {
-							this.advertising.destroy()
-						}
+						
+						this.advertising.destroy()
 					}
 					
 				})
