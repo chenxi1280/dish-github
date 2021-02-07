@@ -48,33 +48,36 @@
             },
 			async updateUserInfo() {
                 let _this = this
-                await uni.request({
-                    url: baseURL + '/savaUserInfo',
-                    data: {
-                        openid: uni.getStorageSync("openid"),
-                        nickname: _this.nickName,
-						gender: _this.gender,
-                        avatarurl: _this.avatarUrl,
-						country: _this.country,
-						province: _this.province,
-						city: _this.city,
-						language: _this.language
-                    },
-                    method: 'POST',
-                    header: {
-                        'content-type': 'application/json'
-                    },
-                    success: (res) => {
-                        if (res.data.status == 200) {
-							uni.setStorageSync("token",res.data.data)
-							uni.reLaunch({
-									url: 'pages/dishover/dishover'
-							})
-							globalBus.$emit('getLightOfAppReady')
-                        }
-                    }
-                   
-                })
+				let token = uni.getStorageSync("token")
+				if(!token){
+					await uni.request({
+					    url: baseURL + '/savaUserInfo',
+					    data: {
+					        openid: uni.getStorageSync("openid"),
+					        nickname: _this.nickName,
+							gender: _this.gender,
+					        avatarurl: _this.avatarUrl,
+							country: _this.country,
+							province: _this.province,
+							city: _this.city,
+							language: _this.language
+					    },
+					    method: 'POST',
+					    header: {
+					        'content-type': 'application/json'
+					    },
+					    success: (res) => {
+					        if (res.data.status == 200) {
+								uni.setStorageSync("token",res.data.data)
+								uni.reLaunch({
+										url: 'pages/dishover/dishover'
+								})
+								globalBus.$emit('getLightOfAppReady')
+					        }
+					    }
+					   
+					})
+				}
             },
 			onLaunch: function() {
 				let _this = this;
