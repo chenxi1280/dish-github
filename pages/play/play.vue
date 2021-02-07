@@ -667,7 +667,9 @@
 				bouySectionTime: 0,
 				buoyTimestamp: 0,
 				bouyReturnToPreviousFlag: false,
-				backBuoyTimestamp:0
+				//节流时间
+				backBuoyTimestamp:0,
+				clickCommonOptionTodoBuoyFlag: false
 			}
 		},
 		onReady(){
@@ -1010,6 +1012,7 @@
 						this.videoContext.play()
 					}
 					this.advertising.destroy()
+					this.clickCommonOptionTodoBuoyFlag = false
 					
 				})
 				// 激励广告显示并加载
@@ -1060,6 +1063,7 @@
 							}
 						})
 						this.advertising.destroy()
+						this.clickCommonOptionTodoBuoyFlag = false
 					})
 				}
 				// 监听激励广告关闭
@@ -1153,6 +1157,7 @@
 						}
 						// 浮标 结尾 广告 未看完 时间添加
 						console.log('憨批用户不给光')
+						this.clickCommonOptionTodoBuoyFlag = false
 						//广告拉取失败销毁对象
 						
 						this.advertising.destroy()
@@ -2204,6 +2209,7 @@
 				}
 			},
 			clickCommonOptionTodo(index){
+				this.clickCommonOptionTodoBuoyFlag = true
 				//保存用户的选择记录
 				this.savaOptionSelectionRecord(this.childs[index].pkDetailId,this.childs[index].parentId)
 				//获取百分比的名称和数据
@@ -4125,6 +4131,9 @@
 			},
 			// 浮标 加光回调
 			bouyClickCommonOptionTodo() {
+				if (this.clickCommonOptionTodoBuoyFlag) {
+					
+				
 				if (this.bouyNodeFlage ) {
 					let buoyTimestamp = (new Date()).valueOf();
 					console.log('buoyTimestamp',buoyTimestamp)
@@ -4144,6 +4153,8 @@
 
 						this.clickCommonOptionTodo(this.optionIndex)
 					}
+				}
+				this.clickCommonOptionTodoBuoyFlag = false
 				}
 			},
 			// 浮标 加光回调 监听
