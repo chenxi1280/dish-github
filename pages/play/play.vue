@@ -3214,7 +3214,7 @@
 					this.showBuoyCanvasFlag = true
 					this.initVerticalBuoyCanvas()
 				}
-				if(this.returnToPreviousFlag){
+				if(this.returnToPreviousFlag && this.bouyNodeFlage){
 					console.log("************bouySectionTime2s: ",this.bouySectionTime)
 					this.videoContext.seek(parseInt(this.bouySectionTime))
 					this.returnToPreviousFlag = false
