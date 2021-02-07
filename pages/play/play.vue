@@ -664,7 +664,8 @@
 				//是否返回上一级
 				returnToPreviousFlag: false,
 				//浮标作品选项浮标开始渲染时间点
-				bouySectionTime: 0
+				bouySectionTime: 0,
+				buoyTimestamp: 0
 			}
 		},
 		onReady(){
@@ -1690,6 +1691,7 @@
 				});
 			},
 			async customLightByUserId(eventId){
+				console.log('扣光了！！！！！',eventId)
 				// 默认假设有光
 				this.isHaveLight = true
 				//故事线消费的eventId = 3
@@ -1704,6 +1706,7 @@
 					},
 					success: result=> {
 						if(result.data.status == 200){
+							console.log("***************result.data.data light:",result.data.data)
 							// console.log(result, '嘿嘿')
 							this.setLight(result.data.data)
 							this.customLightSuccessCallBack(this.optionIndex)
@@ -2061,10 +2064,20 @@
 						this.videoUrl = ''
 					}
 					// 浮标修改
-					else if (this.isPosition  === 2){
+					else if (this.isPosition  == 2){
+						//节流
+						let buoyTimestamp = (new Date()).valueOf();
+						console.log('buoyTimestamp',buoyTimestamp)
+						if ( buoyTimestamp - this.buoyTimestamp < 1000 ) {
+							return
+						}
+						this.buoyTimestamp = buoyTimestamp
 						// 默认选A
 						this.optionIndex = 0
 						this.clickCommonOptionTodo(0)
+						
+						
+						
 						// console.log(this.buoyRectList)
 						// return
 					}else{
@@ -2226,8 +2239,6 @@
 						}
 					}
 				}
-
-
 			},
 			// 选项touchend事件触发时所做的操作
 			optionTouchendTodo(index){
@@ -2313,9 +2324,9 @@
 							let popupSettings = this.childs[index].ecmArtworkNodePopupSettings
 							uni.setStorageSync('popupState',popupState)
 							uni.setStorageSync('popupSettings',popupSettings)
-					console.log(popupSettings)
+							console.log(popupSettings)
 						}
-				console.log("重新吊起initPlayData",this.childs[index])
+						console.log("重新吊起initPlayData",this.childs[index])
 						this.initPlayData(this.childs[index], false)
 			},
 			/* findmultipleResultChild(){
@@ -3709,6 +3720,12 @@
 									vTime) * 60)
 								let buoy = this.initializationBuoy(rectX, rectY, rectW, rectH, vx, vy, rectOpacity, v.fkNodeId, buoySectionTime,
 									v.buoyType,targetX,targetY,targetTime)
+									
+								if (buoySectionTime == 0) {
+									this.buoyRectList.push(buoy)
+									// this.clearAnimation()
+									this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+								}
 								aList.push(buoy)
 							}else {
 								// console.log("竖屏")
@@ -3741,6 +3758,11 @@
 									vTime) * 60)
 								let buoy = this.initializationBuoy(rectX, rectY, rectW, rectH, vx, vy, rectOpacity, v.fkNodeId, buoySectionTime,
 									v.buoyType,targetX,targetY,targetTime)
+								if (buoySectionTime == 0) {
+									this.buoyRectList.push(buoy)
+									// this.clearAnimation()
+									this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+								}
 								aList.push(buoy)
 							}
 

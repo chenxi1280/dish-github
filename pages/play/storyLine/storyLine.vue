@@ -97,8 +97,8 @@
 						res.data.data.forEach(node => {
 							
 							// if (node.nodeImgUrl != null) {
-							// 	if (node.nodeImgUrl.indexOf( '/common') == -1) {
-							// 		node.nodeImgUrl = node.nodeImgUrl + '/common'
+							// 	if (node.nodeImgUrl.indexOf( '/story_vertical') == -1) {
+							// 		node.nodeImgUrl = node.nodeImgUrl + '/story_vertical'
 							// 	}
 							// }
 							
