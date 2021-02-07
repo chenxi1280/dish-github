@@ -3223,7 +3223,7 @@
 					this.showBuoyCanvasFlag = true
 					this.initVerticalBuoyCanvas()
 				}
-				if(this.returnToPreviousFlag){
+				if(this.returnToPreviousFlag && this.bouyNodeFlage){
 					console.log("************bouySectionTime2s: ",this.bouySectionTime)
 					this.bouyReturnToPreviousFlag = true 
 					//视频暂停
