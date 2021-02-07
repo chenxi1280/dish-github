@@ -666,7 +666,8 @@
 				//浮标作品选项浮标开始渲染时间点
 				bouySectionTime: 0,
 				buoyTimestamp: 0,
-				bouyReturnToPreviousFlag: false
+				bouyReturnToPreviousFlag: false,
+				backBuoyTimestamp:0
 			}
 		},
 		onReady(){
@@ -994,9 +995,13 @@
 							this.recoveryBuoyDraw()
 						}
 					}
-
-					//广告拉取失败销毁对象
-					this.advertising.destroy()
+					
+						console.log('憨批用户不给光')
+						//广告拉取失败销毁对象
+						if ((Math.random() * 10) > 5 )  {
+							this.advertising.destroy()
+						}
+					
 				})
 				// 激励广告显示并加载
 				if (this.advertising) {
@@ -1043,9 +1048,10 @@
 									this.recoveryBuoyDraw()
 								}
 							}
-							
-							// //广告拉取失败销毁对象
-							// this.advertising.destroy()
+							//广告拉取失败销毁对象
+							if ((Math.random() * 10) > 5 )  {
+								this.advertising.destroy()
+							}
 						})
 					})
 				}
@@ -1140,8 +1146,8 @@
 						}
 						// 浮标 结尾 广告 未看完 时间添加
 						console.log('憨批用户不给光')
-						
-						if (this.pkDetailId % 2 == 1) {
+						//广告拉取失败销毁对象
+						if ((Math.random() * 10) > 5 )  {
 							this.advertising.destroy()
 						}
 					}
@@ -4114,13 +4120,22 @@
 			// 浮标 加光回调
 			bouyClickCommonOptionTodo() {
 				if (this.bouyNodeFlage ) {
+					let buoyTimestamp = (new Date()).valueOf();
+					console.log('buoyTimestamp',buoyTimestamp)
+					if ( buoyTimestamp - this.backBuoyTimestamp < 1000 ) {
+						console.log('没节流')
+						return
+					}
+					this.backBuoyTimestamp = buoyTimestamp
 					// 浮标改动不稳定
 					if(this.isVideoEndFlag){
 						if(this.isVideoEndFlag){
+
 							this.optionIndex = 0
 							this.clickCommonOptionTodo(0)
 						}
 					}else{
+
 						this.clickCommonOptionTodo(this.optionIndex)
 					}
 				}
