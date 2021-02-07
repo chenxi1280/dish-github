@@ -956,6 +956,7 @@
 			openAdvertising () {
 				this.showAdvertisingFlag = false
 				if (this.advertising == null) {
+					this.advertising.destroy() 
 					this.advertising = wx.createRewardedVideoAd({
 						adUnitId: 'adunit-7423fd1b2c7c5724',
 						multiton: true
