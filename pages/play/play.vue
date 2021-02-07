@@ -665,7 +665,8 @@
 				returnToPreviousFlag: false,
 				//浮标作品选项浮标开始渲染时间点
 				bouySectionTime: 0,
-				buoyTimestamp: 0
+				buoyTimestamp: 0,
+				bouyReturnToPreviousFlag: false
 			}
 		},
 		onReady(){
@@ -2068,9 +2069,11 @@
 						//节流
 						let buoyTimestamp = (new Date()).valueOf();
 						console.log('buoyTimestamp',buoyTimestamp)
-						if ( buoyTimestamp - this.buoyTimestamp < 1000 ) {
+						if ( buoyTimestamp - this.buoyTimestamp < 100 ) {
+							console.log('没节流')
 							return
 						}
+						console.log('没有节流')
 						this.buoyTimestamp = buoyTimestamp
 						// 默认选A
 						this.optionIndex = 0
@@ -3216,7 +3219,12 @@
 				}
 				if(this.returnToPreviousFlag){
 					console.log("************bouySectionTime2s: ",this.bouySectionTime)
-					this.videoContext.seek(parseInt(this.bouySectionTime))
+					this.bouyReturnToPreviousFlag = true 
+					//视频暂停
+					// console.log('bouySectionTime',this.bouySectionTime == 0 ? 0 : parseInt(this.bouySectionTssime) -1)
+					this.videoContext.seek( this.bouySectionTime == 0 ? 0 : parseInt(this.bouySectionTime) -1)
+					this.videoContext.pause()
+					this.videoContext.play()
 					this.returnToPreviousFlag = false
 				}
 			},
@@ -3677,16 +3685,23 @@
 			initializationBuoyList() {
 				// console.log(this.ecmArtworkNodeBuoyList)
 				let hList = uni.getStorageSync('historyNodeBuoyList')
-				let aFlag = true 
-				if (hList.length > 0 ) {
-					aFlag = false
-				}
-				
 				this.ecmArtworkNodeBuoyList.forEach((nodeBuoyList, index) => {
 					let aList = []
 					nodeBuoyList.forEach((v, i) => {
-						if (v.buoyType == 0 && aFlag) {
-							hList.push(v)
+						if (v.buoyType == 0) {
+							let  aFlag = true
+							hList.forEach(n => {
+								console.log('v.nodeId ',v,'n.nodeId',n.fkNodeId )
+								if (v.fkNodeId == n.fkNodeId) {
+									aFlag = false
+								}
+
+							})
+							if (aFlag) {
+								hList.push(v)
+								aFlag = true
+							}
+
 						}
 						if (v.buoyType != 2) {
 							if (uni.getStorageSync('playMode') == 1) {
@@ -4041,7 +4056,9 @@
 				//canvas 回来
 				this.showBuoyCanvasFlag = true
 				// 动画开启
-				this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+				if (this.buoyCanvas != null) {
+					this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+				}
 				// if (this.bouyNodeFlage) {
 				// 	this.showBuoyCanvasFlag = true
 				// 	this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
@@ -4087,9 +4104,11 @@
 			},
 			//视频进入 缓冲
 			waitingVideo() {
-				if (this.bouyNodeFlage) {
+				console.log(this.returnToPreviousFlag,'this.returnToPreviousFlag')
+				if (this.bouyNodeFlage && !this.bouyReturnToPreviousFlag) {
 					this.waitingVideoFlag = true
 					this.stopBuoyDraw()
+					this.bouyReturnToPreviousFlag = false
 				}
 			},
 			// 浮标 加光回调
