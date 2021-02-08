@@ -22,7 +22,7 @@
 				<icon class="more_icon"></icon>
 			</view>
 			<view class="demo-img-wrap" @click="play(xid,status)">
-				<image class="demo-image" :src="image+'/common'" mode="widthFix" ></image>
+				<image class="demo-image" :src="image" mode="widthFix" ></image>
 			</view>
 			<view class="padding_box">
 				<view class="work_info">
@@ -103,6 +103,7 @@
 		data() {
 			return {
 				imgCodeSrc: '',
+				
 				//组件是否展示开关
 				localFlag: false,
 				//蒙板开关
@@ -142,6 +143,13 @@
 			status: {
 				type: Number,
 				default: 2
+			}
+		},
+		onLoad() {
+			if (this.image != null) {
+				if (this.image.indexOf( '/common') == -1) {
+					this.image = this.image + '/common'
+				}
 			}
 		},
 		onReady() {
