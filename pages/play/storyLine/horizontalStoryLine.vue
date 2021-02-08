@@ -95,11 +95,11 @@
 					this.resData = res.data.data
 					this.pkDetailIds.forEach( v => {
 						res.data.data.forEach(node => {
-							// if (node.nodeImgUrl != null) {
-							// 	if (node.nodeImgUrl.indexOf( '/story_horizontal') == -1) {
-							// 		node.nodeImgUrl = node.nodeImgUrl + '/story_horizontal'
-							// 	}
-							// }
+							if (node.nodeImgUrl != null) {
+								if (node.nodeImgUrl.indexOf( '/story_horizontal') == -1) {
+									node.nodeImgUrl = node.nodeImgUrl + '/story_horizontal'
+								}
+							}
 							if (v === node.pkDetailId) {
 								if (node.isLink == 1) {
 									res.data.data.forEach( item => {
