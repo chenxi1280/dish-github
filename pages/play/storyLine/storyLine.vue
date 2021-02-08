@@ -91,10 +91,14 @@
 					endingFlag: this.endingFlag
 				},
 				success: res => {
-					// console.log(res.data.data)
 					this.resData = res.data.data
 					this.pkDetailIds.forEach(v => {
 						res.data.data.forEach(node => {
+							if (node.nodeImgUrl != null) {
+								if (node.nodeImgUrl.indexOf( '/story_vertical') == -1) {
+									node.nodeImgUrl = node.nodeImgUrl + '/story_vertical'
+								}
+							}
 							if (v === node.pkDetailId) {
 								// 是否为 跳转节点
 								if (node.isLink == 1) {

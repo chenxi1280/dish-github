@@ -172,7 +172,7 @@
 				this.advertising.onError(err => {
 					uni.showToast({
 						icon: 'none',
-						title:'获取激励视频失败，请重试'
+						title:'当前没有适合您的激励视频，请待会再试'
 					})
 				})
 				// 激励广告显示并加载
@@ -187,7 +187,7 @@
 						}).catch(() => {
 							uni.showToast({
 								icon: 'none',
-								title:'激励视频加载失败，请重试'
+								title:'当前没有适合您的激励视频，请待会再试'
 							})
 						})
 					})

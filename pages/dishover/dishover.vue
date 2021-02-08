@@ -144,6 +144,9 @@
 			})
 			this.addRandomDataHot()
 		},
+		onHide() {
+			
+		},
 		onShareAppMessage (res) {
 		    return {
 		      title: '灵巫互动',
@@ -238,7 +241,9 @@
 								title: '恭喜成功获得光'
 							})
 							globalBus.$emit('getLight', res.data.data)
+							
 							globalBus.$emit('bouyClickCommonOptionTodo')
+							
 						}
 					})
 				})

@@ -1,7 +1,6 @@
 <template>
-	<view>
 		<view class="playBox">
-			<view class="play">
+			<view class="play"  :style="{'width': mobilePhoneWidth+'px', 'height': mobilePhoneHeight+'px'}">
 				<!-- 定位选项画布 -->
 				<view class="container" v-show="showBuoyCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px'}">
 					<canvas type="2d" id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas>
@@ -9,14 +8,31 @@
 				<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" -->
 				<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform}">
 					<video :src="videoUrl" :loop="true" @timeupdate="getNewVideoPlayTime" :autoplay="true" @loadedmetadata="loadedmetadata"
-					 :style="{'width': videoWide+'px', 'height': videoHigh+'px'}"  @ended="videoEnd"></video>
+					 :style="{'width': videoWidth +'px', 'height': videoHeight+'px'}"  @ended="videoEnd"></video>
 					<!-- 视频播放结束触发事件显示最后一帧截图 -->
 					<!-- 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
 						'background-repeat':'no-repeat', backgroundSize:'100% 100%'}"></view> -->
 				</view>
 			</view>
+			<u-modal v-model="previewShow"
+					show-cancel-button="true"
+					:cancel-style="{background: '#B5B5B5'}"
+					confirm-text="登录"
+					:confirm-style="{background: '#F08080'}"
+					:show-title = 'false'
+					cancel-color="white"
+					confirm-color="white"
+					:content-style="{'word-wrap': 'break-word',
+									'word-break': 'break-all',
+									'white-space': 'pre-line',
+									'text-align': 'center',
+									'margin': '5% 5%'}"
+					@confirm="goLogin">
+				<view class="slot-content">
+					<rich-text nodes="预览作品只能作者自己观看\n\n请登录作者帐号"></rich-text>
+				</view>
+			</u-modal>
 		</view>
-	</view>
 </template>
 
 <script>
@@ -27,6 +43,8 @@
 
 		data() {
 			return {
+				//扫码预览提示框开关
+				previewShow: false,
 				transform: 'translate(-50%, -50%)',
 				// 是否自动播放标志
 				autopalyFlag: true,
@@ -58,32 +76,48 @@
 				buoyCurrentTime: 0,
 				// canvas是否展示 flag
 				showBuoyCanvasFlag: false,
-	
+				mobilePhoneHeight: 0,
+				mobilePhoneWidth:0,
 			}
 		},
 
 		onReady(option) {
 
+				const {windowWidth, windowHeight, brand, model} = uni.getSystemInfoSync()
+				uni.setStorageSync('windowSize',{
+					'windowWidth': windowWidth,
+					'windowHeight': windowHeight
+				})
+				
+				this.mobilePhoneHeight = windowHeight
+				this.mobilePhoneWidth = windowWidth
+
 		},
 		onLoad(option) {
-			const {windowWidth, windowHeight, brand, model} = uni.getSystemInfoSync()
-			uni.setStorageSync('windowSize',{
-				'windowWidth': windowWidth,
-				'windowHeight': windowHeight
-			})
 			console.log(option.scene)
 			this.option = option
-			
 			this.initPageInfo()
-			
-
-
 			
 			// this.initializationBuoy(0, 0, 0, 0)
 		},
 		methods: {
+			//去登陆
+			goLogin(){
+				uni.redirectTo({
+					url: '../login/login/login?isPlayJump='+true
+				})
+			},
+			goDiscover(){
+				console.log('我触发了')
+				uni.switchTab({
+					url: '../dishover/dishover',
+					fail(err) {
+						console.log('跳转失败:',err)
+					}
+				})
+			},
 			initPageInfo() {
-				console.log(this.option.scene)
+				console.log('this.option.scene',this.option.scene)
 				if(this.option.scene){
 						let scene = decodeURIComponent(this.option.scene);
 						var arr = scene.split('=')
@@ -93,10 +127,16 @@
 						//b=1 表示用户扫描的预览的二维码
 						this.artworkId = a;
 						this.pkDetailId = b
-				}	
+				}
+				
+				let token = uni.getStorageSync("token")
+				if (token == null || token == '') {
+					this.previewShow = true
+					return
+				}
 				
 				this.getArtworkTreeByArtworkId()
-				this.showBuoyCanvasFlag = true
+				
 			},
 			//初始化竖屏canvas画布
 			initVerticalCanvas() {
@@ -104,7 +144,7 @@
 				// // console.log('画布的宽: ',this.canvasWidth)
 				// // console.log('画布的高: ',this.canvasHeight)
 				// buoyCtx.clearRect(0 , 0 , this.canvasWidth, this.canvasHeight)
-				const query = tt.createSelectorQuery()
+				const query = wx.createSelectorQuery()
 				query.select('#posterCanvas')
 					.fields({
 						node: true,
@@ -125,31 +165,27 @@
 
 			},
 			// 移动函数
-			draw() {
+			buoyDraw() {
 				// 关闭 动画
-				this.buoyCanvas.cancelAnimationFrame(this.buoyRef)
-				// console.log(this.rect)
-				this.buoyCtx.clearRect(0, 0, this.buoyCanvas.width, this.buoyCanvas.height);
-				this.buoyRectList.forEach((v, index) => {
-
-					// if (v.y + v.vy > this.canvas.height || v.y + v.vy < 0) {
-					// 	v.vy = -v.vy;
-					// }
-					// if (v.x + v.vx > this.canvas.width || v.x + v.vx < 0) {
-					// 	v.vx = -v.vx;
-					// }
-					v.draw();
-					v.x += v.vx;
-					v.y += v.vy;
-
-				})
-				// console.log('这是第',this.start)
-				// this.start +=1
-
-				this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.draw());
+				if (this.buoyCanvas != null) {
+					this.buoyCanvas.cancelAnimationFrame(this.buoyRef)
+					// console.log(this.rect)
+					this.buoyCtx.clearRect(0, 0, this.buoyCanvas.width, this.buoyCanvas.height);
+					this.buoyRectList.forEach((v, index) => {
+						v.draw();
+						v.x += v.vx;
+						v.y += v.vy;
+					
+					})
+					// console.log('这是第',this.start)
+					// this.start +=1
+					
+					this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw());
+				}
+				
 			},
 			// 初始化 浮标对象
-			initializationBuoy(rectX, rectY, rectH, rectW, vx, vy, rectOpacity, nodeId, buoySectionTime, buoyType,targetX,targetY,targetTime) {
+			initializationBuoy(rectX, rectY, rectW , rectH, vx, vy, rectOpacity, nodeId, buoySectionTime, buoyType,targetX,targetY,targetTime) {
 				// 默认 透明度0.9
 				// rectOpacity = 0.9
 				return {
@@ -213,6 +249,8 @@
 				// 当前时间
 				let newTime = Math.floor(e.detail.currentTime)
 				this.buoyNewTime = e.detail.currentTime
+				this.currentTime =  e.detail.currentTime
+				this.buoySpeedCalibration()
 				// console.log('tie',e.detail.currentTime,'newTime',newTime)
 				// 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
 				if (this.buoyCurrentTime == newTime || newTime == 0) {
@@ -251,7 +289,9 @@
 							// })
 						}
 					})
-					this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.draw())
+					
+					this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+					
 				})
 			},
 			// 初始化浮标 对象 List
@@ -261,19 +301,18 @@
 					let aList = []
 					nodeBuoyList.forEach((v, i) => {
 						if (v.buoyType != 2) {
-							if (uni.getStorageSync('playMode')) {
+							if (this.playMode ==1) {
 								let rectOpacity = (v.buoyOpacity - 0) /100
 										
 								let rectX = parseInt(( (1 - (v.buoyCoordinateY - 0)  - (v.buoyHigh - 0))* this.canvasWidth).toFixed(0))
 								// console.log('矩形框的x轴坐标: ',rectX)
 								let rectY = parseInt(((v.buoyCoordinateX  - 0) * this.canvasHeight).toFixed(0))
-								console.log('矩形框的y轴坐标: ',rectY)
-								console.log('矩形框的x轴坐标: ',rectX)
+
 								//矩形框高度
-								let rectW = parseInt(((v.buoyHigh - 0) * this.canvasWidth).toFixed(0))
-								// console.log('矩形框的高: ',rectH)
+								let rectW = parseInt(((v.buoyWide - 0) * this.canvasHeight).toFixed(0)) 
+								console.log('矩形框的高: ',rectH)
 								//矩形框宽度
-								let  rectH= parseInt(((v.buoyWide - 0) * this.canvasHeight).toFixed(0))
+								let  rectH=  parseInt(((v.buoyHigh - 0) * this.canvasWidth).toFixed(0))
 										
 								let buoySectionTime =  parseInt(v.buoySectionTime - 0)
 								// 目标时间
@@ -364,8 +403,6 @@
 					console.log("我竟来了")
 					this.transform = 'translate(-50%, -50%) rotateZ(90deg)'
 					this.validateHorizontalWindowSize()
-
-
 				}else{
 					this.validateVerticalWindowSize()
 				}
@@ -402,12 +439,68 @@
 				})
 
 			},
+			
+			// 速度校准方法
+			buoySpeedCalibration(){
+				// 时间  当前位置  距离  =》  新的 速度
+				this.clearAnimation()
+				// this.currentTime 
+				this.buoyRectList.forEach( (buoyRect,index) => {
+					if ((buoyRect.targetTime - this.currentTime ) > 0) {
+						buoyRect.vx =( buoyRect.targetX - buoyRect.x)/( (buoyRect.targetTime - this.currentTime )  * 58)
+						buoyRect.vy = (buoyRect.targetY - buoyRect.y)/ ( (buoyRect.targetTime  - this.currentTime )  * 58)
+					}
+				})
+				if  ( this.buoyCanvas != null) {
+					this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+				}
+			
+			},
+			//视频进入 缓冲
+			waitingVideo() {
+				if (this.bouyNodeFlage) {
+					this.waitingVideoFlag = true
+					this.stopBuoyDraw()
+				}
+			},
+			//清除动画
+			clearAnimation(){
+				if(this.buoyCanvas != null) {
+					this.buoyCanvas.cancelAnimationFrame(this.buoyRef)
+					this.buoyCanvas.cancelAnimationFrame(this.buoyRef -1 )
+					this.buoyCanvas.cancelAnimationFrame(this.buoyRef -2)
+					this.buoyCanvas.cancelAnimationFrame(this.buoyRef +1)
+					if (this.buoyRef !=null ){
+						this.buoyCanvas.cancelAnimationFrame(this.buoyRef)
+					}
+				}
+			},
+			// 浮标 视频暂停方法
+			stopBuoyDraw(){
+				//视频暂停
+				this.videoContext.pause()
+				// 关闭canvas
+				this.showBuoyCanvasFlag = false
+				// this.stopBuoyRectList = this.deepCopy(this.buoyRectList )
+				// this.showBuoyCanvasFlag = false
+				//清空动画
+				this.clearAnimation()
+			
+				//清空 移动对象
+				// this.buoyRectList = []
+			
+				// 关闭canvas
+				this.showBuoyCanvasFlag = false
+			
+			
+			},
 
 		
 			//异步请求获取作品树 by ArtworkId
 			async getArtworkTreeByArtworkId(){
-				this.artworkId = 10210;
+				// this.artworkId = 10210;
 				console.log( this.artworkId)
+				let t = uni.getStorageSync("token")
 				await uni.request({
 					url: baseURL  + "/wxPlay/playArtWorkByChildTree",
 					method: 'POST',
@@ -420,6 +513,7 @@
 					},
 					success: res=> {
 						if(res.data.status === 200){
+							this.showBuoyCanvasFlag = true
 							console.log(res)
 							this.ecmArtworkNodeBuoyList = res.data.data.ecmArtworkNodeBuoyVOList
 							const uuid = Math.random().toString(36).substring(2)
@@ -432,6 +526,8 @@
 							
 						}else{
 							// this.videoShowFlag = false
+							this.previewShow = true
+							return
 						}
 					}
 				})
@@ -611,37 +707,244 @@
 </script>
 
 <style lang="scss">
-	.playBox {
+	.playBox{
 		width: 100%;
 		height: 100%;
-
-		.play {
+		.verticalOptionPercentagesBox{
+			position: fixed;
+			right: 5%;
+			top: 12%;
+			height: 600rpx;
+			width: 290rpx;
+			z-index: 15;
+			// background-color: rgba(255,255,255,.5);
+			.optionPercentages{
+				height: 50rpx;
+				width: 100%;
+				.optionPercentageBox{
+					margin-top: 10rpx;
+					padding: 10rpx 20rpx;
+					height: 50rpx;
+					border-radius: 20rpx;
+					background-color: rgba(0,0,0,.3);
+					text-align: left;
+					.optionPercentage{
+						color: white;
+						font-size: 30rpx;
+						line-height: 30rpx;
+					}
+				}
+			}
+		}
+		.horizontalOptionPercentagesBox{
+			position: fixed;
+			left: 40%;
+			top: 81%;
+			height: 600rpx;
+			width: 290rpx;
+			transform: translate(-50%, -50%) rotateZ(90deg);
+			z-index: 15;
+			// background-color: rgba(255,255,255,.5);
+			.optionPercentages{
+				height: 50rpx;
+				width: 100%;
+				.optionPercentageBox{
+					margin-top: 10rpx;
+					padding: 10rpx 20rpx;
+					height: 50rpx;
+					border-radius: 20rpx;
+					background-color: rgba(0,0,0,.3);
+					text-align: left;
+					.optionPercentage{
+						color: white;
+						font-size: 30rpx;
+						line-height: 30rpx;
+					}
+				}
+			}
+		}
+		.multipleResultPlayEndMask{
+			position: fixed;
+			left: 50%;
+			top: 50%;
+			background-color: black;
+			z-index: 8;
+		}
+		.verticalPopupNameBox{
+			position: fixed;
+			left: 5%;
+			top: 7%;
+			width: 460rpx;
+			height: 60rpx;
+			background-color: rgba(0,0,0,0.3);
+			border-radius: 30rpx;
+			text-align: left;
+			text{
+				padding: 20rpx;
+				font-size: 30rpx;
+				color: white;
+				line-height: 60rpx;
+			}
+		}
+		.horizontalPopupNameBox{
+			position: fixed;
+			left: 84%;
+			top: 21%;
+			width: 460rpx;
+			height: 60rpx;
+			transform: translate(-50%, -50%) rotateZ(90deg);
+			background-color: rgba(0,0,0,0.3);
+			border-radius: 30rpx;
+			text-align: left;
+			text{
+				padding: 20rpx;
+				font-size: 30rpx;
+				color: white;
+				line-height: 60rpx;
+			}
+		}
+		.progress-line-box{
+			position: fixed;
+			left: 2%;
+			top: 50%;
+			height: 50rpx;
+			z-index: 10;
+			transform: translate(-50%, -50%) rotateZ(90deg);
+			progress{
+				position: absolute;
+				top: 48%;
+				left: 4%;
+				width: 80%;
+			}
+			.progress-time{
+				position: absolute;
+				left: 85%;
+				color: white;
+				line-height: 50rpx;
+			}
+		}
+		.progress-box{
+			position: fixed;
+			left: 6%;
+			top: 50%;
+			z-index: 10;
+			height: 50rpx;
+			width: 450rpx;
+			display: flex;
+			justify-content: center;
+			border-radius: 20rpx;
+			background-color:  rgba(0, 0, 0, .5);
+			transform: translate(-50%, -50%) rotateZ(90deg);
+			.replayVideoIconBox{
+				width: 50rpx;
+				height: 50rpx;
+				icon{
+					width: 100%;
+					height: 100%;
+					background: url(../../static/icon/jumpback.png) no-repeat center;
+					background-size: 50rpx;
+				}
+			}
+			.jumpbackIconBox{
+				width: 50rpx;
+				height: 50rpx;
+				margin-left: 30rpx;
+				icon{
+					width: 100%;
+					height: 100%;
+					background: url(../../static/icon/jumpback15.png) no-repeat center;
+					background-size: 50rpx;
+				}
+			}
+			.suspendIconBox{
+				width: 50rpx;
+				height: 50rpx;
+				margin-left: 30rpx;
+				icon{
+					width: 100%;
+					height: 100%;
+					background: url(../../static/icon/suspend.png) no-repeat center;
+					background-size: 50rpx;
+				}
+			}
+			.playIconBox{
+				width: 50rpx;
+				height: 50rpx;
+				margin-left: 30rpx;
+				icon{
+					width: 100%;
+					height: 100%;
+					background: url(../../static/icon/play.png) no-repeat center;
+					background-size: 50rpx;
+				}
+			}
+			.jumpforwardIconBox{
+				width: 50rpx;
+				height: 50rpx;
+				margin-left: 30rpx;
+				icon{
+					width: 100%;
+					height: 100%;
+					background: url(../../static/icon/jumpforward15.png) no-repeat center;
+					background-size: 50rpx;
+				}
+			}
+			.endVideoIconBox{
+				width: 50rpx;
+				height: 50rpx;
+				margin-left: 30rpx;
+				icon{
+					display: block;
+					transform: rotateZ(180deg);
+					width: 100%;
+					height: 100%;
+					background: url(../../static/icon/jumpback.png) no-repeat center;
+					background-size: 50rpx;
+				}
+			}
+			.f-text{
+				color: white;
+				line-height: 50rpx;
+			}
+			.t-text{
+				color: white;
+				line-height: 50rpx;
+			}
+		}
+		.videoLoadImageBox{
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			image{
+				width: 100%;
+				height: 100%;
+			}
+		}
+		.play{
 			background-color: black;
 			position: relative;
 			overflow: hidden;
-
-			.container {
+			.container{
 				position: fixed;
 				left: 50%;
 				top: 50%;
 				transform: translate(-50%, -50%);
 				margin: 0 auto;
 				z-index: 25;
-
-				canvas {
+				canvas{
 					width: 100%;
 					height: 100%;
 				}
 			}
-
-			.videoBox {
+			.videoBox{
 				position: absolute;
 				left: 50%;
 				top: 50%;
 				// transform: translate(-50%, -50%);修改为了行内样式
 				overflow: hidden;
-
-				video {
+				video{
 					position: fixed;
 					left: 0;
 					top: 0;
@@ -650,8 +953,7 @@
 					width: 100%;
 					height: 100%;
 				}
-
-				.screenshot {
+				.screenshot{
 					position: absolute;
 					left: 0;
 					top: 0;
@@ -660,8 +962,7 @@
 					height: 100%;
 				}
 			}
-
-			.chooseTipsMask15 {
+			.chooseTipsMask15{
 				background-color: rgba(0, 0, 0, .1);
 				position: fixed;
 				left: 0;
@@ -669,9 +970,8 @@
 				width: 100%;
 				height: 100%;
 				z-index: 17;
-
-				.chooseTipsMask16 {
-					background-color: rgba(255, 255, 255, 0);
+				.chooseTipsMask16{
+					background-color: rgba(255,255,255, 0);
 					position: fixed;
 					left: 50%;
 					top: 50%;
@@ -680,41 +980,35 @@
 					height: 38%;
 					z-index: 18;
 					border-radius: 20rpx;
-
-					.chooseTips {
+					.chooseTips{
 						width: 100%;
 						z-index: 25;
 						// background-color: rgba(0,0,0,1);
 						position: absolute;
 						top: 50%;
 						transform: translateY(-50%);
-
-						.closeBox {
+						.closeBox{
 							position: absolute;
 							width: 46rpx;
 							height: 46rpx;
 							right: 20rpx;
 							top: 20rpx;
-
-							.closeIcon {
+							.closeIcon{
 								width: 100%;
 								height: 100%;
 								background: url(../../static/icon/close.png) no-repeat center;
 								background-size: 46rpx;
 							}
 						}
-
-						.title {
+						.title{
 							text-align: center;
 							color: white;
 							font-size: 36rpx;
 							line-height: 100rpx;
 						}
-
-						.tips {
+						.tips{
 							position: relative;
-
-							.optionBox {
+							.optionBox{
 								background: url('https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1606382670960frame.png') no-repeat center;
 								background-size: 100% 100%;
 								width: 100%;
@@ -723,25 +1017,22 @@
 								line-height: 80rpx;
 								display: flex;
 								justify-content: space-between;
-
-								.option {
+								.option{
 									color: white;
 									padding-left: 20rpx;
 									font-size: 34rpx;
-
-									.iconBox {
+									.iconBox{
 										position: absolute;
 										right: 0;
 										top: -18rpx;
 										// background-color: #7E4DAB;
-										background-color: rgba(#ffffff, 0.6);
+										background-color: rgba(#ffffff,0.6);
 										height: 50rpx;
 										width: 180rpx;
 										border-radius: 25rpx;
 										display: flex;
 										justify-content: flex-start;
-
-										icon {
+										icon{
 											display: inline-block;
 											margin-left: 12rpx;
 											line-height: 50rpx;
@@ -750,8 +1041,7 @@
 											height: 50rpx;
 											background-size: 50rpx;
 										}
-
-										text {
+										text{
 											margin-left: 8rpx;
 											line-height: 50rpx;
 											color: #707070;
@@ -761,7 +1051,6 @@
 								}
 							}
 						}
-
 						.video_rebroadcast {
 							width: 80rpx;
 							height: 80rpx;
@@ -769,7 +1058,7 @@
 							background-color: rgba(#000, .2);
 							border-radius: 40rpx;
 							margin: 0 auto;
-
+	
 							img {
 								width: 100%;
 								height: 100%;
@@ -779,30 +1068,26 @@
 					}
 				}
 			}
-
-			.verticalLikabilityBox {
-				.likabilityTips {
+			.verticalLikabilityBox{
+				.likabilityTips{
 					position: fixed;
 					left: 5%;
 					top: 12%;
 					height: 600rpx;
 					width: 420rpx;
 					z-index: 15;
-
 					// background-color: rgba(255,255,255,.5);
-					.lbtips {
+					.lbtips{
 						height: 50rpx;
 						width: 100%;
-
-						.likabilityBox {
+						.likabilityBox{
 							margin-top: 10rpx;
 							padding: 10rpx 20rpx;
 							height: 50rpx;
 							border-radius: 20rpx;
-							background-color: rgba(0, 0, 0, .3);
+							background-color: rgba(0,0,0,.3);
 							text-align: left;
-
-							.likability {
+							.likability{
 								color: white;
 								font-size: 30rpx;
 								line-height: 30rpx;
@@ -811,9 +1096,8 @@
 					}
 				}
 			}
-
-			.horizontalLikabilityBox {
-				.likabilityTips {
+			.horizontalLikabilityBox{
+				.likabilityTips{
 					position: fixed;
 					left: 40%;
 					top: 19%;
@@ -821,21 +1105,18 @@
 					width: 420rpx;
 					transform: translate(-50%, -50%) rotateZ(90deg);
 					z-index: 15;
-
 					// background-color: rgba(255,255,255,.5);
-					.lbtips {
+					.lbtips{
 						height: 50rpx;
 						width: 100%;
-
-						.likabilityBox {
+						.likabilityBox{
 							margin-top: 10rpx;
 							padding: 10rpx 20rpx;
 							height: 50rpx;
 							border-radius: 20rpx;
-							background-color: rgba(0, 0, 0, .3);
+							background-color: rgba(0,0,0,.3);
 							text-align: left;
-
-							.likability {
+							.likability{
 								color: white;
 								font-size: 30rpx;
 								line-height: 30rpx;
@@ -844,45 +1125,39 @@
 					}
 				}
 			}
-
-			.lightBox {
+			.lightBox{
 				position: fixed;
 				left: 6%;
 				top: 4%;
 				height: 40rpx;
 				width: 160rpx;
 				z-index: 15;
-				background-color: rgba(255, 255, 255, .5);
+				background-color: rgba(255,255,255,.5);
 				border-radius: 20rpx;
 				display: flex;
 				justify-content: flex-start;
-
-				.lightIconBox {
+				.lightIconBox{
 					width: 40rpx;
 					height: 40rpx;
 					margin-left: 10rpx;
-
-					.lightIcon {
+					.lightIcon{
 						width: 100%;
 						height: 100%;
 						background: url(../../static/icon/hourglass.png) no-repeat center;
 						background-size: 40rpx;
 					}
 				}
-
-				.lightText {
+				.lightText{
 					font-size: 24rpx;
 					color: white;
 					line-height: 40rpx;
 					margin-left: 10rpx;
 				}
-
-				.addLightIconBox {
+				.addLightIconBox{
 					width: 40rpx;
 					height: 40rpx;
 					margin-left: 26rpx;
-
-					.addLightIcon {
+					.addLightIcon{
 						width: 100%;
 						height: 100%;
 						background: url(../../static/icon/addofplay.png) no-repeat center;
@@ -890,94 +1165,109 @@
 					}
 				}
 			}
-
-			.verticalBox {
-				.storyLineBox {
+			.verticalBox{
+				.storyLineBox{
 					position: fixed;
 					right: 6%;
 					top: 37%;
 					height: 80rpx;
 					width: 100rpx;
 					z-index: 15;
-					background-color: rgba(0, 0, 0, .3);
+					background-color: rgba(0,0,0,.3);
 					border-radius: 20rpx;
-
-					.storyLineIconBox {
+					.storyLineIconBox{
 						width: 100rpx;
 						height: 50rpx;
 						text-align: center;
-
-						.storyLineIcon {
+						.storyLineIcon{
 							width: 50rpx;
 							height: 50rpx;
 							background: url(../../static/icon/fenzhi.png) no-repeat center;
 							background-size: 50rpx;
 						}
 					}
-
-					.storyLine {
+					.storyLine{
 						text-align: center;
 						color: white;
 						font-size: 20rpx;
 						line-height: 30rpx;
 					}
 				}
-
-				.reportBox {
+				.reportBox{
 					position: fixed;
 					right: 6%;
 					top: 45%;
 					height: 80rpx;
 					width: 100rpx;
 					z-index: 15;
-					background-color: rgba(0, 0, 0, .3);
+					background-color: rgba(0,0,0,.3);
 					border-radius: 20rpx;
-
-					.reportIconBox {
+					.reportIconBox{
 						width: 100rpx;
 						height: 50rpx;
 						text-align: center;
-
-						.reportIcon {
+						.reportIcon{
 							width: 50rpx;
 							height: 50rpx;
 							background: url(../../static/icon/report.png) no-repeat center;
 							background-size: 50rpx;
 						}
 					}
-
-					.report {
+					.report{
 						text-align: center;
 						color: white;
 						font-size: 20rpx;
 						line-height: 30rpx;
 					}
 				}
-
-				.seeMoreBox {
+				.seeMoreBox{
 					position: fixed;
 					right: 6%;
 					top: 53%;
 					height: 80rpx;
 					width: 100rpx;
 					z-index: 15;
-					background-color: rgba(0, 0, 0, .3);
+					background-color: rgba(0,0,0,.3);
 					border-radius: 20rpx;
-
-					.seeMoreIconBox {
+					.seeMoreIconBox{
 						width: 100rpx;
 						height: 50rpx;
 						text-align: center;
-
-						.seeMoreIcon {
+						.seeMoreIcon{
 							width: 50rpx;
 							height: 50rpx;
 							background: url(../../static/icon/seeMore.png) no-repeat center;
 							background-size: 50rpx;
 						}
 					}
-
-					.seeMore {
+					.seeMore{
+						text-align: center;
+						color: white;
+						font-size: 20rpx;
+						line-height: 30rpx;
+					}
+				}
+				.returnToPreviousBox{
+					position: fixed;
+					right: 6%;
+					top: 61%;
+					height: 80rpx;
+					width: 100rpx;
+					z-index: 15;
+					background-color: rgba(0,0,0,.3);
+					border-radius: 20rpx;
+					.returnToPreviousIconBox{
+						width: 100rpx;
+						height: 50rpx;
+						text-align: center;
+						.returnToPreviousIcon{
+							width: 50rpx;
+							height: 50rpx;
+							background: url(../../static/icon/returnToPrevious.png) no-repeat center;
+							background-size: 50rpx;
+						}
+					}
+					.returnToPrevious{
 						text-align: center;
 						color: white;
 						font-size: 20rpx;
@@ -985,41 +1275,64 @@
 					}
 				}
 			}
-
-			.horizontalBox {
-				.storyLineBox {
+			.horizontalBox{
+				.storyLineBox{
 					position: fixed;
 					right: 0;
-					top: 70%;
+					top: 60%;
 					height: 80rpx;
 					width: 100rpx;
 					transform: translate(-50%, -50%) rotateZ(90deg);
 					z-index: 15;
-					background-color: rgba(0, 0, 0, .3);
+					background-color: rgba(0,0,0,.3);
 					border-radius: 20rpx;
-
-					.storyLineIconBox {
+					.storyLineIconBox{
 						width: 100rpx;
 						height: 50rpx;
 						text-align: center;
-
-						.storyLineIcon {
+						.storyLineIcon{
 							width: 50rpx;
 							height: 50rpx;
 							background: url(../../static/icon/fenzhi.png) no-repeat center;
 							background-size: 50rpx;
 						}
 					}
-
-					.storyLine {
+					.storyLine{
 						text-align: center;
 						color: white;
 						font-size: 20rpx;
 						line-height: 30rpx;
 					}
 				}
-
-				.reportBox {
+				.reportBox{
+					position: fixed;
+					right: 0;
+					top: 70%;
+					transform: translate(-50%, -50%) rotateZ(90deg);
+					height: 80rpx;
+					width: 100rpx;
+					z-index: 15;
+					background-color: rgba(0,0,0,.3);
+					border-radius: 20rpx;
+					.reportIconBox{
+						width: 100rpx;
+						height: 50rpx;
+						text-align: center;
+						.reportIcon{
+							width: 50rpx;
+							height: 50rpx;
+							background: url(../../static/icon/report.png) no-repeat center;
+							background-size: 50rpx;
+						}
+					}
+					.report{
+						text-align: center;
+						color: white;
+						font-size: 20rpx;
+						line-height: 30rpx;
+					}
+				}
+				.seeMoreBox{
 					position: fixed;
 					right: 0;
 					top: 80%;
@@ -1027,31 +1340,27 @@
 					height: 80rpx;
 					width: 100rpx;
 					z-index: 15;
-					background-color: rgba(0, 0, 0, .3);
+					background-color: rgba(0,0,0,.3);
 					border-radius: 20rpx;
-
-					.reportIconBox {
+					.seeMoreIconBox{
 						width: 100rpx;
 						height: 50rpx;
 						text-align: center;
-
-						.reportIcon {
+						.seeMoreIcon{
 							width: 50rpx;
 							height: 50rpx;
-							background: url(../../static/icon/report.png) no-repeat center;
+							background: url(../../static/icon/seeMore.png) no-repeat center;
 							background-size: 50rpx;
 						}
 					}
-
-					.report {
+					.seeMore{
 						text-align: center;
 						color: white;
 						font-size: 20rpx;
 						line-height: 30rpx;
 					}
 				}
-
-				.seeMoreBox {
+				.returnToPreviousBox{
 					position: fixed;
 					right: 0;
 					top: 90%;
@@ -1059,23 +1368,20 @@
 					height: 80rpx;
 					width: 100rpx;
 					z-index: 15;
-					background-color: rgba(0, 0, 0, .3);
+					background-color: rgba(0,0,0,.3);
 					border-radius: 20rpx;
-
-					.seeMoreIconBox {
+					.returnToPreviousIconBox{
 						width: 100rpx;
 						height: 50rpx;
 						text-align: center;
-
-						.seeMoreIcon {
+						.returnToPreviousIcon{
 							width: 50rpx;
 							height: 50rpx;
-							background: url(../../static/icon/seeMore.png) no-repeat center;
+							background: url(../../static/icon/returnToPrevious.png) no-repeat center;
 							background-size: 50rpx;
 						}
 					}
-
-					.seeMore {
+					.returnToPrevious{
 						text-align: center;
 						color: white;
 						font-size: 20rpx;
@@ -1083,43 +1389,37 @@
 					}
 				}
 			}
-
-			.storyLineContentMask16 {
+			.storyLineContentMask16{
 				position: fixed;
 				z-index: 16;
 				left: 0;
 				top: 0;
 				width: 100%;
 				height: 100%;
-				background-color: rgba(255, 255, 255, .9);
-
-				.storyLineContentBox {
+				background-color: rgba(255,255,255,.9);
+				.storyLineContentBox{
 					width: 100%;
 					height: 100%;
 					z-index: 17;
-					background-color: rgba(0, 0, 0, .3);
-
-					.title {
+					background-color: rgba(0,0,0,.3);
+					.title{
 						text-align: center;
 						font-size: 36rpx;
 						color: white;
 						line-height: 100rpx;
 					}
-
-					.splitLine {
+					.splitLine{
 						border: 2rpx solid #D3D3D3;
 						width: 80%;
 						margin: 0 auto;
 					}
-
-					.closeBox {
+					.closeBox{
 						position: absolute;
 						width: 46rpx;
 						height: 46rpx;
 						right: 20rpx;
 						top: 20rpx;
-
-						.closeIcon {
+						.closeIcon{
 							width: 100%;
 							height: 100%;
 							background: url(../../static/icon/close.png) no-repeat center;
@@ -1128,123 +1428,100 @@
 					}
 				}
 			}
-
-			.reportContentMask16 {
+			.reportContentMask16{
 				position: fixed;
 				z-index: 16;
 				left: 0;
 				top: 0;
 				width: 100%;
 				height: 100%;
-				background-color: rgba(255, 255, 255, .9);
-
-				.reportContentBox {
+				background-color: rgba(255,255,255,.9);
+				.reportContentBox{
 					width: 100%;
 					height: 100%;
 					z-index: 17;
-					background-color: rgba(0, 0, 0, .3);
-
-					.title {
+					background-color: rgba(0,0,0,.3);
+					.title{
 						text-align: center;
 						font-size: 36rpx;
 						color: white;
 						line-height: 100rpx;
 					}
-
-					.splitLine {
+					.splitLine{
 						border: 2rpx solid #D3D3D3;
 						width: 100%;
 						margin: 0 auto;
 					}
-
-					.subTitle {
+					.subTitle{
 						color: white;
 						margin: 10rpx 0 0 10rpx;
 						font-size: 30rpx;
 					}
-
-					.closeBox {
+					.closeBox{
 						position: absolute;
 						width: 46rpx;
 						height: 46rpx;
 						right: 20rpx;
 						top: 20rpx;
-
-						.closeIcon {
+						.closeIcon{
 							width: 100%;
 							height: 100%;
 							background: url(../../static/icon/close.png) no-repeat center;
 							background-size: 46rpx;
 						}
 					}
-
-					.reportContent {
-						.uni-list {
-							.checkBox {
+					.reportContent{
+						.uni-list{
+							.checkBox{
 								margin: 30rpx 0 0 30rpx;
 								display: flex;
 								justify-content: flex-start;
-
-								.nameBox {
+								.nameBox{
 									height: 48rpx;
-
-									.name {
+									.name{
 										line-height: 48rpx;
 										color: white;
 									}
 								}
 							}
 						}
-
-						.uni-textarea {
+						.uni-textarea{
 							margin: 30rpx 0 0 30rpx;
-
-							textarea {
+							textarea{
 								background: white;
 							}
 						}
-
-						.uploadBox {
+						.uploadBox{
 							margin: 30rpx 0 0 0;
-
-							.subTitle {
+							.subTitle{
 								color: white;
 								font-size: 30rpx;
 							}
-
-							.uploadBtnBox {
+							.uploadBtnBox{
 								margin: 30rpx 0 0 30rpx;
 								border: 2rpx solid white;
 								width: 200rpx;
 								height: 300rpx;
-
 								icon {
 									width: 100%;
 									height: 100%;
 									background: url(../../static/icon/add.png) no-repeat center;
 									background-size: 200rpx 200rpx;
-								}
-
-								;
+								};
 							}
-
-							.uploadImageBox {
+							.uploadImageBox{
 								margin: 30rpx 0 0 30rpx;
 								border: 2rpx solid red;
 								width: 200rpx;
 								height: 300rpx;
 								border: 2rpx solid white;
-
 								image {
 									width: 100%;
 									height: 100%;
-								}
-
-								;
+								};
 							}
 						}
-
-						.submitBtnBox {
+						.submitBtnBox{
 							margin: 0 auto;
 							margin-top: 20rpx;
 							font-size: 30rpx;
@@ -1252,8 +1529,7 @@
 							height: 60rpx;
 							color: white;
 							border: 2rpx solid white;
-
-							.btnText {
+							.btnText{
 								line-height: 60rpx;
 								text-align: center;
 							}
@@ -1263,8 +1539,7 @@
 			}
 		}
 	}
-
-	page {
+	page{
 		width: 100%;
 		height: 100%;
 	}

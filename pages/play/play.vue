@@ -52,7 +52,7 @@
 			<u-modal v-model="showConditionAdvertisingFlag" title="温馨提示" :show-confirm-button="false" z-index="999">
 				<view class="slot-content">
 					<view style="padding: 0 20rpx;padding-top: 40rpx;">
-						<view >此选项作者设置必须观看广告才能观看哦</view>
+						<view >此选项作者设置必须观看激励视频才能播放哦</view>
 						<!-- <view v-if="!isHaveLight">当前光的数量不足，完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view> -->
 						<view @click="openAdvertising" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
 							<image src="../../static/icon/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
@@ -77,7 +77,7 @@
 				<video :src="videoUrl" :autoplay="autopalyFlag" :show-mute-btn="true" :show-fullscreen-btn="false" id="myVideo"
 				 :enable-play-gesture="playGestureFlag" :enable-progress-gesture="progressGestureFlag" @ended="videoEnd(false)"
 				 @pause="videoPause" @loadedmetadata="loadeddata" @touchend="videoTouchend" @touchstart="videoTouchstart" v-if="videoShowFlag"
-				 @timeupdate="videoTimeupdate" :controls="controlsFlag" @play="videoPlay"></video>
+				 @timeupdate="videoTimeupdate" :controls="controlsFlag" @play="videoPlay" @waiting="waitingVideo"></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
 				'background-repeat':'no-repeat', backgroundSize:'100% 100%'}"></view>
@@ -157,6 +157,12 @@
 					</view>
 					<view class="seeMore">看更多</view>
 				</view>
+				<view class="returnToPreviousBox" @click="returnToPrevious">
+					<view class="returnToPreviousIconBox">
+						<icon class="returnToPreviousIcon"></icon>
+					</view>
+					<view class="returnToPrevious">返回上级</view>
+				</view>
 			</view>
 			<!-- 横屏 -->
 			<view v-if="hiddenBtnFlag" :style="!showStyleFlag?'display: block':'display: none'" class="horizontalBox">
@@ -177,6 +183,12 @@
 						<icon class="seeMoreIcon"></icon>
 					</view>
 					<view class="seeMore">看更多</view>
+				</view>
+				<view class="returnToPreviousBox" @click="returnToPrevious">
+					<view class="returnToPreviousIconBox">
+						<icon class="returnToPreviousIcon"></icon>
+					</view>
+					<view class="returnToPrevious">返回上级</view>
 				</view>
 			</view>
 			<!-- 故事线内容呈现在蒙板之上 -->
@@ -263,6 +275,18 @@
 					<view @click="goAdvertisement" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
 						<image src="../../static/icon/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
 						<view style="display: inline-block;margin-left: 10rpx;color: #fff;transform: translateY(-4rpx);">查看结果</view>
+					</view>
+				</view>
+			</view>
+		</u-modal>
+		<u-modal v-model="returnToPreviouShow" title="温馨提示" :show-confirm-button="false" z-index="999">
+			<view class="slot-content">
+				<view style="padding: 0 20rpx;padding-top: 40rpx;">
+					<view style="text-align: center;">
+						<view >别点了，真的回不去了</view>
+					</view>
+					<view @click="returnToPreviouConfirm" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
+						<view style="display: inline-block;margin-left: 10rpx;color: #fff;transform: translateY(-4rpx);">确定</view>
 					</view>
 				</view>
 			</view>
@@ -590,7 +614,7 @@
 				optionPercentageFunction: Function,
 				//选项百分比的值
 				optionPercentageValues: [],
-				// 浮标 
+				// 浮标
 				// 后台数据
 				ecmArtworkNodeBuoyList:[],
 				// canvas context 对象
@@ -609,27 +633,47 @@
 				showBuoyCanvasFlag: false,
 				// 是否为 浮标视频
 				bouyNodeFlage:false,
+				waitingVideoFlag: false,
 				// 故事线位置
 				storyLineBoxWidthMax: 0,
 				storyLineBoxHeightMin: 0,
 				storyLineBoxWidthMin : 0,
 				storyLineBoxHeightMax : 0,
-				// 图标位置
+				// 举报位置
 				reportBoxWidthMin: 0,
 				reportBoxWidthMax: 0,
 				reportBoxHeightMin: 0,
 				reportBoxHeightMax: 0,
-				// 图标位置
+				// 看更多位置
 				seeMoreBoxWidthMin : 0,
 				seeMoreBoxWidthMax : 0,
 				seeMoreBoxHeightMin: 0,
 				seeMoreBoxHeightMax : 0,
+				// 看更多位置
+				returnToPreviouWidthMin : 0,
+				returnToPreviouWidthMax : 0,
+				returnToPreviouHeightMin: 0,
+				returnToPreviouHeightMax : 0,
+				
 				// 浮标广告弹窗
 				showConditionAdvertisingFlag:false,
-
+				//是否展示返回上一级提示弹窗
+				returnToPreviouShow: false,
+				//开场节点的detailId
+				startDetailId: 0,
+				//是否返回上一级
+				returnToPreviousFlag: false,
+				//浮标作品选项浮标开始渲染时间点
+				bouySectionTime: 0,
+				buoyTimestamp: 0,
+				bouyReturnToPreviousFlag: false,
+				//节流时间
+				backBuoyTimestamp:0,
+				clickCommonOptionTodoBuoyFlag: false
 			}
 		},
 		onReady(){
+			uni.setStorageSync('historyNodeBuoyList',[])
 			//重置重播
 			uni.setStorageSync('isReplay',false)
 			//重置弹窗状态
@@ -709,9 +753,17 @@
 				this.getPlayArtworkInfo(this.artworkId)
 			}
 		},
+		onHide() {
+			console.log('离开play！！！！')
+			globalBus.$off('bouyClickCommonOptionTodo')
+		},
+		onShow() {
+			console.log('进入play！！！！')
+			
+		},
 		onUnload(){
 			uni.navigateBack({
-			    delta: 1 ,
+			    delta: 1,
 				animationDuration: 10,
 				animationType: null
 			});
@@ -719,6 +771,8 @@
 			uni.setStorageSync('isNumericalOptions',0)
 			//关闭页面时重置节点分数容器
 			uni.setStorageSync('appearConditionMap',null)
+			console.log('离开play！！！！')
+			globalBus.$off('bouyClickCommonOptionTodo')
 		},
 		onShareAppMessage (res) {
 			let artworkInfo = uni.getStorageSync('artworkInfo')
@@ -754,6 +808,72 @@
 			}
 		},
 		methods: {
+			//返回上一级弹窗的确认事件
+			returnToPreviouConfirm(){
+				if(this.bouyNodeFlage){
+					this.recoveryBuoyDraw()
+				}else{
+					this.videoContext.play()
+				}
+				this.returnToPreviouShow = false
+			},
+			//返回上级
+			returnToPrevious(){
+				//设置返回上一级开关 给是否快进视频做标识
+				this.returnToPreviousFlag = true
+				//若parentId是0或-1时点击返回上一级弹框提示（parentId为0根节点为-1多结局作品的结局视频）
+				if(this.parentId == -1 || this.parentId == 0){
+					if(this.bouyNodeFlage){
+						this.stopBuoyDraw()
+					}else{
+						this.videoContext.pause()
+					}
+					return this.returnToPreviouShow = true
+				}
+				//返回上一级时如果是开场不去获取百分比
+				if(this.startDetailId == this.parentId){
+					this.isShowOptionPercentageFlag = false
+				}
+				let pkDetailIds = uni.getStorageSync("pkDetailIds")
+				//获取浮标视频的选项初始渲染时间
+				let historyNodeBuoyList = uni.getStorageSync("historyNodeBuoyList")
+				for (let i = 0; i < historyNodeBuoyList.length; i++) {
+					let currentId = historyNodeBuoyList[i].fkNodeId
+					let detailId = pkDetailIds[pkDetailIds.length-1]
+					console.log("************detailId return: ",detailId)
+					//此处还是不能使用this.detailId来对比要使用历史记录的来对比 因为返回的节点可能是跳转节点
+					if(currentId == detailId){
+						this.bouySectionTime = historyNodeBuoyList[i].buoySectionTime
+						console.log("*************bouySectionTime1: ",this.bouySectionTime)
+						break
+					}
+				}
+				// console.log("************pkDetailIds: ",pkDetailIds)
+				//返回上一级不使用parentId 使用播放历史记录的倒数第二个detailid
+				let currentDetailId = pkDetailIds[pkDetailIds.length-2]
+				// console.log("************currentDetailId: ",currentDetailId)
+				//砍掉倒数两个detailId 因为播放时会再存一次当前的播放记录
+				pkDetailIds.splice(pkDetailIds.length-2,2)
+				// console.log("************pkDetailIds: ",pkDetailIds)
+				this.playedHistoryArray = pkDetailIds
+				// console.log("************playedHistoryArray: ",this.playedHistoryArray)
+				uni.setStorageSync("pkDetailIds",this.playedHistoryArray)
+				//将多结局作品的路径砍掉 对照着播放历史截取
+				if(uni.getStorageSync('isEndings') == 1){
+					let multipleResultLine = uni.getStorageSync("multipleResultLine")
+					//砍掉倒数第一个多结局作品的线路记录
+					multipleResultLine.splice(multipleResultLine.length-1,1)
+					this.multipleResultLine = multipleResultLine
+					uni.setStorageSync("multipleResultLine",this.multipleResultLine)
+				}
+				//走故事线逻辑 组装option参数
+				let option = {
+					"pkArtworkId": this.artworkId,
+					"pkDetailId": currentDetailId,
+					"jumpFlag": true
+				}
+				this.storyLineJumpPlayTodo(option)
+			},
 			//截取选项的名称
 			getOptionPercentageNames(option){
 				this.optionPercentageNames = []
@@ -817,7 +937,7 @@
 					if(this.isPosition == 1){
 						this.showCanvasFlag = true
 					}
-					
+
 				}else{
 					this.videoContext.play()
 					// 浮标修改
@@ -829,7 +949,6 @@
 
 			// 显示激励广告确认弹窗
 			showDialog () {
-				// this.clearNodeBuoyInfo()
 				console.log('我们显示激励广告确认弹窗  被调用')
 				if(!this.isVideoEndFlag){
 					this.showCanvasFlag = false
@@ -839,12 +958,11 @@
 					if (this.bouyNodeFlage) {
 						this.stopBuoyDraw()
 					}
-				
+
 				}else {
 					//浮标改动
 					if (this.bouyNodeFlage) {
 						this.stopBuoyDraw()
-						// this.clearNodeBuoyInfo()
 					}
 				}
 
@@ -853,10 +971,20 @@
 			// 观看激励广告
 			openAdvertising () {
 				this.showAdvertisingFlag = false
-				this.advertising = wx.createRewardedVideoAd({
-					adUnitId: 'adunit-7423fd1b2c7c5724',
-					multiton: true
-				})
+				if (this.advertising != null ){
+					this.advertising.destroy() 
+				} 
+				if ((Math.random() * 10) > 5 ) {
+					this.advertising = wx.createRewardedVideoAd({
+						adUnitId: 'adunit-7423fd1b2c7c5724',
+						multiton: true
+					})
+				}else {
+					this.advertising = wx.createRewardedVideoAd({
+						adUnitId: 'adunit-8d7f7b5a86ac5537',
+						multiton: true
+					})
+				}
 				//捕捉错误
 				this.advertising.onError(err => {
 					console.log(err)
@@ -877,15 +1005,19 @@
 							this.showCanvasFlag = true
 						}
 						if(this.bouyNodeFlage) {
+							this.showConditionAdvertisingFlag = false
 							this.againPlayVideo()
 						}
-					}else{
+					}else {
+					
 						if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
 							this.recoveryBuoyDraw()
 						}
+						this.videoContext.play()
 					}
-					//加载失败销毁对象
 					this.advertising.destroy()
+					this.clickCommonOptionTodoBuoyFlag = false
+					
 				})
 				// 激励广告显示并加载
 				if (this.advertising) {
@@ -924,20 +1056,25 @@
 									this.showCanvasFlag = true
 								}
 								if(this.bouyNodeFlage) {
+									this.showConditionAdvertisingFlag = false
 									this.againPlayVideo()
 								}
 							}else{
 								if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
 									this.recoveryBuoyDraw()
 								}
+								this.videoContext.play()
 							}
 							//加载失败销毁对象
 							this.advertising.destroy()
 						})
+						this.advertising.destroy()
+						this.clickCommonOptionTodoBuoyFlag = false
 					})
 				}
 				// 监听激励广告关闭
 				this.advertising.onClose((status) => {
+					this.showConditionAdvertisingFlag = false
 						if(this.isVideoEndFlag){
 							if(this.isPosition == 1){
 								if(this.playMode == 1){
@@ -948,10 +1085,8 @@
 								this.showCanvasFlag = true
 							}
 						}else{
-							
 							// 浮标修改
 							if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
-								
 								this.recoveryBuoyDraw()
 							}else {
 								this.videoContext.play()
@@ -961,7 +1096,6 @@
 					if(status.isEnded){
 						// 关闭条件浮标 弹窗
 						this.showConditionAdvertisingFlag = false
-
 						if(this.isPosition == 1){
 							//获取多结局作品开关
 							if(this.isGetMultipleFlag){
@@ -978,7 +1112,6 @@
 
 									// 浮标修改
 									if (this.bouyNodeFlage) {
-
 										this.recoveryBuoyDraw()
 									}
 								}
@@ -988,7 +1121,6 @@
 								this.multipleResultAdvertiseShow = false
 								this.multipleResultCallbackTodo(false)
 							}else{
-
 								// 条件 广告
 								if(this.conditionState[this.optionIndex] == 1){
 									//成功播放完广告
@@ -996,12 +1128,10 @@
 								}else{
 									console.log('给光')
 									globalBus.$emit('requestOfAES')
-									
-									
-									
 								}
 							}
 						}
+						this.advertising.destroy()
 					} else {
 						if(this.isVideoEndFlag){
 							if(this.isGetMultipleFlag){
@@ -1033,12 +1163,21 @@
 						}
 						// 浮标 结尾 广告 未看完 时间添加
 						console.log('憨批用户不给光')
+						this.clickCommonOptionTodoBuoyFlag = false
+						//广告拉取失败销毁对象
+						
+						this.advertising.destroy()
 					}
-					this.advertising.destroy()
+					
 				})
+			},
+			openVideoShowFlag(){
+				this.videoShowFlag = true
 			},
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option){
+				//清除视频的画面缓存直接删除video控件
+				this.videoShowFlag = false
 				//故事线跳回重置关闭故事重播不去保存播放记录的开关closeStoryLineReplayFlag为true不去保存播放记录
 				this.closeStoryLineReplayFlag = false
 				//重置是否展示百分比开关
@@ -1061,10 +1200,7 @@
 				this.isPlayedFlag = option.jumpFlag
 				// 浮标修改 清楚信息
 				this.clearNodeBuoyInfo()
-				// if (this.isPlayedFlag) {
-				// 	this.clearNodeBuoyInfo()
-				// }
-				
+
 				this.storyLineJumpFlag = true
 				//故事线跳转时清除好感度延时函数
 				clearTimeout(this.likabilityDelayFunction)
@@ -1094,7 +1230,7 @@
 				//请求获取主树
 				this.getArtworkTreeByArtworkId()
 				//请求获取子树
-				this.getArtworkTreeByDetailId()
+				this.getArtworkTreeByDetailId(option.pkDetailId)
 				//获取播放历史记录
 				this.playedHistoryArray = uni.getStorageSync("pkDetailIds")
 				//重置多结局数组（故事线跳回时进行重组直接获取就好了）
@@ -1161,8 +1297,9 @@
 			},
 			//对节点播放数据进行筛选和提取
 			initPlayData(artworkTree, isJumpDialogCallbackFlag){
-
+				console.log("***********************pkDetailId: ",artworkTree.pkDetailId)
 				if(artworkTree.parentId === 0 ){
+					this.startDetailId = artworkTree.pkDetailId
 					if(artworkTree.percentageState == 1){
 						this.isShowOptionPercentageFlag = true
 					}
@@ -1187,10 +1324,12 @@
 				}else{
 					this.isReplayPopupWindow = false
 				}
+				console.log('this.videoShowFlag',this.videoShowFlag)
 				if(!isJumpDialogCallbackFlag && this.popupPosition == 0 && this.popupState == 1 && !this.isPlayedFlag){
-					this.popupWindowByPopupPositonEqualsZero()
-					return
+					this.videoShowFlag = false
+					return this.popupWindowByPopupPositonEqualsZero()
 				}
+				console.log('这里不应该被执行')
 				if(!popupWindowRecord){
 					this.popupCountNumber = 0
 				}else{
@@ -1358,25 +1497,25 @@
 			},
 			// 视频播放器 弹窗
 			popupWindowByPopupPositonEqualsZero(){
+				console.log('视频暂停被启用过')
+			
 				// 浮标修改
 				if (uni.getStorageSync('playMode') == 1) {
 					try{
 						this.stopBuoyDraw()
 						this.horizontalJumpDialogFlag = true
 						this.$refs.horizontalJumpDialog.horizontalJumpDialogFlag = true
-
-					}catch(e){
 					}
 				}else {
 					try{
 						this.stopBuoyDraw()
 						this.verticalJumpDialogFlag = true
 						this.$refs.verticalJumpDialog.verticalJumpDialogFlag = true
-					}catch(e){
-					}
+					}}
 				}
 				this.savaPopupWindowRecord()
-
+				
+				
 				// if(this.isPosition == 1 && uni.getStorageSync('playMode') == 1){
 				// 	try{
 				// 		this.horizontalJumpDialogFlag = true
@@ -1551,14 +1690,13 @@
 				});
 			},
 			async checkUserIdInfos(a){
-				const token = uni.getStorageSync('token')
 				await uni.request ({
 					url: baseURL + "/wxPlay/checkUserIdInfos",
 					method: 'POST',
 					dataType: 'json',
 					data: {
 						pkArtworkId: a,
-						token: token
+						token: this.token
 					},
 					success: result=> {
 						if(result.data.status == 200){
@@ -1577,6 +1715,7 @@
 				});
 			},
 			async customLightByUserId(eventId){
+				console.log('扣光了！！！！！',eventId)
 				// 默认假设有光
 				this.isHaveLight = true
 				//故事线消费的eventId = 3
@@ -1586,11 +1725,12 @@
 					method: 'POST',
 					dataType: 'json',
 					data: {
-						token: uni.getStorageSync('token'),
+						token: this.token,
 						eventId: eventId
 					},
 					success: result=> {
 						if(result.data.status == 200){
+							console.log("***************result.data.data light:",result.data.data)
 							// console.log(result, '嘿嘿')
 							this.setLight(result.data.data)
 							this.customLightSuccessCallBack(this.optionIndex)
@@ -1649,7 +1789,7 @@
 					dataType: 'json',
 					data: {
 						pkArtworkId: this.artworkId,
-						token: uni.getStorageSync("token")
+						token: this.token
 					},
 					success: res=> {
 						if(res.data.status == 200){
@@ -1670,7 +1810,7 @@
 				})
 			},
 			//异步请求获取作品树 by DetailId
-			async getArtworkTreeByDetailId(){
+			async getArtworkTreeByDetailId(detailId){
 				console.log( this.artworkId)
 				await uni.request({
 					url: baseURL + "/wxPlay/playArtWorkByChildTree",
@@ -1678,14 +1818,15 @@
 					dataType: 'json',
 					data: {
 						pkArtworkId: this.artworkId,
-						detailId:  this.pkDetailId,
-						token: uni.getStorageSync("token")
+						detailId:  detailId,
+						token: this.token
 					},
 					success: res=> {
 						if(res.data.status == 200){
+							this.videoShowFlag = true
 							uni.setStorageSync("artworkTree",res.data.data);
 							uni.setStorageSync('playMode',res.data.data.playMode);
-							uni.setStorageSync('isEndings',res.data.data.isEndings );
+							uni.setStorageSync('isEndings',res.data.data.isEndings);
 							uni.setStorageSync('popupState',res.data.data.popupState)
 							this.popupState = res.data.data.popupState
 							uni.setStorageSync('popupSettings',res.data.data.ecmArtworkNodePopupSettings)
@@ -1948,10 +2089,21 @@
 					}
 					// 浮标修改
 					else if (this.isPosition  === 2){
+						//节流
+						let buoyTimestamp = (new Date()).valueOf();
+						console.log('buoyTimestamp',buoyTimestamp)
+						if ( buoyTimestamp - this.buoyTimestamp < 100 ) {
+							console.log('没节流')
+							return
+						}
+						console.log('没有节流')
+						this.buoyTimestamp = buoyTimestamp
 						// 默认选A
-						// this.clearNodeBuoyInfo()
 						this.optionIndex = 0
 						this.clickCommonOptionTodo(0)
+						
+						
+						
 						// console.log(this.buoyRectList)
 						// return
 					}else{
@@ -1983,6 +2135,15 @@
 				this.multipleResultFlag = false
 				this.isVideoEndFlag = false
 				this.isGetMultipleFlag = false
+				
+				if (this.waitingVideoFlag) {
+					if (this.bouyNodeFlage) {
+						console.log('play里面的  recoveryBuoyDraw 被启动了')
+						this.recoveryBuoyDraw()
+						this.waitingVideoFlag = false
+					}
+				}
+				
 			},
 			//视屏暂停操作
 			videoPause(){
@@ -2054,6 +2215,7 @@
 				}
 			},
 			clickCommonOptionTodo(index){
+				this.clickCommonOptionTodoBuoyFlag = true
 				//保存用户的选择记录
 				this.savaOptionSelectionRecord(this.childs[index].pkDetailId,this.childs[index].parentId)
 				//获取百分比的名称和数据
@@ -2077,7 +2239,7 @@
 						//视频暂停
 						this.videoContext.pause()
 						this.stopBuoyDraw()
-						this.showConditionAdvertisingFlag = true
+						this.showConditionAdvertisingFlag = true	
 					}else {
 						this.openAdvertising()
 					}
@@ -2104,12 +2266,9 @@
 						}
 					}
 				}
-
-
 			},
 			// 选项touchend事件触发时所做的操作
 			optionTouchendTodo(index){
-
 				console.log('touchend我被触发了')
 				// 浮标修改
 				if(this.bouyNodeFlage) {
@@ -2192,9 +2351,9 @@
 							let popupSettings = this.childs[index].ecmArtworkNodePopupSettings
 							uni.setStorageSync('popupState',popupState)
 							uni.setStorageSync('popupSettings',popupSettings)
-					console.log(popupSettings)
+							console.log(popupSettings)
 						}
-				console.log("重新吊起initPlayData",this.childs[index])
+						console.log("重新吊起initPlayData",this.childs[index])
 						this.initPlayData(this.childs[index], false)
 			},
 			/* findmultipleResultChild(){
@@ -2989,20 +3148,14 @@
 				})
 			},
 			loadeddata(e){
+				console.log('this.videoShowFlag: ', this.videoShowFlag)
 				console.log('this.isPlayedFlag: ', this.isPlayedFlag)
 				if(this.isShowOptionPercentageFlag && !this.isPlayedFlag && this.artworkTree.parentId != 0){
-					if(uni.getStorageSync('playMode') == 1){
-						this.horizontalOptionPercentageFlag = true
-					}else{
-						this.verticalOptionPercentageFlag = true
-					}
-					this.optionPercentageFunction= setTimeout(()=>{
 						if(uni.getStorageSync('playMode') == 1){
-							this.horizontalOptionPercentageFlag = false
+							this.horizontalOptionPercentageFlag = true
 						}else{
-							this.verticalOptionPercentageFlag = false
+							this.verticalOptionPercentageFlag = true
 						}
-					},5000)
 				}else{
 					if(this.bouyNodeFlage  && this.artworkTree.parentId != 0){
 						if(uni.getStorageSync('playMode') == 1){
@@ -3081,31 +3234,42 @@
 					this.showBuoyCanvasFlag = true
 					this.initVerticalBuoyCanvas()
 				}
-
+				if(this.returnToPreviousFlag && this.bouyNodeFlage){
+					console.log("************bouySectionTime2s: ",this.bouySectionTime)
+					this.bouyReturnToPreviousFlag = true 
+					//视频暂停
+					// console.log('bouySectionTime',this.bouySectionTime == 0 ? 0 : parseInt(this.bouySectionTssime) -1)
+					this.videoContext.seek( this.bouySectionTime == 0 ? 0 : parseInt(this.bouySectionTime) -1)
+					this.videoContext.pause()
+					this.videoContext.play()
+					this.returnToPreviousFlag = false
+				}
 			},
 			videoTimeupdate(e){
 
 				//获取视频当前时间
 				this.currentTime = e.detail.currentTime
 								//获取视频当前时间
-				if(this.duration -this.currentTime > 0.4){
+				if(this.duration - this.currentTime > 0.4){
 					this.percent = parseInt(this.currentTime/this.duration*100)
 				}else{
 					this.percent = 100
 				}
 
 				if (this.bouyNodeFlage) {
+					//速度校准
+					this.buoySpeedCalibration()
+					
 					// 当前时间
 					let newTime = Math.floor(this.currentTime)
 					this.buoyNewTime = this.currentTime
-					//速度校准
-					// console.log('tie',e.detail.currentTime,'newTime',newTime)
+
 					// 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
 					if (this.buoyCurrentTime == newTime || newTime == 0) {
 						// this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
 						return
 					}
-					// this.buoySpeedCalibration()
+					
 					//获取视频当前时间
 					this.buoyCurrentTime = newTime
 					// 遍历 初始化后的可直接用于画图的 类canvas对象2维数组 index 位置下表
@@ -3120,22 +3284,8 @@
 							if (nodeBuoy.buoySectionTime === newTime) {
 
 								this.buoyRectList[index] = nodeBuoy
-								// 遍历画图的 暂存对象数组
-								// this.buoyRectList.forEach((buoyRect, i) => {
-								// 	// 当位置 不为空时说明 有以前的对象
-								// 	// if (this.buoyRectList[index] != null) {
-								// 	// 	if (nodeBuoy.nodeId === buoyRect.nodeId && index === i) {
-								// 	// 		this.buoyRectList[index] = nodeBuoy
-								// 	// 	}
-
-								// 	// }
-								// 	// //为空时说明应该加入新的对象
-								// 	// else {
-								// 	// 	console.log('推送，inde',index)
-								// 	// 	// this.buoyRectList.push(nodeBuoy)
-								// 	// 	this.buoyRectList[index] = nodeBuoy
-								// 	// }
-								// })
+								
+								
 							}
 						})
 						this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
@@ -3237,7 +3387,7 @@
 						imgUrl: this.headImage,
 						content: this.textareaContent,
 						reportStatue: this.reportType,
-						token: uni.getStorageSync("token"),
+						token: this.token,
 						fkArtworkNodeId: uni.getStorageSync("detailId"),
 						fkArtworkId: this.artworkId
 					},
@@ -3420,13 +3570,33 @@
 				// console.log(this.rect)
 				this.buoyCtx.clearRect(0, 0, this.buoyCanvas.width, this.buoyCanvas.height);
 				this.buoyRectList.forEach((v, index) => {
-
-					// if (v.x >= v.targetX) {
-					// 	v.x = v.targetX;
+					
+					// if (this.playMode) {
+						
+					// }else {
+						// 阻止移动出 指定位置
+						if (v.vx > 0) {
+							if (v.x >= v.targetX) {
+								v.vx = 0
+							}
+						}
+						if (v.vx < 0) {
+							if (v.x <= v.targetX) {
+								v.vx = 0
+							}
+						}
+						if (v.vy > 0 ) {
+							if (v.y >= v.targetY){
+								v.vy = 0 
+							}
+						}
+						if (v.vy < 0 ) {
+							if (v.y <= v.targetY){
+								v.vy = 0 
+							}
+						}
 					// }
-					// if (v.y >= v.targetY) {
-					// 	v.y = v.targetY;
-					// }
+					
 					if(v != null) {
 						v.draw();
 						v.x += v.vx;
@@ -3482,7 +3652,6 @@
 					}
 				}
 			},
-
 			// 获取当前播放视频时间
 			getNewVideoPlayTime(e) {
 				// 当前时间
@@ -3532,9 +3701,25 @@
 			// 初始化浮标 对象 List
 			initializationBuoyList() {
 				// console.log(this.ecmArtworkNodeBuoyList)
+				let hList = uni.getStorageSync('historyNodeBuoyList')
 				this.ecmArtworkNodeBuoyList.forEach((nodeBuoyList, index) => {
 					let aList = []
 					nodeBuoyList.forEach((v, i) => {
+						if (v.buoyType == 0) {
+							let  aFlag = true
+							hList.forEach(n => {
+								console.log('v.nodeId ',v,'n.nodeId',n.fkNodeId )
+								if (v.fkNodeId == n.fkNodeId) {
+									aFlag = false
+								}
+
+							})
+							if (aFlag) {
+								hList.push(v)
+								aFlag = true
+							}
+
+						}
 						if (v.buoyType != 2) {
 							if (uni.getStorageSync('playMode') == 1) {
 								// console.log("横屏")
@@ -3549,7 +3734,7 @@
 								// console.log('矩形框的高: ',rectH)
 								//矩形框宽度
 								let  rectH= parseInt(((v.buoyWide - 0) * this.canvasHeight).toFixed(0))
-
+								// 浮标出现的时间 
 								let buoySectionTime =  parseInt(v.buoySectionTime - 0)
 								// 目标时间
 								let targetTime = parseInt(nodeBuoyList[i + 1].buoySectionTime - 0)
@@ -3560,16 +3745,19 @@
 								let targetX = parseInt(( (1 - (nodeBuoyList[i + 1].buoyCoordinateY - 0)  - (nodeBuoyList[i + 1].buoyHigh - 0))* this.canvasWidth).toFixed(0))
 								// 目标位置 Y
 								let targetY = parseInt(((nodeBuoyList[i + 1].buoyCoordinateX  - 0) * this.canvasHeight).toFixed(0))
-
-
-
+								
 								let vx = ( targetX - rectX) / ((
 									vTime) * 60)
 								let vy = (targetY - rectY) / ((
 									vTime) * 60)
 								let buoy = this.initializationBuoy(rectX, rectY, rectW, rectH, vx, vy, rectOpacity, v.fkNodeId, buoySectionTime,
 									v.buoyType,targetX,targetY,targetTime)
-
+									
+								if (buoySectionTime == 0) {
+									this.buoyRectList.push(buoy)
+									// this.clearAnimation()
+									this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+								}
 								aList.push(buoy)
 							}else {
 								// console.log("竖屏")
@@ -3602,7 +3790,11 @@
 									vTime) * 60)
 								let buoy = this.initializationBuoy(rectX, rectY, rectW, rectH, vx, vy, rectOpacity, v.fkNodeId, buoySectionTime,
 									v.buoyType,targetX,targetY,targetTime)
-
+								if (buoySectionTime == 0) {
+									this.buoyRectList.push(buoy)
+									// this.clearAnimation()
+									this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+								}
 								aList.push(buoy)
 							}
 
@@ -3614,9 +3806,9 @@
 					})
 					this.canvasNodeBuoyList.push(aList)
 					// console.log("这是初始化",this.canvasNodeBuoyList[0])
-
-
 				})
+				uni.setStorageSync('historyNodeBuoyList',hList)
+				
 			},
 			// canvas 触摸事件
 			canvasBuoyTouchstart(e) {
@@ -3629,7 +3821,7 @@
 
 				let stopFlag = false
 				// console.log('nowBuoyRectList',nowBuoyRectList)
-				console.log('newY',newY,'newX',newX)
+				// console.log('newY',newY,'newX',newX)
 				// console.log('nowBuoyRectList',nowBuoyRectList)
 
 				nowBuoyRectList.forEach((v, i) => {
@@ -3684,7 +3876,7 @@
 					if (this.storyLineBoxHeightMin <= newY && this.storyLineBoxHeightMax >= newY) {
 						console.log("故事线")
 						this.showBuoyCanvasFlag = false
-						// this.clearNodeBuoyInfo()
+
 						this.stopBuoyDraw()
 						this.showStoryLineContent()
 						return
@@ -3694,7 +3886,7 @@
 					if (this.reportBoxHeightMin <= newY && this.reportBoxHeightMax >= newY) {
 						console.log("举报")
 						this.showBuoyCanvasFlag = false
-						// this.clearNodeBuoyInfo()
+
 						this.stopBuoyDraw()
 						this.showReportContent()
 						return
@@ -3704,8 +3896,17 @@
 					if (this.seeMoreBoxHeightMin <= newY && this.seeMoreBoxHeightMax >= newY) {
 						this.showBuoyCanvasFlag = false
 						console.log("更多")
-						// this.clearNodeBuoyInfo()
+
 						this.goDiscover()
+						this.stopBuoyDraw()
+						return
+					}
+				}
+				if (this.returnToPreviouWidthMin<= newX && this.returnToPreviouWidthMax>= newX) {
+					if (this.returnToPreviouHeightMin <= newY && this.returnToPreviouHeightMax >= newY) {
+						this.showBuoyCanvasFlag = false
+						console.log("返回上级")
+						this.returnToPrevious()
 						this.stopBuoyDraw()
 						return
 					}
@@ -3719,8 +3920,6 @@
 						return
 					}
 				}
-
-
 			},
 			// 清除浮标
 			clearNodeBuoyInfo() {
@@ -3729,7 +3928,7 @@
 				this.showBuoyCanvasFlag = false
 				//清空节点 浮标 标记
 				this.bouyNodeFlage = false
-				
+
 				//清空 所有数据
 				this.buoyRectList = []
 				this.canvasNodeBuoyList = []
@@ -3754,21 +3953,27 @@
 					// 故事线 图标位置
 					this.storyLineBoxWidthMin = ww - cw - this.getPxbyRpx(140)
 					this.storyLineBoxWidthMax =  this.storyLineBoxWidthMin + this.getPxbyRpx(80)
-					this.storyLineBoxHeightMin = (wh * 0.7) - ch - this.getPxbyRpx(60)
+					this.storyLineBoxHeightMin = (wh * 0.6) - ch - this.getPxbyRpx(60)
 
 					this.storyLineBoxHeightMax = this.storyLineBoxHeightMin + this.getPxbyRpx(100)
 
 					// 举报   图标位置
 					this.reportBoxWidthMin = this.storyLineBoxWidthMin
 					this.reportBoxWidthMax = this.storyLineBoxWidthMax
-					this.reportBoxHeightMin = (wh * 0.8) - ch - this.getPxbyRpx(60)
+					this.reportBoxHeightMin = (wh * 0.7) - ch - this.getPxbyRpx(60)
 					this.reportBoxHeightMax = this.reportBoxHeightMin + this.getPxbyRpx(100)
 
 					// 更多   图标位置
 					this.seeMoreBoxWidthMin = this.storyLineBoxWidthMin
 					this.seeMoreBoxWidthMax = this.storyLineBoxWidthMax
-					this.seeMoreBoxHeightMin = (wh * 0.9) - ch - this.getPxbyRpx(60)
+					this.seeMoreBoxHeightMin = (wh * 0.8) - ch - this.getPxbyRpx(60)
 					this.seeMoreBoxHeightMax = this.seeMoreBoxHeightMin + this.getPxbyRpx(100)
+
+					// 返回上一级   图标位置
+					this.returnToPreviouWidthMin = this.storyLineBoxWidthMin
+					this.returnToPreviouWidthMax = this.storyLineBoxWidthMax
+					this.returnToPreviouHeightMin = (wh * 0.9) - ch - this.getPxbyRpx(60)
+					this.returnToPreviouHeightMax = this.returnToPreviouHeightMin + this.getPxbyRpx(100)
 
 					// 广告 位置
 					this.advertisingDivWidthMin = ww - this.getPxbyRpx(80) - cw
@@ -3798,6 +4003,12 @@
 					this.seeMoreBoxWidthMax = this.storyLineBoxWidthMax
 					this.seeMoreBoxHeightMin = (wh * 0.53) - ch
 					this.seeMoreBoxHeightMax = this.seeMoreBoxHeightMin + this.getPxbyRpx(80)
+
+					//返回上一级   图标位置
+					this.returnToPreviouWidthMin = this.storyLineBoxWidthMin
+					this.returnToPreviouWidthMax = this.storyLineBoxWidthMax
+					this.returnToPreviouHeightMin = (wh * 0.61) - ch
+					this.returnToPreviouHeightMax = this.returnToPreviouHeightMin + this.getPxbyRpx(80)
 
 					// 广告 位置
 					this.advertisingDivWidthMin = this.getPxbyRpx(60) - cw
@@ -3835,7 +4046,6 @@
 				this.videoContext.pause()
 				// 关闭canvas
 				this.showBuoyCanvasFlag = false
-
 				// this.stopBuoyRectList = this.deepCopy(this.buoyRectList )
 				// this.showBuoyCanvasFlag = false
 				//清空动画
@@ -3863,7 +4073,9 @@
 				//canvas 回来
 				this.showBuoyCanvasFlag = true
 				// 动画开启
-				this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+				if (this.buoyCanvas != null) {
+					this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+				}
 				// if (this.bouyNodeFlage) {
 				// 	this.showBuoyCanvasFlag = true
 				// 	this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
@@ -3873,28 +4085,78 @@
 			// 速度校准方法
 			buoySpeedCalibration(){
 				// 时间  当前位置  距离  =》  新的 速度
-				//
-				// console.log( this.currentTime)
+				
+				// console.log('当前时间',this.currentTime)
+				this.clearAnimation()
+				// this.currentTime 
 				this.buoyRectList.forEach( (buoyRect,index) => {
 					if ((buoyRect.targetTime - this.currentTime ) > 0) {
-						buoyRect.vx =( buoyRect.targetX - buoyRect.x) /( (buoyRect.targetTime - this.currentTime )  * 15)
-						buoyRect.vy = (buoyRect.targetY - buoyRect.y)/ ( (buoyRect.targetTime  - this.currentTime )  * 15)
+						buoyRect.vx =( buoyRect.targetX - buoyRect.x)/( (buoyRect.targetTime - this.currentTime )  * 58)
+						buoyRect.vy = (buoyRect.targetY - buoyRect.y)/ ( (buoyRect.targetTime  - this.currentTime )  * 58)
+					}else {
+						// 当前时间
+						let newTime = Math.floor(this.currentTime)
+						this.buoyNewTime = this.currentTime
+						// 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
+						if (this.buoyCurrentTime == newTime || newTime == 0) {
+							return
+						}
+						
+						//获取视频当前时间
+						this.buoyCurrentTime = newTime
+						// 遍历 初始化后的可直接用于画图的 类canvas对象2维数组 index 位置下表
+						this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
+							// 变量 为几号位置 数组
+							// console.log("nodeBuoyList",nodeBuoyList,"index",index)
+							nodeBuoyList.forEach((nodeBuoy) => {
+								if (nodeBuoy.buoySectionTime === newTime) { this.buoyRectList[index] = nodeBuoy }
+							})
+						})
+						
 					}
 				})
+				if (this.buoyCanvas != null) {
+					this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+				}
 			},
+			//视频进入 缓冲
+			waitingVideo() {
+				console.log(this.returnToPreviousFlag,'this.returnToPreviousFlag')
+				if (this.bouyNodeFlage && !this.bouyReturnToPreviousFlag) {
+					this.waitingVideoFlag = true
+					this.stopBuoyDraw()
+					this.bouyReturnToPreviousFlag = false
+				}
+			},
+			// 浮标 加光回调
 			bouyClickCommonOptionTodo() {
+				if (this.clickCommonOptionTodoBuoyFlag) {
+					
+				
 				if (this.bouyNodeFlage ) {
+					let buoyTimestamp = (new Date()).valueOf();
+					console.log('buoyTimestamp',buoyTimestamp)
+					if ( buoyTimestamp - this.backBuoyTimestamp < 1000 ) {
+						console.log('没节流')
+						return
+					}
+					this.backBuoyTimestamp = buoyTimestamp
 					// 浮标改动不稳定
 					if(this.isVideoEndFlag){
 						if(this.isVideoEndFlag){
+
 							this.optionIndex = 0
 							this.clickCommonOptionTodo(0)
 						}
 					}else{
+
 						this.clickCommonOptionTodo(this.optionIndex)
 					}
 				}
+				this.clickCommonOptionTodoBuoyFlag = false
+				}
 			},
+			// 浮标 加光回调 监听
 			isBouyClickCommonOptionTodo(){
 				globalBus.$on('bouyClickCommonOptionTodo',() => {
 					this.bouyClickCommonOptionTodo()
@@ -4446,12 +4708,39 @@
 						line-height: 30rpx;
 					}
 				}
+				.returnToPreviousBox{
+					position: fixed;
+					right: 6%;
+					top: 61%;
+					height: 80rpx;
+					width: 100rpx;
+					z-index: 15;
+					background-color: rgba(0,0,0,.3);
+					border-radius: 20rpx;
+					.returnToPreviousIconBox{
+						width: 100rpx;
+						height: 50rpx;
+						text-align: center;
+						.returnToPreviousIcon{
+							width: 50rpx;
+							height: 50rpx;
+							background: url(../../static/icon/returnToPrevious.png) no-repeat center;
+							background-size: 50rpx;
+						}
+					}
+					.returnToPrevious{
+						text-align: center;
+						color: white;
+						font-size: 20rpx;
+						line-height: 30rpx;
+					}
+				}
 			}
 			.horizontalBox{
 				.storyLineBox{
 					position: fixed;
 					right: 0;
-					top: 70%;
+					top: 60%;
 					height: 80rpx;
 					width: 100rpx;
 					transform: translate(-50%, -50%) rotateZ(90deg);
@@ -4479,7 +4768,7 @@
 				.reportBox{
 					position: fixed;
 					right: 0;
-					top: 80%;
+					top: 70%;
 					transform: translate(-50%, -50%) rotateZ(90deg);
 					height: 80rpx;
 					width: 100rpx;
@@ -4507,7 +4796,7 @@
 				.seeMoreBox{
 					position: fixed;
 					right: 0;
-					top: 90%;
+					top: 80%;
 					transform: translate(-50%, -50%) rotateZ(90deg);
 					height: 80rpx;
 					width: 100rpx;
@@ -4526,6 +4815,34 @@
 						}
 					}
 					.seeMore{
+						text-align: center;
+						color: white;
+						font-size: 20rpx;
+						line-height: 30rpx;
+					}
+				}
+				.returnToPreviousBox{
+					position: fixed;
+					right: 0;
+					top: 90%;
+					transform: translate(-50%, -50%) rotateZ(90deg);
+					height: 80rpx;
+					width: 100rpx;
+					z-index: 15;
+					background-color: rgba(0,0,0,.3);
+					border-radius: 20rpx;
+					.returnToPreviousIconBox{
+						width: 100rpx;
+						height: 50rpx;
+						text-align: center;
+						.returnToPreviousIcon{
+							width: 50rpx;
+							height: 50rpx;
+							background: url(../../static/icon/returnToPrevious.png) no-repeat center;
+							background-size: 50rpx;
+						}
+					}
+					.returnToPrevious{
 						text-align: center;
 						color: white;
 						font-size: 20rpx;
