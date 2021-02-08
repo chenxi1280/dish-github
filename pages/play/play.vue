@@ -3150,12 +3150,21 @@
 			loadeddata(e){
 				console.log('this.videoShowFlag: ', this.videoShowFlag)
 				console.log('this.isPlayedFlag: ', this.isPlayedFlag)
+				//清除百分比延时函数
+				clearTimeout(this.optionPercentageFunction)
 				if(this.isShowOptionPercentageFlag && !this.isPlayedFlag && this.artworkTree.parentId != 0){
 						if(uni.getStorageSync('playMode') == 1){
 							this.horizontalOptionPercentageFlag = true
 						}else{
 							this.verticalOptionPercentageFlag = true
 						}
+						this.optionPercentageFunction= setTimeout(()=>{
+							if(uni.getStorageSync('playMode') == 1){
+								this.horizontalOptionPercentageFlag = false
+							}else{
+								this.verticalOptionPercentageFlag = false
+							}
+						},5000)
 				}else{
 					if(this.bouyNodeFlage  && this.artworkTree.parentId != 0){
 						if(uni.getStorageSync('playMode') == 1){
