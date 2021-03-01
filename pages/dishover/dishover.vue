@@ -323,6 +323,11 @@
 											v.logoPath = v.logoPath + '/common'
 										}
 									}
+									if (v.userLogoUrl != null && v.userLogoUrl != '') {
+										if (v.userLogoUrl.indexOf( '/common') == -1) {
+											v.userLogoUrl = v.userLogoUrl + '/common'
+										}
+									}
 									this.hotList.push(v)
 								})
 								if (res.data.data.loadStatus != null ) {
@@ -365,6 +370,11 @@
 									if (v.logoPath != null) {
 										if (v.logoPath.indexOf( '/common') == -1) {
 											v.logoPath = v.logoPath + '/common'
+										}
+									}
+									if (v.userLogoUrl != null && v.userLogoUrl != '') {
+										if (v.userLogoUrl.indexOf( '/common') == -1) {
+											v.userLogoUrl = v.userLogoUrl + '/common'
 										}
 									}
 									this['sortList' + this.currentsort].push(v)

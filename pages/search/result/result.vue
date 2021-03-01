@@ -51,6 +51,11 @@
 										v.logoPath = v.logoPath + '/common'
 									}
 								}
+								if (v.userLogoUrl != null && v.userLogoUrl != '') {
+									if (v.userLogoUrl.indexOf( '/common') == -1) {
+										v.userLogoUrl = v.userLogoUrl + '/common'
+									}
+								}
 								this.flowList.push(v)
 							})
 							if(res.data.data.length < this.limit){

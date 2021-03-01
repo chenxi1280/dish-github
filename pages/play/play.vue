@@ -1505,13 +1505,15 @@
 						this.stopBuoyDraw()
 						this.horizontalJumpDialogFlag = true
 						this.$refs.horizontalJumpDialog.horizontalJumpDialogFlag = true
-					}catch(e){}
+					}catch(e){
+					}
 				}else {
 					try{
 						this.stopBuoyDraw()
 						this.verticalJumpDialogFlag = true
 						this.$refs.verticalJumpDialog.verticalJumpDialogFlag = true
-					}catch(e){}
+					}catch(e){
+				}
 				}
 				this.savaPopupWindowRecord()
 				
