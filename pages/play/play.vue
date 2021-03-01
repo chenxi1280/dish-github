@@ -1505,13 +1505,13 @@
 						this.stopBuoyDraw()
 						this.horizontalJumpDialogFlag = true
 						this.$refs.horizontalJumpDialog.horizontalJumpDialogFlag = true
-					}
+					}catch(e){}
 				}else {
 					try{
 						this.stopBuoyDraw()
 						this.verticalJumpDialogFlag = true
 						this.$refs.verticalJumpDialog.verticalJumpDialogFlag = true
-					}}
+					}catch(e){}
 				}
 				this.savaPopupWindowRecord()
 				
