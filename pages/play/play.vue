@@ -705,6 +705,7 @@
 			this.isBouyClickCommonOptionTodo()
 		},
 		onLoad(option) {
+			console.log('cookieToken',uni.getStorageInfoSync('cookieToken'))
 			//初始化video对象
 			this.videoContext = uni.createVideoContext('myVideo')
 			this.token = uni.getStorageSync('token')
@@ -1297,6 +1298,7 @@
 			},
 			//对节点播放数据进行筛选和提取
 			initPlayData(artworkTree, isJumpDialogCallbackFlag){
+				console.log('cookieToken',uni.getStorageInfoSync('cookieToken'))
 				console.log("***********************pkDetailId: ",artworkTree.pkDetailId)
 				if(artworkTree.parentId === 0 ){
 					this.startDetailId = artworkTree.pkDetailId

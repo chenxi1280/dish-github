@@ -319,8 +319,8 @@
 								res.data.data.list.forEach(v => {
 									v.high = 287.1
 									if (v.logoPath != null) {
-										if (v.logoPath.indexOf( '/common') == -1) {
-											v.logoPath = v.logoPath + '/common'
+										if (v.logoPath.indexOf( '/mobilePop') == -1) {
+											v.logoPath = v.logoPath + '/mobilePop'
 										}
 									}
 									if (v.userLogoUrl != null && v.userLogoUrl != '') {
@@ -368,8 +368,8 @@
 								res.data.data.forEach(v => {
 									v.high = 287.1
 									if (v.logoPath != null) {
-										if (v.logoPath.indexOf( '/common') == -1) {
-											v.logoPath = v.logoPath + '/common'
+										if (v.logoPath.indexOf( '/mobilePop') == -1) {
+											v.logoPath = v.logoPath + '/mobilePop'
 										}
 									}
 									if (v.userLogoUrl != null && v.userLogoUrl != '') {
