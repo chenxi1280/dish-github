@@ -74,9 +74,9 @@
 			</view>
 			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" -->
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform}">
-				<video :src="videoUrl" :autoplay="autopalyFlag" :show-mute-btn="true" :show-fullscreen-btn="false" id="myVideo"
+				<video v-if="videoShowFlag" :src="videoUrl" :autoplay="autopalyFlag" :show-mute-btn="true" :show-fullscreen-btn="false" id="myVideo"
 				 :enable-play-gesture="playGestureFlag" :enable-progress-gesture="progressGestureFlag" @ended="videoEnd(false)"
-				 @pause="videoPause" @loadedmetadata="loadeddata" @touchend="videoTouchend" @touchstart="videoTouchstart" v-if="videoShowFlag"
+				 @pause="videoPause" @loadedmetadata="loadeddata" @touchend="videoTouchend" @touchstart="videoTouchstart"
 				 @timeupdate="videoTimeupdate" :controls="controlsFlag" @play="videoPlay" @waiting="waitingVideo"></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
@@ -379,6 +379,8 @@
 		},
 		data() {
 			return {
+				// 是否显示video  用于修复广告BUG
+				isShowVideo: true,
 				//用户身份唯一识别符
 				token: null,
 				// 是否有光
@@ -705,6 +707,7 @@
 			this.isBouyClickCommonOptionTodo()
 		},
 		onLoad(option) {
+			this.videoShowFlag = true
 			console.log('cookieToken',uni.getStorageInfoSync('cookieToken'))
 			//初始化video对象
 			this.videoContext = uni.createVideoContext('myVideo')
@@ -755,6 +758,7 @@
 			}
 		},
 		onHide() {
+			this.videoShowFlag = false
 			console.log('离开play！！！！')
 			globalBus.$off('bouyClickCommonOptionTodo')
 		},
@@ -809,6 +813,29 @@
 			}
 		},
 		methods: {
+			//浮标选项点击跳转到其他小程序
+			JumpToOtherApplets(appId,navigatorUrl){
+				console.log("进来跳转了")
+				if(this.appId && this.navigatorUrl){
+					uni.navigateToMiniProgram({
+						appId: this.appId,
+						path: this.navigatorUrl,
+						envVersion: 'release',
+						extraData: {
+								  source:'CandleWitches',
+								  miniProgramName:'灵巫互动',
+								  artwork: this.artworkId
+						},
+						success(res){
+							console.log('跳转成功')
+						},
+						fail(res){
+							console.log('跳转失败: ',res)
+						}
+					})
+				}
+			},
+			//浮标视频 点击打印文字或者展示图片
 			//返回上一级弹窗的确认事件
 			returnToPreviouConfirm(){
 				if(this.bouyNodeFlage){
@@ -1366,7 +1393,8 @@
 				//随机数
 				const uuid = Math.random().toString(36).substring(2)
 				//初始化视频及选项
-				this.videoUrl = artworkTree.videoUrl+'?uuid='+uuid
+				const url = (artworkTree.videoUrl + '').split("://")
+				this.videoUrl = "https://"+url[1]+'?uuid='+uuid
 				this.parentId = artworkTree.parentId
 				this.imageSrc = artworkTree.nodeLastImgUrl
 				//如果是根节点初始化存储节点分值的容器
@@ -3152,6 +3180,11 @@
 				})
 			},
 			loadeddata(e){
+				//for ios 浮标作品
+				if(this.bouyNodeFlage){
+					this.videoContext.pause()
+					this.videoContext.play()
+				}
 				console.log('this.videoShowFlag: ', this.videoShowFlag)
 				console.log('this.isPlayedFlag: ', this.isPlayedFlag)
 				//清除百分比延时函数
@@ -3222,14 +3255,21 @@
 					this.validateHorizontalWindowSize()
 					this.playGestureFlag = false
 					this.progressGestureFlag = false
-					clearTimeout(this.horizontalControlsFunction)
-					this.horizontalControlsFlags = true
-					this.horizontalControlsFunction	= setTimeout(()=>{
-						this.horizontalControlsFlags = false
-					},5000)
+					//浮标视频不显示自定义开关
+					if(!this.bouyNodeFlage){
+						//控制自定义开关的标志 horizontalControlsFlags
+						clearTimeout(this.horizontalControlsFunction)
+						this.horizontalControlsFlags = true
+						this.horizontalControlsFunction	= setTimeout(()=>{
+							this.horizontalControlsFlags = false
+						},5000)
+					}
 					this.storyLineFlag = false
 				}else{
-					this.controlsFlag = true
+					if(!this.bouyNodeFlage){
+						//浮标视频不显示原生开关
+						this.controlsFlag = true
+					}
 					this.horizontalControlsFlags = false
 					this.validateVerticalWindowSize()
 				}
@@ -4180,7 +4220,7 @@
 	}
 </script>
 
-<style lang="scss" >
+<style lang="scss">
 	.playBox{
 		width: 100%;
 		height: 100%;
@@ -4981,7 +5021,7 @@
 									height: 100%;
 									background: url(../../static/icon/add.png) no-repeat center;
 									background-size: 200rpx 200rpx;
-								};
+								}
 							}
 							.uploadImageBox{
 								margin: 30rpx 0 0 30rpx;
