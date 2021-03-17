@@ -74,10 +74,10 @@
 			</view>
 			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" -->
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform}">
-				<video :src="videoUrl" :autoplay="autopalyFlag" :show-mute-btn="true" :show-fullscreen-btn="false" id="myVideo"
-				:enable-play-gesture="playGestureFlag" :enable-progress-gesture="progressGestureFlag" @ended="videoEnd(false)"
-				@pause="videoPause" @loadedmetadata="loadeddata" @touchend="videoTouchend" @touchstart="videoTouchstart" v-if="videoShowFlag"
-				@timeupdate="videoTimeupdate" :controls="controlsFlag" @play="videoPlay" @waiting="waitingVideo"></video>
+				<video v-if="videoShowFlag" :src="videoUrl" :autoplay="autopalyFlag" :show-mute-btn="true" :show-fullscreen-btn="false" id="myVideo"
+				 :enable-play-gesture="playGestureFlag" :enable-progress-gesture="progressGestureFlag" @ended="videoEnd(false)"
+				 @pause="videoPause" @loadedmetadata="loadeddata" @touchend="videoTouchend" @touchstart="videoTouchstart"
+				 @timeupdate="videoTimeupdate" :controls="controlsFlag" @play="videoPlay" @waiting="waitingVideo"></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
 				'background-repeat':'no-repeat', backgroundSize:'100% 100%'}"></view>
@@ -379,6 +379,8 @@
 		},
 		data() {
 			return {
+				// 是否显示video  用于修复广告BUG
+				isShowVideo: true,
 				//用户身份唯一识别符
 				token: null,
 				// 是否有光
@@ -705,6 +707,7 @@
 			this.isBouyClickCommonOptionTodo()
 		},
 		onLoad(option) {
+			this.videoShowFlag = true
 			console.log('cookieToken',uni.getStorageInfoSync('cookieToken'))
 			//初始化video对象
 			this.videoContext = uni.createVideoContext('myVideo')
@@ -755,6 +758,7 @@
 			}
 		},
 		onHide() {
+			this.videoShowFlag = false
 			console.log('离开play！！！！')
 			globalBus.$off('bouyClickCommonOptionTodo')
 		},
@@ -4216,7 +4220,7 @@
 	}
 </script>
 
-<style lang="scss" >
+<style lang="scss">
 	.playBox{
 		width: 100%;
 		height: 100%;
@@ -5017,7 +5021,7 @@
 									height: 100%;
 									background: url(../../static/icon/add.png) no-repeat center;
 									background-size: 200rpx 200rpx;
-								};
+								}
 							}
 							.uploadImageBox{
 								margin: 30rpx 0 0 30rpx;
