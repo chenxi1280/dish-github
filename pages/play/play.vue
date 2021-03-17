@@ -707,7 +707,7 @@
 			this.isBouyClickCommonOptionTodo()
 		},
 		onLoad(option) {
-			this.videoShowFlag = true
+			// this.videoShowFlag = true
 			console.log('cookieToken',uni.getStorageInfoSync('cookieToken'))
 			//初始化video对象
 			this.videoContext = uni.createVideoContext('myVideo')
@@ -758,7 +758,7 @@
 			}
 		},
 		onHide() {
-			this.videoShowFlag = false
+			// this.videoShowFlag = false
 			console.log('离开play！！！！')
 			globalBus.$off('bouyClickCommonOptionTodo')
 		},
