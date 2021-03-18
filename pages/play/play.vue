@@ -4417,6 +4417,7 @@
 			}
 		}
 
+
 		.horizontalOptionPercentagesBox {
 			position: fixed;
 			left: 40%;
