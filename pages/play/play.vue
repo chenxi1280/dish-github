@@ -4223,6 +4223,21 @@
 					return true
 				}
 			},
+			// 获取改浮弹窗信息
+			getBuoyPopInfo(index){
+				if(this.ecmArtworkNodeBuoyList[index][0] == null ){
+					return null
+				}else{
+					return {
+						buoyStatus:this.ecmArtworkNodeBuoyList[index][0].buoyStatus,
+						buoyPopType:this.ecmArtworkNodeBuoyList[index][0].buoyPopType,
+						buoyPopContext:this.ecmArtworkNodeBuoyList[index][0].buoyPopContext,
+						buoyPopAppId:this.ecmArtworkNodeBuoyList[index][0].buoyPopAppId,
+						fkNodeId:this.ecmArtworkNodeBuoyList[index][0].fkNodeId,
+						pkBuoyId:this.ecmArtworkNodeBuoyList[index][0].pkBuoyId
+					}
+				}
+			},
 			
 
 		}
