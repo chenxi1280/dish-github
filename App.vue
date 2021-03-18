@@ -16,69 +16,68 @@
 		    }
 		},
 		 methods: {　　　　　　
-            login() {
-                let _this = this
-                uni.login({
-                    provider: 'weixin',
-                    success: async loginRes => {
-                        let code = loginRes.code
-                        await uni.request({
-                            url: baseURL + '/getOpenid',
-                            data: {
-                                code: code,
-                            },
-                            method: 'POST',
-                            header: {
-                                'content-type': 'application/json'
-                            },
-                            success: res => {
-								if (res.data.status == 200) {
-								   uni.setStorageSync("openid",res.data.data.openid)
-								   _this.updateUserInfo()
-							   }else{
-								   return uni.showToast({
-										icon: 'none',
-										title: '授权失败，请退出重新进入小程序'
-								    })
-							   }
-							}
-                        })
-                    },
-                })
-            },
+			login() {
+					let _this = this
+					uni.login({
+							provider: 'weixin',
+							success: async loginRes => {
+									let code = loginRes.code
+									await uni.request({
+											url: baseURL + '/getOpenid',
+											data: {
+													code: code,
+											},
+											method: 'POST',
+											header: {
+													'content-type': 'application/json'
+											},
+											success: res => {
+					if (res.data.status == 200) {
+							uni.setStorageSync("openid",res.data.data.openid)
+							_this.updateUserInfo()
+						}else{
+							return uni.showToast({
+							icon: 'none',
+							title: '授权失败，请退出重新进入小程序'
+							})
+						}
+				}
+									})
+							},
+					})
+			},
 			async updateUserInfo() {
-                let _this = this
+				let _this = this
 				let token = uni.getStorageSync("token")
 				if(!token){
 					await uni.request({
-					    url: baseURL + '/savaUserInfo',
-					    data: {
-					        openid: uni.getStorageSync("openid"),
-					        nickname: _this.nickName,
+						url: baseURL + '/savaUserInfo',
+						data: {
+							openid: uni.getStorageSync("openid"),
+							nickname: _this.nickName,
 							gender: _this.gender,
-					        avatarurl: _this.avatarUrl,
+							avatarurl: _this.avatarUrl,
 							country: _this.country,
 							province: _this.province,
 							city: _this.city,
 							language: _this.language
-					    },
-					    method: 'POST',
-					    header: {
-					        'content-type': 'application/json'
-					    },
-					    success: (res) => {
-					        if (res.data.status == 200) {
+						},
+						method: 'POST',
+						header: {
+							'content-type': 'application/json'
+						},
+						success: (res) => {
+							if (res.data.status == 200) {
 								uni.setStorageSync("token",res.data.data)
 								uni.reLaunch({
-										url: 'pages/dishover/dishover'
+									url: 'pages/dishover/dishover'
 								})
 								globalBus.$emit('getLightOfAppReady')
-					        }
-					    }
-					   
+							}
+						}
 					})
 				}
-            },
+			},
 			onLaunch: function() {
 				let _this = this;
 				let openid = uni.getStorageSync("openid")
@@ -90,6 +89,27 @@
 				}else{
 					_this.login()
 				}
+
+				const updateManager = wx.getUpdateManager()
+				updateManager.onCheckForUpdate(function (res) {
+				// 请求完新版本信息的回调
+				console.log(res.hasUpdate, '新版本信息')
+				})
+				updateManager.onUpdateReady(function () {
+				wx.showModal({
+					title:'更新提示',
+					content:'新版本已经准备好，是否马上重启小程序？',
+					success:function (res) {
+						if (res.confirm) {
+							// 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
+							updateManager.applyUpdate()
+						}
+					}
+				})
+				})
+				updateManager.onUpdateFailed(function () {
+				// 新的版本下载失败
+				})
 			},
 			onShow: function() {
 				console.log('App Show')

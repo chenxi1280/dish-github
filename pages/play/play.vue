@@ -3381,7 +3381,7 @@
 								
 							}
 						})
-						this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+						// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
 					})
 				}
 			},
@@ -3627,30 +3627,54 @@
 				// // console.log('画布的宽: ',this.canvasWidth)
 				// // console.log('画布的高: ',this.canvasHeight)
 				// buoyCtx.clearRect(0 , 0 , this.canvasWidth, this.canvasHeight)
-				const query = wx.createSelectorQuery()
-				query.select('#posterCanvas')
-					.fields({
-						node: true,
-						size: true
-					})
-					.exec((res) => {
-						const canvas = res[0].node;
-						this.buoyCanvas = canvas
-						canvas.width = this.canvasWidth
-						canvas.height = this.canvasHeight
+				
+				
+				//wx 方法
+				// const query = wx.createSelectorQuery()
+				// query.select('#posterCanvas')
+				// 	.fields({
+				// 		node: true,
+				// 		size: true
+				// 	})
+				// 	.exec((res) => {
+				// 		const canvas = res[0].node;
+				// 		this.buoyCanvas = canvas
+				// 		canvas.width = this.canvasWidth
+				// 		canvas.height = this.canvasHeight
 
-						// canvas.width = 339
-						// canvas.height =  603
+				// 		// canvas.width = 339
+				// 		// canvas.height =  603
 
 
-						// console.log('this.canvasWidth',this.canvasWidth,'this.canvasHeight',this.canvasHeight)
+				// 		// console.log('this.canvasWidth',this.canvasWidth,'this.canvasHeight',this.canvasHeight)
 
-						const ctx = canvas.getContext('2d')
-						this.buoyCtx = ctx
-						this.initializationBuoyList()
-						this.initializationIconPosition()
+				// 		const ctx = canvas.getContext('2d')
+				// 		this.buoyCtx = ctx
+				// 		this.initializationBuoyList()
+				// 		this.initializationIconPosition()
 
-					})
+				// 	})
+				
+				this.buoyCtx = uni.createCanvasContext('posterCanvas', this)
+				this.buoyCtx.clearRect(0 , 0 , this.canvasWidth, this.canvasHeight)
+				
+				setTimeout(() => {
+					this.buoyCtx.beginPath()
+					this.buoyCtx.fill()
+					//开始描绘
+					this.buoyCtx.stroke()
+					this.buoyCtx.draw(true)
+					
+					
+					this.buoyCtx.stroke()
+					this.buoyCtx.draw(true)
+					
+					this.startBuoy()
+				},25)
+				
+				this.initializationBuoyList()
+				this.initializationIconPosition()
+				
 
 			},
 			// 移动函数
@@ -3661,7 +3685,7 @@
 				// }
 				this.clearAnimation()
 				// console.log(this.rect)
-				this.buoyCtx.clearRect(0, 0, this.buoyCanvas.width, this.buoyCanvas.height);
+				this.buoyCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
 				this.buoyRectList.forEach((v, index) => {
 					
 					// if (this.playMode) {
@@ -3699,8 +3723,10 @@
 				})
 				// console.log('这是第',this.start)
 				// this.start +=1
-
-				this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw());
+				this.buoyCtx.stroke()
+				this.buoyCtx.draw(true)
+				
+				// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw());
 			},
 			// 初始化 浮标对象
 			initializationBuoy(rectX, rectY, rectW, rectH, vx, vy, rectOpacity, nodeId, buoySectionTime, buoyType,targetX,targetY,targetTime) {
@@ -3736,64 +3762,21 @@
 					draw: function() {
 						// 开始路径
 						this.ctx.beginPath();
+						this.ctx.fillRect(this.x, this.y, this.rectW, this.rectH)
 						this.ctx.rect(this.x, this.y, this.rectW, this.rectH)
 						// 闭合路径
-						this.ctx.closePath();
+						// this.ctx.closePath();
 						// this.ctx.fillRect(255, 255, 255,0.5);
-						this.ctx.fillStyle = "rgba(255, 255, 255," + this.opacity + ")";
+						this.ctx.setStrokeStyle('rgba(255, 255, 255,'+ rectOpacity +')')
+						this.ctx.setFillStyle('rgba(255, 255, 255, '+ rectOpacity +')')
 						this.ctx.fill()
 					}
 				}
 			},
-			// 获取当前播放视频时间
-			getNewVideoPlayTime(e) {
-				// 当前时间
-				let newTime = Math.floor(e.detail.currentTime)
-				this.buoyNewTime = e.detail.currentTime
-				// console.log('tie',e.detail.currentTime,'newTime',newTime)
-				// 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
-				if (this.buoyCurrentTime == newTime || newTime == 0) {
-					// this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
-					return
-				}
-				//获取视频当前时间
-				this.buoyCurrentTime = newTime
-				// 遍历 初始化后的可直接用于画图的 类canvas对象2维数组 index 位置下表
-				this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
-					// 变量 为几号位置 数组
-					// console.log(index)
-					nodeBuoyList.forEach((nodeBuoy) => {
-
-						//当时间相等时
-						// console.log('时间',nodeBuoy.buoySectionTime === newTime)
-						// console.log(newTime)
-						if (nodeBuoy.buoySectionTime === newTime) {
-							// console.log(this.buoyRectList)
-							this.buoyRectList[index] = nodeBuoy
-							// 遍历画图的 暂存对象数组
-							// this.buoyRectList.forEach((buoyRect, i) => {
-							// 	// 当位置 不为空时说明 有以前的对象
-							// 	// if (this.buoyRectList[index] != null) {
-							// 	// 	if (nodeBuoy.nodeId === buoyRect.nodeId && index === i) {
-							// 	// 		this.buoyRectList[index] = nodeBuoy
-							// 	// 	}
-
-							// 	// }
-							// 	// //为空时说明应该加入新的对象
-							// 	// else {
-							// 	// 	console.log('推送，inde',index)
-							// 	// 	// this.buoyRectList.push(nodeBuoy)
-							// 	// 	this.buoyRectList[index] = nodeBuoy
-							// 	// }
-							// })
-						}
-					})
-					this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
-				})
-			},
+		
 			// 初始化浮标 对象 List
 			initializationBuoyList() {
-				// console.log(this.ecmArtworkNodeBuoyList)
+				console.log(this.ecmArtworkNodeBuoyList)
 				let hList = uni.getStorageSync('historyNodeBuoyList')
 				this.ecmArtworkNodeBuoyList.forEach((nodeBuoyList, index) => {
 					let aList = []
@@ -3849,7 +3832,8 @@
 								if (buoySectionTime == 0) {
 									this.buoyRectList.push(buoy)
 									// this.clearAnimation()
-									this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+									// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+									this.startBuoy()
 								}
 								aList.push(buoy)
 							}else {
@@ -3886,7 +3870,8 @@
 								if (buoySectionTime == 0) {
 									this.buoyRectList.push(buoy)
 									// this.clearAnimation()
-									this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+									// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+									this.startBuoy()
 								}
 								aList.push(buoy)
 							}
@@ -3924,8 +3909,9 @@
 						if (v.x <= newX && (v.x + v.rectW) >= newX) {
 							// 加10 增加判定区域
 							if (v.y <= newY && (v.y + v.rectH) >= newY) {
-								// console.log("我出发了选项点击")
+								console.log("我出发了选项点击")
 								this.optionIndex = i
+								console.log(this.getBuoyPopVideo(i))
 								this.clickCommonOptionTodo(i)
 								stopFlag= true
 								return
@@ -4121,14 +4107,18 @@
 			},
 			//清除动画
 			clearAnimation(){
-				if(this.buoyCanvas != null) {
-					this.buoyCanvas.cancelAnimationFrame(this.buoyRef)
-					this.buoyCanvas.cancelAnimationFrame(this.buoyRef -1 )
-					this.buoyCanvas.cancelAnimationFrame(this.buoyRef -2)
-					this.buoyCanvas.cancelAnimationFrame(this.buoyRef +1)
-					if (this.buoyRef !=null ){
-						this.buoyCanvas.cancelAnimationFrame(this.buoyRef)
-					}
+				// if(this.buoyCanvas != null) {
+				// 	this.buoyCanvas.cancelAnimationFrame(this.buoyRef)
+				// 	this.buoyCanvas.cancelAnimationFrame(this.buoyRef -1 )
+				// 	this.buoyCanvas.cancelAnimationFrame(this.buoyRef -2)
+				// 	this.buoyCanvas.cancelAnimationFrame(this.buoyRef +1)
+				// 	if (this.buoyRef !=null ){
+				// 		this.buoyCanvas.cancelAnimationFrame(this.buoyRef)
+				// 	}
+				// }
+				
+				if (this.buoyRef != null) {
+					clearInterval(this.buoyRef)	
 				}
 
 
@@ -4167,11 +4157,11 @@
 				this.showBuoyCanvasFlag = true
 				// 动画开启
 				if (this.buoyCanvas != null) {
-					this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+					// 	this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+					this.startBuoy()
 				}
 				// if (this.bouyNodeFlage) {
 				// 	this.showBuoyCanvasFlag = true
-				// 	this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
 				// }
 
 			},
@@ -4209,9 +4199,18 @@
 					}
 				})
 				if (this.buoyCanvas != null) {
-					this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+					// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+					this.startBuoy()
 				}
 			},
+			
+			startBuoy() {
+				this.clearAnimation()
+				this.buoyRef = setInterval( () => {
+					this.buoyDraw()	
+				} ,16)
+			},
+			
 			//视频进入 缓冲
 			waitingVideo() {
 				console.log(this.returnToPreviousFlag,'this.returnToPreviousFlag')
@@ -4219,6 +4218,7 @@
 					this.waitingVideoFlag = true
 					this.stopBuoyDraw()
 					this.bouyReturnToPreviousFlag = false
+					this.recoveryBuoyDraw()
 				}
 			},
 			// 浮标 加光回调
@@ -4255,6 +4255,15 @@
 					this.bouyClickCommonOptionTodo()
 				})
 			},
+			// 获取改浮标下 有没有 视频 false 没有视频 true 有视频，index 为第几个选择 
+			getBuoyPopVideo(index){
+				if(this.ecmArtworkNodeBuoyList[index][0].buoyVideoUrlStatus == null || this.ecmArtworkNodeBuoyList[index][0].buoyVideoUrlStatus == 0){
+					return false
+				}else{
+					return true
+				}
+			},
+			
 
 		}
 	}
