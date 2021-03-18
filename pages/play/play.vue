@@ -357,6 +357,19 @@
 				</view>
 			</view>
 		</view>
+		<!-- 浮标视频点击选项显示图片和打印文字 -->
+		<view class="popupBox"  v-if="buoyDialogFlag">
+			<icon @click="closeDialog" class="horizontalCloseIcon" v-if="playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
+			<icon @click="closeDialog" class="verticalCloseIcon" v-if="!playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
+			<view class="buoyDialog" :style="{'transform': transform , 'z-index': 17}">		
+				<view class="buoyDialogImage"  v-if="buoyDialogImageFlag">
+					<image src = "buoyDialogImageSrc"></image>
+				</view>
+				<view class="buoyDialogPrintWords"  v-if="!buoyDialogImageFlag">
+					<textarea v-model="buoyDialogWords"></textarea>
+				</view>
+			</view>
+		</view>
 	</view>
 </template>
 
@@ -671,7 +684,15 @@
 				bouyReturnToPreviousFlag: false,
 				//节流时间
 				backBuoyTimestamp:0,
-				clickCommonOptionTodoBuoyFlag: false
+				clickCommonOptionTodoBuoyFlag: false,
+				//浮标选项的打印内容
+				buoyDialogWords: "萨拉卡金卡舒夫卡了上来就发数据发送方看卡拉即使对方",
+				//浮标选项点击是否是展示图片
+				buoyDialogImageFlag: false,
+				//浮标选项是否是展示信息开关
+				buoyDialogFlag: false,
+				//浮标选项的展示图片路径
+				buoyDialogImageSrc: null
 			}
 		},
 		onReady(){
@@ -703,7 +724,7 @@
 			//重置好感度数组
 			this.likabilityArray = []
 			//获取一颗作品树
-			this.getArtworkTreeByArtworkId();
+			this.getArtworkTreeByArtworkId()
 			this.isBouyClickCommonOptionTodo()
 		},
 		onLoad(option) {
@@ -759,6 +780,8 @@
 		},
 		onHide() {
 			// this.videoShowFlag = false
+			uni.removeStorageSync('popupState')
+			uni.removeStorageSync('popupSettings')
 			console.log('离开play！！！！')
 			globalBus.$off('bouyClickCommonOptionTodo')
 		},
@@ -767,6 +790,8 @@
 			
 		},
 		onUnload(){
+			uni.removeStorageSync('popupState')
+			uni.removeStorageSync('popupSettings')
 			uni.navigateBack({
 			    delta: 1,
 				animationDuration: 10,
@@ -813,13 +838,28 @@
 			}
 		},
 		methods: {
+			//浮标视频 点击打印文字
+			printContent(str){
+				let pringInterval = Function
+				if(this.i <= str.length){
+					this.content = str.slice(0,this.i++) + '_'
+					pringInterval = setTimeout(()=>{
+						this.printContent(str)
+					},100)
+				}else{
+					this.content = str//结束打字一处光标
+					clearTimeout(pringInterval)
+				}
+			},
+			//浮标视频 点击展示图片
+			
 			//浮标选项点击跳转到其他小程序
 			JumpToOtherApplets(appId,navigatorUrl){
 				console.log("进来跳转了")
-				if(this.appId && this.navigatorUrl){
+				if(appId && navigatorUrl){
 					uni.navigateToMiniProgram({
-						appId: this.appId,
-						path: this.navigatorUrl,
+						appId: appId,
+						path: navigatorUrl,
 						envVersion: 'release',
 						extraData: {
 								  source:'CandleWitches',
@@ -835,7 +875,6 @@
 					})
 				}
 			},
-			//浮标视频 点击打印文字或者展示图片
 			//返回上一级弹窗的确认事件
 			returnToPreviouConfirm(){
 				if(this.bouyNodeFlage){
@@ -1825,10 +1864,11 @@
 					},
 					success: res=> {
 						if(res.data.status == 200){
-							uni.setStorageSync("mainArtworkTree",res.data.data);
+							uni.setStorageSync("mainArtworkTree",res.data.data)
 							//传到播放页面带pkDetailId参数 说明故事线跳转，只需要存一棵主树跳转节点不用去播放视频
-							uni.setStorageSync('playMode',res.data.data.playMode);
-							uni.setStorageSync('isEndings',res.data.data.isEndings );
+							uni.setStorageSync('playMode',res.data.data.playMode)
+							uni.setStorageSync('isEndings',res.data.data.isEndings)
+							uni.setStorageSync('popupState',res.data.data.popupState)
 							this.popupTotalNumber = res.data.data.nodePopupCount
 							this.popupNameState = res.data.data.popupNameStatus
 							if(this.pkDetailId != null) return;
@@ -4224,6 +4264,56 @@
 	.playBox{
 		width: 100%;
 		height: 100%;
+		.popupBox{
+			.horizontalCloseIcon{
+				position: absolute;
+				right: 19%;
+				top: 67%;
+				width: 60rpx;
+				height: 60rpx;
+				background: url(../../static/icon/dialogClose.png) no-repeat center;
+				background-size: 60rpx;
+			}
+			.verticalCloseIcon{
+				position: absolute;
+				right: 13%;
+				top: 37%;
+				width: 60rpx;
+				height: 60rpx;
+				background: url(../../static/icon/dialogClose.png) no-repeat center;
+				background-size: 60rpx;
+			}
+			.buoyDialog{
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				width: 400rpx;
+				height: 400rpx;
+				.buoyDialogImage{
+					width: 100%;
+					height: 100%;
+					margin-top: 50rpx;
+					image{
+						width: 100%;
+						height: 100%;
+					}
+				}
+				.buoyDialogPrintWords{
+					// border: 2rpx solid red;
+					width: 100%;
+					height: 100%;
+					background-color: rgba(255,255,255,.5);
+					margin-top: 50rpx;
+					textarea{
+						margin: 20rpx 20rpx;
+						font-size: 38rpx;
+						width: 90%;
+						height: 90%;
+					}
+				}
+			}
+		}
+		
 		.verticalOptionPercentagesBox{
 			position: fixed;
 			right: 5%;
