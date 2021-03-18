@@ -3670,6 +3670,7 @@
 						this.buoyCtx = ctx
 						this.initializationBuoyList()
 						this.initializationIconPosition()
+						this.startBuoy()
 
 					})
 
@@ -3693,7 +3694,6 @@
 				// this.initializationBuoyList()
 				// this.initializationIconPosition()
 
-				this.startBuoy()
 
 			},
 			// 移动函数
@@ -3923,6 +3923,7 @@
 					// console.log("这是初始化",this.canvasNodeBuoyList[0])
 				})
 				uni.setStorageSync('historyNodeBuoyList', hList)
+				// this.startBuoy()
 
 
 			},
