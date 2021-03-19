@@ -2336,6 +2336,8 @@
 				}
 			},
 			clickCommonOptionTodo(index) {
+				//返回上一级的开关在这个视频播放结束时应该被关闭
+				this.returnToPreviousFlag = false
 				this.clickCommonOptionTodoBuoyFlag = true
 				//保存用户的选择记录
 				this.savaOptionSelectionRecord(this.childs[index].pkDetailId, this.childs[index].parentId)
@@ -3016,6 +3018,8 @@
 				}
 			},
 			clickPositionOptionTodo() {
+				//返回上一级的开关在这个视频播放结束时应该被关闭
+				this.returnToPreviousFlag = false
 				//保存用户的选择记录
 				this.savaOptionSelectionRecord(this.childs[this.touchRectNum].pkDetailId, this.childs[this.touchRectNum].parentId)
 				//获取百分比的名称和数据
