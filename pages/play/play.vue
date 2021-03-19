@@ -360,11 +360,11 @@
 		</view>
 		<!-- 浮标视频点击选项显示图片和打印文字 -->
 		<view class="popupBox"  v-if="buoyDialogFlag">
-			<icon @click="closeDialog" class="horizontalCloseIcon" v-if="playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
-			<icon @click="closeDialog" class="verticalCloseIcon" v-if="!playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
+			<icon @click="closeBuoyDialog" class="horizontalCloseIcon" v-if="playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
+			<icon @click="closeBuoyDialog" class="verticalCloseIcon" v-if="!playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
 			<view class="buoyDialog" :style="{'transform': transform , 'z-index': 17}">		
 				<view class="buoyDialogImage"  v-if="buoyDialogImageFlag">
-					<image src = "buoyDialogImageSrc"></image>
+					<image :src = "buoyDialogImageSrc"></image>
 				</view>
 				<view class="buoyDialogPrintWords"  v-if="!buoyDialogImageFlag">
 					<textarea v-model="buoyDialogWords"></textarea>
@@ -696,13 +696,15 @@
 				backBuoyTimestamp: 0,
 				clickCommonOptionTodoBuoyFlag: false,
 				//浮标选项的打印内容
-				buoyDialogWords: "萨拉卡金卡舒夫卡了上来就发数据发送方看卡拉即使对方",
+				buoyDialogWords: null,
 				//浮标选项点击是否是展示图片
 				buoyDialogImageFlag: false,
 				//浮标选项是否是展示信息开关
 				buoyDialogFlag: false,
 				//浮标选项的展示图片路径
-				buoyDialogImageSrc: null
+				buoyDialogImageSrc: null,
+				//字符其实下标
+				i: 0
 			}
 		},
 		onReady() {
@@ -855,16 +857,28 @@
 			}
 		},
 		methods: {
+			//点击浮标选项弹窗关闭按钮事件
+			closeBuoyDialog(){
+				this.buoyDialogFlag = false
+				this.buoyDialogWords = null
+				this.i = 0
+				let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
+				if(buoyPopInfo.buoyStatus){
+					this.againPlayVideo()
+				}else{
+					this.clickCommonOptionTodo(this.optionIndex)
+				}
+			},
 			//浮标视频 点击打印文字
 			printContent(str) {
 				let pringInterval = Function
 				if (this.i <= str.length) {
-					this.content = str.slice(0, this.i++) + '_'
+					this.buoyDialogWords = str.slice(0, this.i++) + '_'
 					pringInterval = setTimeout(() => {
 						this.printContent(str)
 					}, 100)
 				} else {
-					this.content = str //结束打字一处光标
+					this.buoyDialogWords = str //结束打字一处光标
 					clearTimeout(pringInterval)
 				}
 			},
@@ -2183,8 +2197,27 @@
 						this.buoyTimestamp = buoyTimestamp
 						// 默认选A
 						this.optionIndex = 0
-						this.clickCommonOptionTodo(0)
-
+						let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
+						// buoyStatus 弹窗是否开启 1开启 0默认选项
+						if(buoyPopInfo.buoyStatus){
+							//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
+							if(buoyPopInfo.buoyPopType === 0){
+								this.JumpToOtherApplets(buoyPopInfo.buoyPopAppId,buoyPopInfo.buoyPopContext)
+							}else if(buoyPopInfo.buoyPopType === 1){
+								this.stopBuoyDraw()
+								this.printContent(buoyPopInfo.buoyPopContext)
+								this.buoyDialogImageFlag = false
+								this.buoyDialogFlag = true
+							}else{
+								this.stopBuoyDraw()
+								this.buoyDialogImageSrc = buoyPopInfo.buoyPopContext
+								this.buoyDialogFlag = true
+								this.buoyDialogImageFlag = true
+							}
+						}else{
+							this.clickCommonOptionTodo(0)
+						}
+						
 
 
 						// console.log(this.buoyRectList)
@@ -3950,8 +3983,27 @@
 							if (v.y <= newY && (v.y + v.rectH) >= newY) {
 								console.log("我出发了选项点击")
 								this.optionIndex = i
-								console.log(this.getBuoyPopVideo(i))
-								this.clickCommonOptionTodo(i)
+								console.log(this.getBuoyPopInfo(i))
+								let buoyPopInfo = this.getBuoyPopInfo(i)
+								// buoyStatus 弹窗是否开启 1开启 0默认选项
+								if(buoyPopInfo.buoyStatus){
+									//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
+									if(buoyPopInfo.buoyPopType === 0){
+										this.JumpToOtherApplets(buoyPopInfo.buoyPopAppId,buoyPopInfo.buoyPopContext)
+									}else if(buoyPopInfo.buoyPopType === 1){
+										this.stopBuoyDraw()
+										this.printContent(buoyPopInfo.buoyPopContext)
+										this.buoyDialogImageFlag = false
+										this.buoyDialogFlag = true
+									}else{
+										this.stopBuoyDraw()
+										this.buoyDialogImageSrc = buoyPopInfo.buoyPopContext
+										this.buoyDialogFlag = true
+										this.buoyDialogImageFlag = true
+									}
+								}else{
+									this.clickCommonOptionTodo(i)
+								}
 								stopFlag = true
 								return
 							}
@@ -4311,12 +4363,16 @@
 					return null
 				} else {
 					return {
-						buoyStatus: this.ecmArtworkNodeBuoyList[index][0].buoyStatus,
-						buoyPopType: this.ecmArtworkNodeBuoyList[index][0].buoyPopType,
-						buoyPopContext: this.ecmArtworkNodeBuoyList[index][0].buoyPopContext,
-						buoyPopAppId: this.ecmArtworkNodeBuoyList[index][0].buoyPopAppId,
-						fkNodeId: this.ecmArtworkNodeBuoyList[index][0].fkNodeId,
-						pkBuoyId: this.ecmArtworkNodeBuoyList[index][0].pkBuoyId
+						//弹窗是否开启 1开启 0默认选项
+						buoyStatus:this.ecmArtworkNodeBuoyList[index][0].buoyStatus,
+						//类型有三种 对应 0其他小程序 1文字 2图片
+						buoyPopType:this.ecmArtworkNodeBuoyList[index][0].buoyPopType,
+						//类型有三种 0小程序的页面路径 1文字的文本信息 2图片的url
+						buoyPopContext:this.ecmArtworkNodeBuoyList[index][0].buoyPopContext,
+						//小程序的appid
+						buoyPopAppId:this.ecmArtworkNodeBuoyList[index][0].buoyPopAppId,
+						fkNodeId:this.ecmArtworkNodeBuoyList[index][0].fkNodeId,
+						pkBuoyId:this.ecmArtworkNodeBuoyList[index][0].pkBuoyId
 					}
 				}
 			},
