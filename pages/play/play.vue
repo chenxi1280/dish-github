@@ -359,7 +359,7 @@
 			</view>
 		</view>
 		<!-- 浮标视频点击选项显示图片和打印文字 -->
-		<view class="popupBox"  v-if="buoyDialogFlag">
+		<!-- <view class="popupBox"  v-if="buoyDialogFlag">
 			<icon @click="closeBuoyDialog" class="horizontalCloseIcon" v-if="playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
 			<icon @click="closeBuoyDialog" class="verticalCloseIcon" v-if="!playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
 			<view class="buoyDialog" :style="{'transform': transform , 'z-index': 17}">		
@@ -368,10 +368,10 @@
 				</view>
 				<view class="buoyDialogPrintWords"  v-if="!buoyDialogImageFlag">
 					<textarea v-model="buoyDialogWords"></textarea>
-						</view>
-					</view>
 				</view>
 			</view>
+		</view> -->
+	</view>
 </template>
 
 <script>
@@ -2197,9 +2197,10 @@
 						this.buoyTimestamp = buoyTimestamp
 						// 默认选A
 						this.optionIndex = 0
-						let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
+						this.clickCommonOptionTodo(0)
+						// let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
 						// buoyStatus 弹窗是否开启 1开启 0默认选项
-						if(buoyPopInfo.buoyStatus){
+						/* if(buoyPopInfo.buoyStatus){
 							//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
 							if(buoyPopInfo.buoyPopType === 0){
 								this.JumpToOtherApplets(buoyPopInfo.buoyPopAppId,buoyPopInfo.buoyPopContext)
@@ -2216,7 +2217,7 @@
 							}
 						}else{
 							this.clickCommonOptionTodo(0)
-						}
+						} */
 						
 
 
@@ -3984,9 +3985,10 @@
 								console.log("我出发了选项点击")
 								this.optionIndex = i
 								console.log(this.getBuoyPopInfo(i))
-								let buoyPopInfo = this.getBuoyPopInfo(i)
+								this.clickCommonOptionTodo(i)
+								// let buoyPopInfo = this.getBuoyPopInfo(i)
 								// buoyStatus 弹窗是否开启 1开启 0默认选项
-								if(buoyPopInfo.buoyStatus){
+								/* if(buoyPopInfo.buoyStatus){
 									//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
 									if(buoyPopInfo.buoyPopType === 0){
 										this.JumpToOtherApplets(buoyPopInfo.buoyPopAppId,buoyPopInfo.buoyPopContext)
@@ -4003,7 +4005,7 @@
 									}
 								}else{
 									this.clickCommonOptionTodo(i)
-								}
+								} */
 								stopFlag = true
 								return
 							}
