@@ -368,10 +368,10 @@
 				</view>
 				<view class="buoyDialogPrintWords"  v-if="!buoyDialogImageFlag">
 					<textarea v-model="buoyDialogWords"></textarea>
-						</view>
-					</view>
 				</view>
 			</view>
+		</view>
+	</view>
 </template>
 
 <script>
@@ -4388,6 +4388,13 @@
 		height: 100%;
 
 		.popupBox {
+			width: 100%;
+			height: 100%;
+			position: fixed;
+			left: 0;
+			top: 0;
+			background-color: rgba(255, 255, 255, 0);
+			z-index: 16;
 			.horizontalCloseIcon {
 				position: absolute;
 				right: 19%;
@@ -4397,7 +4404,7 @@
 				background: url(../../static/icon/dialogClose.png) no-repeat center;
 				background-size: 60rpx;
 			}
-
+			
 			.verticalCloseIcon {
 				position: absolute;
 				right: 13%;
@@ -4407,32 +4414,32 @@
 				background: url(../../static/icon/dialogClose.png) no-repeat center;
 				background-size: 60rpx;
 			}
-
+			
 			.buoyDialog {
 				position: absolute;
 				left: 50%;
 				top: 50%;
 				width: 400rpx;
 				height: 400rpx;
-
+			
 				.buoyDialogImage {
 					width: 100%;
 					height: 100%;
 					margin-top: 50rpx;
-
+			
 					image {
 						width: 100%;
 						height: 100%;
 					}
 				}
-
+			
 				.buoyDialogPrintWords {
 					// border: 2rpx solid red;
 					width: 100%;
 					height: 100%;
 					background-color: rgba(255, 255, 255, .5);
 					margin-top: 50rpx;
-
+			
 					textarea {
 						margin: 20rpx 20rpx;
 						font-size: 38rpx;
