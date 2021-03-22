@@ -359,7 +359,7 @@
 			</view>
 		</view>
 		<!-- 浮标视频点击选项显示图片和打印文字 -->
-		<view class="popupBox"  v-if="buoyDialogFlag">
+		<!-- <view class="popupBox"  v-if="buoyDialogFlag">
 			<icon @click="closeBuoyDialog" class="horizontalCloseIcon" v-if="playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
 			<icon @click="closeBuoyDialog" class="verticalCloseIcon" v-if="!playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
 			<view class="buoyDialog" :style="{'transform': transform , 'z-index': 17}">		
@@ -2197,9 +2197,10 @@
 						this.buoyTimestamp = buoyTimestamp
 						// 默认选A
 						this.optionIndex = 0
-						let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
+						this.clickCommonOptionTodo(0)
+						// let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
 						// buoyStatus 弹窗是否开启 1开启 0默认选项
-						if(buoyPopInfo.buoyStatus){
+						/* if(buoyPopInfo.buoyStatus){
 							//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
 							if(buoyPopInfo.buoyPopType === 0){
 								this.JumpToOtherApplets(buoyPopInfo.buoyPopAppId,buoyPopInfo.buoyPopContext)
@@ -2216,7 +2217,7 @@
 							}
 						}else{
 							this.clickCommonOptionTodo(0)
-						}
+						} */
 						
 
 
@@ -2335,6 +2336,8 @@
 				}
 			},
 			clickCommonOptionTodo(index) {
+				//返回上一级的开关在这个视频播放结束时应该被关闭
+				this.returnToPreviousFlag = false
 				this.clickCommonOptionTodoBuoyFlag = true
 				//保存用户的选择记录
 				this.savaOptionSelectionRecord(this.childs[index].pkDetailId, this.childs[index].parentId)
@@ -3015,6 +3018,8 @@
 				}
 			},
 			clickPositionOptionTodo() {
+				//返回上一级的开关在这个视频播放结束时应该被关闭
+				this.returnToPreviousFlag = false
 				//保存用户的选择记录
 				this.savaOptionSelectionRecord(this.childs[this.touchRectNum].pkDetailId, this.childs[this.touchRectNum].parentId)
 				//获取百分比的名称和数据
@@ -3984,9 +3989,10 @@
 								console.log("我出发了选项点击")
 								this.optionIndex = i
 								console.log(this.getBuoyPopInfo(i))
-								let buoyPopInfo = this.getBuoyPopInfo(i)
+								this.clickCommonOptionTodo(i)
+								// let buoyPopInfo = this.getBuoyPopInfo(i)
 								// buoyStatus 弹窗是否开启 1开启 0默认选项
-								if(buoyPopInfo.buoyStatus){
+								/* if(buoyPopInfo.buoyStatus){
 									//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
 									if(buoyPopInfo.buoyPopType === 0){
 										this.JumpToOtherApplets(buoyPopInfo.buoyPopAppId,buoyPopInfo.buoyPopContext)
@@ -4003,7 +4009,7 @@
 									}
 								}else{
 									this.clickCommonOptionTodo(i)
-								}
+								} */
 								stopFlag = true
 								return
 							}
@@ -4419,8 +4425,8 @@
 				position: absolute;
 				left: 50%;
 				top: 50%;
-				width: 400rpx;
-				height: 400rpx;
+				width: 500rpx;
+				height: 500rpx;
 			
 				.buoyDialogImage {
 					width: 100%;
