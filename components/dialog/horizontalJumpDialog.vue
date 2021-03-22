@@ -42,10 +42,9 @@
 			}
 		},
 		onReady() {
-			
 		},
 		onLoad() {
-			
+			console.log("******************************popImageUrl: ",popImageUrl)
 		},
 		methods: {
 			closeDialog(){
