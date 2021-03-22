@@ -4418,8 +4418,8 @@
 				position: absolute;
 				left: 50%;
 				top: 50%;
-				width: 400rpx;
-				height: 400rpx;
+				width: 500rpx;
+				height: 500rpx;
 
 				.buoyDialogImage {
 					width: 100%;
