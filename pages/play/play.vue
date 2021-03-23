@@ -704,7 +704,8 @@
 				//浮标选项的展示图片路径
 				buoyDialogImageSrc: null,
 				//字符其实下标
-				i: 0
+				i: 0,
+				otherAppletsReturnFlag: false
 			}
 		},
 		onReady() {
@@ -745,6 +746,7 @@
 			this.isBouyClickCommonOptionTodo()
 		},
 		onLoad(option) {
+			console.log('进入play1！！！！')
 			// this.videoShowFlag = true
 			console.log('cookieToken', uni.getStorageInfoSync('cookieToken'))
 			//初始化video对象
@@ -805,6 +807,13 @@
 		onShow() {
 			console.log('进入play！！！！')
 			//当跳转到其他小程序时设置一个开关当跳回当前小程序时触发页面onShow 此时根据开关控制video是否播放 开关用完就关
+			if(this.otherAppletsReturnFlag){
+				let videoPlayTimeout = setTimeout(()=>{
+					this.videoContext.play()
+					clearTimeout(videoPlayTimeout)
+				},500)
+				this.otherAppletsReturnFlag = false
+			}
 		},
 		onUnload() {
 			uni.removeStorageSync('popupState')
@@ -818,7 +827,7 @@
 			uni.setStorageSync('isNumericalOptions', 0)
 			//关闭页面时重置节点分数容器
 			uni.setStorageSync('appearConditionMap', null)
-			console.log('离开play！！！！')
+			console.log('离开play1！！！！')
 			globalBus.$off('bouyClickCommonOptionTodo')
 		},
 		onShareAppMessage(res) {
@@ -887,6 +896,7 @@
 			//浮标选项点击跳转到其他小程序
 			JumpToOtherApplets(appId, navigatorUrl) {
 				this.videoContext.pause()
+				this.otherAppletsReturnFlag = true
 				console.log("进来跳转了")
 				if (appId && navigatorUrl) {
 					uni.navigateToMiniProgram({
@@ -907,8 +917,7 @@
 							videoContext.play()
 						},
 						complete(res){
-							let videoContext = uni.createVideoContext('myVideo')
-							videoContext.play()
+							
 						}
 					})
 				}
