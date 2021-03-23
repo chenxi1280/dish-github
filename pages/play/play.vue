@@ -73,11 +73,11 @@
 				<!-- <canvas canvas-id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas> -->
 				<canvas type="2d" id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas>
 			</view>
-			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" -->
+			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" @loadedmetadata="loadeddata" -->
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform}">
 				<video v-if="videoShowFlag" :src="videoUrl" :autoplay="autopalyFlag" :show-mute-btn="true" :show-fullscreen-btn="false"
 				 id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="progressGestureFlag" @ended="videoEnd(false)"
-				 @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart" auto-pause-if-navigate @loadedmetadata="loadeddata"
+				 @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart" auto-pause-if-navigate 
 				 @timeupdate="videoTimeupdate" :controls="controlsFlag" @play="videoPlay" @waiting="waitingVideo"></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
@@ -804,7 +804,7 @@
 		},
 		onShow() {
 			console.log('进入play！！！！')
-
+			//当跳转到其他小程序时设置一个开关当跳回当前小程序时触发页面onShow 此时根据开关控制video是否播放 开关用完就关
 		},
 		onUnload() {
 			uni.removeStorageSync('popupState')
@@ -1464,6 +1464,19 @@
 					// console.log('我进来了')
 
 				}
+				
+				//获取视频的宽高时长
+				// console.log('artworkTree.videoInfo: ',artworkTree.videoInfo)
+				if(typeof(artworkTree.videoInfo) != "undefined" && artworkTree.videoInfo){
+					let arr = artworkTree.videoInfo.split(',')
+					console.log('initPlayData视频信息: ',artworkTree.videoInfo)
+					this.videoHeight = arr[0]
+					this.videoWidth = arr[1]
+					this.duration = arr[2]
+					console.log('时长: ',this.duration,'视频高: ',this.videoHeight,'视频宽: ',this.videoWidth)
+					let date = this.formatDate(this.duration)
+					this.durationStr = date
+				}
 
 				//随机数
 				const uuid = Math.random().toString(36).substring(2)
@@ -1472,7 +1485,9 @@
 				this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
 				this.parentId = artworkTree.parentId
 				this.imageSrc = artworkTree.nodeLastImgUrl
-				// this.loadeddata()
+				
+				this.loadeddata()
+				
 				//如果是根节点初始化存储节点分值的容器
 				if (this.parentId === 0) {
 					//存进缓存是防止故事线进入时重置了data里面的数据
@@ -3121,10 +3136,12 @@
 			},
 			// 校正视频播放的黑边 单位px
 			validateVerticalWindowSize() {
-				let videoInfo = uni.getStorageSync('videoSize')
+				// let videoInfo = uni.getStorageSync('videoSize')
 				let windowSize = uni.getStorageSync('windowSize')
-				let videoHeight = videoInfo.videoHeight + 0
-				let videoWidth = videoInfo.videoWidth + 0
+				let videoHeight = this.videoHeight + 0
+				let videoWidth = this.videoWidth + 0
+				// let videoHeight = videoInfo.videoHeight + 0
+				// let videoWidth = videoInfo.videoWidth + 0
 				let videoRate = videoWidth / videoHeight
 				//dh dw canvas宽高  ch cw是窗口宽高
 				let vh, vw, dh, dw, ch, cw
@@ -3218,10 +3235,12 @@
 			},
 			// 用来确定横屏播放时canvas画布的大小和video的大小
 			validateHorizontalWindowSize(windowWidth, windowHeight) {
-				let videoInfo = uni.getStorageSync('videoSize')
+				// let videoInfo = uni.getStorageSync('videoSize')
 				let windowSize = uni.getStorageSync('windowSize')
-				let videoHeight = videoInfo.videoHeight + 0
-				let videoWidth = videoInfo.videoWidth + 0
+				// let videoHeight = videoInfo.videoHeight + 0
+				// let videoWidth = videoInfo.videoWidth + 0
+				let videoHeight = this.videoHeight + 0
+				let videoWidth = this.videoWidth + 0
 				let videoRate = videoWidth / videoHeight
 				//dh dw canvas宽高  ch cw是窗口宽高
 				let vh, vw, dh, dw, ch, cw
@@ -3276,7 +3295,7 @@
 					}
 				})
 			},
-			loadeddata(e) {
+			loadeddata() {
 				//for ios 浮标作品 不自动播放的问题
 				if (this.bouyNodeFlage) {
 					this.videoContext.pause()
@@ -3315,9 +3334,10 @@
 						}, 5000)
 					}
 				}
-				this.duration = e.detail.duration
-				let date = this.formatDate(this.duration)
-				this.durationStr = date
+				//TODO 修改
+				// this.duration = e.detail.duration
+				// let date = this.formatDate(this.duration)
+				// this.durationStr = date
 				console.log('需要重投开始播放吗', this.bouyNodeFlage)
 				// 浮标修改
 				console.log("!this.bouyNodeFlage", !this.bouyNodeFlage)
@@ -3340,10 +3360,11 @@
 				this.likabilityDelayFunction = setTimeout(() => {
 					this.likabilityFlag = false
 				}, 5000)
-				uni.setStorageSync('videoSize', {
+				//TODO 修改
+				/* uni.setStorageSync('videoSize', {
 					videoHeight: e.detail.height,
 					videoWidth: e.detail.width
-				})
+				}) */
 				//加载完视频加载视频的尺寸
 				if (uni.getStorageSync('playMode') == 1) {
 					this.playMode = 1
@@ -4402,8 +4423,8 @@
 			z-index: 16;
 			.horizontalCloseIcon {
 				position: absolute;
-				right: 19%;
-				top: 67%;
+				right: 13%;
+				top: 71%;
 				width: 60rpx;
 				height: 60rpx;
 				background: url(../../static/icon/dialogClose.png) no-repeat center;
@@ -4412,8 +4433,8 @@
 			
 			.verticalCloseIcon {
 				position: absolute;
-				right: 13%;
-				top: 37%;
+				right: 7%;
+				top: 33%;
 				width: 60rpx;
 				height: 60rpx;
 				background: url(../../static/icon/dialogClose.png) no-repeat center;
@@ -4424,8 +4445,8 @@
 				position: absolute;
 				left: 50%;
 				top: 50%;
-				width: 400rpx;
-				height: 400rpx;
+				width: 500rpx;
+				height: 500rpx;
 			
 				.buoyDialogImage {
 					width: 100%;
