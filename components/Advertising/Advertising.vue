@@ -165,9 +165,25 @@
 					return false
 				}
 				this.showAdvertisingFlag = false
-				this.advertising = wx.createRewardedVideoAd({
+				
+				//add
+				if ((Math.random() * 10) > 5) {
+					this.advertising = wx.createRewardedVideoAd({
+						adUnitId: 'adunit-7423fd1b2c7c5724'
+						// multiton: true
+					})
+				} else {
+					this.advertising = wx.createRewardedVideoAd({
+						adUnitId: 'adunit-8d7f7b5a86ac5537'
+						// multiton: true
+					})
+				}
+				
+				//origional
+				/* this.advertising = wx.createRewardedVideoAd({
 					adUnitId: 'adunit-7423fd1b2c7c5724'
-				})
+				}) */
+				
 				//捕捉错误
 				this.advertising.onError(err => {
 					uni.showToast({

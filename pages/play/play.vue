@@ -1086,17 +1086,18 @@
 			openAdvertising() {
 				this.showAdvertisingFlag = false
 				if (this.advertising != null) {
-					this.advertising.destroy()
+					this.advertising.offClose()
+					// this.advertising.destroy()
 				}
 				if ((Math.random() * 10) > 5) {
 					this.advertising = wx.createRewardedVideoAd({
-						adUnitId: 'adunit-7423fd1b2c7c5724',
-						multiton: true
+						adUnitId: 'adunit-7423fd1b2c7c5724'
+						// multiton: true
 					})
 				} else {
 					this.advertising = wx.createRewardedVideoAd({
-						adUnitId: 'adunit-8d7f7b5a86ac5537',
-						multiton: true
+						adUnitId: 'adunit-8d7f7b5a86ac5537'
+						// multiton: true
 					})
 				}
 				//捕捉错误
@@ -1129,7 +1130,8 @@
 						}
 						this.videoContext.play()
 					}
-					this.advertising.destroy()
+					this.advertising.offClose()
+					// this.advertising.destroy()
 					this.clickCommonOptionTodoBuoyFlag = false
 
 				})
@@ -1177,10 +1179,13 @@
 								}
 								this.videoContext.play()
 							}
-							//加载失败销毁对象
-							this.advertising.destroy()
+							//加载失败取消监听用户点击 关闭广告 按钮的事件
+							this.advertising.offClose()
+							//加载失败销毁对象实例
+							// this.advertising.destroy()
 						})
-						this.advertising.destroy()
+						this.advertising.offClose()
+						// this.advertising.destroy()
 						this.clickCommonOptionTodoBuoyFlag = false
 					})
 				}
@@ -1243,7 +1248,8 @@
 								}
 							}
 						}
-						this.advertising.destroy()
+						this.advertising.offClose()
+						// this.advertising.destroy()
 					} else {
 						if (this.isVideoEndFlag) {
 							if (this.isGetMultipleFlag) {
@@ -1276,9 +1282,10 @@
 						// 浮标 结尾 广告 未看完 时间添加
 						console.log('憨批用户不给光')
 						this.clickCommonOptionTodoBuoyFlag = false
-						//广告拉取失败销毁对象
-
-						this.advertising.destroy()
+						//广告拉取取消监听用户点击 关闭广告 按钮的事件
+						this.advertising.offClose()
+						//广告拉取失败销毁对象实例
+						// this.advertising.destroy()
 					}
 
 				})
