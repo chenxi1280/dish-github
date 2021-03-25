@@ -3884,7 +3884,7 @@
 						if (v.buoyType == 0) {
 							let aFlag = true
 							hList.forEach(n => {
-								console.log('v.nodeId ', v, 'n.nodeId', n.fkNodeId)
+								// console.log('v.nodeId ', v, 'n.nodeId', n.fkNodeId)
 								if (v.fkNodeId == n.fkNodeId) {
 									aFlag = false
 								}
@@ -4005,7 +4005,7 @@
 
 				let stopFlag = false
 				// console.log('nowBuoyRectList',nowBuoyRectList)
-				// console.log('newY',newY,'newX',newX)
+				console.log('newY',newY,'newX',newX)
 				// console.log('nowBuoyRectList',nowBuoyRectList)
 
 				nowBuoyRectList.forEach((v, i) => {
