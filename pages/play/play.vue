@@ -77,7 +77,7 @@
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform}">
 				<video v-if="videoShowFlag" :src="videoUrl" :autoplay="autopalyFlag" :show-mute-btn="true" :show-fullscreen-btn="false"
 				 id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="progressGestureFlag" @ended="videoEnd(false)"
-				 @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart" auto-pause-if-navigate 
+				 @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart" auto-pause-if-navigate :custom-cache="false"
 				 @timeupdate="videoTimeupdate" :controls="controlsFlag" @play="videoPlay" @waiting="waitingVideo"></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
@@ -367,7 +367,7 @@
 					<image :src = "buoyDialogImageSrc"></image>
 				</view>
 				<view class="buoyDialogPrintWords"  v-if="!buoyDialogImageFlag">
-					<textarea v-model="buoyDialogWords"></textarea>
+					<textarea v-model="buoyDialogWords" disabled = "true"></textarea>
 				</view>
 			</view>
 		</view>
@@ -805,6 +805,8 @@
 			globalBus.$off('bouyClickCommonOptionTodo')
 		},
 		onShow() {
+			uni.removeStorageSync('popupState')
+			uni.removeStorageSync('popupSettings')
 			console.log('进入play！！！！')
 			//当跳转到其他小程序时设置一个开关当跳回当前小程序时触发页面onShow 此时根据开关控制video是否播放 开关用完就关
 			if(this.otherAppletsReturnFlag){
@@ -814,6 +816,7 @@
 				},500)
 				this.otherAppletsReturnFlag = false
 			}
+			globalBus.$emit('bouyClickCommonOptionTodo')
 		},
 		onUnload() {
 			uni.removeStorageSync('popupState')
@@ -871,9 +874,15 @@
 				this.buoyDialogFlag = false
 				this.buoyDialogWords = null
 				this.i = 0
+				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index1***********************************",this.optionIndex)
 				let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
 				if(buoyPopInfo.buoyStatus){
-					this.againPlayVideo()
+					if(this.isVideoEndFlag){
+						this.againPlayVideo()
+					}else{
+						console.log("**************************recoveryBuoyDraw*****************")
+						this.recoveryBuoyDraw()
+					}
 				}else{
 					this.clickCommonOptionTodo(this.optionIndex)
 				}
@@ -1495,8 +1504,6 @@
 				this.parentId = artworkTree.parentId
 				this.imageSrc = artworkTree.nodeLastImgUrl
 				
-				this.loadeddata()
-				
 				//如果是根节点初始化存储节点分值的容器
 				if (this.parentId === 0) {
 					//存进缓存是防止故事线进入时重置了data里面的数据
@@ -1556,6 +1563,10 @@
 						this.endFlag = false;
 					}
 				}
+				
+				//加载视频数据
+				this.loadeddata()
+				
 				//非跳转节点的目标节点存播放记录
 				if (this.linkNodeId != this.detailId) {
 					// 将作品detailId留存提供给故事线
@@ -3310,6 +3321,7 @@
 					this.videoContext.pause()
 					this.videoContext.play()
 				}
+				this.videoContext.seek(parseInt((this.duration - 7).toFixed(0)))
 				console.log('this.videoShowFlag: ', this.videoShowFlag)
 				console.log('this.isPlayedFlag: ', this.isPlayedFlag)
 				//清除百分比延时函数
@@ -3899,7 +3911,8 @@
 						if (v.buoyType != 2) {
 							if (uni.getStorageSync('playMode') == 1) {
 								// console.log("横屏")
-								let rectOpacity = (v.buoyOpacity - 0) / 100
+								// for test v.buoyOpacity
+								let rectOpacity = (100 - 0) / 100
 
 								let rectX = parseInt(((1 - (v.buoyCoordinateY - 0) - (v.buoyHigh - 0)) * this.canvasWidth).toFixed(0))
 								// console.log('矩形框的x轴坐标: ',rectX)
@@ -3940,7 +3953,8 @@
 								aList.push(buoy)
 							} else {
 								// console.log("竖屏")
-								let rectOpacity = (v.buoyOpacity - 0) / 100
+								// for test v.buoyOpacity
+								let rectOpacity = (100 - 0) / 100
 
 								let rectX = parseInt(((v.buoyCoordinateX - 0) * this.canvasWidth).toFixed(0))
 								// console.log('矩形框的x轴坐标: ',rectX)
@@ -3987,7 +4001,7 @@
 
 					})
 					this.canvasNodeBuoyList.push(aList)
-					// console.log("这是初始化",this.canvasNodeBuoyList[0])
+					console.log("这是初始化",this.canvasNodeBuoyList)
 				})
 				uni.setStorageSync('historyNodeBuoyList', hList)
 				// this.startBuoy()
@@ -4007,11 +4021,11 @@
 				// console.log('nowBuoyRectList',nowBuoyRectList)
 				console.log('newY',newY,'newX',newX)
 				// console.log('nowBuoyRectList',nowBuoyRectList)
+				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$nowBuoyRectList***********************************",nowBuoyRectList)
 
 				nowBuoyRectList.forEach((v, i) => {
 					if (v != null) {
-
-
+						
 						if (v.x <= newX && (v.x + v.rectW) >= newX) {
 							// 加10 增加判定区域
 							if (v.y <= newY && (v.y + v.rectH) >= newY) {
@@ -4019,6 +4033,7 @@
 								this.optionIndex = i
 								console.log(this.getBuoyPopInfo(i))
 								let buoyPopInfo = this.getBuoyPopInfo(i)
+								console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index2***********************************",i)
 								// buoyStatus 弹窗是否开启 1开启 0默认选项
 								if(buoyPopInfo.buoyStatus){
 									//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
@@ -4394,21 +4409,28 @@
 			},
 			// 获取改浮弹窗信息
 			getBuoyPopInfo(index) {
-				if (this.ecmArtworkNodeBuoyList[index][0] == null) {
+				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index3***********************************",index)
+				console.log("$$$$$$$$$$$$$this.ecmArtworkNodeBuoyList*********************************",this.ecmArtworkNodeBuoyList)
+				console.log("$$$$$$$$$$$$$this.ecmArtworkNodeBuoyList*********************************",this.canvasNodeBuoyList)
+				if (this.ecmArtworkNodeBuoyList.length >= index + 1) {
+						if (this.ecmArtworkNodeBuoyList[index][0] == null) {
+						  return null
+						} else {
+							return {
+								//弹窗是否开启 1开启 0默认选项
+								buoyStatus:this.ecmArtworkNodeBuoyList[index][0].buoyStatus,
+								//类型有三种 对应 0其他小程序 1文字 2图片
+								buoyPopType:this.ecmArtworkNodeBuoyList[index][0].buoyPopType,
+								//类型有三种 0小程序的页面路径 1文字的文本信息 2图片的url
+								buoyPopContext:this.ecmArtworkNodeBuoyList[index][0].buoyPopContext,
+								//小程序的appid
+								buoyPopAppId:this.ecmArtworkNodeBuoyList[index][0].buoyPopAppId,
+								fkNodeId:this.ecmArtworkNodeBuoyList[index][0].fkNodeId,
+								pkBuoyId:this.ecmArtworkNodeBuoyList[index][0].pkBuoyId
+							}
+						}
+				}else {
 					return null
-				} else {
-					return {
-						//弹窗是否开启 1开启 0默认选项
-						buoyStatus:this.ecmArtworkNodeBuoyList[index][0].buoyStatus,
-						//类型有三种 对应 0其他小程序 1文字 2图片
-						buoyPopType:this.ecmArtworkNodeBuoyList[index][0].buoyPopType,
-						//类型有三种 0小程序的页面路径 1文字的文本信息 2图片的url
-						buoyPopContext:this.ecmArtworkNodeBuoyList[index][0].buoyPopContext,
-						//小程序的appid
-						buoyPopAppId:this.ecmArtworkNodeBuoyList[index][0].buoyPopAppId,
-						fkNodeId:this.ecmArtworkNodeBuoyList[index][0].fkNodeId,
-						pkBuoyId:this.ecmArtworkNodeBuoyList[index][0].pkBuoyId
-					}
 				}
 			},
 
