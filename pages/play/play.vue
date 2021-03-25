@@ -705,10 +705,24 @@
 				buoyDialogImageSrc: null,
 				//字符其实下标
 				i: 0,
-				otherAppletsReturnFlag: false
+				otherAppletsReturnFlag: false,
+				//浮标自选开关
+				buoyAutoChooseFlag: false
 			}
 		},
 		onReady() {
+			wx.getSavedFileList({
+			  success: savedFileInfo => {
+				let list = savedFileInfo.fileList
+				console.log("list:",savedFileInfo.fileList)
+				for (let i = 0; i < list.length; i++) {
+				  wx.removeSavedFile({
+					filePath: list[i].filePath,
+				  })
+				}
+			  }
+			})
+			console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$pages************: ",getCurrentPages())
 			uni.setStorageSync('historyNodeBuoyList', [])
 			//重置重播
 			uni.setStorageSync('isReplay', false)
@@ -2236,7 +2250,7 @@
 					// 浮标修改
 					else if (this.isPosition === 2) {
 						//节流
-						let buoyTimestamp = (new Date()).valueOf();
+						let buoyTimestamp = (new Date()).valueOf()
 						console.log('buoyTimestamp', buoyTimestamp)
 						if (buoyTimestamp - this.buoyTimestamp < 100) {
 							console.log('没节流')
@@ -2252,10 +2266,11 @@
 							//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
 							this.againPlayVideo()
 						}else{
+							this.buoyAutoChooseFlag = true
 							this.clickCommonOptionTodo(0)
 						}
 						
-
+						
 
 						// console.log(this.buoyRectList)
 						// return
@@ -3310,14 +3325,21 @@
 			},
 			goDiscover() {
 				console.log('我触发了')
-				uni.switchTab({
-					url: '../dishover/dishover',
+				uni.navigateBack({
+					delta: 1,
 					fail(err) {
 						console.log('跳转失败:', err)
 					}
 				})
 			},
 			loadeddata() {
+				// 浮标作品 禁用所有的进度条
+				if (this.bouyNodeFlage) {
+					//浮标视频不显示原生开关
+					this.controlsFlag = false
+					clearTimeout(this.horizontalControlsFunction)
+					this.horizontalControlsFlags = false
+				}
 				//for ios 浮标作品 不自动播放的问题
 				if (this.bouyNodeFlage) {
 					this.videoContext.pause()
@@ -3426,14 +3448,31 @@
 					console.log('我又进来了')
 					this.showBuoyCanvasFlag = true
 					this.initVerticalBuoyCanvas()
-					this.videoContext.seek(parseInt((this.duration - 7).toFixed(0)))
 				}
 				if (this.returnToPreviousFlag && this.bouyNodeFlage) {
 					console.log("************bouySectionTime2s: ", this.bouySectionTime)
 					this.bouyReturnToPreviousFlag = true
+					
+					if(this.buoyAutoChooseFlag){
+						//获取浮标视频的选项初始渲染时间
+						let historyNodeBuoyList = uni.getStorageSync("historyNodeBuoyList")
+						for (let i = 0; i < historyNodeBuoyList.length; i++) {
+							let currentId = historyNodeBuoyList[i].fkNodeId
+							let detailId = this.childs[0].pkDetailId
+							console.log("************$$$$$$$$$$$$$$$$$$$$$detailId return: ", detailId)
+							//此处还是不能使用this.detailId来对比要使用历史记录的来对比 因为返回的节点可能是跳转节点
+							if (currentId == detailId) {
+								let bouySectionTime = historyNodeBuoyList[i].buoySectionTime
+								console.log("************$$$$$$$$$$$$$$$$$$$bouySectionTime return: ", bouySectionTime)
+								this.videoContext.seek(bouySectionTime == 0 ? 0 : parseInt(bouySectionTime) - 1)
+								break
+							}
+						}
+					}else{
+						this.videoContext.seek(this.bouySectionTime == 0 ? 0 : parseInt(this.bouySectionTime) - 1)
+					}
 					//视频暂停
 					// console.log('bouySectionTime',this.bouySectionTime == 0 ? 0 : parseInt(this.bouySectionTssime) -1)
-					this.videoContext.seek(this.bouySectionTime == 0 ? 0 : parseInt(this.bouySectionTime) - 1)
 					this.videoContext.pause()
 					this.videoContext.play()
 					this.returnToPreviousFlag = false
@@ -4064,6 +4103,7 @@
 										this.buoyDialogImageFlag = true
 									}
 								}else{
+									this.buoyAutoChooseFlag = false
 									this.clickCommonOptionTodo(i)
 								}
 								
