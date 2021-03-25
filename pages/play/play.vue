@@ -1504,6 +1504,8 @@
 				this.parentId = artworkTree.parentId
 				this.imageSrc = artworkTree.nodeLastImgUrl
 				
+
+				
 				//如果是根节点初始化存储节点分值的容器
 				if (this.parentId === 0) {
 					//存进缓存是防止故事线进入时重置了data里面的数据
@@ -1563,7 +1565,7 @@
 						this.endFlag = false;
 					}
 				}
-				
+				console.log("这是init调用loadeddata", (new Date()).valueOf())
 				//加载视频数据
 				this.loadeddata()
 				
@@ -3321,7 +3323,6 @@
 					this.videoContext.pause()
 					this.videoContext.play()
 				}
-				this.videoContext.seek(parseInt((this.duration - 7).toFixed(0)))
 				console.log('this.videoShowFlag: ', this.videoShowFlag)
 				console.log('this.isPlayedFlag: ', this.isPlayedFlag)
 				//清除百分比延时函数
@@ -3422,9 +3423,10 @@
 					}
 					// 浮标改动
 				} else if (this.isPosition === 2) {
-					// console.log('我又进来了')
+					console.log('我又进来了')
 					this.showBuoyCanvasFlag = true
 					this.initVerticalBuoyCanvas()
+					this.videoContext.seek(parseInt((this.duration - 7).toFixed(0)))
 				}
 				if (this.returnToPreviousFlag && this.bouyNodeFlage) {
 					console.log("************bouySectionTime2s: ", this.bouySectionTime)
@@ -3888,7 +3890,18 @@
 
 			// 初始化浮标 对象 List
 			initializationBuoyList() {
-				console.log(this.ecmArtworkNodeBuoyList)
+				
+				// let buoyInitTimestamp = (new Date()).valueOf();
+				// console.log('buoyInitTimestamp', buoyInitTimestamp)
+				// if (buoyInitTimestamp - this.buoyInitTimestamp < 1000) {
+				// 	console.log('buoyInitTimestamp节流')
+				// 	return
+				// }
+				// console.log('buoyInitTimestamp没有节流')
+				// this.buoyInitTimestamp = buoyInitTimestamp
+				this.canvasNodeBuoyList = []
+				
+				
 				let hList = uni.getStorageSync('historyNodeBuoyList')
 				this.ecmArtworkNodeBuoyList.forEach((nodeBuoyList, index) => {
 					let aList = []
