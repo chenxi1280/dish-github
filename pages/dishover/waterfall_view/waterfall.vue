@@ -112,7 +112,7 @@
 		methods: {
 			goPlayPage(pkArtworkId) {
 				console.log(pkArtworkId)
-				uni.navigateTo({
+				uni.redirectTo({
 					url: "../play/play?pkArtworkId=" + pkArtworkId,
 				})
 			},

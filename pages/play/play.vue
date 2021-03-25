@@ -3321,7 +3321,6 @@
 					this.videoContext.pause()
 					this.videoContext.play()
 				}
-				this.videoContext.seek(parseInt((this.duration - 7).toFixed(0)))
 				console.log('this.videoShowFlag: ', this.videoShowFlag)
 				console.log('this.isPlayedFlag: ', this.isPlayedFlag)
 				//清除百分比延时函数
@@ -3912,7 +3911,7 @@
 							if (uni.getStorageSync('playMode') == 1) {
 								// console.log("横屏")
 								// for test v.buoyOpacity
-								let rectOpacity = (100 - 0) / 100
+								let rectOpacity = (v.buoyOpacity - 0) / 100
 
 								let rectX = parseInt(((1 - (v.buoyCoordinateY - 0) - (v.buoyHigh - 0)) * this.canvasWidth).toFixed(0))
 								// console.log('矩形框的x轴坐标: ',rectX)
@@ -3954,7 +3953,7 @@
 							} else {
 								// console.log("竖屏")
 								// for test v.buoyOpacity
-								let rectOpacity = (100 - 0) / 100
+								let rectOpacity = (v.buoyOpacity - 0) / 100
 
 								let rectX = parseInt(((v.buoyCoordinateX - 0) * this.canvasWidth).toFixed(0))
 								// console.log('矩形框的x轴坐标: ',rectX)
