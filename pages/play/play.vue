@@ -75,9 +75,9 @@
 			</view>
 			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" @loadedmetadata="loadeddata" -->
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform}">
-				<video v-if="videoShowFlag" :src="videoUrl" :autoplay="autopalyFlag" :show-mute-btn="true" :show-fullscreen-btn="false"
+				<video v-if="videoShowFlag" :src="videoUrl"  :show-mute-btn="true" :show-fullscreen-btn="false" :autoplay="autopalyFlag"
 				 id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="progressGestureFlag" @ended="videoEnd(false)"
-				 @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart" auto-pause-if-navigate :custom-cache="false"
+				 @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart" auto-pause-if-navigate @error="videoError"
 				 @timeupdate="videoTimeupdate" :controls="controlsFlag" @play="videoPlay" @waiting="waitingVideo"></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
@@ -707,22 +707,12 @@
 				i: 0,
 				otherAppletsReturnFlag: false,
 				//浮标自选开关
-				buoyAutoChooseFlag: false
+				buoyAutoChooseFlag: false,
+				//跳转到其他小程序的节流历史时间参数
+				historyTimestamp: 0
 			}
 		},
 		onReady() {
-			wx.getSavedFileList({
-			  success: savedFileInfo => {
-				let list = savedFileInfo.fileList
-				console.log("list:",savedFileInfo.fileList)
-				for (let i = 0; i < list.length; i++) {
-				  wx.removeSavedFile({
-					filePath: list[i].filePath,
-				  })
-				}
-			  }
-			})
-			console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$pages************: ",getCurrentPages())
 			uni.setStorageSync('historyNodeBuoyList', [])
 			//重置重播
 			uni.setStorageSync('isReplay', false)
@@ -753,18 +743,17 @@
 			this.endFlag = true;
 			//重置用户选项分数
 			uni.setStorageSync('userScore', [])
-			//重置好感度数组
+			//重置好感度数组js 判断对象是否为空
 			this.likabilityArray = []
 			//获取一颗作品树
 			this.getArtworkTreeByArtworkId()
 			this.isBouyClickCommonOptionTodo()
 		},
 		onLoad(option) {
-			console.log('进入play1！！！！')
 			// this.videoShowFlag = true
-			console.log('cookieToken', uni.getStorageInfoSync('cookieToken'))
 			//初始化video对象
 			this.videoContext = uni.createVideoContext('myVideo')
+			console.log("%%%%%%%%%%%%%%%%%%%%%videoContext%%%%%%%%%%%",this.videoContext)
 			this.token = uni.getStorageSync('token')
 			// 初始化看广告获取光的数量
 			this.rewardLight = uni.getStorageSync('rewardLight') || 3
@@ -883,6 +872,12 @@
 			}
 		},
 		methods: {
+			videoError(e){
+				wx.reLaunch({
+					url: 'play?pkArtworkId='+this.artworkId
+				})
+				console.log("********************我报错了*********: ",e)
+			},
 			//点击浮标选项弹窗关闭按钮事件
 			closeBuoyDialog(){
 				this.buoyDialogFlag = false
@@ -918,6 +913,19 @@
 
 			//浮标选项点击跳转到其他小程序
 			JumpToOtherApplets(appId, navigatorUrl) {
+				//节流
+					let currentTimestamp = (new Date()).valueOf()
+					// console.log("***************************currentTimestamp:",currentTimestamp, this.historyTimestamp)
+					// console.log("***************************historyTimestamp:",this.historyTimestamp)
+					// console.log('buoyTimestamp', buoyTimestamp)
+					if (this.historyTimestamp !== 0 && currentTimestamp - this.historyTimestamp < 500) {
+						console.log("***************************111111111111111111111")
+						this.historyTimestamp = currentTimestamp
+						return
+					}
+					console.log("***************************2222222222222222222222222")
+					this.historyTimestamp = currentTimestamp
+				//把用过的时间赋值给历史时间
 				this.videoContext.pause()
 				this.otherAppletsReturnFlag = true
 				console.log("进来跳转了")
@@ -1518,8 +1526,6 @@
 				this.parentId = artworkTree.parentId
 				this.imageSrc = artworkTree.nodeLastImgUrl
 				
-
-				
 				//如果是根节点初始化存储节点分值的容器
 				if (this.parentId === 0) {
 					//存进缓存是防止故事线进入时重置了data里面的数据
@@ -1580,6 +1586,7 @@
 					}
 				}
 				console.log("这是init调用loadeddata", (new Date()).valueOf())
+				
 				//加载视频数据
 				this.loadeddata()
 				
@@ -1598,6 +1605,7 @@
 					uni.setStorageSync("pkDetailIds", this.playedHistoryArray);
 					this.linkNodeId = null
 				}
+				
 			},
 			//视频 播放后弹窗
 			popupWindowByPopupPositonEqualsOne() {
@@ -2303,7 +2311,7 @@
 				this.multipleResultFlag = false
 				this.isVideoEndFlag = false
 				this.isGetMultipleFlag = false
-
+				this.videoloadFlag = false
 				if (this.waitingVideoFlag) {
 					if (this.bouyNodeFlage) {
 						console.log('play里面的  recoveryBuoyDraw 被启动了')
@@ -3324,7 +3332,8 @@
 				})
 			},
 			goDiscover() {
-				console.log('我触发了')
+				/* console.log('我触发了')
+				this.videoContext.play() */
 				uni.navigateBack({
 					delta: 1,
 					fail(err) {
@@ -3382,12 +3391,12 @@
 				// this.duration = e.detail.duration
 				// let date = this.formatDate(this.duration)
 				// this.durationStr = date
-				console.log('需要重投开始播放吗', this.bouyNodeFlage)
 				// 浮标修改
 				console.log("!this.bouyNodeFlage", !this.bouyNodeFlage)
 				if (!this.bouyNodeFlage) {
 					//判断是不是故事线跳转过来的第一个视频 第一个视频需要快进到结尾进行播放
 					if (this.isPlayedFlag) {
+						console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", (this.duration - 3).toFixed(0))
 						this.videoContext.seek(parseInt((this.duration - 3).toFixed(0)))
 						this.isPlayedFlag = false
 					}
@@ -3395,7 +3404,7 @@
 					this.isPlayedFlag = false
 				}
 				//加载完成将入场loading关闭
-				this.videoloadFlag = false
+				//this.videoloadFlag = false
 				//展示故事线和举报
 				this.hiddenBtnFlag = true
 				//展示好感度
@@ -3462,24 +3471,19 @@
 							console.log("************$$$$$$$$$$$$$$$$$$$$$detailId return: ", detailId)
 							//此处还是不能使用this.detailId来对比要使用历史记录的来对比 因为返回的节点可能是跳转节点
 							if (currentId == detailId) {
-								let bouySectionTime = historyNodeBuoyList[i].buoySectionTime
-								console.log("************$$$$$$$$$$$$$$$$$$$bouySectionTime return: ", bouySectionTime)
-								this.videoContext.seek(bouySectionTime == 0 ? 0 : parseInt(bouySectionTime) - 1)
+								this.bouySectionTime = historyNodeBuoyList[i].buoySectionTime
+								this.buoyAutoChooseFlag = false
 								break
 							}
 						}
-					}else{
-						this.videoContext.seek(this.bouySectionTime == 0 ? 0 : parseInt(this.bouySectionTime) - 1)
 					}
-					//视频暂停
-					// console.log('bouySectionTime',this.bouySectionTime == 0 ? 0 : parseInt(this.bouySectionTssime) -1)
-					this.videoContext.pause()
-					this.videoContext.play()
+					console.log("************$$$$$$$$$$$$$$$$$$$this.videoContext return: ", this.videoContext)
+					this.videoContext.seek(this.bouySectionTime == 0 ? 0 : parseInt(this.bouySectionTime) - 1)
 					this.returnToPreviousFlag = false
 				}
 			},
 			videoTimeupdate(e) {
-
+			
 				//获取视频当前时间
 				this.currentTime = e.detail.currentTime
 				//获取视频当前时间
@@ -4345,7 +4349,7 @@
 				// 	this.buoyRectList.push(this.initializationBuoy(v.x,v.y,v.rectW,v.rectH,v.vx,v.vy,v.opacity,v.nodeId,v.buoySectionTime,v.buoyType))
 				// })
 				// console.log('this.buoyRectList111 ',this.buoyRectList )
-				//视频回复
+				//视频回复 
 				this.videoContext.play()
 				//canvas 回来
 				this.showBuoyCanvasFlag = true
@@ -4409,13 +4413,7 @@
 
 			//视频进入 缓冲
 			waitingVideo() {
-				// console.log(this.returnToPreviousFlag,'this.returnToPreviousFlag')
-				// if (this.bouyNodeFlage && !this.bouyReturnToPreviousFlag) {
-				// 	this.waitingVideoFlag = true
-				// 	this.stopBuoyDraw()
-				// 	this.bouyReturnToPreviousFlag = false
-				// 	this.recoveryBuoyDraw()
-				// }
+				console.log("**********************等我一下，我在缓冲********************************")
 			},
 			// 浮标 加光回调
 			bouyClickCommonOptionTodo() {
