@@ -73,12 +73,12 @@
 				<!-- <canvas canvas-id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas> -->
 				<canvas type="2d" id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas>
 			</view>
-			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" @loadedmetadata="loadeddata" -->
-			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform}">
+			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" @loadedmetadata="loadeddata"  -->
+			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform} ">
 				<video v-if="videoShowFlag" :src="videoUrl"  :show-mute-btn="true" :show-fullscreen-btn="false" :autoplay="autopalyFlag"
 				 id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="progressGestureFlag" @ended="videoEnd(false)"
-				 @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart" auto-pause-if-navigate @error="videoError"
-				 @timeupdate="videoTimeupdate" :controls="controlsFlag" @play="videoPlay" @waiting="waitingVideo"></video>
+				 @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart"  @error="videoError" auto-pause-if-navigate
+				 @timeupdate="videoTimeupdate" :controls="controlsFlag" @play="videoPlay" @waiting="waitingVideo"  @loadedmetadata="loadeddata"></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
 				'background-repeat':'no-repeat', backgroundSize:'100% 100%'}"></view>
@@ -752,7 +752,7 @@
 		onLoad(option) {
 			// this.videoShowFlag = true
 			//初始化video对象
-			this.videoContext = uni.createVideoContext('myVideo')
+			this.videoContext = uni.createVideoContext('myVideo',this)
 			console.log("%%%%%%%%%%%%%%%%%%%%%videoContext%%%%%%%%%%%",this.videoContext)
 			this.token = uni.getStorageSync('token')
 			// 初始化看广告获取光的数量
@@ -873,8 +873,9 @@
 		},
 		methods: {
 			videoError(e){
-				wx.reLaunch({
-					url: 'play?pkArtworkId='+this.artworkId
+				uni.setStorageSync("relaunchApplets",true)
+				uni.switchTab({
+					url: '../dishover/dishover'
 				})
 				console.log("********************我报错了*********: ",e)
 			},
@@ -1507,7 +1508,7 @@
 				
 				//获取视频的宽高时长
 				// console.log('artworkTree.videoInfo: ',artworkTree.videoInfo)
-				if(typeof(artworkTree.videoInfo) != "undefined" && artworkTree.videoInfo){
+				/* if(typeof(artworkTree.videoInfo) != "undefined" && artworkTree.videoInfo){
 					let arr = artworkTree.videoInfo.split(',')
 					console.log('initPlayData视频信息: ',artworkTree.videoInfo)
 					this.videoHeight = arr[0]
@@ -1516,7 +1517,7 @@
 					console.log('时长: ',this.duration,'视频高: ',this.videoHeight,'视频宽: ',this.videoWidth)
 					let date = this.formatDate(this.duration)
 					this.durationStr = date
-				}
+				} */
 
 				//随机数
 				const uuid = Math.random().toString(36).substring(2)
@@ -1585,10 +1586,8 @@
 						this.endFlag = false;
 					}
 				}
-				console.log("这是init调用loadeddata", (new Date()).valueOf())
-				
 				//加载视频数据
-				this.loadeddata()
+				// this.loadeddata()
 				
 				//非跳转节点的目标节点存播放记录
 				if (this.linkNodeId != this.detailId) {
@@ -3181,12 +3180,12 @@
 			},
 			// 校正视频播放的黑边 单位px
 			validateVerticalWindowSize() {
-				// let videoInfo = uni.getStorageSync('videoSize')
+				let videoInfo = uni.getStorageSync('videoSize')
 				let windowSize = uni.getStorageSync('windowSize')
-				let videoHeight = this.videoHeight + 0
-				let videoWidth = this.videoWidth + 0
-				// let videoHeight = videoInfo.videoHeight + 0
-				// let videoWidth = videoInfo.videoWidth + 0
+				// let videoHeight = this.videoHeight + 0
+				// let videoWidth = this.videoWidth + 0
+				let videoHeight = videoInfo.videoHeight + 0
+				let videoWidth = videoInfo.videoWidth + 0
 				let videoRate = videoWidth / videoHeight
 				//dh dw canvas宽高  ch cw是窗口宽高
 				let vh, vw, dh, dw, ch, cw
@@ -3280,12 +3279,12 @@
 			},
 			// 用来确定横屏播放时canvas画布的大小和video的大小
 			validateHorizontalWindowSize(windowWidth, windowHeight) {
-				// let videoInfo = uni.getStorageSync('videoSize')
+				let videoInfo = uni.getStorageSync('videoSize')
 				let windowSize = uni.getStorageSync('windowSize')
-				// let videoHeight = videoInfo.videoHeight + 0
-				// let videoWidth = videoInfo.videoWidth + 0
-				let videoHeight = this.videoHeight + 0
-				let videoWidth = this.videoWidth + 0
+				let videoHeight = videoInfo.videoHeight + 0
+				let videoWidth = videoInfo.videoWidth + 0
+				// let videoHeight = this.videoHeight + 0
+				// let videoWidth = this.videoWidth + 0
 				let videoRate = videoWidth / videoHeight
 				//dh dw canvas宽高  ch cw是窗口宽高
 				let vh, vw, dh, dw, ch, cw
@@ -3341,8 +3340,9 @@
 					}
 				})
 			},
-			loadeddata() {
+			loadeddata(e) {
 				// 浮标作品 禁用所有的进度条
+				console.log("%%%%%%%%%%%%%%%%%%%%%videoContext%%%%%%%%%%%",this.videoContext)
 				if (this.bouyNodeFlage) {
 					//浮标视频不显示原生开关
 					this.controlsFlag = false
@@ -3388,9 +3388,9 @@
 					}
 				}
 				//TODO 修改
-				// this.duration = e.detail.duration
-				// let date = this.formatDate(this.duration)
-				// this.durationStr = date
+				this.duration = e.detail.duration
+				let date = this.formatDate(this.duration)
+				this.durationStr = date
 				// 浮标修改
 				console.log("!this.bouyNodeFlage", !this.bouyNodeFlage)
 				if (!this.bouyNodeFlage) {
@@ -3414,10 +3414,10 @@
 					this.likabilityFlag = false
 				}, 5000)
 				//TODO 修改
-				/* uni.setStorageSync('videoSize', {
+				uni.setStorageSync('videoSize', {
 					videoHeight: e.detail.height,
 					videoWidth: e.detail.width
-				}) */
+				})
 				//加载完视频加载视频的尺寸
 				if (uni.getStorageSync('playMode') == 1) {
 					this.playMode = 1
