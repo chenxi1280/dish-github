@@ -73,12 +73,12 @@
 				<!-- <canvas canvas-id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas> -->
 				<canvas type="2d" id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas>
 			</view>
-			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" @loadedmetadata="loadeddata"  -->
+			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" @loadedmetadata="loadeddata"  :controls="controlsFlag" -->
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform} ">
-				<video v-if="videoShowFlag" :src="videoUrl"  :show-mute-btn="false" :show-fullscreen-btn="false" :autoplay="autopalyFlag"
+				<video v-if="videoShowFlag" :controls="false" :src="videoUrl"  :show-mute-btn="false" :show-fullscreen-btn="false" :autoplay="autopalyFlag"
 				 id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="progressGestureFlag" @ended="videoEnd(false)"
 				 @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart"  @error="videoError" auto-pause-if-navigate
-				 @timeupdate="videoTimeupdate" :controls="controlsFlag" @play="videoPlay" @waiting="waitingVideo"  @loadedmetadata="loadeddata" :show-play-btn="false"></video>
+				 @timeupdate="videoTimeupdate" @play="videoPlay" @waiting="waitingVideo"  @loadedmetadata="loadeddata" :show-play-btn="false"></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
 				'background-repeat':'no-repeat', backgroundSize:'100% 100%'}"></view>
