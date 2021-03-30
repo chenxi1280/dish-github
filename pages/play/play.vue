@@ -73,12 +73,12 @@
 				<!-- <canvas canvas-id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas> -->
 				<canvas type="2d" id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas>
 			</view>
-			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" @loadedmetadata="loadeddata" -->
-			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform}">
-				<video v-if="videoShowFlag" :src="videoUrl" :autoplay="autopalyFlag" :show-mute-btn="true" :show-fullscreen-btn="false"
+			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" @loadedmetadata="loadeddata"  -->
+			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform} ">
+				<video v-if="videoShowFlag" :src="videoUrl"  :show-mute-btn="true" :show-fullscreen-btn="false" :autoplay="autopalyFlag"
 				 id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="progressGestureFlag" @ended="videoEnd(false)"
-				 @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart" auto-pause-if-navigate 
-				 @timeupdate="videoTimeupdate" :controls="controlsFlag" @play="videoPlay" @waiting="waitingVideo"></video>
+				 @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart"  @error="videoError" auto-pause-if-navigate
+				 @timeupdate="videoTimeupdate" :controls="controlsFlag" @play="videoPlay" @waiting="waitingVideo"  @loadedmetadata="loadeddata"></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
 				'background-repeat':'no-repeat', backgroundSize:'100% 100%'}"></view>
@@ -367,7 +367,7 @@
 					<image :src = "buoyDialogImageSrc"></image>
 				</view>
 				<view class="buoyDialogPrintWords"  v-if="!buoyDialogImageFlag">
-					<textarea v-model="buoyDialogWords"></textarea>
+					<textarea v-model="buoyDialogWords" disabled = "true"></textarea>
 				</view>
 			</view>
 		</view>
@@ -705,7 +705,11 @@
 				buoyDialogImageSrc: null,
 				//字符其实下标
 				i: 0,
-				otherAppletsReturnFlag: false
+				otherAppletsReturnFlag: false,
+				//浮标自选开关
+				buoyAutoChooseFlag: false,
+				//跳转到其他小程序的节流历史时间参数
+				historyTimestamp: 0
 			}
 		},
 		onReady() {
@@ -739,18 +743,17 @@
 			this.endFlag = true;
 			//重置用户选项分数
 			uni.setStorageSync('userScore', [])
-			//重置好感度数组
+			//重置好感度数组js 判断对象是否为空
 			this.likabilityArray = []
 			//获取一颗作品树
 			this.getArtworkTreeByArtworkId()
 			this.isBouyClickCommonOptionTodo()
 		},
 		onLoad(option) {
-			console.log('进入play1！！！！')
 			// this.videoShowFlag = true
-			console.log('cookieToken', uni.getStorageInfoSync('cookieToken'))
 			//初始化video对象
-			this.videoContext = uni.createVideoContext('myVideo')
+			this.videoContext = uni.createVideoContext('myVideo',this)
+			console.log("%%%%%%%%%%%%%%%%%%%%%videoContext%%%%%%%%%%%",this.videoContext)
 			this.token = uni.getStorageSync('token')
 			// 初始化看广告获取光的数量
 			this.rewardLight = uni.getStorageSync('rewardLight') || 3
@@ -805,6 +808,8 @@
 			globalBus.$off('bouyClickCommonOptionTodo')
 		},
 		onShow() {
+			uni.removeStorageSync('popupState')
+			uni.removeStorageSync('popupSettings')
 			console.log('进入play！！！！')
 			//当跳转到其他小程序时设置一个开关当跳回当前小程序时触发页面onShow 此时根据开关控制video是否播放 开关用完就关
 			if(this.otherAppletsReturnFlag){
@@ -814,6 +819,7 @@
 				},500)
 				this.otherAppletsReturnFlag = false
 			}
+			globalBus.$emit('bouyClickCommonOptionTodo')
 		},
 		onUnload() {
 			uni.removeStorageSync('popupState')
@@ -866,14 +872,27 @@
 			}
 		},
 		methods: {
+			videoError(e){
+				uni.setStorageSync("relaunchApplets",true)
+				uni.switchTab({
+					url: '../dishover/dishover'
+				})
+				console.log("********************我报错了*********: ",e)
+			},
 			//点击浮标选项弹窗关闭按钮事件
 			closeBuoyDialog(){
 				this.buoyDialogFlag = false
 				this.buoyDialogWords = null
 				this.i = 0
+				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index1***********************************",this.optionIndex)
 				let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
 				if(buoyPopInfo.buoyStatus){
-					this.againPlayVideo()
+					if(this.isVideoEndFlag){
+						this.againPlayVideo()
+					}else{
+						console.log("**************************recoveryBuoyDraw*****************")
+						this.recoveryBuoyDraw()
+					}
 				}else{
 					this.clickCommonOptionTodo(this.optionIndex)
 				}
@@ -895,6 +914,19 @@
 
 			//浮标选项点击跳转到其他小程序
 			JumpToOtherApplets(appId, navigatorUrl) {
+				//节流
+					let currentTimestamp = (new Date()).valueOf()
+					// console.log("***************************currentTimestamp:",currentTimestamp, this.historyTimestamp)
+					// console.log("***************************historyTimestamp:",this.historyTimestamp)
+					// console.log('buoyTimestamp', buoyTimestamp)
+					if (this.historyTimestamp !== 0 && currentTimestamp - this.historyTimestamp < 500) {
+						console.log("***************************111111111111111111111")
+						this.historyTimestamp = currentTimestamp
+						return
+					}
+					console.log("***************************2222222222222222222222222")
+					this.historyTimestamp = currentTimestamp
+				//把用过的时间赋值给历史时间
 				this.videoContext.pause()
 				this.otherAppletsReturnFlag = true
 				console.log("进来跳转了")
@@ -1483,7 +1515,7 @@
 				
 				//获取视频的宽高时长
 				// console.log('artworkTree.videoInfo: ',artworkTree.videoInfo)
-				if(typeof(artworkTree.videoInfo) != "undefined" && artworkTree.videoInfo){
+				/* if(typeof(artworkTree.videoInfo) != "undefined" && artworkTree.videoInfo){
 					let arr = artworkTree.videoInfo.split(',')
 					console.log('initPlayData视频信息: ',artworkTree.videoInfo)
 					this.videoHeight = arr[0]
@@ -1492,7 +1524,7 @@
 					console.log('时长: ',this.duration,'视频高: ',this.videoHeight,'视频宽: ',this.videoWidth)
 					let date = this.formatDate(this.duration)
 					this.durationStr = date
-				}
+				} */
 
 				//随机数
 				const uuid = Math.random().toString(36).substring(2)
@@ -1501,8 +1533,6 @@
 				this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
 				this.parentId = artworkTree.parentId
 				this.imageSrc = artworkTree.nodeLastImgUrl
-				
-				this.loadeddata()
 				
 				//如果是根节点初始化存储节点分值的容器
 				if (this.parentId === 0) {
@@ -1563,6 +1593,9 @@
 						this.endFlag = false;
 					}
 				}
+				//加载视频数据
+				// this.loadeddata()
+				
 				//非跳转节点的目标节点存播放记录
 				if (this.linkNodeId != this.detailId) {
 					// 将作品detailId留存提供给故事线
@@ -1578,6 +1611,7 @@
 					uni.setStorageSync("pkDetailIds", this.playedHistoryArray);
 					this.linkNodeId = null
 				}
+				
 			},
 			//视频 播放后弹窗
 			popupWindowByPopupPositonEqualsOne() {
@@ -2230,7 +2264,7 @@
 					// 浮标修改
 					else if (this.isPosition === 2) {
 						//节流
-						let buoyTimestamp = (new Date()).valueOf();
+						let buoyTimestamp = (new Date()).valueOf()
 						console.log('buoyTimestamp', buoyTimestamp)
 						if (buoyTimestamp - this.buoyTimestamp < 100) {
 							console.log('没节流')
@@ -2246,10 +2280,11 @@
 							//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
 							this.againPlayVideo()
 						}else{
+							this.buoyAutoChooseFlag = true
 							this.clickCommonOptionTodo(0)
 						}
 						
-
+						
 
 						// console.log(this.buoyRectList)
 						// return
@@ -2282,7 +2317,7 @@
 				this.multipleResultFlag = false
 				this.isVideoEndFlag = false
 				this.isGetMultipleFlag = false
-
+				this.videoloadFlag = false
 				if (this.waitingVideoFlag) {
 					if (this.bouyNodeFlage) {
 						console.log('play里面的  recoveryBuoyDraw 被启动了')
@@ -3152,12 +3187,12 @@
 			},
 			// 校正视频播放的黑边 单位px
 			validateVerticalWindowSize() {
-				// let videoInfo = uni.getStorageSync('videoSize')
+				let videoInfo = uni.getStorageSync('videoSize')
 				let windowSize = uni.getStorageSync('windowSize')
-				let videoHeight = this.videoHeight + 0
-				let videoWidth = this.videoWidth + 0
-				// let videoHeight = videoInfo.videoHeight + 0
-				// let videoWidth = videoInfo.videoWidth + 0
+				// let videoHeight = this.videoHeight + 0
+				// let videoWidth = this.videoWidth + 0
+				let videoHeight = videoInfo.videoHeight + 0
+				let videoWidth = videoInfo.videoWidth + 0
 				let videoRate = videoWidth / videoHeight
 				//dh dw canvas宽高  ch cw是窗口宽高
 				let vh, vw, dh, dw, ch, cw
@@ -3251,12 +3286,12 @@
 			},
 			// 用来确定横屏播放时canvas画布的大小和video的大小
 			validateHorizontalWindowSize(windowWidth, windowHeight) {
-				// let videoInfo = uni.getStorageSync('videoSize')
+				let videoInfo = uni.getStorageSync('videoSize')
 				let windowSize = uni.getStorageSync('windowSize')
-				// let videoHeight = videoInfo.videoHeight + 0
-				// let videoWidth = videoInfo.videoWidth + 0
-				let videoHeight = this.videoHeight + 0
-				let videoWidth = this.videoWidth + 0
+				let videoHeight = videoInfo.videoHeight + 0
+				let videoWidth = videoInfo.videoWidth + 0
+				// let videoHeight = this.videoHeight + 0
+				// let videoWidth = this.videoWidth + 0
 				let videoRate = videoWidth / videoHeight
 				//dh dw canvas宽高  ch cw是窗口宽高
 				let vh, vw, dh, dw, ch, cw
@@ -3303,15 +3338,24 @@
 				})
 			},
 			goDiscover() {
-				console.log('我触发了')
-				uni.switchTab({
-					url: '../dishover/dishover',
+				/* console.log('我触发了')
+				this.videoContext.play() */
+				uni.navigateBack({
+					delta: 1,
 					fail(err) {
 						console.log('跳转失败:', err)
 					}
 				})
 			},
-			loadeddata() {
+			loadeddata(e) {
+				// 浮标作品 禁用所有的进度条
+				console.log("%%%%%%%%%%%%%%%%%%%%%videoContext%%%%%%%%%%%",this.videoContext)
+				if (this.bouyNodeFlage) {
+					//浮标视频不显示原生开关
+					this.controlsFlag = false
+					clearTimeout(this.horizontalControlsFunction)
+					this.horizontalControlsFlags = false
+				}
 				//for ios 浮标作品 不自动播放的问题
 				if (this.bouyNodeFlage) {
 					this.videoContext.pause()
@@ -3351,15 +3395,15 @@
 					}
 				}
 				//TODO 修改
-				// this.duration = e.detail.duration
-				// let date = this.formatDate(this.duration)
-				// this.durationStr = date
-				console.log('需要重投开始播放吗', this.bouyNodeFlage)
+				this.duration = e.detail.duration
+				let date = this.formatDate(this.duration)
+				this.durationStr = date
 				// 浮标修改
 				console.log("!this.bouyNodeFlage", !this.bouyNodeFlage)
 				if (!this.bouyNodeFlage) {
 					//判断是不是故事线跳转过来的第一个视频 第一个视频需要快进到结尾进行播放
 					if (this.isPlayedFlag) {
+						console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", (this.duration - 3).toFixed(0))
 						this.videoContext.seek(parseInt((this.duration - 3).toFixed(0)))
 						this.isPlayedFlag = false
 					}
@@ -3367,7 +3411,7 @@
 					this.isPlayedFlag = false
 				}
 				//加载完成将入场loading关闭
-				this.videoloadFlag = false
+				//this.videoloadFlag = false
 				//展示故事线和举报
 				this.hiddenBtnFlag = true
 				//展示好感度
@@ -3377,10 +3421,10 @@
 					this.likabilityFlag = false
 				}, 5000)
 				//TODO 修改
-				/* uni.setStorageSync('videoSize', {
+				uni.setStorageSync('videoSize', {
 					videoHeight: e.detail.height,
 					videoWidth: e.detail.width
-				}) */
+				})
 				//加载完视频加载视频的尺寸
 				if (uni.getStorageSync('playMode') == 1) {
 					this.playMode = 1
@@ -3417,23 +3461,36 @@
 					}
 					// 浮标改动
 				} else if (this.isPosition === 2) {
-					// console.log('我又进来了')
+					console.log('我又进来了')
 					this.showBuoyCanvasFlag = true
 					this.initVerticalBuoyCanvas()
 				}
 				if (this.returnToPreviousFlag && this.bouyNodeFlage) {
 					console.log("************bouySectionTime2s: ", this.bouySectionTime)
 					this.bouyReturnToPreviousFlag = true
-					//视频暂停
-					// console.log('bouySectionTime',this.bouySectionTime == 0 ? 0 : parseInt(this.bouySectionTssime) -1)
+					
+					if(this.buoyAutoChooseFlag){
+						//获取浮标视频的选项初始渲染时间
+						let historyNodeBuoyList = uni.getStorageSync("historyNodeBuoyList")
+						for (let i = 0; i < historyNodeBuoyList.length; i++) {
+							let currentId = historyNodeBuoyList[i].fkNodeId
+							let detailId = this.childs[0].pkDetailId
+							console.log("************$$$$$$$$$$$$$$$$$$$$$detailId return: ", detailId)
+							//此处还是不能使用this.detailId来对比要使用历史记录的来对比 因为返回的节点可能是跳转节点
+							if (currentId == detailId) {
+								this.bouySectionTime = historyNodeBuoyList[i].buoySectionTime
+								this.buoyAutoChooseFlag = false
+								break
+							}
+						}
+					}
+					console.log("************$$$$$$$$$$$$$$$$$$$this.videoContext return: ", this.videoContext)
 					this.videoContext.seek(this.bouySectionTime == 0 ? 0 : parseInt(this.bouySectionTime) - 1)
-					this.videoContext.pause()
-					this.videoContext.play()
 					this.returnToPreviousFlag = false
 				}
 			},
 			videoTimeupdate(e) {
-
+			
 				//获取视频当前时间
 				this.currentTime = e.detail.currentTime
 				//获取视频当前时间
@@ -3883,7 +3940,18 @@
 
 			// 初始化浮标 对象 List
 			initializationBuoyList() {
-				console.log(this.ecmArtworkNodeBuoyList)
+				
+				// let buoyInitTimestamp = (new Date()).valueOf();
+				// console.log('buoyInitTimestamp', buoyInitTimestamp)
+				// if (buoyInitTimestamp - this.buoyInitTimestamp < 1000) {
+				// 	console.log('buoyInitTimestamp节流')
+				// 	return
+				// }
+				// console.log('buoyInitTimestamp没有节流')
+				// this.buoyInitTimestamp = buoyInitTimestamp
+				this.canvasNodeBuoyList = []
+				
+				
 				let hList = uni.getStorageSync('historyNodeBuoyList')
 				this.ecmArtworkNodeBuoyList.forEach((nodeBuoyList, index) => {
 					let aList = []
@@ -3891,7 +3959,7 @@
 						if (v.buoyType == 0) {
 							let aFlag = true
 							hList.forEach(n => {
-								console.log('v.nodeId ', v, 'n.nodeId', n.fkNodeId)
+								// console.log('v.nodeId ', v, 'n.nodeId', n.fkNodeId)
 								if (v.fkNodeId == n.fkNodeId) {
 									aFlag = false
 								}
@@ -3906,6 +3974,7 @@
 						if (v.buoyType != 2) {
 							if (uni.getStorageSync('playMode') == 1) {
 								// console.log("横屏")
+								// for test v.buoyOpacity
 								let rectOpacity = (v.buoyOpacity - 0) / 100
 
 								let rectX = parseInt(((1 - (v.buoyCoordinateY - 0) - (v.buoyHigh - 0)) * this.canvasWidth).toFixed(0))
@@ -3947,6 +4016,7 @@
 								aList.push(buoy)
 							} else {
 								// console.log("竖屏")
+								// for test v.buoyOpacity
 								let rectOpacity = (v.buoyOpacity - 0) / 100
 
 								let rectX = parseInt(((v.buoyCoordinateX - 0) * this.canvasWidth).toFixed(0))
@@ -3994,7 +4064,7 @@
 
 					})
 					this.canvasNodeBuoyList.push(aList)
-					// console.log("这是初始化",this.canvasNodeBuoyList[0])
+					console.log("这是初始化",this.canvasNodeBuoyList)
 				})
 				uni.setStorageSync('historyNodeBuoyList', hList)
 				// this.startBuoy()
@@ -4012,13 +4082,13 @@
 
 				let stopFlag = false
 				// console.log('nowBuoyRectList',nowBuoyRectList)
-				// console.log('newY',newY,'newX',newX)
+				console.log('newY',newY,'newX',newX)
 				// console.log('nowBuoyRectList',nowBuoyRectList)
+				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$nowBuoyRectList***********************************",nowBuoyRectList)
 
 				nowBuoyRectList.forEach((v, i) => {
 					if (v != null) {
-
-
+						
 						if (v.x <= newX && (v.x + v.rectW) >= newX) {
 							// 加10 增加判定区域
 							if (v.y <= newY && (v.y + v.rectH) >= newY) {
@@ -4026,6 +4096,7 @@
 								this.optionIndex = i
 								console.log(this.getBuoyPopInfo(i))
 								let buoyPopInfo = this.getBuoyPopInfo(i)
+								console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index2***********************************",i)
 								// buoyStatus 弹窗是否开启 1开启 0默认选项
 								if(buoyPopInfo.buoyStatus){
 									//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
@@ -4043,6 +4114,7 @@
 										this.buoyDialogImageFlag = true
 									}
 								}else{
+									this.buoyAutoChooseFlag = false
 									this.clickCommonOptionTodo(i)
 								}
 								
@@ -4284,7 +4356,7 @@
 				// 	this.buoyRectList.push(this.initializationBuoy(v.x,v.y,v.rectW,v.rectH,v.vx,v.vy,v.opacity,v.nodeId,v.buoySectionTime,v.buoyType))
 				// })
 				// console.log('this.buoyRectList111 ',this.buoyRectList )
-				//视频回复
+				//视频回复 
 				this.videoContext.play()
 				//canvas 回来
 				this.showBuoyCanvasFlag = true
@@ -4348,13 +4420,7 @@
 
 			//视频进入 缓冲
 			waitingVideo() {
-				// console.log(this.returnToPreviousFlag,'this.returnToPreviousFlag')
-				// if (this.bouyNodeFlage && !this.bouyReturnToPreviousFlag) {
-				// 	this.waitingVideoFlag = true
-				// 	this.stopBuoyDraw()
-				// 	this.bouyReturnToPreviousFlag = false
-				// 	this.recoveryBuoyDraw()
-				// }
+				console.log("**********************等我一下，我在缓冲********************************")
 			},
 			// 浮标 加光回调
 			bouyClickCommonOptionTodo() {
@@ -4401,21 +4467,28 @@
 			},
 			// 获取改浮弹窗信息
 			getBuoyPopInfo(index) {
-				if (this.ecmArtworkNodeBuoyList[index][0] == null) {
+				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index3***********************************",index)
+				console.log("$$$$$$$$$$$$$this.ecmArtworkNodeBuoyList*********************************",this.ecmArtworkNodeBuoyList)
+				console.log("$$$$$$$$$$$$$this.ecmArtworkNodeBuoyList*********************************",this.canvasNodeBuoyList)
+				if (this.ecmArtworkNodeBuoyList.length >= index + 1) {
+						if (this.ecmArtworkNodeBuoyList[index][0] == null) {
+						  return null
+						} else {
+							return {
+								//弹窗是否开启 1开启 0默认选项
+								buoyStatus:this.ecmArtworkNodeBuoyList[index][0].buoyStatus,
+								//类型有三种 对应 0其他小程序 1文字 2图片
+								buoyPopType:this.ecmArtworkNodeBuoyList[index][0].buoyPopType,
+								//类型有三种 0小程序的页面路径 1文字的文本信息 2图片的url
+								buoyPopContext:this.ecmArtworkNodeBuoyList[index][0].buoyPopContext,
+								//小程序的appid
+								buoyPopAppId:this.ecmArtworkNodeBuoyList[index][0].buoyPopAppId,
+								fkNodeId:this.ecmArtworkNodeBuoyList[index][0].fkNodeId,
+								pkBuoyId:this.ecmArtworkNodeBuoyList[index][0].pkBuoyId
+							}
+						}
+				}else {
 					return null
-				} else {
-					return {
-						//弹窗是否开启 1开启 0默认选项
-						buoyStatus:this.ecmArtworkNodeBuoyList[index][0].buoyStatus,
-						//类型有三种 对应 0其他小程序 1文字 2图片
-						buoyPopType:this.ecmArtworkNodeBuoyList[index][0].buoyPopType,
-						//类型有三种 0小程序的页面路径 1文字的文本信息 2图片的url
-						buoyPopContext:this.ecmArtworkNodeBuoyList[index][0].buoyPopContext,
-						//小程序的appid
-						buoyPopAppId:this.ecmArtworkNodeBuoyList[index][0].buoyPopAppId,
-						fkNodeId:this.ecmArtworkNodeBuoyList[index][0].fkNodeId,
-						pkBuoyId:this.ecmArtworkNodeBuoyList[index][0].pkBuoyId
-					}
 				}
 			},
 

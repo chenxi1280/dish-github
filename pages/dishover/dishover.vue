@@ -137,6 +137,24 @@
 		},
 		onShow() {
 			this.getLight()
+			console.log("*****************************************relaunchApplets",uni.getStorageSync("relaunchApplets"))
+			if(uni.getStorageSync("relaunchApplets") == true){
+				console.log("*****************************************重播")
+				uni.reLaunch({
+					url: 'dishover',
+					success() {
+						/* console.log("*****************************************play")
+						console.log("*****************************************detailId",uni.getStorageSync("detailId"))
+						uni.navigateTo({
+							url: "../play/play?pkArtworkId=" + uni.getStorageSync("detailId"),
+						}) */
+					},
+					fail(res) {
+							console.log("*****************************************reLaunch fail: ",res)
+					}
+				})
+				uni.setStorageSync("relaunchApplets",false)
+			}
 		},
 		onLoad() {
 			uni.showShareMenu({
