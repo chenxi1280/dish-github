@@ -3514,7 +3514,7 @@
 				console.log("%%%%%%%%%%%%%%%%%%%%%videoContext%%%%%%%%%%%",this.videoContext)
 				if (this.bouyNodeFlage) {
 					//浮标视频不显示原生开关
-					this.controlsFlag = false
+					this.controlsFlag = true
 					clearTimeout(this.horizontalControlsFunction)
 					this.horizontalControlsFlags = false
 				}
