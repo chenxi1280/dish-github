@@ -46,7 +46,12 @@
 						if(res.data.data != null){
 							res.data.data.forEach(v => {
 								v.high = 287.1
-								if (v.logoPath != null) {
+								if (v.userLogoUrl != null) {
+									if (v.userLogoUrl.indexOf( '/mobilePop') == -1) {
+										v.userLogoUrl = v.userLogoUrl + '/mobilePop'
+									}
+								}
+								if (v.logoPath != null && v.logoPath != '') {
 									if (v.logoPath.indexOf( '/common') == -1) {
 										v.logoPath = v.logoPath + '/common'
 									}

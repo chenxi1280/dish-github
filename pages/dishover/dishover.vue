@@ -318,12 +318,16 @@
 							if (res.data.data.list.length != 0) {
 								res.data.data.list.forEach(v => {
 									v.high = 287.1
-									if (v.logoPath != null) {
-										if (v.logoPath.indexOf( '/common') == -1) {
-											v.logoPath = v.logoPath + '/common'
-										}
+								if (v.userLogoUrl != null) {
+									if (v.userLogoUrl.indexOf( '/mobilePop') == -1) {
+										v.userLogoUrl = v.userLogoUrl + '/mobilePop'
 									}
-									this.hotList.push(v)
+								}
+								if (v.logoPath != null && v.logoPath != '') {
+									if (v.logoPath.indexOf( '/common') == -1) {
+										v.logoPath = v.logoPath + '/common'
+									}
+								}									this.hotList.push(v)
 								})
 								if (res.data.data.loadStatus != null ) {
 									this.hotLoadStatus = 'nomore'
@@ -362,7 +366,12 @@
 							if (res.data.data != null) {
 								res.data.data.forEach(v => {
 									v.high = 287.1
-									if (v.logoPath != null) {
+									if (v.userLogoUrl != null) {
+										if (v.userLogoUrl.indexOf( '/mobilePop') == -1) {
+											v.userLogoUrl = v.userLogoUrl + '/mobilePop'
+										}
+									}
+									if (v.logoPath != null && v.logoPath != '') {
 										if (v.logoPath.indexOf( '/common') == -1) {
 											v.logoPath = v.logoPath + '/common'
 										}

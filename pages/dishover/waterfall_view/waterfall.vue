@@ -159,12 +159,9 @@
 
 
 	.demo-warter {
-		border-radius: 8px !important;
 		margin: 5px;
 		background-color: #ffffff;
 		padding: 8px;
-		height: 240px !important;
-		border: 10rpx solid red !important;
 		position: relative;
 	}
 
