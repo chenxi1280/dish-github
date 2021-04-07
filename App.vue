@@ -15,35 +15,62 @@
 				language: null
 		    }
 		},
-		 methods: {　　　　　　
+		 methods: {
+			checkUpdate(){
+				const updateManager = uni.getUpdateManager();
+				updateManager.onCheckForUpdate(function (res) {
+				    // 请求完新版本信息的回调
+					console.log("是否有更新: ",res.hasUpdate);
+					if(res.hasUpdate){
+						this.updateApplets()
+					}
+				});
+				updateManager.onUpdateFailed(function (res) {
+					this.checkUpdate()
+				});
+			},
+			updateApplets(){
+				updateManager.onUpdateReady(function (res) {
+				    uni.showModal({
+						title: '更新提示',
+						content: '新版本已经准备好，是否重启应用？',
+						success(res) {
+							if (res.confirm) {
+								 // 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
+								updateManager.applyUpdate();
+							}
+						}
+					});
+				});
+			},
 			login() {
 					let _this = this
 					uni.login({
-							provider: 'weixin',
-							success: async loginRes => {
-									let code = loginRes.code
-									await uni.request({
-											url: baseURL + '/getOpenid',
-											data: {
-													code: code,
-											},
-											method: 'POST',
-											header: {
-													'content-type': 'application/json'
-											},
-											success: res => {
-					if (res.data.status == 200) {
-							uni.setStorageSync("openid",res.data.data.openid)
-							_this.updateUserInfo()
-						}else{
-							return uni.showToast({
-							icon: 'none',
-							title: '授权失败，请退出重新进入小程序'
+						provider: 'weixin',
+						success: async loginRes => {
+							let code = loginRes.code
+							await uni.request({
+								url: baseURL + '/getOpenid',
+								data: {
+										code: code,
+								},
+								method: 'POST',
+								header: {
+										'content-type': 'application/json'
+								},
+								success: res => {
+									if (res.data.status == 200) {
+										uni.setStorageSync("openid",res.data.data.openid)
+										_this.updateUserInfo()
+									}else{
+										return uni.showToast({
+										icon: 'none',
+										title: '授权失败，请退出重新进入小程序'
+										})
+									}
+								}
 							})
-						}
-				}
-									})
-							},
+						},
 					})
 			},
 			async updateUserInfo() {
@@ -80,6 +107,7 @@
 			},
 			onLaunch: function() {
 				let _this = this;
+				_this.checkUpdate()
 				let openid = uni.getStorageSync("openid")
 				if(openid){
 					uni.navigateTo({
@@ -89,27 +117,7 @@
 				}else{
 					_this.login()
 				}
-
-				const updateManager = wx.getUpdateManager()
-				updateManager.onCheckForUpdate(function (res) {
-				// 请求完新版本信息的回调
-				console.log(res.hasUpdate, '新版本信息')
-				})
-				updateManager.onUpdateReady(function () {
-				wx.showModal({
-					title:'更新提示',
-					content:'新版本已经准备好，是否马上重启小程序？',
-					success:function (res) {
-						if (res.confirm) {
-							// 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
-							updateManager.applyUpdate()
-						}
-					}
-				})
-				})
-				updateManager.onUpdateFailed(function () {
-				// 新的版本下载失败
-				})
+				
 			},
 			onShow: function() {
 				console.log('App Show')
