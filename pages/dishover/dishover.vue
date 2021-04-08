@@ -71,7 +71,7 @@
 
 <script>
 	import {
-		baseURL
+		baseURL,versionId
 	} from '../login/config/config.js'
 	import search from '../search/search'
 	import waterfall from './waterfall_view/waterfall.vue'
@@ -325,7 +325,8 @@
 						data: {
 							page: this.pageHot,
 							limit: this.limit,
-							playClient: 1
+							playClient: 1,
+							versionId: versionId
 						},
 						success: res => {
 							console.log(res.data)
