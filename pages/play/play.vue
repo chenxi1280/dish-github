@@ -76,9 +76,9 @@
 			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" @loadedmetadata="loadeddata"  :controls="controlsFlag" -->
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform} ">
 				<video v-if="videoShowFlag" :controls="false" :src="videoUrl"  :show-mute-btn="false" :show-fullscreen-btn="false" :autoplay="autopalyFlag"
-				 id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="progressGestureFlag" @ended="videoEnd(false)"
+				 id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="false" @ended="videoEnd(false)"
 				 @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart"  @error="videoError" auto-pause-if-navigate
-				 @timeupdate="videoTimeupdate" @play="videoPlay" @waiting="waitingVideo"  @loadedmetadata="loadeddata" :show-play-btn="false"></video>
+				 @timeupdate="videoTimeupdate" @play="videoPlay" @waiting="waitingVideo"  @loadedmetadata="loadeddata" :show-play-btn="false" @click="toggleProgress"></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
 				'background-repeat':'no-repeat', backgroundSize:'100% 100%'}"></view>
@@ -141,7 +141,7 @@
 			<!-- 竖屏 -->
 			<view v-if="hiddenBtnFlag" :style="showStyleFlag?'display: block':'display: none'" class="verticalBox">
 				<!-- 自制进度条 -->
-				<view class="my_progress" style="z-index: 999;">
+				<view class="my_progress" style="z-index: 999;" v-if="isShowMyProgress">
           <view class="play_btn">
             <view class="play_v" v-if="!isPlay" @click="toggleIsPlay(true)"></view>
             <view class="pause_v" v-else @click="toggleIsPlay(false)"></view>
@@ -184,7 +184,7 @@
 			<!-- 横屏 -->
 			<view v-if="hiddenBtnFlag" :style="!showStyleFlag?'display: block':'display: none'" class="horizontalBox">
 				<!-- 自制进度条 -->
-				<view class="my_progress_h">
+				<view class="my_progress_h" v-if="isShowMyProgress">
           <view class="play_btn">
             <view class="play_v" v-if="!isPlay" @click="toggleIsPlay(true)"></view>
             <view class="pause_v" v-else @click="toggleIsPlay(false)"></view>
@@ -435,6 +435,8 @@
 		},
 		data() {
 			return {
+				// 是否显示进度条
+				isShowMyProgress: true,
 				progressWidth: 0,
 				durationBeginTimer: '00:00',
 				durationOverTimer: '00:00',
@@ -915,6 +917,10 @@
 			}
 		}, */
 		methods: {
+			toggleProgress () {
+				if (this.isPosition === 2) return false
+				this.isShowMyProgress = !this.isShowMyProgress
+			},
 			// 点击自制进度条的播放/暂停
 			toggleIsPlay(isPlay) {
 				const video = uni.createVideoContext("myVideo");
@@ -1651,8 +1657,8 @@
 					this.videoShowFlag = true
 				}
 				//是否是定位选项的标志2是浮标 1是定位选项 其他是普通选项
-				console.log('artworkTree', artworkTree)
 				this.isPosition = artworkTree.isPosition
+				console.log('artworkTree', artworkTree)
 				console.log('this.isPosition', this.isPosition)
 				if (this.isPosition == 1) {
 					//获取定位选项位置数据
@@ -5279,7 +5285,7 @@
         background-color: rgba($color: #fff, $alpha: 0.15);
         display: flex;
         .play_btn {
-          width: 40rpx;
+          width: 40px;
           height: 40px;
           view {
             width: 100%;
@@ -5474,7 +5480,7 @@
         background-color: rgba($color: #fff, $alpha: 0.15);
         display: flex;
         .play_btn {
-          width: 40rpx;
+          width: 40px;
           height: 40px;
           view {
             width: 100%;
@@ -5660,7 +5666,7 @@
 
     .storyLineContentMask16 {
       position: fixed;
-      z-index: 16;
+      z-index: 999;
       left: 0;
       top: 0;
       width: 100%;
@@ -5705,7 +5711,7 @@
 
     .reportContentMask16 {
       position: fixed;
-      z-index: 16;
+      z-index: 999;
       left: 0;
       top: 0;
       width: 100%;
