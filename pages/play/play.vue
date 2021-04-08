@@ -76,7 +76,7 @@
 			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" @loadedmetadata="loadeddata"  :controls="controlsFlag" -->
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform} ">
 				<video v-if="videoShowFlag" :controls="false" :src="videoUrl"  :show-mute-btn="false" :show-fullscreen-btn="false" :autoplay="autopalyFlag"
-				 id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="progressGestureFlag" @ended="videoEnd(false)"
+				 id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="false" @ended="videoEnd(false)"
 				 @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart"  @error="videoError" auto-pause-if-navigate
 				 @timeupdate="videoTimeupdate" @play="videoPlay" @waiting="waitingVideo"  @loadedmetadata="loadeddata" :show-play-btn="false" @click="toggleProgress"></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
