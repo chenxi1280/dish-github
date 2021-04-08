@@ -896,7 +896,8 @@
 			}
 
 		},
-		onShareTimeline(res) {
+		//转发到朋友圈
+		/* onShareTimeline(res) {
 			let artworkInfo = uni.getStorageSync('artworkInfo')
 			let param = 'artWorkId=' + artworkInfo.pkArtworkId + '=status=4'
 			let title = artworkInfo.artworkName
@@ -912,7 +913,7 @@
 				imageUrl: imageUrl,
 				path: 'pages/play/play?scene=' + param
 			}
-		},
+		}, */
 		methods: {
 			// 点击自制进度条的播放/暂停
 			toggleIsPlay(isPlay) {
