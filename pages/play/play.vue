@@ -5278,7 +5278,7 @@
         background-color: rgba($color: #fff, $alpha: 0.15);
         display: flex;
         .play_btn {
-          width: 40rpx;
+          width: 40px;
           height: 40px;
           view {
             width: 100%;
@@ -5473,7 +5473,7 @@
         background-color: rgba($color: #fff, $alpha: 0.15);
         display: flex;
         .play_btn {
-          width: 40rpx;
+          width: 40px;
           height: 40px;
           view {
             width: 100%;
@@ -5659,7 +5659,7 @@
 
     .storyLineContentMask16 {
       position: fixed;
-      z-index: 16;
+      z-index: 999;
       left: 0;
       top: 0;
       width: 100%;
@@ -5704,7 +5704,7 @@
 
     .reportContentMask16 {
       position: fixed;
-      z-index: 16;
+      z-index: 999;
       left: 0;
       top: 0;
       width: 100%;
