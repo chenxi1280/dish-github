@@ -920,8 +920,11 @@
 		}, */
 		methods: {
 			toggleProgress () {
-				if (this.isPosition === 2) return false
-				this.isShowMyProgress = !this.isShowMyProgress
+				if (this.isPosition === 2) {
+					this.isShowMyProgress = true
+				} else {
+					this.isShowMyProgress = !this.isShowMyProgress
+				}
 			},
 			// 点击自制进度条的播放/暂停
 			toggleIsPlay(isPlay) {
@@ -4687,10 +4690,10 @@
 .playBox {
   width: 100%;
   height: 100%;
-	
-	.u-drawer {
-		z-index: 9999!important;
-	}
+
+  .u-drawer {
+    z-index: 9999 !important;
+  }
 
   .popupBox {
     width: 100%;
