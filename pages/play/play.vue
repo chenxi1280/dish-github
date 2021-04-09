@@ -17,7 +17,7 @@
 		</view>
 		<!-- 确认观看激励视频广告的弹窗 -->
 		<view v-if="playMode">
-			<u-modal v-model="showAdvertisingFlag" title="温馨提示" :show-confirm-button="false" z-index="999">
+			<u-modal v-model="showAdvertisingFlag" title="温馨提示" :show-confirm-button="false" z-index="9999">
 				<view class="slot-content">
 					<view style="padding: 0 20rpx;padding-top: 40rpx;">
 						<view v-if="isHaveLight">观看作品过程中会消耗光，完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view>
@@ -990,8 +990,11 @@
 				}
 			},
 			toggleProgress () {
-				if (this.isPosition === 2) return false
-				this.isShowMyProgress = !this.isShowMyProgress
+				if (this.isPosition === 2) {
+					this.isShowMyProgress = true
+				} else {
+					this.isShowMyProgress = !this.isShowMyProgress
+				}
 			},
 			// 点击自制进度条的播放/暂停
 			toggleIsPlay(isPlay) {
@@ -1680,6 +1683,7 @@
 			},
 			//对节点播放数据进行筛选和提取
 			initPlayData(artworkTree, isJumpDialogCallbackFlag) {
+				this.isShowMyProgress = true
 				console.log('cookieToken', uni.getStorageInfoSync('cookieToken'))
 				console.log("***********************pkDetailId: ", artworkTree.pkDetailId)
 				if (artworkTree.parentId === 0) {
@@ -4757,6 +4761,10 @@
 .playBox {
   width: 100%;
   height: 100%;
+
+  .u-drawer {
+    z-index: 9999 !important;
+  }
 
   .popupBox {
     width: 100%;
