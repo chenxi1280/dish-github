@@ -794,7 +794,13 @@
 			this.isBouyClickCommonOptionTodo()
 		},
 		onLoad(option) {
-			// this.videoShowFlag = true
+			uni.showShareMenu({
+				withShareTicket: true,
+				menus: ['shareAppMessage']
+			})
+			uni.hideShareMenu({
+				menus: ['shareTimeline']
+			}) 
 			//初始化video对象
 			this.videoContext = uni.createVideoContext('myVideo',this)
 			console.log("%%%%%%%%%%%%%%%%%%%%%videoContext%%%%%%%%%%%",this.videoContext)
@@ -803,10 +809,6 @@
 			this.rewardLight = uni.getStorageSync('rewardLight') || 3
 			this.randomText()
 			this.initLightNum()
-			uni.showShareMenu({
-				withShareTicket: true,
-				menus: ['shareAppMessage', 'shareTimeline']
-			})
 			//option.scene 不为空说明是二维码跳转
 			if (option.scene) {
 				let scene = decodeURIComponent(option.scene);
@@ -898,7 +900,8 @@
 			}
 
 		},
-		onShareTimeline(res) {
+		//转发到朋友圈
+		/* onShareTimeline(res) {
 			let artworkInfo = uni.getStorageSync('artworkInfo')
 			let param = 'artWorkId=' + artworkInfo.pkArtworkId + '=status=4'
 			let title = artworkInfo.artworkName
@@ -914,7 +917,7 @@
 				imageUrl: imageUrl,
 				path: 'pages/play/play?scene=' + param
 			}
-		},
+		}, */
 		methods: {
 			toggleProgress () {
 				if (this.isPosition === 2) return false
