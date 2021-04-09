@@ -1,13 +1,5 @@
 <template>
 	<view class="playBox">
-		<!-- for test -->
-		<view style="width: 200rpx;height: 80rpx;z-index: 1999;position: absolute; left: 0;top: 0;background: rgba(0,0,0,.5);">
-			<input v-model="artworkId" style="width: 200rpx;height: 80rpx;border: 2rpx solid black;color: white;"/>
-		</view>
-		<view style="width: 200rpx;height: 80rpx;z-index: 1999;position: absolute; left: 0;top: 80rpx;background: rgba(0,0,0,.5);">
-			<input v-model="row" style="width: 200rpx;height: 80rpx;border: 2rpx solid black;color: white;"/>
-		</view>
-		
 		<!-- 入场loading -->
 		<view v-if="videoloadFlag" class="videoLoadImageBox" style="z-index: 999;">
 			<!-- <view style="position: absolute;text-align: center;width: 100%;font-size: 40rpx;top: 40%;color: #fff;">Tips :</view> -->
@@ -432,7 +424,6 @@
 	import {
 		horizontalJumpDialog
 	} from '../../components/dialog/horizontalJumpDialog.vue'
-	import eruda from 'eruda'
 	export default {
 		components: {
 			storyLine,
@@ -932,12 +923,9 @@
 			getToken() {
 				let _this = this
 				let openid = uni.getStorageSync("openid")
-				console.log("**************************22")
 				if(openid){
-					console.log("**************************221")
-					_this.updateUserInfo()
+					_this.updateUserInfo(openid)
 				}else{
-					console.log("**************************222")
 					uni.login({
 						provider: 'weixin',
 						success: async loginRes => {
@@ -952,11 +940,9 @@
 										'content-type': 'application/json'
 								},
 								success: res => {
-									console.log("**************************333")
 									if (res.data.status == 200) {
-										console.log("**************************3334")
 										uni.setStorageSync("openid",res.data.data.openid)
-										_this.updateUserInfo()
+										_this.updateUserInfo(res.data.data.openid)
 									}else{
 										return uni.showToast({
 										icon: 'none',
@@ -969,16 +955,15 @@
 					})
 				}
 			},
-			async updateUserInfo() {
+			async updateUserInfo(openid) {
 				let _this = this
 				let token = uni.getStorageSync("token")
-				console.log("**************************token:",token)
+				this.string = token
 				if(!token){
-					console.log("**************************44444")
 					await uni.request({
 						url: baseURL + '/savaUserInfo',
 						data: {
-							openid: uni.getStorageSync("openid"),
+							openid: openid,
 							nickname: _this.nickName,
 							gender: _this.gender,
 							avatarurl: _this.avatarUrl,
@@ -992,12 +977,10 @@
 							'content-type': 'application/json'
 						},
 						success: (res) => {
-							console.log("**************************5555")
 							if (res.data.status == 200) {
 								uni.setStorageSync("token",res.data.data)
-								uni.reLaunch({
-									url: 'pages/dishover/dishover'
-								})
+								_this.token = res.data.data
+								this.getLight()
 								globalBus.$emit('getLightOfAppReady')
 							}
 						}
@@ -1303,6 +1286,49 @@
 				this.lightNumber = uni.getStorageSync('lightNumber') || 0
 				this.ecmUserLightUpLimit = uni.getStorageSync('ecmUserLightUpLimit') || 0
 			},
+			addLight () {
+				uni.request({
+					url: baseURL + '/wxPlay/addLight',
+					method: 'POST',
+					dataType: 'json',
+					data: {
+						token: uni.getStorageSync('token'),
+						eventId: 2
+					},
+					success: res => {
+						uni.showToast({
+							title: '恭喜成功获得光'
+						})
+						this.getLight()
+						this.bouyClickCommonOptionTodo()
+						
+					}
+				})
+			},
+			// 获取光
+			getLight () {
+				uni.request({
+					url: baseURL + '/user/light/getUserLight',
+					method: 'POST',
+					dataType: 'json',
+					data: {
+						token: uni.getStorageSync('token')
+					},
+					header: {
+						'Authorization': uni.getStorageSync('token')
+					},
+					success: res => {
+						if (res.data.status === 200) {
+							this.ecmUserLightUpLimit = res.data.data.ecmUserLightUpLimit
+							this.lightNumber = res.data.data.lightNumber
+							console.log(this.ecmUserLightUpLimit, this.lightNumber)
+							uni.setStorageSync('ecmUserLightUpLimit', this.ecmUserLightUpLimit)
+							uni.setStorageSync('lightNumber', this.lightNumber)
+							globalBus.$emit('initLightStyle')
+						}
+					}
+				})
+			},
 			closeConditionDialog() {
 				this.showConditionAdvertisingFlag = false
 				if (this.isVideoEndFlag) {
@@ -1507,7 +1533,7 @@
 									this.customLightSuccessCallBack(this.touchRectNum)
 								} else {
 									console.log('给光')
-									globalBus.$emit('requestOfAES')
+									this.addLight()
 
 									// 浮标修改
 									if (this.bouyNodeFlage) {
@@ -1526,7 +1552,7 @@
 									this.customLightSuccessCallBack(this.optionIndex)
 								} else {
 									console.log('给光')
-									globalBus.$emit('requestOfAES')
+									this.addLight()
 								}
 							}
 						}
@@ -2147,6 +2173,12 @@
 				});
 			},
 			async customLightByUserId(eventId) {
+				let token = null
+				if(!this.token){
+					token = uni.getStorageSync("token")
+				}else{
+					token = this.token
+				}
 				console.log('扣光了！！！！！', eventId)
 				// 默认假设有光
 				this.isHaveLight = true
@@ -2157,7 +2189,7 @@
 					method: 'POST',
 					dataType: 'json',
 					data: {
-						token: this.token,
+						token: token,
 						eventId: eventId
 					},
 					success: result => {
@@ -3764,13 +3796,16 @@
 				} else {
 					this.percent = 100
 				}
-
+				let newTime = Math.floor(this.currentTime)
+				if (newTime  == 1) {
+					this.getLight()
+				}
 				if (this.bouyNodeFlage) {
 					//速度校准
 					this.buoySpeedCalibration()
 
 					// 当前时间
-					let newTime = Math.floor(this.currentTime)
+					
 					this.buoyNewTime = this.currentTime
 
 					// 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
