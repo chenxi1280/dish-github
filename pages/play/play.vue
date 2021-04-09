@@ -1,5 +1,13 @@
 <template>
 	<view class="playBox">
+		<!-- for test -->
+		<view style="width: 200rpx;height: 80rpx;z-index: 1999;position: absolute; left: 0;top: 0;background: rgba(0,0,0,.5);">
+			<input v-model="artworkId" style="width: 200rpx;height: 80rpx;border: 2rpx solid black;color: white;"/>
+		</view>
+		<view style="width: 200rpx;height: 80rpx;z-index: 1999;position: absolute; left: 0;top: 80rpx;background: rgba(0,0,0,.5);">
+			<input v-model="row" style="width: 200rpx;height: 80rpx;border: 2rpx solid black;color: white;"/>
+		</view>
+		
 		<!-- 入场loading -->
 		<view v-if="videoloadFlag" class="videoLoadImageBox" style="z-index: 999;">
 			<!-- <view style="position: absolute;text-align: center;width: 100%;font-size: 40rpx;top: 40%;color: #fff;">Tips :</view> -->
@@ -424,7 +432,7 @@
 	import {
 		horizontalJumpDialog
 	} from '../../components/dialog/horizontalJumpDialog.vue'
-
+	import eruda from 'eruda'
 	export default {
 		components: {
 			storyLine,
@@ -795,7 +803,9 @@
 		},
 		onLoad(option) {
 			this.token = uni.getStorageSync('token')
+			console.log("**************************this.token:",this.token)
 			if(!this.token){
+				console.log("**************************11:")
 				this.getToken()
 			}
 			uni.showShareMenu({
@@ -922,9 +932,12 @@
 			getToken() {
 				let _this = this
 				let openid = uni.getStorageSync("openid")
+				console.log("**************************22")
 				if(openid){
+					console.log("**************************221")
 					_this.updateUserInfo()
 				}else{
+					console.log("**************************222")
 					uni.login({
 						provider: 'weixin',
 						success: async loginRes => {
@@ -939,7 +952,9 @@
 										'content-type': 'application/json'
 								},
 								success: res => {
+									console.log("**************************333")
 									if (res.data.status == 200) {
+										console.log("**************************3334")
 										uni.setStorageSync("openid",res.data.data.openid)
 										_this.updateUserInfo()
 									}else{
@@ -957,7 +972,9 @@
 			async updateUserInfo() {
 				let _this = this
 				let token = uni.getStorageSync("token")
+				console.log("**************************token:",token)
 				if(!token){
+					console.log("**************************44444")
 					await uni.request({
 						url: baseURL + '/savaUserInfo',
 						data: {
@@ -975,6 +992,7 @@
 							'content-type': 'application/json'
 						},
 						success: (res) => {
+							console.log("**************************5555")
 							if (res.data.status == 200) {
 								uni.setStorageSync("token",res.data.data)
 								uni.reLaunch({
