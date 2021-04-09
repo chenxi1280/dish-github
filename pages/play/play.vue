@@ -800,11 +800,8 @@
 			}
 			uni.showShareMenu({
 				withShareTicket: true,
-				menus: ['shareAppMessage']
+				menus: ['shareAppMessage','shareTimeline']
 			})
-			uni.hideShareMenu({
-				menus: ['shareTimeline']
-			}) 
 			//初始化video对象
 			this.videoContext = uni.createVideoContext('myVideo',this)
 			console.log("%%%%%%%%%%%%%%%%%%%%%videoContext%%%%%%%%%%%",this.videoContext)
@@ -904,7 +901,7 @@
 
 		},
 		//转发到朋友圈
-		/* onShareTimeline(res) {
+		onShareTimeline(res) {
 			let artworkInfo = uni.getStorageSync('artworkInfo')
 			let param = 'artWorkId=' + artworkInfo.pkArtworkId + '=status=4'
 			let title = artworkInfo.artworkName
@@ -920,7 +917,7 @@
 				imageUrl: imageUrl,
 				path: 'pages/play/play?scene=' + param
 			}
-		}, */
+		},
 		methods: {
 			getToken() {
 				let _this = this

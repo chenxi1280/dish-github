@@ -86,11 +86,11 @@
 		onLoad(options) {
 			uni.showShareMenu({
 				withShareTicket: true,
-				menus: ['shareAppMessage']
+				menus: ['shareAppMessage','shareTimeline']
 			})
-			uni.hideShareMenu({
+			/* uni.hideShareMenu({
 				menus: ['shareTimeline']
-			}) 
+			}) */ 
 			this.current = uni.getStorageSync("mine_current")
 			let token = uni.getStorageSync("token")
 			if(token != null && typeof(token) != "undefined" && token.length != 0){
@@ -127,7 +127,7 @@
 		onShow () {
 			this.getLightNum()
 		},
-		/* onShareTimeline (res) {
+		onShareTimeline (res) {
 			return {
 			  title: '灵巫互动',
 			  imageUrl: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605600100857%E5%9C%86%E5%BD%A2%E7%94%A8JPG.jpg',
@@ -144,7 +144,7 @@
 			    // 不管成功失败都会执行
 			  }
 			}
-		}, */
+		},
 		onReachBottom() {
 			if(this.current == 0){
 				console.log('我去拿数据2')
