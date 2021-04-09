@@ -1613,6 +1613,7 @@
 			},
 			//对节点播放数据进行筛选和提取
 			initPlayData(artworkTree, isJumpDialogCallbackFlag) {
+				this.isShowMyProgress = true
 				console.log('cookieToken', uni.getStorageInfoSync('cookieToken'))
 				console.log("***********************pkDetailId: ", artworkTree.pkDetailId)
 				if (artworkTree.parentId === 0) {
