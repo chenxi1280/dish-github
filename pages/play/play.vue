@@ -75,10 +75,11 @@
 			</view>
 			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" @loadedmetadata="loadeddata"  :controls="controlsFlag" -->
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform} ">
-				<video v-if="videoShowFlag" :controls="false" :src="videoUrl"  :show-mute-btn="false" :show-fullscreen-btn="false" :autoplay="autopalyFlag"
-				 id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="false" @ended="videoEnd(false)"
-				 @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart"  @error="videoError" auto-pause-if-navigate
-				 @timeupdate="videoTimeupdate" @play="videoPlay" @waiting="waitingVideo"  @loadedmetadata="loadeddata" :show-play-btn="false" @click="toggleProgress"></video>
+				<video v-if="videoShowFlag" :controls="false" :src="videoUrl" :show-mute-btn="false" :show-fullscreen-btn="false"
+				 :autoplay="autopalyFlag" id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="false"
+				 @ended="videoEnd(false)" @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart" @error="videoError"
+				 auto-pause-if-navigate @timeupdate="videoTimeupdate" @play="videoPlay" @waiting="waitingVideo" @loadedmetadata="loadeddata"
+				 :show-play-btn="false" @click="toggleProgress"></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
 				'background-repeat':'no-repeat', backgroundSize:'100% 100%'}"></view>
@@ -142,20 +143,20 @@
 			<view v-if="hiddenBtnFlag" :style="showStyleFlag?'display: block':'display: none'" class="verticalBox">
 				<!-- 自制进度条 -->
 				<view class="my_progress" style="z-index: 999;" v-if="isShowMyProgress">
-          <view class="play_btn">
-            <view class="play_v" v-if="!isPlay" @click="toggleIsPlay(true)"></view>
-            <view class="pause_v" v-else @click="toggleIsPlay(false)"></view>
-          </view>
-          <view class="progress_contaier">
-            <view class="begin_timer">{{ durationBeginTimer }}</view>
-            <view class="progress_event_box" @touchmove="onProgressTouchmove" @touchend="onProgressTouchend">
-              <view class="progress">
-                <view class="on_progress" :style="{width: progressWidth + '%'}"></view>
-              </view>
-            </view>
-            <view class="over_timer">{{ durationOverTimer }}</view>
-          </view>
-        </view>
+					<view class="play_btn">
+						<view class="play_v" v-if="!isPlay" @click="toggleIsPlay(true)"></view>
+						<view class="pause_v" v-else @click="toggleIsPlay(false)"></view>
+					</view>
+					<view class="progress_contaier">
+						<view class="begin_timer">{{ durationBeginTimer }}</view>
+						<view class="progress_event_box" @touchmove="onProgressTouchmove" @touchend="onProgressTouchend">
+							<view class="progress">
+								<view class="on_progress" :style="{width: progressWidth + '%'}"></view>
+							</view>
+						</view>
+						<view class="over_timer">{{ durationOverTimer }}</view>
+					</view>
+				</view>
 				<view class="reportBox" @click="showReportContent">
 					<view class="reportIconBox">
 						<icon class="reportIcon"></icon>
@@ -185,20 +186,20 @@
 			<view v-if="hiddenBtnFlag" :style="!showStyleFlag?'display: block':'display: none'" class="horizontalBox">
 				<!-- 自制进度条 -->
 				<view class="my_progress_h" v-if="isShowMyProgress">
-          <view class="play_btn">
-            <view class="play_v" v-if="!isPlay" @click="toggleIsPlay(true)"></view>
-            <view class="pause_v" v-else @click="toggleIsPlay(false)"></view>
-          </view>
-          <view class="progress_contaier">
-            <view class="begin_timer">{{ durationBeginTimer }}</view>
-            <view class="progress_event_box_h" @touchmove="onProgressTouchmoveH" @touchend="onProgressTouchendH">
-              <view class="progress_h">
-                <view class="on_progress_h" :style="{width: progressWidth + '%'}"></view>
-              </view>
-            </view>
-            <view class="over_timer">{{ durationOverTimer }}</view>
-          </view>
-        </view>
+					<view class="play_btn">
+						<view class="play_v" v-if="!isPlay" @click="toggleIsPlay(true)"></view>
+						<view class="pause_v" v-else @click="toggleIsPlay(false)"></view>
+					</view>
+					<view class="progress_contaier">
+						<view class="begin_timer">{{ durationBeginTimer }}</view>
+						<view class="progress_event_box_h" @touchmove="onProgressTouchmoveH" @touchend="onProgressTouchendH">
+							<view class="progress_h">
+								<view class="on_progress_h" :style="{width: progressWidth + '%'}"></view>
+							</view>
+						</view>
+						<view class="over_timer">{{ durationOverTimer }}</view>
+					</view>
+				</view>
 				<view class="reportBox" @click="showReportContent">
 					<view class="reportIconBox">
 						<icon class="reportIcon"></icon>
@@ -400,10 +401,10 @@
 				</view>
 				<view class="buoyDialogPrintWords"  v-if="!buoyDialogImageFlag">
 					<textarea v-model="buoyDialogWords" disabled = "true"></textarea>
+						</view>
+					</view>
 				</view>
 			</view>
-		</view>
-	</view>
 </template>
 
 <script>
@@ -752,7 +753,8 @@
 				//浮标自选开关
 				buoyAutoChooseFlag: false,
 				//跳转到其他小程序的节流历史时间参数
-				historyTimestamp: 0
+				historyTimestamp: 0,
+				buoyTouchFlag:false
 			}
 		},
 		onReady() {
@@ -794,18 +796,18 @@
 		},
 		onLoad(option) {
 			this.token = uni.getStorageSync('token')
-			console.log("**************************this.token:",this.token)
-			if(!this.token){
+			console.log("**************************this.token:", this.token)
+			if (!this.token) {
 				console.log("**************************11:")
 				this.getToken()
 			}
 			uni.showShareMenu({
 				withShareTicket: true,
-				menus: ['shareAppMessage','shareTimeline']
+				menus: ['shareAppMessage', 'shareTimeline']
 			})
 			//初始化video对象
-			this.videoContext = uni.createVideoContext('myVideo',this)
-			console.log("%%%%%%%%%%%%%%%%%%%%%videoContext%%%%%%%%%%%",this.videoContext)
+			this.videoContext = uni.createVideoContext('myVideo', this)
+			console.log("%%%%%%%%%%%%%%%%%%%%%videoContext%%%%%%%%%%%", this.videoContext)
 			// 初始化看广告获取光的数量
 			this.rewardLight = uni.getStorageSync('rewardLight') || 3
 			this.randomText()
@@ -859,11 +861,11 @@
 			uni.removeStorageSync('popupSettings')
 			console.log('进入play！！！！')
 			//当跳转到其他小程序时设置一个开关当跳回当前小程序时触发页面onShow 此时根据开关控制video是否播放 开关用完就关
-			if(this.otherAppletsReturnFlag){
-				let videoPlayTimeout = setTimeout(()=>{
+			if (this.otherAppletsReturnFlag) {
+				let videoPlayTimeout = setTimeout(() => {
 					this.videoContext.play()
 					clearTimeout(videoPlayTimeout)
-				},500)
+				}, 500)
 				this.otherAppletsReturnFlag = false
 			}
 			globalBus.$emit('bouyClickCommonOptionTodo')
@@ -923,9 +925,9 @@
 			getToken() {
 				let _this = this
 				let openid = uni.getStorageSync("openid")
-				if(openid){
+				if (openid) {
 					_this.updateUserInfo(openid)
-				}else{
+				} else {
 					uni.login({
 						provider: 'weixin',
 						success: async loginRes => {
@@ -933,20 +935,20 @@
 							await uni.request({
 								url: baseURL + '/getOpenid',
 								data: {
-										code: code,
+									code: code,
 								},
 								method: 'POST',
 								header: {
-										'content-type': 'application/json'
+									'content-type': 'application/json'
 								},
 								success: res => {
 									if (res.data.status == 200) {
-										uni.setStorageSync("openid",res.data.data.openid)
+										uni.setStorageSync("openid", res.data.data.openid)
 										_this.updateUserInfo(res.data.data.openid)
-									}else{
+									} else {
 										return uni.showToast({
-										icon: 'none',
-										title: '授权失败，请退出重新进入小程序'
+											icon: 'none',
+											title: '授权失败，请退出重新进入小程序'
 										})
 									}
 								}
@@ -959,7 +961,7 @@
 				let _this = this
 				let token = uni.getStorageSync("token")
 				this.string = token
-				if(!token){
+				if (!token) {
 					await uni.request({
 						url: baseURL + '/savaUserInfo',
 						data: {
@@ -978,7 +980,7 @@
 						},
 						success: (res) => {
 							if (res.data.status == 200) {
-								uni.setStorageSync("token",res.data.data)
+								uni.setStorageSync("token", res.data.data)
 								_this.token = res.data.data
 								this.getLight()
 								globalBus.$emit('getLightOfAppReady')
@@ -987,7 +989,7 @@
 					})
 				}
 			},
-			toggleProgress () {
+			toggleProgress() {
 				if (this.isPosition === 2) {
 					this.isShowMyProgress = true
 				} else {
@@ -1023,6 +1025,7 @@
 					// video.play()
 					// console.log(advanceNum, allNum)
 				}).exec()
+				this.buoyTouchFlag = true
 				// return false;
 				// console.log('move', e.touches[0].clientX)
 				// const pro = uni.createSelectorQuery().select(".progress_h");
@@ -1054,6 +1057,7 @@
 					video.play()
 					// console.log(advanceNum, allNum)
 				}).exec()
+				this.buoyTouchFlag = true
 				// const pro = uni.createSelectorQuery().select(".progress_h");
 				// const video = uni.createVideoContext("myVideo");
 				// // 计算比例
@@ -1084,6 +1088,7 @@
 					// video.play()
 					// console.log(advanceNum, allNum)
 				}).exec()
+				this.buoyTouchFlag = true
 				// video.play()
 			},
 			onProgressTouchend(e) {
@@ -1104,29 +1109,30 @@
 					video.play()
 					// console.log(advanceNum, allNum)
 				}).exec()
+				this.buoyTouchFlag = true
 			},
-			videoError(e){
-				uni.setStorageSync("relaunchApplets",true)
+			videoError(e) {
+				uni.setStorageSync("relaunchApplets", true)
 				uni.switchTab({
 					url: '../dishover/dishover'
 				})
-				console.log("********************我报错了*********: ",e)
+				console.log("********************我报错了*********: ", e)
 			},
 			//点击浮标选项弹窗关闭按钮事件
-			closeBuoyDialog(){
+			closeBuoyDialog() {
 				this.buoyDialogFlag = false
 				this.buoyDialogWords = null
 				this.i = 0
-				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index1***********************************",this.optionIndex)
+				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index1***********************************", this.optionIndex)
 				let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
-				if(buoyPopInfo.buoyStatus){
-					if(this.isVideoEndFlag){
+				if (buoyPopInfo.buoyStatus) {
+					if (this.isVideoEndFlag) {
 						this.againPlayVideo()
-					}else{
+					} else {
 						console.log("**************************recoveryBuoyDraw*****************")
 						this.recoveryBuoyDraw()
 					}
-				}else{
+				} else {
 					this.clickCommonOptionTodo(this.optionIndex)
 				}
 			},
@@ -1148,17 +1154,17 @@
 			//浮标选项点击跳转到其他小程序
 			JumpToOtherApplets(appId, navigatorUrl) {
 				//节流
-					let currentTimestamp = (new Date()).valueOf()
-					// console.log("***************************currentTimestamp:",currentTimestamp, this.historyTimestamp)
-					// console.log("***************************historyTimestamp:",this.historyTimestamp)
-					// console.log('buoyTimestamp', buoyTimestamp)
-					if (this.historyTimestamp !== 0 && currentTimestamp - this.historyTimestamp < 500) {
-						console.log("***************************111111111111111111111")
-						this.historyTimestamp = currentTimestamp
-						return
-					}
-					console.log("***************************2222222222222222222222222")
+				let currentTimestamp = (new Date()).valueOf()
+				// console.log("***************************currentTimestamp:",currentTimestamp, this.historyTimestamp)
+				// console.log("***************************historyTimestamp:",this.historyTimestamp)
+				// console.log('buoyTimestamp', buoyTimestamp)
+				if (this.historyTimestamp !== 0 && currentTimestamp - this.historyTimestamp < 500) {
+					console.log("***************************111111111111111111111")
 					this.historyTimestamp = currentTimestamp
+					return
+				}
+				console.log("***************************2222222222222222222222222")
+				this.historyTimestamp = currentTimestamp
 				//把用过的时间赋值给历史时间
 				this.videoContext.pause()
 				this.otherAppletsReturnFlag = true
@@ -1181,8 +1187,8 @@
 							let videoContext = uni.createVideoContext('myVideo')
 							videoContext.play()
 						},
-						complete(res){
-							
+						complete(res) {
+
 						}
 					})
 				}
@@ -1286,7 +1292,7 @@
 				this.lightNumber = uni.getStorageSync('lightNumber') || 0
 				this.ecmUserLightUpLimit = uni.getStorageSync('ecmUserLightUpLimit') || 0
 			},
-			addLight () {
+			addLight() {
 				uni.request({
 					url: baseURL + '/wxPlay/addLight',
 					method: 'POST',
@@ -1301,12 +1307,12 @@
 						})
 						this.getLight()
 						this.bouyClickCommonOptionTodo()
-						
+
 					}
 				})
 			},
 			// 获取光
-			getLight () {
+			getLight() {
 				uni.request({
 					url: baseURL + '/user/light/getUserLight',
 					method: 'POST',
@@ -1789,7 +1795,7 @@
 					// console.log('我进来了')
 
 				}
-				
+
 				//获取视频的宽高时长
 				// console.log('artworkTree.videoInfo: ',artworkTree.videoInfo)
 				/* if(typeof(artworkTree.videoInfo) != "undefined" && artworkTree.videoInfo){
@@ -1818,7 +1824,7 @@
 				this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
 				this.parentId = artworkTree.parentId
 				this.imageSrc = artworkTree.nodeLastImgUrl
-				
+
 				//如果是根节点初始化存储节点分值的容器
 				if (this.parentId === 0) {
 					//存进缓存是防止故事线进入时重置了data里面的数据
@@ -1880,7 +1886,7 @@
 				}
 				//加载视频数据
 				// this.loadeddata()
-				
+
 				//非跳转节点的目标节点存播放记录
 				if (this.linkNodeId != this.detailId) {
 					// 将作品detailId留存提供给故事线
@@ -1896,7 +1902,7 @@
 					uni.setStorageSync("pkDetailIds", this.playedHistoryArray);
 					this.linkNodeId = null
 				}
-				
+
 			},
 			//视频 播放后弹窗
 			popupWindowByPopupPositonEqualsOne() {
@@ -2038,9 +2044,9 @@
 				this.popupPosition = this.popupSettings.popupPosition
 				this.popupContextState = this.popupSettings.popupContextStates
 				this.navigatorUrl = this.popupSettings.popupSkip
-				if(this.popupSettings.popupContext.search("/mobilePop")){
+				if (this.popupSettings.popupContext.search("/mobilePop")) {
 					this.popupImageUrl = this.popupSettings.popupContext
-				}else{
+				} else {
 					this.popupImageUrl = this.popupSettings.popupContext + "/mobilePop"
 				}
 				this.appId = this.popupSettings.popupAppId
@@ -2174,9 +2180,9 @@
 			},
 			async customLightByUserId(eventId) {
 				let token = null
-				if(!this.token){
+				if (!this.token) {
 					token = uni.getStorageSync("token")
-				}else{
+				} else {
 					token = this.token
 				}
 				console.log('扣光了！！！！！', eventId)
@@ -2567,15 +2573,15 @@
 						this.optionIndex = 0
 						let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
 						// buoyStatus 弹窗是否开启 1开启 0默认选项
-						if(buoyPopInfo.buoyStatus){
+						if (buoyPopInfo.buoyStatus) {
 							//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
 							this.againPlayVideo()
-						}else{
+						} else {
 							this.buoyAutoChooseFlag = true
 							this.clickCommonOptionTodo(0)
 						}
-						
-						
+
+
 
 						// console.log(this.buoyRectList)
 						// return
@@ -2605,7 +2611,7 @@
 				}
 			},
 			videoPlay() {
-				this.isPlay = true 
+				this.isPlay = true
 				this.multipleResultFlag = false
 				this.isVideoEndFlag = false
 				this.isGetMultipleFlag = false
@@ -3641,7 +3647,7 @@
 			},
 			loadeddata(e) {
 				// 浮标作品 禁用所有的进度条
-				console.log("%%%%%%%%%%%%%%%%%%%%%videoContext%%%%%%%%%%%",this.videoContext)
+				console.log("%%%%%%%%%%%%%%%%%%%%%videoContext%%%%%%%%%%%", this.videoContext)
 				if (this.bouyNodeFlage) {
 					//浮标视频不显示原生开关
 					this.controlsFlag = true
@@ -3760,8 +3766,8 @@
 				if (this.returnToPreviousFlag && this.bouyNodeFlage) {
 					console.log("************bouySectionTime2s: ", this.bouySectionTime)
 					this.bouyReturnToPreviousFlag = true
-					
-					if(this.buoyAutoChooseFlag){
+
+					if (this.buoyAutoChooseFlag) {
 						//获取浮标视频的选项初始渲染时间
 						let historyNodeBuoyList = uni.getStorageSync("historyNodeBuoyList")
 						for (let i = 0; i < historyNodeBuoyList.length; i++) {
@@ -3782,12 +3788,14 @@
 				}
 			},
 			videoTimeupdate(e) {
-			
+
 				//获取视频当前时间
 				this.currentTime = e.detail.currentTime
 				// 进度条的时间格式化
-				const mm = parseInt(this.currentTime / 60) >= 10 ? parseInt(this.currentTime / 60) : "0" + parseInt(this.currentTime / 60);
-				const ss = parseInt(this.currentTime % 60) >= 10 ? parseInt(this.currentTime % 60) : "0" + parseInt(this.currentTime % 60);
+				const mm = parseInt(this.currentTime / 60) >= 10 ? parseInt(this.currentTime / 60) : "0" + parseInt(this.currentTime /
+					60);
+				const ss = parseInt(this.currentTime % 60) >= 10 ? parseInt(this.currentTime % 60) : "0" + parseInt(this.currentTime %
+					60);
 				this.durationBeginTimer = mm + ":" + ss;
 				this.progressWidth = (this.currentTime / this.duration) * 100;
 				//获取视频当前时间
@@ -3797,7 +3805,7 @@
 					this.percent = 100
 				}
 				let newTime = Math.floor(this.currentTime)
-				if (newTime  == 1) {
+				if (newTime == 1) {
 					this.getLight()
 				}
 				if (this.bouyNodeFlage) {
@@ -3805,12 +3813,35 @@
 					this.buoySpeedCalibration()
 
 					// 当前时间
-					
+
 					this.buoyNewTime = this.currentTime
 
 					// 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
 					if (this.buoyCurrentTime == newTime || newTime == 0) {
 						// this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+						if (this.buoyTouchFlag) {
+							this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
+								// 变量 为几号位置 数组
+								// console.log("nodeBuoyList",nodeBuoyList,"index",index)
+								nodeBuoyList.forEach((nodeBuoy) => {
+
+									//当时间相等时
+									// console.log('时间',nodeBuoy.buoySectionTime === newTime)
+									if (newTime >= nodeBuoy.buoySectionTime && nodeBuoy.targetTime >= newTime) {
+										console.log("nodeBuoy",nodeBuoy)
+										nodeBuoy.x = nodeBuoy.startX + (newTime - nodeBuoy.buoySectionTime) * nodeBuoy.startVX * 60
+										nodeBuoy.y = nodeBuoy.startY + (newTime - nodeBuoy.buoySectionTime) * nodeBuoy.startVY * 60
+										nodeBuoy.vx = nodeBuoy.startVX
+										nodeBuoy.vy = nodeBuoy.startVY
+										this.buoyRectList[index] = nodeBuoy
+									}
+
+								})
+								// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+							})
+							// this.startBuoy()
+							this.buoyTouchFlag = false
+						}
 						return
 					}
 					//获取视频当前时间
@@ -4183,6 +4214,13 @@
 				// 默认 透明度0.9
 				// rectOpacity = 0.9
 				return {
+					startX: rectX,
+					// y 位置
+					startY: rectY,
+					//移动速度 x
+					startVX: vx,
+					// 移动速度y
+					startVY: vy,
 					// x 位置
 					x: rectX,
 					// y 位置
@@ -4240,7 +4278,7 @@
 
 			// 初始化浮标 对象 List
 			initializationBuoyList() {
-				
+
 				// let buoyInitTimestamp = (new Date()).valueOf();
 				// console.log('buoyInitTimestamp', buoyInitTimestamp)
 				// if (buoyInitTimestamp - this.buoyInitTimestamp < 1000) {
@@ -4250,8 +4288,8 @@
 				// console.log('buoyInitTimestamp没有节流')
 				// this.buoyInitTimestamp = buoyInitTimestamp
 				this.canvasNodeBuoyList = []
-				
-				
+
+
 				let hList = uni.getStorageSync('historyNodeBuoyList')
 				this.ecmArtworkNodeBuoyList.forEach((nodeBuoyList, index) => {
 					let aList = []
@@ -4364,7 +4402,7 @@
 
 					})
 					this.canvasNodeBuoyList.push(aList)
-					console.log("这是初始化",this.canvasNodeBuoyList)
+					console.log("这是初始化", this.canvasNodeBuoyList)
 				})
 				uni.setStorageSync('historyNodeBuoyList', hList)
 				// this.startBuoy()
@@ -4382,13 +4420,14 @@
 
 				let stopFlag = false
 				// console.log('nowBuoyRectList',nowBuoyRectList)
-				console.log('newY',newY,'newX',newX)
+				console.log('newY', newY, 'newX', newX)
 				// console.log('nowBuoyRectList',nowBuoyRectList)
-				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$nowBuoyRectList***********************************",nowBuoyRectList)
+				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$nowBuoyRectList***********************************",
+					nowBuoyRectList)
 
 				nowBuoyRectList.forEach((v, i) => {
 					if (v != null) {
-						
+
 						if (v.x <= newX && (v.x + v.rectW) >= newX) {
 							// 加10 增加判定区域
 							if (v.y <= newY && (v.y + v.rectH) >= newY) {
@@ -4396,28 +4435,28 @@
 								this.optionIndex = i
 								console.log(this.getBuoyPopInfo(i))
 								let buoyPopInfo = this.getBuoyPopInfo(i)
-								console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index2***********************************",i)
+								console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index2***********************************", i)
 								// buoyStatus 弹窗是否开启 1开启 0默认选项
-								if(buoyPopInfo.buoyStatus){
+								if (buoyPopInfo.buoyStatus) {
 									//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
-									if(buoyPopInfo.buoyPopType === 0){
-										this.JumpToOtherApplets(buoyPopInfo.buoyPopAppId,buoyPopInfo.buoyPopContext)
-									}else if(buoyPopInfo.buoyPopType === 1){
+									if (buoyPopInfo.buoyPopType === 0) {
+										this.JumpToOtherApplets(buoyPopInfo.buoyPopAppId, buoyPopInfo.buoyPopContext)
+									} else if (buoyPopInfo.buoyPopType === 1) {
 										this.stopBuoyDraw()
 										this.printContent(buoyPopInfo.buoyPopContext)
 										this.buoyDialogImageFlag = false
 										this.buoyDialogFlag = true
-									}else{
+									} else {
 										this.stopBuoyDraw()
 										this.buoyDialogImageSrc = buoyPopInfo.buoyPopContext + "/mobilePop"
 										this.buoyDialogFlag = true
 										this.buoyDialogImageFlag = true
 									}
-								}else{
+								} else {
 									this.buoyAutoChooseFlag = false
 									this.clickCommonOptionTodo(i)
 								}
-								
+
 								stopFlag = true
 								return
 							}
@@ -4693,25 +4732,25 @@
 						buoyRect.vy = (buoyRect.targetY - buoyRect.y) / ((buoyRect.targetTime - this.currentTime) * 58)
 					} else {
 						// 当前时间
-						let newTime = Math.floor(this.currentTime)
-						this.buoyNewTime = this.currentTime
-						// 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
-						if (this.buoyCurrentTime == newTime || newTime == 0) {
-							return
-						}
+						// let newTime = Math.floor(this.currentTime)
+						// this.buoyNewTime = this.currentTime
+						// // 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
+						// if (this.buoyCurrentTime == newTime || newTime == 0) {
+						// 	return
+						// }
 
-						//获取视频当前时间
-						this.buoyCurrentTime = newTime
-						// 遍历 初始化后的可直接用于画图的 类canvas对象2维数组 index 位置下表
-						this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
-							// 变量 为几号位置 数组
-							// console.log("nodeBuoyList",nodeBuoyList,"index",index)
-							nodeBuoyList.forEach((nodeBuoy) => {
-								if (nodeBuoy.buoySectionTime === newTime) {
-									this.buoyRectList[index] = nodeBuoy
-								}
-							})
-						})
+						// //获取视频当前时间
+						// this.buoyCurrentTime = newTime
+						// // 遍历 初始化后的可直接用于画图的 类canvas对象2维数组 index 位置下表
+						// this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
+						// 	// 变量 为几号位置 数组
+						// 	// console.log("nodeBuoyList",nodeBuoyList,"index",index)
+						// 	nodeBuoyList.forEach((nodeBuoy) => {
+						// 		if (nodeBuoy.buoySectionTime === newTime) {
+						// 			this.buoyRectList[index] = nodeBuoy
+						// 		}
+						// 	})
+						// })
 
 					}
 				})
@@ -4777,27 +4816,27 @@
 			},
 			// 获取改浮弹窗信息
 			getBuoyPopInfo(index) {
-				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index3***********************************",index)
-				console.log("$$$$$$$$$$$$$this.ecmArtworkNodeBuoyList*********************************",this.ecmArtworkNodeBuoyList)
-				console.log("$$$$$$$$$$$$$this.ecmArtworkNodeBuoyList*********************************",this.canvasNodeBuoyList)
+				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index3***********************************", index)
+				console.log("$$$$$$$$$$$$$this.ecmArtworkNodeBuoyList*********************************", this.ecmArtworkNodeBuoyList)
+				console.log("$$$$$$$$$$$$$this.ecmArtworkNodeBuoyList*********************************", this.canvasNodeBuoyList)
 				if (this.ecmArtworkNodeBuoyList.length >= index + 1) {
-						if (this.ecmArtworkNodeBuoyList[index][0] == null) {
-						  return null
-						} else {
-							return {
-								//弹窗是否开启 1开启 0默认选项
-								buoyStatus:this.ecmArtworkNodeBuoyList[index][0].buoyStatus,
-								//类型有三种 对应 0其他小程序 1文字 2图片
-								buoyPopType:this.ecmArtworkNodeBuoyList[index][0].buoyPopType,
-								//类型有三种 0小程序的页面路径 1文字的文本信息 2图片的url
-								buoyPopContext:this.ecmArtworkNodeBuoyList[index][0].buoyPopContext,
-								//小程序的appid
-								buoyPopAppId:this.ecmArtworkNodeBuoyList[index][0].buoyPopAppId,
-								fkNodeId:this.ecmArtworkNodeBuoyList[index][0].fkNodeId,
-								pkBuoyId:this.ecmArtworkNodeBuoyList[index][0].pkBuoyId
-							}
+					if (this.ecmArtworkNodeBuoyList[index][0] == null) {
+						return null
+					} else {
+						return {
+							//弹窗是否开启 1开启 0默认选项
+							buoyStatus: this.ecmArtworkNodeBuoyList[index][0].buoyStatus,
+							//类型有三种 对应 0其他小程序 1文字 2图片
+							buoyPopType: this.ecmArtworkNodeBuoyList[index][0].buoyPopType,
+							//类型有三种 0小程序的页面路径 1文字的文本信息 2图片的url
+							buoyPopContext: this.ecmArtworkNodeBuoyList[index][0].buoyPopContext,
+							//小程序的appid
+							buoyPopAppId: this.ecmArtworkNodeBuoyList[index][0].buoyPopAppId,
+							fkNodeId: this.ecmArtworkNodeBuoyList[index][0].fkNodeId,
+							pkBuoyId: this.ecmArtworkNodeBuoyList[index][0].pkBuoyId
 						}
-				}else {
+					}
+				} else {
 					return null
 				}
 			},
@@ -4808,1170 +4847,1187 @@
 </script>
 
 <style lang="scss">
-.playBox {
-  width: 100%;
-  height: 100%;
-
-  .u-drawer {
-    z-index: 9999 !important;
-  }
-
-  .popupBox {
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    left: 0;
-    top: 0;
-    background-color: rgba(255, 255, 255, 0);
-    z-index: 16;
-    .horizontalCloseIcon {
-      position: absolute;
-      right: 13%;
-      top: 71%;
-      width: 60rpx;
-      height: 60rpx;
-      background: url(../../static/icon/dialogClose.png) no-repeat center;
-      background-size: 60rpx;
-    }
-
-    .verticalCloseIcon {
-      position: absolute;
-      right: 7%;
-      top: 33%;
-      width: 60rpx;
-      height: 60rpx;
-      background: url(../../static/icon/dialogClose.png) no-repeat center;
-      background-size: 60rpx;
-    }
-
-    .buoyDialog {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 500rpx;
-      height: 500rpx;
-
-      .buoyDialogImage {
-        width: 100%;
-        height: 100%;
-        margin-top: 50rpx;
-
-        image {
-          width: 100%;
-          height: 100%;
-        }
-      }
-
-      .buoyDialogPrintWords {
-        // border: 2rpx solid red;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(255, 255, 255, 0.5);
-        margin-top: 50rpx;
-
-        textarea {
-          margin: 20rpx 20rpx;
-          font-size: 38rpx;
-          width: 90%;
-          height: 90%;
-        }
-      }
-    }
-  }
-
-  .verticalOptionPercentagesBox {
-    position: fixed;
-    right: 5%;
-    top: 12%;
-    height: 600rpx;
-    width: 290rpx;
-    z-index: 15;
-
-    // background-color: rgba(255,255,255,.5);
-    .optionPercentages {
-      height: 50rpx;
-      width: 100%;
-
-      .optionPercentageBox {
-        margin-top: 10rpx;
-        padding: 10rpx 20rpx;
-        height: 50rpx;
-        border-radius: 20rpx;
-        background-color: rgba(0, 0, 0, 0.3);
-        text-align: left;
-
-        .optionPercentage {
-          color: white;
-          font-size: 30rpx;
-          line-height: 30rpx;
-        }
-      }
-    }
-  }
-
-  .horizontalOptionPercentagesBox {
-    position: fixed;
-    left: 40%;
-    top: 81%;
-    height: 600rpx;
-    width: 290rpx;
-    transform: translate(-50%, -50%) rotateZ(90deg);
-    z-index: 15;
-
-    // background-color: rgba(255,255,255,.5);
-    .optionPercentages {
-      height: 50rpx;
-      width: 100%;
-
-      .optionPercentageBox {
-        margin-top: 10rpx;
-        padding: 10rpx 20rpx;
-        height: 50rpx;
-        border-radius: 20rpx;
-        background-color: rgba(0, 0, 0, 0.3);
-        text-align: left;
-
-        .optionPercentage {
-          color: white;
-          font-size: 30rpx;
-          line-height: 30rpx;
-        }
-      }
-    }
-  }
-
-  .multipleResultPlayEndMask {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    background-color: black;
-    z-index: 8;
-  }
-
-  .verticalPopupNameBox {
-    position: fixed;
-    left: 5%;
-    top: 7%;
-    width: 460rpx;
-    height: 60rpx;
-    background-color: rgba(0, 0, 0, 0.3);
-    border-radius: 30rpx;
-    text-align: left;
-
-    text {
-      padding: 20rpx;
-      font-size: 30rpx;
-      color: white;
-      line-height: 60rpx;
-    }
-  }
-
-  .horizontalPopupNameBox {
-    position: fixed;
-    left: 84%;
-    top: 21%;
-    width: 460rpx;
-    height: 60rpx;
-    transform: translate(-50%, -50%) rotateZ(90deg);
-    background-color: rgba(0, 0, 0, 0.3);
-    border-radius: 30rpx;
-    text-align: left;
-
-    text {
-      padding: 20rpx;
-      font-size: 30rpx;
-      color: white;
-      line-height: 60rpx;
-    }
-  }
-
-  .progress-line-box {
-    position: fixed;
-    left: 2%;
-    top: 50%;
-    height: 50rpx;
-    z-index: 10;
-    transform: translate(-50%, -50%) rotateZ(90deg);
-
-    progress {
-      position: absolute;
-      top: 48%;
-      left: 4%;
-      width: 80%;
-    }
-
-    .progress-time {
-      position: absolute;
-      left: 85%;
-      color: white;
-      line-height: 50rpx;
-    }
-  }
-
-  .progress-box {
-    position: fixed;
-    left: 6%;
-    top: 50%;
-    z-index: 10;
-    height: 50rpx;
-    width: 450rpx;
-    display: flex;
-    justify-content: center;
-    border-radius: 20rpx;
-    background-color: rgba(0, 0, 0, 0.5);
-    transform: translate(-50%, -50%) rotateZ(90deg);
-
-    .replayVideoIconBox {
-      width: 50rpx;
-      height: 50rpx;
-
-      icon {
-        width: 100%;
-        height: 100%;
-        background: url(../../static/icon/jumpback.png) no-repeat center;
-        background-size: 50rpx;
-      }
-    }
-
-    .jumpbackIconBox {
-      width: 50rpx;
-      height: 50rpx;
-      margin-left: 30rpx;
-
-      icon {
-        width: 100%;
-        height: 100%;
-        background: url(../../static/icon/jumpback15.png) no-repeat center;
-        background-size: 50rpx;
-      }
-    }
-
-    .suspendIconBox {
-      width: 50rpx;
-      height: 50rpx;
-      margin-left: 30rpx;
-
-      icon {
-        width: 100%;
-        height: 100%;
-        background: url(../../static/icon/suspend.png) no-repeat center;
-        background-size: 50rpx;
-      }
-    }
-
-    .playIconBox {
-      width: 50rpx;
-      height: 50rpx;
-      margin-left: 30rpx;
-
-      icon {
-        width: 100%;
-        height: 100%;
-        background: url(../../static/icon/play.png) no-repeat center;
-        background-size: 50rpx;
-      }
-    }
-
-    .jumpforwardIconBox {
-      width: 50rpx;
-      height: 50rpx;
-      margin-left: 30rpx;
-
-      icon {
-        width: 100%;
-        height: 100%;
-        background: url(../../static/icon/jumpforward15.png) no-repeat center;
-        background-size: 50rpx;
-      }
-    }
-
-    .endVideoIconBox {
-      width: 50rpx;
-      height: 50rpx;
-      margin-left: 30rpx;
-
-      icon {
-        display: block;
-        transform: rotateZ(180deg);
-        width: 100%;
-        height: 100%;
-        background: url(../../static/icon/jumpback.png) no-repeat center;
-        background-size: 50rpx;
-      }
-    }
-
-    .f-text {
-      color: white;
-      line-height: 50rpx;
-    }
-
-    .t-text {
-      color: white;
-      line-height: 50rpx;
-    }
-  }
-
-  .videoLoadImageBox {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-
-    image {
-      width: 100%;
-      height: 100%;
-    }
-  }
-
-  .play {
-    background-color: black;
-    position: relative;
-    overflow: hidden;
-
-    .container {
-      position: fixed;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      margin: 0 auto;
-      z-index: 25;
-
-      canvas {
-        width: 100%;
-        height: 100%;
-      }
-    }
-
-    .videoBox {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      // transform: translate(-50%, -50%);修改为了行内样式
-      overflow: hidden;
-
-      video {
-        position: fixed;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        z-index: 7;
-        width: 100%;
-        height: 100%;
-      }
-
-      .screenshot {
-        position: absolute;
-        left: 0;
-        top: 0;
-        z-index: 9;
-        width: 100%;
-        height: 100%;
-      }
-    }
-
-    .chooseTipsMask15 {
-      background-color: rgba(0, 0, 0, 0.1);
-      position: fixed;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 17;
-
-      .chooseTipsMask16 {
-        background-color: rgba(255, 255, 255, 0);
-        position: fixed;
-        left: 50%;
-        top: 50%;
-        // transform: translate(-50%, -50%);
-        width: 650rpx;
-        height: 38%;
-        z-index: 18;
-        border-radius: 20rpx;
-
-        .chooseTips {
-          width: 100%;
-          z-index: 25;
-          // background-color: rgba(0,0,0,1);
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-
-          .closeBox {
-            position: absolute;
-            width: 46rpx;
-            height: 46rpx;
-            right: 20rpx;
-            top: 20rpx;
-
-            .closeIcon {
-              width: 100%;
-              height: 100%;
-              background: url(../../static/icon/close.png) no-repeat center;
-              background-size: 46rpx;
-            }
-          }
-
-          .title {
-            text-align: center;
-            color: white;
-            font-size: 36rpx;
-            line-height: 100rpx;
-          }
-
-          .tips {
-            position: relative;
-
-            .optionBox {
-              background: url("https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1606382670960frame.png")
-                no-repeat center;
-              background-size: 100% 100%;
-              width: 100%;
-              margin: 0 auto;
-              margin-bottom: 20rpx;
-              line-height: 80rpx;
-              display: flex;
-              justify-content: space-between;
-
-              .option {
-                color: white;
-                padding-left: 20rpx;
-                font-size: 34rpx;
-
-                .iconBox {
-                  position: absolute;
-                  right: 0;
-                  top: -18rpx;
-                  // background-color: #7E4DAB;
-                  background-color: rgba(#ffffff, 0.6);
-                  height: 50rpx;
-                  width: 180rpx;
-                  border-radius: 25rpx;
-                  display: flex;
-                  justify-content: flex-start;
-
-                  icon {
-                    display: inline-block;
-                    margin-left: 12rpx;
-                    line-height: 50rpx;
-                    background: url(../../static/icon/advertisement.png)
-                      no-repeat center;
-                    width: 50rpx;
-                    height: 50rpx;
-                    background-size: 50rpx;
-                  }
-
-                  text {
-                    margin-left: 8rpx;
-                    line-height: 50rpx;
-                    color: #707070;
-                    font-size: 24rpx;
-                  }
-                }
-              }
-            }
-          }
-
-          .video_rebroadcast {
-            width: 80rpx;
-            height: 80rpx;
-            padding: 10rpx;
-            background-color: rgba(#000, 0.2);
-            border-radius: 40rpx;
-            margin: 0 auto;
-
-            img {
-              width: 100%;
-              height: 100%;
-              // transform: rotateY(180deg);
-            }
-          }
-        }
-      }
-    }
-
-    .verticalLikabilityBox {
-      .likabilityTips {
-        position: fixed;
-        left: 5%;
-        top: 12%;
-        height: 600rpx;
-        width: 420rpx;
-        z-index: 15;
-
-        // background-color: rgba(255,255,255,.5);
-        .lbtips {
-          height: 50rpx;
-          width: 100%;
-
-          .likabilityBox {
-            margin-top: 10rpx;
-            padding: 10rpx 20rpx;
-            height: 50rpx;
-            border-radius: 20rpx;
-            background-color: rgba(0, 0, 0, 0.3);
-            text-align: left;
-
-            .likability {
-              color: white;
-              font-size: 30rpx;
-              line-height: 30rpx;
-            }
-          }
-        }
-      }
-    }
-
-    .horizontalLikabilityBox {
-      .likabilityTips {
-        position: fixed;
-        left: 40%;
-        top: 19%;
-        height: 600rpx;
-        width: 420rpx;
-        transform: translate(-50%, -50%) rotateZ(90deg);
-        z-index: 15;
-
-        // background-color: rgba(255,255,255,.5);
-        .lbtips {
-          height: 50rpx;
-          width: 100%;
-
-          .likabilityBox {
-            margin-top: 10rpx;
-            padding: 10rpx 20rpx;
-            height: 50rpx;
-            border-radius: 20rpx;
-            background-color: rgba(0, 0, 0, 0.3);
-            text-align: left;
-
-            .likability {
-              color: white;
-              font-size: 30rpx;
-              line-height: 30rpx;
-            }
-          }
-        }
-      }
-    }
-
-    .lightBox {
-      position: fixed;
-      left: 6%;
-      top: 4%;
-      height: 40rpx;
-      width: 160rpx;
-      z-index: 15;
-      background-color: rgba(255, 255, 255, 0.5);
-      border-radius: 20rpx;
-      display: flex;
-      justify-content: flex-start;
-
-      .lightIconBox {
-        width: 40rpx;
-        height: 40rpx;
-        margin-left: 10rpx;
-
-        .lightIcon {
-          width: 100%;
-          height: 100%;
-          background: url(../../static/icon/hourglass.png) no-repeat center;
-          background-size: 40rpx;
-        }
-      }
-
-      .lightText {
-        font-size: 24rpx;
-        color: white;
-        line-height: 40rpx;
-        margin-left: 10rpx;
-      }
-
-      .addLightIconBox {
-        width: 40rpx;
-        height: 40rpx;
-        margin-left: 26rpx;
-
-        .addLightIcon {
-          width: 100%;
-          height: 100%;
-          background: url(../../static/icon/addofplay.png) no-repeat center;
-          background-size: 40rpx;
-        }
-      }
-    }
-
-    .verticalBox {
-      .my_progress {
-        position: fixed;
-        width: 100%;
-        z-index: 999;
-        padding: 0 20rpx;
-        border-radius: 40rpx;
-        height: 40px;
-        left: 0;
-        bottom: 20rpx;
-        background-color: rgba($color: #fff, $alpha: 0.15);
-        display: flex;
-        .play_btn {
-          width: 40px;
-          height: 40px;
-          view {
-            width: 100%;
-            height: 100%;
-            display: block;
-          }
-          .play_v {
-            background: url("../../static/playIcon/play.png") no-repeat center;
-            background-size: 40rpx;
-          }
-          .pause_v {
-            background: url("../../static/playIcon/pause.png") no-repeat center;
-            background-size: 40rpx;
-          }
-        }
-        .progress_contaier {
-          flex: 1;
-          // width: calc(100% - 40rpx);
-          position: relative;
-          top: 50%;
-          transform: translateY(-50%);
-          display: flex;
-          line-height: 40px;
-          .begin_timer,
-          .over_timer {
-            width: 84rpx;
-            text-align: left;
-            color: #fff;
-          }
-          .progress_event_box {
-            flex: 1;
-            height: 40px;
-            margin: 0 20rpx;
-            .progress {
-              height: 8rpx;
-              border-radius: 6rpx;
-              background-color: #808080;
-              position: relative;
-              top: 50%;
-              transform: translateY(-50%);
-              overflow: hidden;
-              .on_progress {
-                transition: all 0.1s;
-                position: absolute;
-                left: 0;
-                top: 0;
-                height: 100%;
-                background-color: #fff;
-              }
-            }
-          }
-        }
-      }
-      .storyLineBox {
-        position: fixed;
-        right: 6%;
-        top: 37%;
-        height: 80rpx;
-        width: 100rpx;
-        z-index: 15;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 20rpx;
-
-        .storyLineIconBox {
-          width: 100rpx;
-          height: 50rpx;
-          text-align: center;
-
-          .storyLineIcon {
-            width: 50rpx;
-            height: 50rpx;
-            background: url(../../static/icon/fenzhi.png) no-repeat center;
-            background-size: 50rpx;
-          }
-        }
-
-        .storyLine {
-          text-align: center;
-          color: white;
-          font-size: 20rpx;
-          line-height: 30rpx;
-        }
-      }
-
-      .reportBox {
-        position: fixed;
-        right: 6%;
-        top: 45%;
-        height: 80rpx;
-        width: 100rpx;
-        z-index: 15;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 20rpx;
-
-        .reportIconBox {
-          width: 100rpx;
-          height: 50rpx;
-          text-align: center;
-
-          .reportIcon {
-            width: 50rpx;
-            height: 50rpx;
-            background: url(../../static/icon/report.png) no-repeat center;
-            background-size: 50rpx;
-          }
-        }
-
-        .report {
-          text-align: center;
-          color: white;
-          font-size: 20rpx;
-          line-height: 30rpx;
-        }
-      }
-
-      .seeMoreBox {
-        position: fixed;
-        right: 6%;
-        top: 53%;
-        height: 80rpx;
-        width: 100rpx;
-        z-index: 15;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 20rpx;
-
-        .seeMoreIconBox {
-          width: 100rpx;
-          height: 50rpx;
-          text-align: center;
-
-          .seeMoreIcon {
-            width: 50rpx;
-            height: 50rpx;
-            background: url(../../static/icon/seeMore.png) no-repeat center;
-            background-size: 50rpx;
-          }
-        }
-
-        .seeMore {
-          text-align: center;
-          color: white;
-          font-size: 20rpx;
-          line-height: 30rpx;
-        }
-      }
-
-      .returnToPreviousBox {
-        position: fixed;
-        right: 6%;
-        top: 61%;
-        height: 80rpx;
-        width: 100rpx;
-        z-index: 15;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 20rpx;
-
-        .returnToPreviousIconBox {
-          width: 100rpx;
-          height: 50rpx;
-          text-align: center;
-
-          .returnToPreviousIcon {
-            width: 50rpx;
-            height: 50rpx;
-            background: url(../../static/icon/returnToPrevious.png) no-repeat
-              center;
-            background-size: 50rpx;
-          }
-        }
-
-        .returnToPrevious {
-          text-align: center;
-          color: white;
-          font-size: 20rpx;
-          line-height: 30rpx;
-        }
-      }
-    }
-
-    .horizontalBox {
-      .my_progress_h {
-        position: fixed;
-        // width: calc(100vh - 80rpx);
-        width: 133.3%;
-        z-index: 999;
-        padding: 0 20rpx;
-        border-radius: 40rpx;
-        height: 40px;
-        left: calc(-66.1% + 50rpx);
-        top: calc(50% - 40rpx);
-        transform: rotate(90deg);
-        background-color: rgba($color: #fff, $alpha: 0.15);
-        display: flex;
-        .play_btn {
-          width: 40px;
-          height: 40px;
-          view {
-            width: 100%;
-            height: 100%;
-            display: block;
-          }
-          .play_v {
-            background: url("../../static/playIcon/play.png") no-repeat center;
-            background-size: 40rpx;
-          }
-          .pause_v {
-            background: url("../../static/playIcon/pause.png") no-repeat center;
-            background-size: 40rpx;
-          }
-        }
-        .progress_contaier {
-          flex: 1;
-          // width: calc(100% - 40rpx);
-          position: relative;
-          top: 50%;
-          transform: translateY(-50%);
-          display: flex;
-          line-height: 40px;
-          .begin_timer,
-          .over_timer {
-            width: 84rpx;
-            text-align: left;
-            color: #fff;
-          }
-          .progress_event_box_h {
-            flex: 1;
-            height: 40px;
-            margin: 0 20rpx;
-            .progress_h {
-              height: 8rpx;
-              border-radius: 6rpx;
-              background-color: #808080;
-              position: relative;
-              top: 50%;
-              transform: translateY(-50%);
-              overflow: hidden;
-              .on_progress_h {
-                transition: all 0.1s;
-                position: absolute;
-                left: 0;
-                top: 0;
-                height: 100%;
-                background-color: #fff;
-              }
-            }
-          }
-        }
-      }
-      .storyLineBox {
-        position: fixed;
-        right: 0;
-        top: 60%;
-        height: 80rpx;
-        width: 100rpx;
-        transform: translate(-50%, -50%) rotateZ(90deg);
-        z-index: 15;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 20rpx;
-
-        .storyLineIconBox {
-          width: 100rpx;
-          height: 50rpx;
-          text-align: center;
-
-          .storyLineIcon {
-            width: 50rpx;
-            height: 50rpx;
-            background: url(../../static/icon/fenzhi.png) no-repeat center;
-            background-size: 50rpx;
-          }
-        }
-
-        .storyLine {
-          text-align: center;
-          color: white;
-          font-size: 20rpx;
-          line-height: 30rpx;
-        }
-      }
-
-      .reportBox {
-        position: fixed;
-        right: 0;
-        top: 70%;
-        transform: translate(-50%, -50%) rotateZ(90deg);
-        height: 80rpx;
-        width: 100rpx;
-        z-index: 15;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 20rpx;
-
-        .reportIconBox {
-          width: 100rpx;
-          height: 50rpx;
-          text-align: center;
-
-          .reportIcon {
-            width: 50rpx;
-            height: 50rpx;
-            background: url(../../static/icon/report.png) no-repeat center;
-            background-size: 50rpx;
-          }
-        }
-
-        .report {
-          text-align: center;
-          color: white;
-          font-size: 20rpx;
-          line-height: 30rpx;
-        }
-      }
-
-      .seeMoreBox {
-        position: fixed;
-        right: 0;
-        top: 80%;
-        transform: translate(-50%, -50%) rotateZ(90deg);
-        height: 80rpx;
-        width: 100rpx;
-        z-index: 15;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 20rpx;
-
-        .seeMoreIconBox {
-          width: 100rpx;
-          height: 50rpx;
-          text-align: center;
-
-          .seeMoreIcon {
-            width: 50rpx;
-            height: 50rpx;
-            background: url(../../static/icon/seeMore.png) no-repeat center;
-            background-size: 50rpx;
-          }
-        }
-
-        .seeMore {
-          text-align: center;
-          color: white;
-          font-size: 20rpx;
-          line-height: 30rpx;
-        }
-      }
-
-      .returnToPreviousBox {
-        position: fixed;
-        right: 0;
-        top: 90%;
-        transform: translate(-50%, -50%) rotateZ(90deg);
-        height: 80rpx;
-        width: 100rpx;
-        z-index: 15;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 20rpx;
-
-        .returnToPreviousIconBox {
-          width: 100rpx;
-          height: 50rpx;
-          text-align: center;
-
-          .returnToPreviousIcon {
-            width: 50rpx;
-            height: 50rpx;
-            background: url(../../static/icon/returnToPrevious.png) no-repeat
-              center;
-            background-size: 50rpx;
-          }
-        }
-
-        .returnToPrevious {
-          text-align: center;
-          color: white;
-          font-size: 20rpx;
-          line-height: 30rpx;
-        }
-      }
-    }
-
-    .storyLineContentMask16 {
-      position: fixed;
-      z-index: 999;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(255, 255, 255, 0.9);
-
-      .storyLineContentBox {
-        width: 100%;
-        height: 100%;
-        z-index: 17;
-        background-color: rgba(0, 0, 0, 0.3);
-
-        .title {
-          text-align: center;
-          font-size: 36rpx;
-          color: white;
-          line-height: 100rpx;
-        }
-
-        .splitLine {
-          border: 2rpx solid #d3d3d3;
-          width: 80%;
-          margin: 0 auto;
-        }
-
-        .closeBox {
-          position: absolute;
-          width: 46rpx;
-          height: 46rpx;
-          right: 20rpx;
-          top: 20rpx;
-
-          .closeIcon {
-            width: 100%;
-            height: 100%;
-            background: url(../../static/icon/close.png) no-repeat center;
-            background-size: 46rpx;
-          }
-        }
-      }
-    }
-
-    .reportContentMask16 {
-      position: fixed;
-      z-index: 999;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(255, 255, 255, 0.9);
-
-      .reportContentBox {
-        width: 100%;
-        height: 100%;
-        z-index: 17;
-        background-color: rgba(0, 0, 0, 0.3);
-
-        .title {
-          text-align: center;
-          font-size: 36rpx;
-          color: white;
-          line-height: 100rpx;
-        }
-
-        .splitLine {
-          border: 2rpx solid #d3d3d3;
-          width: 100%;
-          margin: 0 auto;
-        }
-
-        .subTitle {
-          color: white;
-          margin: 10rpx 0 0 10rpx;
-          font-size: 30rpx;
-        }
-
-        .closeBox {
-          position: absolute;
-          width: 46rpx;
-          height: 46rpx;
-          right: 20rpx;
-          top: 20rpx;
-
-          .closeIcon {
-            width: 100%;
-            height: 100%;
-            background: url(../../static/icon/close.png) no-repeat center;
-            background-size: 46rpx;
-          }
-        }
-
-        .reportContent {
-          .uni-list {
-            .checkBox {
-              margin: 30rpx 0 0 30rpx;
-              display: flex;
-              justify-content: flex-start;
-
-              .nameBox {
-                height: 48rpx;
-
-                .name {
-                  line-height: 48rpx;
-                  color: white;
-                }
-              }
-            }
-          }
-
-          .uni-textarea {
-            margin: 30rpx 0 0 30rpx;
-
-            textarea {
-              background: white;
-            }
-          }
-
-          .uploadBox {
-            margin: 30rpx 0 0 0;
-
-            .subTitle {
-              color: white;
-              font-size: 30rpx;
-            }
-
-            .uploadBtnBox {
-              margin: 30rpx 0 0 30rpx;
-              border: 2rpx solid white;
-              width: 200rpx;
-              height: 300rpx;
-
-              icon {
-                width: 100%;
-                height: 100%;
-                background: url(../../static/icon/add.png) no-repeat center;
-                background-size: 200rpx 200rpx;
-              }
-            }
-
-            .uploadImageBox {
-              margin: 30rpx 0 0 30rpx;
-              border: 2rpx solid red;
-              width: 200rpx;
-              height: 300rpx;
-              border: 2rpx solid white;
-
-              image {
-                width: 100%;
-                height: 100%;
-              }
-            }
-          }
-
-          .submitBtnBox {
-            margin: 0 auto;
-            margin-top: 20rpx;
-            font-size: 30rpx;
-            width: 150rpx;
-            height: 60rpx;
-            color: white;
-            border: 2rpx solid white;
-
-            .btnText {
-              line-height: 60rpx;
-              text-align: center;
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-page {
-  width: 100%;
-  height: 100%;
-}
+	.playBox {
+		width: 100%;
+		height: 100%;
+
+		.u-drawer {
+			z-index: 9999 !important;
+		}
+
+		.popupBox {
+			width: 100%;
+			height: 100%;
+			position: fixed;
+			left: 0;
+			top: 0;
+			background-color: rgba(255, 255, 255, 0);
+			z-index: 16;
+
+			.horizontalCloseIcon {
+				position: absolute;
+				right: 13%;
+				top: 71%;
+				width: 60rpx;
+				height: 60rpx;
+				background: url(../../static/icon/dialogClose.png) no-repeat center;
+				background-size: 60rpx;
+			}
+
+			.verticalCloseIcon {
+				position: absolute;
+				right: 7%;
+				top: 33%;
+				width: 60rpx;
+				height: 60rpx;
+				background: url(../../static/icon/dialogClose.png) no-repeat center;
+				background-size: 60rpx;
+			}
+
+			.buoyDialog {
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				width: 500rpx;
+				height: 500rpx;
+
+				.buoyDialogImage {
+					width: 100%;
+					height: 100%;
+					margin-top: 50rpx;
+
+					image {
+						width: 100%;
+						height: 100%;
+					}
+				}
+
+				.buoyDialogPrintWords {
+					// border: 2rpx solid red;
+					width: 100%;
+					height: 100%;
+					background-color: rgba(255, 255, 255, 0.5);
+					margin-top: 50rpx;
+
+					textarea {
+						margin: 20rpx 20rpx;
+						font-size: 38rpx;
+						width: 90%;
+						height: 90%;
+					}
+				}
+			}
+		}
+
+		.verticalOptionPercentagesBox {
+			position: fixed;
+			right: 5%;
+			top: 12%;
+			height: 600rpx;
+			width: 290rpx;
+			z-index: 15;
+
+			// background-color: rgba(255,255,255,.5);
+			.optionPercentages {
+				height: 50rpx;
+				width: 100%;
+
+				.optionPercentageBox {
+					margin-top: 10rpx;
+					padding: 10rpx 20rpx;
+					height: 50rpx;
+					border-radius: 20rpx;
+					background-color: rgba(0, 0, 0, 0.3);
+					text-align: left;
+
+					.optionPercentage {
+						color: white;
+						font-size: 30rpx;
+						line-height: 30rpx;
+					}
+				}
+			}
+		}
+
+		.horizontalOptionPercentagesBox {
+			position: fixed;
+			left: 40%;
+			top: 81%;
+			height: 600rpx;
+			width: 290rpx;
+			transform: translate(-50%, -50%) rotateZ(90deg);
+			z-index: 15;
+
+			// background-color: rgba(255,255,255,.5);
+			.optionPercentages {
+				height: 50rpx;
+				width: 100%;
+
+				.optionPercentageBox {
+					margin-top: 10rpx;
+					padding: 10rpx 20rpx;
+					height: 50rpx;
+					border-radius: 20rpx;
+					background-color: rgba(0, 0, 0, 0.3);
+					text-align: left;
+
+					.optionPercentage {
+						color: white;
+						font-size: 30rpx;
+						line-height: 30rpx;
+					}
+				}
+			}
+		}
+
+		.multipleResultPlayEndMask {
+			position: fixed;
+			left: 50%;
+			top: 50%;
+			background-color: black;
+			z-index: 8;
+		}
+
+		.verticalPopupNameBox {
+			position: fixed;
+			left: 5%;
+			top: 7%;
+			width: 460rpx;
+			height: 60rpx;
+			background-color: rgba(0, 0, 0, 0.3);
+			border-radius: 30rpx;
+			text-align: left;
+
+			text {
+				padding: 20rpx;
+				font-size: 30rpx;
+				color: white;
+				line-height: 60rpx;
+			}
+		}
+
+		.horizontalPopupNameBox {
+			position: fixed;
+			left: 84%;
+			top: 21%;
+			width: 460rpx;
+			height: 60rpx;
+			transform: translate(-50%, -50%) rotateZ(90deg);
+			background-color: rgba(0, 0, 0, 0.3);
+			border-radius: 30rpx;
+			text-align: left;
+
+			text {
+				padding: 20rpx;
+				font-size: 30rpx;
+				color: white;
+				line-height: 60rpx;
+			}
+		}
+
+		.progress-line-box {
+			position: fixed;
+			left: 2%;
+			top: 50%;
+			height: 50rpx;
+			z-index: 10;
+			transform: translate(-50%, -50%) rotateZ(90deg);
+
+			progress {
+				position: absolute;
+				top: 48%;
+				left: 4%;
+				width: 80%;
+			}
+
+			.progress-time {
+				position: absolute;
+				left: 85%;
+				color: white;
+				line-height: 50rpx;
+			}
+		}
+
+		.progress-box {
+			position: fixed;
+			left: 6%;
+			top: 50%;
+			z-index: 10;
+			height: 50rpx;
+			width: 450rpx;
+			display: flex;
+			justify-content: center;
+			border-radius: 20rpx;
+			background-color: rgba(0, 0, 0, 0.5);
+			transform: translate(-50%, -50%) rotateZ(90deg);
+
+			.replayVideoIconBox {
+				width: 50rpx;
+				height: 50rpx;
+
+				icon {
+					width: 100%;
+					height: 100%;
+					background: url(../../static/icon/jumpback.png) no-repeat center;
+					background-size: 50rpx;
+				}
+			}
+
+			.jumpbackIconBox {
+				width: 50rpx;
+				height: 50rpx;
+				margin-left: 30rpx;
+
+				icon {
+					width: 100%;
+					height: 100%;
+					background: url(../../static/icon/jumpback15.png) no-repeat center;
+					background-size: 50rpx;
+				}
+			}
+
+			.suspendIconBox {
+				width: 50rpx;
+				height: 50rpx;
+				margin-left: 30rpx;
+
+				icon {
+					width: 100%;
+					height: 100%;
+					background: url(../../static/icon/suspend.png) no-repeat center;
+					background-size: 50rpx;
+				}
+			}
+
+			.playIconBox {
+				width: 50rpx;
+				height: 50rpx;
+				margin-left: 30rpx;
+
+				icon {
+					width: 100%;
+					height: 100%;
+					background: url(../../static/icon/play.png) no-repeat center;
+					background-size: 50rpx;
+				}
+			}
+
+			.jumpforwardIconBox {
+				width: 50rpx;
+				height: 50rpx;
+				margin-left: 30rpx;
+
+				icon {
+					width: 100%;
+					height: 100%;
+					background: url(../../static/icon/jumpforward15.png) no-repeat center;
+					background-size: 50rpx;
+				}
+			}
+
+			.endVideoIconBox {
+				width: 50rpx;
+				height: 50rpx;
+				margin-left: 30rpx;
+
+				icon {
+					display: block;
+					transform: rotateZ(180deg);
+					width: 100%;
+					height: 100%;
+					background: url(../../static/icon/jumpback.png) no-repeat center;
+					background-size: 50rpx;
+				}
+			}
+
+			.f-text {
+				color: white;
+				line-height: 50rpx;
+			}
+
+			.t-text {
+				color: white;
+				line-height: 50rpx;
+			}
+		}
+
+		.videoLoadImageBox {
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+
+			image {
+				width: 100%;
+				height: 100%;
+			}
+		}
+
+		.play {
+			background-color: black;
+			position: relative;
+			overflow: hidden;
+
+			.container {
+				position: fixed;
+				left: 50%;
+				top: 50%;
+				transform: translate(-50%, -50%);
+				margin: 0 auto;
+				z-index: 25;
+
+				canvas {
+					width: 100%;
+					height: 100%;
+				}
+			}
+
+			.videoBox {
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				// transform: translate(-50%, -50%);修改为了行内样式
+				overflow: hidden;
+
+				video {
+					position: fixed;
+					left: 0;
+					top: 0;
+					bottom: 0;
+					z-index: 7;
+					width: 100%;
+					height: 100%;
+				}
+
+				.screenshot {
+					position: absolute;
+					left: 0;
+					top: 0;
+					z-index: 9;
+					width: 100%;
+					height: 100%;
+				}
+			}
+
+			.chooseTipsMask15 {
+				background-color: rgba(0, 0, 0, 0.1);
+				position: fixed;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				z-index: 17;
+
+				.chooseTipsMask16 {
+					background-color: rgba(255, 255, 255, 0);
+					position: fixed;
+					left: 50%;
+					top: 50%;
+					// transform: translate(-50%, -50%);
+					width: 650rpx;
+					height: 38%;
+					z-index: 18;
+					border-radius: 20rpx;
+
+					.chooseTips {
+						width: 100%;
+						z-index: 25;
+						// background-color: rgba(0,0,0,1);
+						position: absolute;
+						top: 50%;
+						transform: translateY(-50%);
+
+						.closeBox {
+							position: absolute;
+							width: 46rpx;
+							height: 46rpx;
+							right: 20rpx;
+							top: 20rpx;
+
+							.closeIcon {
+								width: 100%;
+								height: 100%;
+								background: url(../../static/icon/close.png) no-repeat center;
+								background-size: 46rpx;
+							}
+						}
+
+						.title {
+							text-align: center;
+							color: white;
+							font-size: 36rpx;
+							line-height: 100rpx;
+						}
+
+						.tips {
+							position: relative;
+
+							.optionBox {
+								background: url("https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1606382670960frame.png") no-repeat center;
+								background-size: 100% 100%;
+								width: 100%;
+								margin: 0 auto;
+								margin-bottom: 20rpx;
+								line-height: 80rpx;
+								display: flex;
+								justify-content: space-between;
+
+								.option {
+									color: white;
+									padding-left: 20rpx;
+									font-size: 34rpx;
+
+									.iconBox {
+										position: absolute;
+										right: 0;
+										top: -18rpx;
+										// background-color: #7E4DAB;
+										background-color: rgba(#ffffff, 0.6);
+										height: 50rpx;
+										width: 180rpx;
+										border-radius: 25rpx;
+										display: flex;
+										justify-content: flex-start;
+
+										icon {
+											display: inline-block;
+											margin-left: 12rpx;
+											line-height: 50rpx;
+											background: url(../../static/icon/advertisement.png) no-repeat center;
+											width: 50rpx;
+											height: 50rpx;
+											background-size: 50rpx;
+										}
+
+										text {
+											margin-left: 8rpx;
+											line-height: 50rpx;
+											color: #707070;
+											font-size: 24rpx;
+										}
+									}
+								}
+							}
+						}
+
+						.video_rebroadcast {
+							width: 80rpx;
+							height: 80rpx;
+							padding: 10rpx;
+							background-color: rgba(#000, 0.2);
+							border-radius: 40rpx;
+							margin: 0 auto;
+
+							img {
+								width: 100%;
+								height: 100%;
+								// transform: rotateY(180deg);
+							}
+						}
+					}
+				}
+			}
+
+			.verticalLikabilityBox {
+				.likabilityTips {
+					position: fixed;
+					left: 5%;
+					top: 12%;
+					height: 600rpx;
+					width: 420rpx;
+					z-index: 15;
+
+					// background-color: rgba(255,255,255,.5);
+					.lbtips {
+						height: 50rpx;
+						width: 100%;
+
+						.likabilityBox {
+							margin-top: 10rpx;
+							padding: 10rpx 20rpx;
+							height: 50rpx;
+							border-radius: 20rpx;
+							background-color: rgba(0, 0, 0, 0.3);
+							text-align: left;
+
+							.likability {
+								color: white;
+								font-size: 30rpx;
+								line-height: 30rpx;
+							}
+						}
+					}
+				}
+			}
+
+			.horizontalLikabilityBox {
+				.likabilityTips {
+					position: fixed;
+					left: 40%;
+					top: 19%;
+					height: 600rpx;
+					width: 420rpx;
+					transform: translate(-50%, -50%) rotateZ(90deg);
+					z-index: 15;
+
+					// background-color: rgba(255,255,255,.5);
+					.lbtips {
+						height: 50rpx;
+						width: 100%;
+
+						.likabilityBox {
+							margin-top: 10rpx;
+							padding: 10rpx 20rpx;
+							height: 50rpx;
+							border-radius: 20rpx;
+							background-color: rgba(0, 0, 0, 0.3);
+							text-align: left;
+
+							.likability {
+								color: white;
+								font-size: 30rpx;
+								line-height: 30rpx;
+							}
+						}
+					}
+				}
+			}
+
+			.lightBox {
+				position: fixed;
+				left: 6%;
+				top: 4%;
+				height: 40rpx;
+				width: 160rpx;
+				z-index: 15;
+				background-color: rgba(255, 255, 255, 0.5);
+				border-radius: 20rpx;
+				display: flex;
+				justify-content: flex-start;
+
+				.lightIconBox {
+					width: 40rpx;
+					height: 40rpx;
+					margin-left: 10rpx;
+
+					.lightIcon {
+						width: 100%;
+						height: 100%;
+						background: url(../../static/icon/hourglass.png) no-repeat center;
+						background-size: 40rpx;
+					}
+				}
+
+				.lightText {
+					font-size: 24rpx;
+					color: white;
+					line-height: 40rpx;
+					margin-left: 10rpx;
+				}
+
+				.addLightIconBox {
+					width: 40rpx;
+					height: 40rpx;
+					margin-left: 26rpx;
+
+					.addLightIcon {
+						width: 100%;
+						height: 100%;
+						background: url(../../static/icon/addofplay.png) no-repeat center;
+						background-size: 40rpx;
+					}
+				}
+			}
+
+			.verticalBox {
+				.my_progress {
+					position: fixed;
+					width: 100%;
+					z-index: 999;
+					padding: 0 20rpx;
+					border-radius: 40rpx;
+					height: 40px;
+					left: 0;
+					bottom: 20rpx;
+					background-color: rgba($color: #fff, $alpha: 0.15);
+					display: flex;
+
+					.play_btn {
+						width: 40px;
+						height: 40px;
+
+						view {
+							width: 100%;
+							height: 100%;
+							display: block;
+						}
+
+						.play_v {
+							background: url("../../static/playIcon/play.png") no-repeat center;
+							background-size: 40rpx;
+						}
+
+						.pause_v {
+							background: url("../../static/playIcon/pause.png") no-repeat center;
+							background-size: 40rpx;
+						}
+					}
+
+					.progress_contaier {
+						flex: 1;
+						// width: calc(100% - 40rpx);
+						position: relative;
+						top: 50%;
+						transform: translateY(-50%);
+						display: flex;
+						line-height: 40px;
+
+						.begin_timer,
+						.over_timer {
+							width: 84rpx;
+							text-align: left;
+							color: #fff;
+						}
+
+						.progress_event_box {
+							flex: 1;
+							height: 40px;
+							margin: 0 20rpx;
+
+							.progress {
+								height: 8rpx;
+								border-radius: 6rpx;
+								background-color: #808080;
+								position: relative;
+								top: 50%;
+								transform: translateY(-50%);
+								overflow: hidden;
+
+								.on_progress {
+									transition: all 0.1s;
+									position: absolute;
+									left: 0;
+									top: 0;
+									height: 100%;
+									background-color: #fff;
+								}
+							}
+						}
+					}
+				}
+
+				.storyLineBox {
+					position: fixed;
+					right: 6%;
+					top: 37%;
+					height: 80rpx;
+					width: 100rpx;
+					z-index: 15;
+					background-color: rgba(0, 0, 0, 0.3);
+					border-radius: 20rpx;
+
+					.storyLineIconBox {
+						width: 100rpx;
+						height: 50rpx;
+						text-align: center;
+
+						.storyLineIcon {
+							width: 50rpx;
+							height: 50rpx;
+							background: url(../../static/icon/fenzhi.png) no-repeat center;
+							background-size: 50rpx;
+						}
+					}
+
+					.storyLine {
+						text-align: center;
+						color: white;
+						font-size: 20rpx;
+						line-height: 30rpx;
+					}
+				}
+
+				.reportBox {
+					position: fixed;
+					right: 6%;
+					top: 45%;
+					height: 80rpx;
+					width: 100rpx;
+					z-index: 15;
+					background-color: rgba(0, 0, 0, 0.3);
+					border-radius: 20rpx;
+
+					.reportIconBox {
+						width: 100rpx;
+						height: 50rpx;
+						text-align: center;
+
+						.reportIcon {
+							width: 50rpx;
+							height: 50rpx;
+							background: url(../../static/icon/report.png) no-repeat center;
+							background-size: 50rpx;
+						}
+					}
+
+					.report {
+						text-align: center;
+						color: white;
+						font-size: 20rpx;
+						line-height: 30rpx;
+					}
+				}
+
+				.seeMoreBox {
+					position: fixed;
+					right: 6%;
+					top: 53%;
+					height: 80rpx;
+					width: 100rpx;
+					z-index: 15;
+					background-color: rgba(0, 0, 0, 0.3);
+					border-radius: 20rpx;
+
+					.seeMoreIconBox {
+						width: 100rpx;
+						height: 50rpx;
+						text-align: center;
+
+						.seeMoreIcon {
+							width: 50rpx;
+							height: 50rpx;
+							background: url(../../static/icon/seeMore.png) no-repeat center;
+							background-size: 50rpx;
+						}
+					}
+
+					.seeMore {
+						text-align: center;
+						color: white;
+						font-size: 20rpx;
+						line-height: 30rpx;
+					}
+				}
+
+				.returnToPreviousBox {
+					position: fixed;
+					right: 6%;
+					top: 61%;
+					height: 80rpx;
+					width: 100rpx;
+					z-index: 15;
+					background-color: rgba(0, 0, 0, 0.3);
+					border-radius: 20rpx;
+
+					.returnToPreviousIconBox {
+						width: 100rpx;
+						height: 50rpx;
+						text-align: center;
+
+						.returnToPreviousIcon {
+							width: 50rpx;
+							height: 50rpx;
+							background: url(../../static/icon/returnToPrevious.png) no-repeat center;
+							background-size: 50rpx;
+						}
+					}
+
+					.returnToPrevious {
+						text-align: center;
+						color: white;
+						font-size: 20rpx;
+						line-height: 30rpx;
+					}
+				}
+			}
+
+			.horizontalBox {
+				.my_progress_h {
+					position: fixed;
+					// width: calc(100vh - 80rpx);
+					width: 133.3%;
+					z-index: 999;
+					padding: 0 20rpx;
+					border-radius: 40rpx;
+					height: 40px;
+					left: calc(-66.1% + 50rpx);
+					top: calc(50% - 40rpx);
+					transform: rotate(90deg);
+					background-color: rgba($color: #fff, $alpha: 0.15);
+					display: flex;
+
+					.play_btn {
+						width: 40px;
+						height: 40px;
+
+						view {
+							width: 100%;
+							height: 100%;
+							display: block;
+						}
+
+						.play_v {
+							background: url("../../static/playIcon/play.png") no-repeat center;
+							background-size: 40rpx;
+						}
+
+						.pause_v {
+							background: url("../../static/playIcon/pause.png") no-repeat center;
+							background-size: 40rpx;
+						}
+					}
+
+					.progress_contaier {
+						flex: 1;
+						// width: calc(100% - 40rpx);
+						position: relative;
+						top: 50%;
+						transform: translateY(-50%);
+						display: flex;
+						line-height: 40px;
+
+						.begin_timer,
+						.over_timer {
+							width: 84rpx;
+							text-align: left;
+							color: #fff;
+						}
+
+						.progress_event_box_h {
+							flex: 1;
+							height: 40px;
+							margin: 0 20rpx;
+
+							.progress_h {
+								height: 8rpx;
+								border-radius: 6rpx;
+								background-color: #808080;
+								position: relative;
+								top: 50%;
+								transform: translateY(-50%);
+								overflow: hidden;
+
+								.on_progress_h {
+									transition: all 0.1s;
+									position: absolute;
+									left: 0;
+									top: 0;
+									height: 100%;
+									background-color: #fff;
+								}
+							}
+						}
+					}
+				}
+
+				.storyLineBox {
+					position: fixed;
+					right: 0;
+					top: 60%;
+					height: 80rpx;
+					width: 100rpx;
+					transform: translate(-50%, -50%) rotateZ(90deg);
+					z-index: 15;
+					background-color: rgba(0, 0, 0, 0.3);
+					border-radius: 20rpx;
+
+					.storyLineIconBox {
+						width: 100rpx;
+						height: 50rpx;
+						text-align: center;
+
+						.storyLineIcon {
+							width: 50rpx;
+							height: 50rpx;
+							background: url(../../static/icon/fenzhi.png) no-repeat center;
+							background-size: 50rpx;
+						}
+					}
+
+					.storyLine {
+						text-align: center;
+						color: white;
+						font-size: 20rpx;
+						line-height: 30rpx;
+					}
+				}
+
+				.reportBox {
+					position: fixed;
+					right: 0;
+					top: 70%;
+					transform: translate(-50%, -50%) rotateZ(90deg);
+					height: 80rpx;
+					width: 100rpx;
+					z-index: 15;
+					background-color: rgba(0, 0, 0, 0.3);
+					border-radius: 20rpx;
+
+					.reportIconBox {
+						width: 100rpx;
+						height: 50rpx;
+						text-align: center;
+
+						.reportIcon {
+							width: 50rpx;
+							height: 50rpx;
+							background: url(../../static/icon/report.png) no-repeat center;
+							background-size: 50rpx;
+						}
+					}
+
+					.report {
+						text-align: center;
+						color: white;
+						font-size: 20rpx;
+						line-height: 30rpx;
+					}
+				}
+
+				.seeMoreBox {
+					position: fixed;
+					right: 0;
+					top: 80%;
+					transform: translate(-50%, -50%) rotateZ(90deg);
+					height: 80rpx;
+					width: 100rpx;
+					z-index: 15;
+					background-color: rgba(0, 0, 0, 0.3);
+					border-radius: 20rpx;
+
+					.seeMoreIconBox {
+						width: 100rpx;
+						height: 50rpx;
+						text-align: center;
+
+						.seeMoreIcon {
+							width: 50rpx;
+							height: 50rpx;
+							background: url(../../static/icon/seeMore.png) no-repeat center;
+							background-size: 50rpx;
+						}
+					}
+
+					.seeMore {
+						text-align: center;
+						color: white;
+						font-size: 20rpx;
+						line-height: 30rpx;
+					}
+				}
+
+				.returnToPreviousBox {
+					position: fixed;
+					right: 0;
+					top: 90%;
+					transform: translate(-50%, -50%) rotateZ(90deg);
+					height: 80rpx;
+					width: 100rpx;
+					z-index: 15;
+					background-color: rgba(0, 0, 0, 0.3);
+					border-radius: 20rpx;
+
+					.returnToPreviousIconBox {
+						width: 100rpx;
+						height: 50rpx;
+						text-align: center;
+
+						.returnToPreviousIcon {
+							width: 50rpx;
+							height: 50rpx;
+							background: url(../../static/icon/returnToPrevious.png) no-repeat center;
+							background-size: 50rpx;
+						}
+					}
+
+					.returnToPrevious {
+						text-align: center;
+						color: white;
+						font-size: 20rpx;
+						line-height: 30rpx;
+					}
+				}
+			}
+
+			.storyLineContentMask16 {
+				position: fixed;
+				z-index: 999;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(255, 255, 255, 0.9);
+
+				.storyLineContentBox {
+					width: 100%;
+					height: 100%;
+					z-index: 17;
+					background-color: rgba(0, 0, 0, 0.3);
+
+					.title {
+						text-align: center;
+						font-size: 36rpx;
+						color: white;
+						line-height: 100rpx;
+					}
+
+					.splitLine {
+						border: 2rpx solid #d3d3d3;
+						width: 80%;
+						margin: 0 auto;
+					}
+
+					.closeBox {
+						position: absolute;
+						width: 46rpx;
+						height: 46rpx;
+						right: 20rpx;
+						top: 20rpx;
+
+						.closeIcon {
+							width: 100%;
+							height: 100%;
+							background: url(../../static/icon/close.png) no-repeat center;
+							background-size: 46rpx;
+						}
+					}
+				}
+			}
+
+			.reportContentMask16 {
+				position: fixed;
+				z-index: 999;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(255, 255, 255, 0.9);
+
+				.reportContentBox {
+					width: 100%;
+					height: 100%;
+					z-index: 17;
+					background-color: rgba(0, 0, 0, 0.3);
+
+					.title {
+						text-align: center;
+						font-size: 36rpx;
+						color: white;
+						line-height: 100rpx;
+					}
+
+					.splitLine {
+						border: 2rpx solid #d3d3d3;
+						width: 100%;
+						margin: 0 auto;
+					}
+
+					.subTitle {
+						color: white;
+						margin: 10rpx 0 0 10rpx;
+						font-size: 30rpx;
+					}
+
+					.closeBox {
+						position: absolute;
+						width: 46rpx;
+						height: 46rpx;
+						right: 20rpx;
+						top: 20rpx;
+
+						.closeIcon {
+							width: 100%;
+							height: 100%;
+							background: url(../../static/icon/close.png) no-repeat center;
+							background-size: 46rpx;
+						}
+					}
+
+					.reportContent {
+						.uni-list {
+							.checkBox {
+								margin: 30rpx 0 0 30rpx;
+								display: flex;
+								justify-content: flex-start;
+
+								.nameBox {
+									height: 48rpx;
+
+									.name {
+										line-height: 48rpx;
+										color: white;
+									}
+								}
+							}
+						}
+
+						.uni-textarea {
+							margin: 30rpx 0 0 30rpx;
+
+							textarea {
+								background: white;
+							}
+						}
+
+						.uploadBox {
+							margin: 30rpx 0 0 0;
+
+							.subTitle {
+								color: white;
+								font-size: 30rpx;
+							}
+
+							.uploadBtnBox {
+								margin: 30rpx 0 0 30rpx;
+								border: 2rpx solid white;
+								width: 200rpx;
+								height: 300rpx;
+
+								icon {
+									width: 100%;
+									height: 100%;
+									background: url(../../static/icon/add.png) no-repeat center;
+									background-size: 200rpx 200rpx;
+								}
+							}
+
+							.uploadImageBox {
+								margin: 30rpx 0 0 30rpx;
+								border: 2rpx solid red;
+								width: 200rpx;
+								height: 300rpx;
+								border: 2rpx solid white;
+
+								image {
+									width: 100%;
+									height: 100%;
+								}
+							}
+						}
+
+						.submitBtnBox {
+							margin: 0 auto;
+							margin-top: 20rpx;
+							font-size: 30rpx;
+							width: 150rpx;
+							height: 60rpx;
+							color: white;
+							border: 2rpx solid white;
+
+							.btnText {
+								line-height: 60rpx;
+								text-align: center;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	page {
+		width: 100%;
+		height: 100%;
+	}
 </style>
