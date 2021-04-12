@@ -855,6 +855,9 @@
 			uni.removeStorageSync('popupSettings')
 			console.log('离开play！！！！')
 			globalBus.$off('bouyClickCommonOptionTodo')
+			if(this.bouyNodeFlage){
+				this.stopBuoyDraw()()
+			}
 		},
 		onShow() {
 			uni.removeStorageSync('popupState')
@@ -869,6 +872,9 @@
 				this.otherAppletsReturnFlag = false
 			}
 			globalBus.$emit('bouyClickCommonOptionTodo')
+			if(this.bouyNodeFlage){
+				this.recoveryBuoyDraw()()()
+			}
 		},
 		onUnload() {
 			uni.removeStorageSync('popupState')
@@ -3822,9 +3828,15 @@
 						if (this.buoyTouchFlag) {
 							this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
 								// 变量 为几号位置 数组
+								this.buoyRectList[index] = null
 								// console.log("nodeBuoyList",nodeBuoyList,"index",index)
 								nodeBuoyList.forEach((nodeBuoy) => {
-
+									
+									// nodeBuoy.x = nodeBuoy.startX 
+									// nodeBuoy.y = nodeBuoy.startY
+									// nodeBuoy.vx = nodeBuoy.startVX
+									// nodeBuoy.vy = nodeBuoy.startVY
+									
 									//当时间相等时
 									// console.log('时间',nodeBuoy.buoySectionTime === newTime)
 									if (newTime >= nodeBuoy.buoySectionTime && nodeBuoy.targetTime >= newTime) {
@@ -4170,37 +4182,38 @@
 				this.buoyRectList.forEach((v, index) => {
 
 					// if (this.playMode) {
-
+				
 					// }else {
 					// 阻止移动出 指定位置
-					if (v.vx > 0) {
-						if (v.x >= v.targetX) {
-							v.vx = 0
+					if (v != null ){
+						if (v.vx > 0) {
+							if (v.x >= v.targetX) {
+								v.vx = 0
+							}
+						}
+						if (v.vx < 0) {
+							if (v.x <= v.targetX) {
+								v.vx = 0
+							}
+						}
+						if (v.vy > 0) {
+							if (v.y >= v.targetY) {
+								v.vy = 0
+							}
+						}
+						if (v.vy < 0) {
+							if (v.y <= v.targetY) {
+								v.vy = 0
+							}
+						}
+						// }
+						
+						if (v != null) {
+							v.draw();
+							v.x += v.vx;
+							v.y += v.vy;
 						}
 					}
-					if (v.vx < 0) {
-						if (v.x <= v.targetX) {
-							v.vx = 0
-						}
-					}
-					if (v.vy > 0) {
-						if (v.y >= v.targetY) {
-							v.vy = 0
-						}
-					}
-					if (v.vy < 0) {
-						if (v.y <= v.targetY) {
-							v.vy = 0
-						}
-					}
-					// }
-
-					if (v != null) {
-						v.draw();
-						v.x += v.vx;
-						v.y += v.vy;
-					}
-
 				})
 
 				// console.log('这是第',this.start)
@@ -4402,11 +4415,11 @@
 
 					})
 					this.canvasNodeBuoyList.push(aList)
-					console.log("这是初始化", this.canvasNodeBuoyList)
+					
 				})
 				uni.setStorageSync('historyNodeBuoyList', hList)
 				// this.startBuoy()
-
+				console.log("这是初始化", this.canvasNodeBuoyList)
 
 			},
 			// canvas 触摸事件
@@ -4727,37 +4740,40 @@
 				// this.clearAnimation()
 				// this.currentTime 
 				this.buoyRectList.forEach((buoyRect, index) => {
-					if ((buoyRect.targetTime - this.currentTime) > 0) {
-						buoyRect.vx = (buoyRect.targetX - buoyRect.x) / ((buoyRect.targetTime - this.currentTime) * 58)
-						buoyRect.vy = (buoyRect.targetY - buoyRect.y) / ((buoyRect.targetTime - this.currentTime) * 58)
-					} else {
-						// 当前时间
-						// let newTime = Math.floor(this.currentTime)
-						// this.buoyNewTime = this.currentTime
-						// // 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
-						// if (this.buoyCurrentTime == newTime || newTime == 0) {
-						// 	return
-						// }
-
-						// //获取视频当前时间
-						// this.buoyCurrentTime = newTime
-						// // 遍历 初始化后的可直接用于画图的 类canvas对象2维数组 index 位置下表
-						// this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
-						// 	// 变量 为几号位置 数组
-						// 	// console.log("nodeBuoyList",nodeBuoyList,"index",index)
-						// 	nodeBuoyList.forEach((nodeBuoy) => {
-						// 		if (nodeBuoy.buoySectionTime === newTime) {
-						// 			this.buoyRectList[index] = nodeBuoy
-						// 		}
-						// 	})
-						// })
-
+					if (buoyRect != null ){
+						if ((buoyRect.targetTime - this.currentTime) > 0) {
+							buoyRect.vx = (buoyRect.targetX - buoyRect.x) / ((buoyRect.targetTime - this.currentTime) * 58)
+							buoyRect.vy = (buoyRect.targetY - buoyRect.y) / ((buoyRect.targetTime - this.currentTime) * 58)
+						} else {
+							// 当前时间
+							// let newTime = Math.floor(this.currentTime)
+							// this.buoyNewTime = this.currentTime
+							// // 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
+							// if (this.buoyCurrentTime == newTime || newTime == 0) {
+							// 	return
+							// }
+						
+							// //获取视频当前时间
+							// this.buoyCurrentTime = newTime
+							// // 遍历 初始化后的可直接用于画图的 类canvas对象2维数组 index 位置下表
+							// this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
+							// 	// 变量 为几号位置 数组
+							// 	// console.log("nodeBuoyList",nodeBuoyList,"index",index)
+							// 	nodeBuoyList.forEach((nodeBuoy) => {
+							// 		if (nodeBuoy.buoySectionTime === newTime) {
+							// 			this.buoyRectList[index] = nodeBuoy
+							// 		}
+							// 	})
+							// })
+						
+						}
 					}
+					
 				})
-				if (this.buoyCanvas != null) {
-					// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
-					this.startBuoy()
-				}
+				// if (this.buoyCanvas != null) {
+				// 	// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+				// 	this.startBuoy()
+				// }
 			},
 			startBuoy() {
 				// console.log("启动")
