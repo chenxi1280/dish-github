@@ -1021,6 +1021,9 @@
 						advanceNum = allNum;
 					}
 					const proportion = advanceNum / allNum;
+					if (proportion >= 1) {
+						proportion = 0.95
+					}
 					video.seek((this.duration - 0) * proportion);
 					// video.play()
 					// console.log(advanceNum, allNum)
@@ -1052,6 +1055,10 @@
 						advanceNum = allNum;
 					}
 					const proportion = advanceNum / allNum;
+					if (proportion >= 1) {
+						proportion = 0.95
+					}
+					console.log('这是结束时间', (this.duration - 0) * proportion, video.currentTime)
 					video.seek((this.duration - 0) * proportion);
 					video.play()
 					// console.log(advanceNum, allNum)
@@ -1082,6 +1089,9 @@
 						advanceNum = allNum;
 					}
 					const proportion = advanceNum / allNum;
+					if (proportion >= 1) {
+						proportion = 0.95
+					}
 					video.seek((this.duration - 0) * proportion);
 					// video.play()
 					// console.log(advanceNum, allNum)
@@ -1102,9 +1112,12 @@
 						advanceNum = allNum;
 					}
 					const proportion = advanceNum / allNum;
+					if (proportion >= 1) {
+						proportion = 0.95
+					}
+					console.log('这是结束时间', (this.duration - 0) * proportion, proportion)
 					video.seek((this.duration - 0) * proportion);
 					video.play()
-					// console.log(advanceNum, allNum)
 				}).exec()
 			},
 			videoError(e){
@@ -5825,7 +5838,7 @@
         }
 
         .splitLine {
-          border: 2rpx solid #d3d3d3;
+          border-top: 2rpx solid #d3d3d3;
           width: 80%;
           margin: 0 auto;
         }
@@ -5855,7 +5868,7 @@
       width: 100%;
       height: 100vh;
 			padding-bottom: 20rpx;
-      background-color: #fff;
+      background-color: rgba($color: #fff, $alpha: 1);
 			color: #1a1a1a!important;
 			overflow: auto;
 			
@@ -5872,7 +5885,7 @@
         }
 
         .splitLine {
-          border: 2rpx solid #d3d3d3;
+          border-top: 2rpx solid #d3d3d3;
           width: 100%;
           margin: 0 auto;
         }
