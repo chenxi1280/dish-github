@@ -138,10 +138,10 @@
 			</view> -->
 			<!-- 故事线和举报 -->
 			<!-- :style="hiddenBtnFlag?'display: block':'display: none'" -->
-			<!-- 竖屏 -->
-			<view v-if="hiddenBtnFlag" :style="showStyleFlag?'display: block':'display: none'" class="verticalBox">
+			<!-- 竖屏  hiddenBtnFlag-->
+			<view :style="showStyleFlag?'display: block':'display: none'" class="verticalBox">
 				<!-- 自制进度条 -->
-				<view class="my_progress" style="z-index: 999;" v-if="isShowMyProgress">
+				<view class="my_progress" style="z-index: 999;" v-if="isShowMyProgress && hiddenBtnFlag">
           <view class="play_btn">
             <view class="play_v" v-if="!isPlay" @click="toggleIsPlay(true)"></view>
             <view class="pause_v" v-else @click="toggleIsPlay(false)"></view>
@@ -181,10 +181,10 @@
 					<view class="returnToPrevious">返回上级</view>
 				</view>
 			</view>
-			<!-- 横屏 -->
-			<view v-if="hiddenBtnFlag" :style="!showStyleFlag?'display: block':'display: none'" class="horizontalBox">
+			<!-- 横屏 hiddenBtnFlag-->
+			<view :style="!showStyleFlag?'display: block':'display: none'" class="horizontalBox">
 				<!-- 自制进度条 -->
-				<view class="my_progress_h" v-if="isShowMyProgress">
+				<view class="my_progress_h" v-if="isShowMyProgress && hiddenBtnFlag">
           <view class="play_btn">
             <view class="play_v" v-if="!isPlay" @click="toggleIsPlay(true)"></view>
             <view class="pause_v" v-else @click="toggleIsPlay(false)"></view>
@@ -253,7 +253,7 @@
 							<checkbox-group @change="checkboxChange">
 								<label class="checkBox" v-for="item in items" :key="item.value">
 									<view>
-										<checkbox :value="item.value" :checked="item.checked" />
+										<checkbox :value="item.value" :checked="item.checked"/>
 									</view>
 									<view class="nameBox">
 										<view class="name">{{item.name}}</view>
@@ -261,21 +261,23 @@
 								</label>
 							</checkbox-group>
 						</view>
+						<view class="content_tips">为帮助审核人员尽快处理，请补充详细信息</view>
 						<view class="uni-textarea">
-							<textarea v-model="textareaContent" />
+							<textarea v-model="textareaContent" style="background-color: #e5e5e5;padding: 10rpx;box-sizing: border-box;" />
 							</view>
 						<view class="uploadBox">
 							<view class="subTitle">上传图片</view>
 							<view class="uploadBtnBox" v-if="uploadBtnFlag" @click="uploadImage">
-								<icon></icon>
+								<view class="add_btn">
+									<view></view>
+									<view></view>
+								</view>
 							</view>
-							<view class="uploadImageBox" v-if="uploadImageFlag">
+							<view class="uploadImageBox" v-if="uploadImageFlag" @click="uploadImage">
 								<image :src="headImage" mode="scaleToFill"></image>
 							</view>
 						</view>
-						<view class="submitBtnBox" @click="submit">
-							<view class="btnText">提交</view>
-						</view>
+						<u-button type="error" style="margin-top: 20rpx;display: inline-block; width: 90%;margin-left: 5%;" @click="submit">提交举报</u-button>
 					</view>
 				</view>
 			</view>
@@ -3632,11 +3634,14 @@
 			goDiscover() {
 				/* console.log('我触发了')
 				this.videoContext.play() */
-				uni.navigateBack({
-					delta: 1,
-					fail(err) {
-						console.log('跳转失败:', err)
-					}
+				// uni.navigateBack({
+				// 	delta: 1,
+				// 	fail(err) {
+				// 		console.log('跳转失败:', err)
+				// 	}
+				// })
+				uni.switchTab({
+					url: '../dishover/dishover'
 				})
 			},
 			loadeddata(e) {
@@ -5138,6 +5143,8 @@
       z-index: 25;
 
       canvas {
+				position: absolute;
+				z-index: -1;
         width: 100%;
         height: 100%;
       }
@@ -5208,12 +5215,12 @@
             .closeIcon {
               width: 100%;
               height: 100%;
-              background: url(../../static/icon/close.png) no-repeat center;
+              background: url(../../static/playIcon/close.png) no-repeat center;
               background-size: 46rpx;
             }
           }
 
-          .title {
+          .title { 
             text-align: center;
             color: white;
             font-size: 36rpx;
@@ -5403,6 +5410,7 @@
     }
 
     .verticalBox {
+			z-index: 90;
       .my_progress {
         position: fixed;
         width: 100%;
@@ -5475,7 +5483,7 @@
         top: 37%;
         height: 80rpx;
         width: 100rpx;
-        z-index: 15;
+        z-index: 30;
         background-color: rgba(0, 0, 0, 0.3);
         border-radius: 20rpx;
 
@@ -5506,7 +5514,7 @@
         top: 45%;
         height: 80rpx;
         width: 100rpx;
-        z-index: 15;
+        z-index: 30;
         background-color: rgba(0, 0, 0, 0.3);
         border-radius: 20rpx;
 
@@ -5537,7 +5545,7 @@
         top: 53%;
         height: 80rpx;
         width: 100rpx;
-        z-index: 15;
+        z-index: 30;
         background-color: rgba(0, 0, 0, 0.3);
         border-radius: 20rpx;
 
@@ -5568,7 +5576,7 @@
         top: 61%;
         height: 80rpx;
         width: 100rpx;
-        z-index: 15;
+        z-index: 30;
         background-color: rgba(0, 0, 0, 0.3);
         border-radius: 20rpx;
 
@@ -5671,7 +5679,7 @@
         height: 80rpx;
         width: 100rpx;
         transform: translate(-50%, -50%) rotateZ(90deg);
-        z-index: 15;
+        z-index: 30;
         background-color: rgba(0, 0, 0, 0.3);
         border-radius: 20rpx;
 
@@ -5703,7 +5711,7 @@
         transform: translate(-50%, -50%) rotateZ(90deg);
         height: 80rpx;
         width: 100rpx;
-        z-index: 15;
+        z-index: 30;
         background-color: rgba(0, 0, 0, 0.3);
         border-radius: 20rpx;
 
@@ -5735,7 +5743,7 @@
         transform: translate(-50%, -50%) rotateZ(90deg);
         height: 80rpx;
         width: 100rpx;
-        z-index: 15;
+        z-index: 30;
         background-color: rgba(0, 0, 0, 0.3);
         border-radius: 20rpx;
 
@@ -5767,7 +5775,7 @@
         transform: translate(-50%, -50%) rotateZ(90deg);
         height: 80rpx;
         width: 100rpx;
-        z-index: 15;
+        z-index: 30;
         background-color: rgba(0, 0, 0, 0.3);
         border-radius: 20rpx;
 
@@ -5832,7 +5840,7 @@
           .closeIcon {
             width: 100%;
             height: 100%;
-            background: url(../../static/icon/close.png) no-repeat center;
+            background: url(../../static/playIcon/close.png) no-repeat center;
             background-size: 46rpx;
           }
         }
@@ -5845,19 +5853,21 @@
       left: 0;
       top: 0;
       width: 100%;
-      height: 100%;
-      background-color: rgba(255, 255, 255, 0.9);
+      height: 100vh;
+			padding-bottom: 20rpx;
+      background-color: #fff;
+			color: #1a1a1a!important;
+			overflow: auto;
+			
 
       .reportContentBox {
         width: 100%;
-        height: 100%;
         z-index: 17;
-        background-color: rgba(0, 0, 0, 0.3);
-
+				color: #1a1a1a;
         .title {
+					color: #1a1a1a;
           text-align: center;
           font-size: 36rpx;
-          color: white;
           line-height: 100rpx;
         }
 
@@ -5868,7 +5878,7 @@
         }
 
         .subTitle {
-          color: white;
+          color: #1a1a1a;
           margin: 10rpx 0 0 10rpx;
           font-size: 30rpx;
         }
@@ -5883,7 +5893,7 @@
           .closeIcon {
             width: 100%;
             height: 100%;
-            background: url(../../static/icon/close.png) no-repeat center;
+            background: url(../../static/playIcon/close.png) no-repeat center;
             background-size: 46rpx;
           }
         }
@@ -5900,16 +5910,23 @@
 
                 .name {
                   line-height: 48rpx;
-                  color: white;
+                  color: #1a1a1a;
                 }
               }
             }
           }
-
+					.content_tips {
+						margin-left: 26rpx;
+						transform: translateY(20rpx);
+						color: #1a1a1a;
+						font-size: 20rpx;
+					}
           .uni-textarea {
-            margin: 30rpx 0 0 30rpx;
+						width: 100%;
+						padding: 30rpx 0 0 30rpx;
 
             textarea {
+							width: calc(100% - 30rpx);
               background: white;
             }
           }
@@ -5918,22 +5935,37 @@
             margin: 30rpx 0 0 0;
 
             .subTitle {
-              color: white;
+              color: #1a1a1a;
               font-size: 30rpx;
             }
 
             .uploadBtnBox {
               margin: 30rpx 0 0 30rpx;
-              border: 2rpx solid white;
+              border: 2rpx dashed #1a1a1a;
               width: 200rpx;
-              height: 300rpx;
+              height: 200rpx;
 
-              icon {
-                width: 100%;
-                height: 100%;
-                background: url(../../static/icon/add.png) no-repeat center;
-                background-size: 200rpx 200rpx;
-              }
+              .add_btn {
+								position: relative;
+								top: 50%;
+								transform: translateY(-50%);
+								view {
+									height: 60rpx;
+									width: 8rpx;
+									border-radius: 4rpx;
+									background-color: black;
+									position: absolute;
+									left: 50%;
+									top: 50%;
+									transform: translate(-50%, -50%);
+									&:nth-child(2) {
+										position: absolute;
+										left: 50%;
+										top: 50%;
+										transform: translate(-50%, -50%) rotate(90deg);
+									}
+								}
+							}
             }
 
             .uploadImageBox {
@@ -5947,21 +5979,6 @@
                 width: 100%;
                 height: 100%;
               }
-            }
-          }
-
-          .submitBtnBox {
-            margin: 0 auto;
-            margin-top: 20rpx;
-            font-size: 30rpx;
-            width: 150rpx;
-            height: 60rpx;
-            color: white;
-            border: 2rpx solid white;
-
-            .btnText {
-              line-height: 60rpx;
-              text-align: center;
             }
           }
         }
