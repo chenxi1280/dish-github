@@ -351,7 +351,7 @@
 		    </view>
 			<view class="t-text">尾</view>
 		</view> -->
-		<view v-if="verticalJumpDialogFlag">
+		<view v-if="verticalJumpDialogFlag" style="z-index: 99999;">
 			<vertical-jump-dialog :imageUrl="popupImageUrl" :navigatorUrl="navigatorUrl" :appId="appId" :artworkId="artworkId"
 			:popupPosition="popupPosition" v-on:videoEnd="videoEnd" v-on:initPlayData="initPlayData" :artworkTree="artworkTree"
 			ref="verticalJumpDialog" v-on:multipleResultCallbackTodo="multipleResultCallbackTodo" >
