@@ -3803,6 +3803,7 @@
 			
 				//获取视频当前时间
 				this.currentTime = e.detail.currentTime
+				this.duration = e.detail.duration
 				// 进度条的时间格式化
 				const mm = parseInt(this.currentTime / 60) >= 10 ? parseInt(this.currentTime / 60) : "0" + parseInt(this.currentTime / 60);
 				const ss = parseInt(this.currentTime % 60) >= 10 ? parseInt(this.currentTime % 60) : "0" + parseInt(this.currentTime % 60);
