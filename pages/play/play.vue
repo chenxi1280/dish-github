@@ -66,7 +66,7 @@
 
 		<view class="play" :style="{'width': mobilePhoneWidth+'px', 'height': mobilePhoneHeight+'px'}">
 			<!-- 定位选项画布 -->
-			<view class="container" v-show="showCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px'}">
+			<view class="container" v-show="showCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px', 'z-index': '9999'}">
 				<canvas canvas-id="myCanvas" @touchstart="getTouchPosition" @touchend="canvasTouchendEvent"></canvas>
 			</view>
 			<view class="container" v-show="showBuoyCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px'}">
@@ -930,6 +930,14 @@
 			}
 		},
 		methods: {
+			onWaiting () {
+				const video = uni.createVideoContext("myVideo");
+				video.play()
+			},
+			onError () {
+				const video = uni.createVideoContext("myVideo");
+				video.play()
+			},
 			getToken() {
 				let _this = this
 				let openid = uni.getStorageSync("openid")
@@ -2607,12 +2615,35 @@
 					}
 				}
 			},
-			videoPlay() {
+			videoPlay(e) {
+				// this.videoContext.pause()
+				// this.videoContext.play()
 				this.isPlay = true
 				this.multipleResultFlag = false
 				this.isVideoEndFlag = false
 				this.isGetMultipleFlag = false
 				this.videoloadFlag = false
+				this.showCanvasFlag = false
+				const time = JSON.parse(JSON.stringify(this.currentTime))
+				if (this.isPlay) {
+					const timer = setTimeout(() => {
+						if (time === this.currentTime) {
+							this.videoContext.play()
+						}
+						clearTimeout(timer)
+					}, 300)
+				}
+				// 更新进度条
+				//获取视频当前时间
+				// this.currentTime = e.detail.currentTime
+				// this.duration = e.detail.duration
+				// // 进度条的时间格式化
+				// const mm = parseInt(this.currentTime / 60) >= 10 ? parseInt(this.currentTime / 60) : "0" + parseInt(this.currentTime /
+				// 	60);
+				// const ss = parseInt(this.currentTime % 60) >= 10 ? parseInt(this.currentTime % 60) : "0" + parseInt(this.currentTime %
+				// 	60);
+				// this.durationBeginTimer = mm + ":" + ss;
+				// this.progressWidth = (this.currentTime / this.duration) * 100;
 				if (this.waitingVideoFlag) {
 					if (this.bouyNodeFlage) {
 						console.log('play里面的  recoveryBuoyDraw 被启动了')
@@ -2620,7 +2651,6 @@
 						this.waitingVideoFlag = false
 					}
 				}
-
 			},
 			//视屏暂停操作
 			videoPause() {
@@ -2628,6 +2658,7 @@
 			},
 			//展示故事线内容的时候暂停视频
 			showStoryLineContent() {
+				this.showCanvasFlag = false
 				this.storyLineContentFlag = true
 				if (uni.getStorageSync('isEndings') == 1) {
 					this.videoShowFlag = false
@@ -2642,6 +2673,7 @@
 				this.reportContentFlag = true
 				this.uploadBtnFlag = true
 				this.uploadImageFlag = false
+				this.showCanvasFlag = false
 				this.videoContext.pause()
 			},
 			//触摸选项touchstart事件
@@ -3799,6 +3831,7 @@
 					60);
 				this.durationBeginTimer = mm + ":" + ss;
 				this.progressWidth = (this.currentTime / this.duration) * 100;
+				console.log('在更新吗', this.progressWidth, this.currentTime, this.duration)
 				//获取视频当前时间
 				if (this.duration - this.currentTime > 0.4) {
 					this.percent = parseInt(this.currentTime / this.duration * 100)
@@ -5229,7 +5262,7 @@
       top: 0;
       width: 100%;
       height: 100%;
-      z-index: 17;
+      z-index: 9999;
 
       .chooseTipsMask16 {
         background-color: rgba(255, 255, 255, 0);
@@ -5849,7 +5882,7 @@
 
     .storyLineContentMask16 {
       position: fixed;
-      z-index: 999;
+      z-index: 9999;
       left: 0;
       top: 0;
       width: 100%;
