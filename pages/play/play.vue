@@ -140,7 +140,7 @@
 			<!-- 故事线和举报 -->
 			<!-- :style="hiddenBtnFlag?'display: block':'display: none'" -->
 			<!-- 竖屏  hiddenBtnFlag-->
-			<view :style="showStyleFlag?'display: block':'display: none'" class="verticalBox">
+			<view  v-if="hiddenBtnFlag" :style="showStyleFlag?'display: block':'display: none'" class="verticalBox">
 				<!-- 自制进度条 -->
 				<view class="my_progress" style="z-index: 999;" v-if="isShowMyProgress && hiddenBtnFlag">
           <view class="play_btn">
@@ -183,7 +183,7 @@
 				</view>
 			</view>
 			<!-- 横屏 hiddenBtnFlag-->
-			<view :style="!showStyleFlag?'display: block':'display: none'" class="horizontalBox">
+			<view  v-if="hiddenBtnFlag" :style="!showStyleFlag?'display: block':'display: none'" class="horizontalBox">
 				<!-- 自制进度条 -->
 				<view class="my_progress_h" v-if="isShowMyProgress && hiddenBtnFlag">
           <view class="play_btn">
@@ -2551,7 +2551,7 @@
 						this.chooseTipsMaskFlag = false
 						this.screenshotShowFlag = true
 						this.videoShowFlag = true
-						this.hiddenBtnFlag = false
+						this.hiddenBtnFlag = true
 						this.showCanvasFlag = true
 						this.videoUrl = ''
 					}
@@ -2584,7 +2584,7 @@
 						// return
 					} else {
 						this.showCanvasFlag = false
-						this.hiddenBtnFlag = false
+						this.hiddenBtnFlag = true
 						this.chooseTipsShowFlag = true
 						this.chooseTipsMaskFlag = true
 					}
