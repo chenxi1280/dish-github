@@ -73,10 +73,10 @@
 				<!-- <canvas canvas-id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas> -->
 				<canvas type="2d" id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas>
 			</view>
-			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" @loadedmetadata="loadeddata"  :controls="controlsFlag" -->
+			<!-- 播放主体  @click="showButton" @timeupdate="videoTimeupdate" @loadedmetadata="loadeddata"  :controls="controlsFlag" -->
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform} ">
 				<video v-if="videoShowFlag" :controls="false" :src="videoUrl" :show-mute-btn="false" :show-fullscreen-btn="false"
-				 :autoplay="autopalyFlag" id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="false"
+				 :autoplay="autopalyFlag" id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="false" :loop="false"
 				 @ended="videoEnd(false)" @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart" @error="videoError"
 				 auto-pause-if-navigate @timeupdate="videoTimeupdate" @play="videoPlay" @waiting="waitingVideo" @loadedmetadata="loadeddata"
 				 :show-play-btn="false" @click="toggleProgress"></video>
@@ -1795,7 +1795,7 @@
 				this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
 				this.parentId = artworkTree.parentId
 				this.imageSrc = artworkTree.nodeLastImgUrl
-
+				console.log("this.imageSrc: ",this.imageSrc)
 				//如果是根节点初始化存储节点分值的容器
 				if (this.parentId === 0) {
 					//存进缓存是防止故事线进入时重置了data里面的数据
@@ -2462,7 +2462,7 @@
 					if (this.isPosition == 1) {
 						this.chooseTipsShowFlag = false
 						this.chooseTipsMaskFlag = false
-						this.screenshotShowFlag = true
+						// this.screenshotShowFlag = true
 						this.videoShowFlag = true
 						this.hiddenBtnFlag = true
 						this.showCanvasFlag = true
@@ -2517,6 +2517,7 @@
 				}
 			},
 			videoPlay() {
+				console.log(123456000011123)
 				this.isPlay = true
 				this.multipleResultFlag = false
 				this.isVideoEndFlag = false
@@ -2533,6 +2534,11 @@
 			},
 			//视屏暂停操作
 			videoPause() {
+				console.log(1111111111111111111)
+				if(this.isVideoEndFlag){
+					console.log(1111111111111111111)
+					this.screenshotShowFlag = true
+				}
 				this.isPlay = false
 			},
 			//展示故事线内容的时候暂停视频
@@ -3607,6 +3613,11 @@
 				}
 			},
 			videoTimeupdate(e) {
+				if (this.duration - this.currentTime < 0.4) {
+					if (this.isPosition == 1) {
+						this.screenshotShowFlag = true
+					}
+				}
 				//获取视频当前时间
 				this.currentTime = e.detail.currentTime
 				this.duration = e.detail.duration
