@@ -407,8 +407,6 @@
 				durationOverTimer: '00:00',
 				// 是否播放【进度条按钮】
 				isPlay: false,
-				// 是否显示video  用于修复广告BUG
-				isShowVideo: true,
 				//用户身份唯一识别符
 				token: null,
 				// 是否有光
@@ -457,8 +455,6 @@
 				reportType: "",
 				//举报内容
 				textareaContent: "",
-				//延时函数
-				time: Function,
 				//云端举报图片url
 				headImage: "",
 				//举报类型选项数组
@@ -504,10 +500,6 @@
 				playGestureFlag: true,
 				//是否开启进度控制手势开关
 				progressGestureFlag: true,
-				//touchstart 横轴坐标
-				tsx: 0,
-				//touchstart纵轴坐标
-				tsy: 0,
 				//视屏播放完成显示截图的截图路径
 				imageSrc: '',
 				//是否展示video标签的标志
@@ -677,12 +669,6 @@
 				returnToPreviouWidthMax: 0,
 				returnToPreviouHeightMin: 0,
 				returnToPreviouHeightMax: 0,
-				// 进度条
-				// progressWidthMin: 0,
-				// progressWidthMax: 0,
-				// progressHeightMin: 0,
-				// progressHeightMax: 0,
-
 				// 浮标广告弹窗
 				showConditionAdvertisingFlag: false,
 				//是否展示返回上一级提示弹窗
