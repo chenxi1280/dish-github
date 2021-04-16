@@ -161,6 +161,7 @@
 				this.controls = DeviceOrientationControls(this.camera);
 				//初始化 视频 返回视频dom
 				this.htmlVideoElement = this.videoInit();
+				console.log("this.htmlVideoElement: ",this.htmlVideoElement)
 				//生产材质
 				//此处有问题视频材质未生成成功
 				const texture = new THREE.VideoTexture(this.htmlVideoElement);
@@ -605,9 +606,9 @@
 			//视频初始化
 			videoInit() {
 				let myVideo = uni.createVideoContext('myVideo',this)
-				uni.createSelectorQuery().select("#myVideo").node().exec((res) => {
-					return res[0].node
-				})
+				let query = uni.createSelectorQuery()
+				let video = query.select('myVideo')
+				return video
 			},
 
 			playBtnClick() {
