@@ -2561,7 +2561,7 @@
 						let buoyTimestamp = (new Date()).valueOf()
 						console.log('buoyTimestamp', buoyTimestamp)
 						if (buoyTimestamp - this.buoyTimestamp < 100) {
-							console.log('没节流')
+							console.log('没节流.')
 							return
 						}
 						console.log('没有节流')
