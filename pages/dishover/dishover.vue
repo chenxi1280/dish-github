@@ -376,7 +376,8 @@
 							page: this['pageSort' + this.currentsort],
 							limit: this.limit,
 							queryType: this.queryType,
-							playClient: 1
+							playClient: 1,
+							versionId: versionId
 						},
 						success: res => {
 							if(res.status == 500) {
