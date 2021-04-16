@@ -34,6 +34,15 @@
 			}
 		},
 		{
+			"path" : "pages/mine/vr/vr",
+			"style" :                                                                                    
+			{
+				"navigationBarTitleText": "VR全景视频",
+				"enablePullDownRefresh": false,
+				"disableSwipeBack": true
+			}
+		},
+		{
 			"path": "pages/search/search",
 			"style": {
 				"navigationBarTitleText": "搜索"

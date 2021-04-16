@@ -75,10 +75,11 @@
 			</view>
 			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" @loadedmetadata="loadeddata"  :controls="controlsFlag" -->
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform} ">
-				<video v-if="videoShowFlag" :controls="false" :src="videoUrl"  :show-mute-btn="false" :show-fullscreen-btn="false" :autoplay="autopalyFlag"
-				 id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="false" @ended="videoEnd(false)"
-				 @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart"  @error="videoError" auto-pause-if-navigate
-				 @timeupdate="videoTimeupdate" @play="videoPlay" @waiting="waitingVideo"  @loadedmetadata="loadeddata" :show-play-btn="false" @click="toggleProgress"></video>
+				<video v-if="videoShowFlag" :controls="false" :src="videoUrl" :show-mute-btn="false" :show-fullscreen-btn="false"
+				 :autoplay="autopalyFlag" id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="false"
+				 @ended="videoEnd(false)" @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart" @error="videoError"
+				 auto-pause-if-navigate @timeupdate="videoTimeupdate" @play="videoPlay" @waiting="waitingVideo" @loadedmetadata="loadeddata"
+				 :show-play-btn="false" @click="toggleProgress"></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
 				'background-repeat':'no-repeat', backgroundSize:'100% 100%'}"></view>
@@ -402,10 +403,10 @@
 				</view>
 				<view class="buoyDialogPrintWords"  v-if="!buoyDialogImageFlag">
 					<textarea v-model="buoyDialogWords" disabled = "true"></textarea>
+						</view>
+					</view>
 				</view>
 			</view>
-		</view>
-	</view>
 </template>
 
 <script>
@@ -754,7 +755,8 @@
 				//浮标自选开关
 				buoyAutoChooseFlag: false,
 				//跳转到其他小程序的节流历史时间参数
-				historyTimestamp: 0
+				historyTimestamp: 0,
+				buoyTouchFlag:false
 			}
 		},
 		onReady() {
@@ -796,18 +798,18 @@
 		},
 		onLoad(option) {
 			this.token = uni.getStorageSync('token')
-			console.log("**************************this.token:",this.token)
-			if(!this.token){
+			console.log("**************************this.token:", this.token)
+			if (!this.token) {
 				console.log("**************************11:")
 				this.getToken()
 			}
 			uni.showShareMenu({
 				withShareTicket: true,
-				menus: ['shareAppMessage','shareTimeline']
+				menus: ['shareAppMessage', 'shareTimeline']
 			})
 			//初始化video对象
-			this.videoContext = uni.createVideoContext('myVideo',this)
-			console.log("%%%%%%%%%%%%%%%%%%%%%videoContext%%%%%%%%%%%",this.videoContext)
+			this.videoContext = uni.createVideoContext('myVideo', this)
+			console.log("%%%%%%%%%%%%%%%%%%%%%videoContext%%%%%%%%%%%", this.videoContext)
 			// 初始化看广告获取光的数量
 			this.rewardLight = uni.getStorageSync('rewardLight') || 3
 			this.randomText()
@@ -855,20 +857,26 @@
 			uni.removeStorageSync('popupSettings')
 			console.log('离开play！！！！')
 			globalBus.$off('bouyClickCommonOptionTodo')
+			if(this.bouyNodeFlage){
+				this.stopBuoyDraw()()
+			}
 		},
 		onShow() {
 			uni.removeStorageSync('popupState')
 			uni.removeStorageSync('popupSettings')
 			console.log('进入play！！！！')
 			//当跳转到其他小程序时设置一个开关当跳回当前小程序时触发页面onShow 此时根据开关控制video是否播放 开关用完就关
-			if(this.otherAppletsReturnFlag){
-				let videoPlayTimeout = setTimeout(()=>{
+			if (this.otherAppletsReturnFlag) {
+				let videoPlayTimeout = setTimeout(() => {
 					this.videoContext.play()
 					clearTimeout(videoPlayTimeout)
-				},500)
+				}, 500)
 				this.otherAppletsReturnFlag = false
 			}
 			globalBus.$emit('bouyClickCommonOptionTodo')
+			if(this.bouyNodeFlage){
+				this.recoveryBuoyDraw()()()
+			}
 		},
 		onUnload() {
 			uni.removeStorageSync('popupState')
@@ -925,9 +933,9 @@
 			getToken() {
 				let _this = this
 				let openid = uni.getStorageSync("openid")
-				if(openid){
+				if (openid) {
 					_this.updateUserInfo(openid)
-				}else{
+				} else {
 					uni.login({
 						provider: 'weixin',
 						success: async loginRes => {
@@ -935,20 +943,20 @@
 							await uni.request({
 								url: baseURL + '/getOpenid',
 								data: {
-										code: code,
+									code: code,
 								},
 								method: 'POST',
 								header: {
-										'content-type': 'application/json'
+									'content-type': 'application/json'
 								},
 								success: res => {
 									if (res.data.status == 200) {
-										uni.setStorageSync("openid",res.data.data.openid)
+										uni.setStorageSync("openid", res.data.data.openid)
 										_this.updateUserInfo(res.data.data.openid)
-									}else{
+									} else {
 										return uni.showToast({
-										icon: 'none',
-										title: '授权失败，请退出重新进入小程序'
+											icon: 'none',
+											title: '授权失败，请退出重新进入小程序'
 										})
 									}
 								}
@@ -961,7 +969,7 @@
 				let _this = this
 				let token = uni.getStorageSync("token")
 				this.string = token
-				if(!token){
+				if (!token) {
 					await uni.request({
 						url: baseURL + '/savaUserInfo',
 						data: {
@@ -980,7 +988,7 @@
 						},
 						success: (res) => {
 							if (res.data.status == 200) {
-								uni.setStorageSync("token",res.data.data)
+								uni.setStorageSync("token", res.data.data)
 								_this.token = res.data.data
 								this.getLight()
 								globalBus.$emit('getLightOfAppReady')
@@ -989,7 +997,7 @@
 					})
 				}
 			},
-			toggleProgress () {
+			toggleProgress() {
 				if (this.isPosition === 2) {
 					this.isShowMyProgress = true
 				} else {
@@ -1028,6 +1036,7 @@
 					// video.play()
 					// console.log(advanceNum, allNum)
 				}).exec()
+				this.buoyTouchFlag = true
 				// return false;
 				// console.log('move', e.touches[0].clientX)
 				// const pro = uni.createSelectorQuery().select(".progress_h");
@@ -1063,6 +1072,7 @@
 					video.play()
 					// console.log(advanceNum, allNum)
 				}).exec()
+				this.buoyTouchFlag = true
 				// const pro = uni.createSelectorQuery().select(".progress_h");
 				// const video = uni.createVideoContext("myVideo");
 				// // 计算比例
@@ -1096,6 +1106,7 @@
 					// video.play()
 					// console.log(advanceNum, allNum)
 				}).exec()
+				this.buoyTouchFlag = true
 				// video.play()
 			},
 			onProgressTouchend(e) {
@@ -1119,29 +1130,30 @@
 					video.seek((this.duration - 0) * proportion);
 					video.play()
 				}).exec()
+				this.buoyTouchFlag = true
 			},
-			videoError(e){
-				uni.setStorageSync("relaunchApplets",true)
+			videoError(e) {
+				uni.setStorageSync("relaunchApplets", true)
 				uni.switchTab({
 					url: '../dishover/dishover'
 				})
-				console.log("********************我报错了*********: ",e)
+				console.log("********************我报错了*********: ", e)
 			},
 			//点击浮标选项弹窗关闭按钮事件
-			closeBuoyDialog(){
+			closeBuoyDialog() {
 				this.buoyDialogFlag = false
 				this.buoyDialogWords = null
 				this.i = 0
-				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index1***********************************",this.optionIndex)
+				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index1***********************************", this.optionIndex)
 				let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
-				if(buoyPopInfo.buoyStatus){
-					if(this.isVideoEndFlag){
+				if (buoyPopInfo.buoyStatus) {
+					if (this.isVideoEndFlag) {
 						this.againPlayVideo()
-					}else{
+					} else {
 						console.log("**************************recoveryBuoyDraw*****************")
 						this.recoveryBuoyDraw()
 					}
-				}else{
+				} else {
 					this.clickCommonOptionTodo(this.optionIndex)
 				}
 			},
@@ -1163,17 +1175,17 @@
 			//浮标选项点击跳转到其他小程序
 			JumpToOtherApplets(appId, navigatorUrl) {
 				//节流
-					let currentTimestamp = (new Date()).valueOf()
-					// console.log("***************************currentTimestamp:",currentTimestamp, this.historyTimestamp)
-					// console.log("***************************historyTimestamp:",this.historyTimestamp)
-					// console.log('buoyTimestamp', buoyTimestamp)
-					if (this.historyTimestamp !== 0 && currentTimestamp - this.historyTimestamp < 500) {
-						console.log("***************************111111111111111111111")
-						this.historyTimestamp = currentTimestamp
-						return
-					}
-					console.log("***************************2222222222222222222222222")
+				let currentTimestamp = (new Date()).valueOf()
+				// console.log("***************************currentTimestamp:",currentTimestamp, this.historyTimestamp)
+				// console.log("***************************historyTimestamp:",this.historyTimestamp)
+				// console.log('buoyTimestamp', buoyTimestamp)
+				if (this.historyTimestamp !== 0 && currentTimestamp - this.historyTimestamp < 500) {
+					console.log("***************************111111111111111111111")
 					this.historyTimestamp = currentTimestamp
+					return
+				}
+				console.log("***************************2222222222222222222222222")
+				this.historyTimestamp = currentTimestamp
 				//把用过的时间赋值给历史时间
 				this.videoContext.pause()
 				this.otherAppletsReturnFlag = true
@@ -1196,8 +1208,8 @@
 							let videoContext = uni.createVideoContext('myVideo')
 							videoContext.play()
 						},
-						complete(res){
-							
+						complete(res) {
+
 						}
 					})
 				}
@@ -1301,7 +1313,7 @@
 				this.lightNumber = uni.getStorageSync('lightNumber') || 0
 				this.ecmUserLightUpLimit = uni.getStorageSync('ecmUserLightUpLimit') || 0
 			},
-			addLight () {
+			addLight() {
 				uni.request({
 					url: baseURL + '/wxPlay/addLight',
 					method: 'POST',
@@ -1316,12 +1328,12 @@
 						})
 						this.getLight()
 						this.bouyClickCommonOptionTodo()
-						
+
 					}
 				})
 			},
 			// 获取光
-			getLight () {
+			getLight() {
 				uni.request({
 					url: baseURL + '/user/light/getUserLight',
 					method: 'POST',
@@ -1804,7 +1816,7 @@
 					// console.log('我进来了')
 
 				}
-				
+
 				//获取视频的宽高时长
 				// console.log('artworkTree.videoInfo: ',artworkTree.videoInfo)
 				/* if(typeof(artworkTree.videoInfo) != "undefined" && artworkTree.videoInfo){
@@ -1833,7 +1845,7 @@
 				this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
 				this.parentId = artworkTree.parentId
 				this.imageSrc = artworkTree.nodeLastImgUrl
-				
+
 				//如果是根节点初始化存储节点分值的容器
 				if (this.parentId === 0) {
 					//存进缓存是防止故事线进入时重置了data里面的数据
@@ -1895,7 +1907,7 @@
 				}
 				//加载视频数据
 				// this.loadeddata()
-				
+
 				//非跳转节点的目标节点存播放记录
 				if (this.linkNodeId != this.detailId) {
 					// 将作品detailId留存提供给故事线
@@ -1911,7 +1923,7 @@
 					uni.setStorageSync("pkDetailIds", this.playedHistoryArray);
 					this.linkNodeId = null
 				}
-				
+
 			},
 			//视频 播放后弹窗
 			popupWindowByPopupPositonEqualsOne() {
@@ -2053,9 +2065,9 @@
 				this.popupPosition = this.popupSettings.popupPosition
 				this.popupContextState = this.popupSettings.popupContextStates
 				this.navigatorUrl = this.popupSettings.popupSkip
-				if(this.popupSettings.popupContext.search("/mobilePop")){
+				if (this.popupSettings.popupContext.search("/mobilePop")) {
 					this.popupImageUrl = this.popupSettings.popupContext
-				}else{
+				} else {
 					this.popupImageUrl = this.popupSettings.popupContext + "/mobilePop"
 				}
 				this.appId = this.popupSettings.popupAppId
@@ -2189,9 +2201,9 @@
 			},
 			async customLightByUserId(eventId) {
 				let token = null
-				if(!this.token){
+				if (!this.token) {
 					token = uni.getStorageSync("token")
-				}else{
+				} else {
 					token = this.token
 				}
 				console.log('扣光了！！！！！', eventId)
@@ -2582,15 +2594,15 @@
 						this.optionIndex = 0
 						let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
 						// buoyStatus 弹窗是否开启 1开启 0默认选项
-						if(buoyPopInfo.buoyStatus){
+						if (buoyPopInfo.buoyStatus) {
 							//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
 							this.againPlayVideo()
-						}else{
+						} else {
 							this.buoyAutoChooseFlag = true
 							this.clickCommonOptionTodo(0)
 						}
-						
-						
+
+
 
 						// console.log(this.buoyRectList)
 						// return
@@ -2620,7 +2632,7 @@
 				}
 			},
 			videoPlay() {
-				this.isPlay = true 
+				this.isPlay = true
 				this.multipleResultFlag = false
 				this.isVideoEndFlag = false
 				this.isGetMultipleFlag = false
@@ -3659,7 +3671,7 @@
 			},
 			loadeddata(e) {
 				// 浮标作品 禁用所有的进度条
-				console.log("%%%%%%%%%%%%%%%%%%%%%videoContext%%%%%%%%%%%",this.videoContext)
+				console.log("%%%%%%%%%%%%%%%%%%%%%videoContext%%%%%%%%%%%", this.videoContext)
 				if (this.bouyNodeFlage) {
 					//浮标视频不显示原生开关
 					this.controlsFlag = true
@@ -3778,8 +3790,8 @@
 				if (this.returnToPreviousFlag && this.bouyNodeFlage) {
 					console.log("************bouySectionTime2s: ", this.bouySectionTime)
 					this.bouyReturnToPreviousFlag = true
-					
-					if(this.buoyAutoChooseFlag){
+
+					if (this.buoyAutoChooseFlag) {
 						//获取浮标视频的选项初始渲染时间
 						let historyNodeBuoyList = uni.getStorageSync("historyNodeBuoyList")
 						for (let i = 0; i < historyNodeBuoyList.length; i++) {
@@ -3800,13 +3812,15 @@
 				}
 			},
 			videoTimeupdate(e) {
-			
+
 				//获取视频当前时间
 				this.currentTime = e.detail.currentTime
 				this.duration = e.detail.duration
 				// 进度条的时间格式化
-				const mm = parseInt(this.currentTime / 60) >= 10 ? parseInt(this.currentTime / 60) : "0" + parseInt(this.currentTime / 60);
-				const ss = parseInt(this.currentTime % 60) >= 10 ? parseInt(this.currentTime % 60) : "0" + parseInt(this.currentTime % 60);
+				const mm = parseInt(this.currentTime / 60) >= 10 ? parseInt(this.currentTime / 60) : "0" + parseInt(this.currentTime /
+					60);
+				const ss = parseInt(this.currentTime % 60) >= 10 ? parseInt(this.currentTime % 60) : "0" + parseInt(this.currentTime %
+					60);
 				this.durationBeginTimer = mm + ":" + ss;
 				this.progressWidth = (this.currentTime / this.duration) * 100;
 				//获取视频当前时间
@@ -3816,7 +3830,7 @@
 					this.percent = 100
 				}
 				let newTime = Math.floor(this.currentTime)
-				if (newTime  == 1) {
+				if (newTime == 1) {
 					this.getLight()
 				}
 				if (this.bouyNodeFlage) {
@@ -3824,12 +3838,41 @@
 					this.buoySpeedCalibration()
 
 					// 当前时间
-					
+
 					this.buoyNewTime = this.currentTime
 
 					// 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
 					if (this.buoyCurrentTime == newTime || newTime == 0) {
 						// this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+						if (this.buoyTouchFlag) {
+							this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
+								// 变量 为几号位置 数组
+								this.buoyRectList[index] = null
+								// console.log("nodeBuoyList",nodeBuoyList,"index",index)
+								nodeBuoyList.forEach((nodeBuoy) => {
+									
+									// nodeBuoy.x = nodeBuoy.startX 
+									// nodeBuoy.y = nodeBuoy.startY
+									// nodeBuoy.vx = nodeBuoy.startVX
+									// nodeBuoy.vy = nodeBuoy.startVY
+									
+									//当时间相等时
+									// console.log('时间',nodeBuoy.buoySectionTime === newTime)
+									if (newTime >= nodeBuoy.buoySectionTime && nodeBuoy.targetTime >= newTime) {
+										console.log("nodeBuoy",nodeBuoy)
+										nodeBuoy.x = nodeBuoy.startX + (newTime - nodeBuoy.buoySectionTime) * nodeBuoy.startVX * 60
+										nodeBuoy.y = nodeBuoy.startY + (newTime - nodeBuoy.buoySectionTime) * nodeBuoy.startVY * 60
+										nodeBuoy.vx = nodeBuoy.startVX
+										nodeBuoy.vy = nodeBuoy.startVY
+										this.buoyRectList[index] = nodeBuoy
+									}
+
+								})
+								// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+							})
+							// this.startBuoy()
+							this.buoyTouchFlag = false
+						}
 						return
 					}
 					//获取视频当前时间
@@ -4158,37 +4201,38 @@
 				this.buoyRectList.forEach((v, index) => {
 
 					// if (this.playMode) {
-
+				
 					// }else {
 					// 阻止移动出 指定位置
-					if (v.vx > 0) {
-						if (v.x >= v.targetX) {
-							v.vx = 0
+					if (v != null ){
+						if (v.vx > 0) {
+							if (v.x >= v.targetX) {
+								v.vx = 0
+							}
+						}
+						if (v.vx < 0) {
+							if (v.x <= v.targetX) {
+								v.vx = 0
+							}
+						}
+						if (v.vy > 0) {
+							if (v.y >= v.targetY) {
+								v.vy = 0
+							}
+						}
+						if (v.vy < 0) {
+							if (v.y <= v.targetY) {
+								v.vy = 0
+							}
+						}
+						// }
+						
+						if (v != null) {
+							v.draw();
+							v.x += v.vx;
+							v.y += v.vy;
 						}
 					}
-					if (v.vx < 0) {
-						if (v.x <= v.targetX) {
-							v.vx = 0
-						}
-					}
-					if (v.vy > 0) {
-						if (v.y >= v.targetY) {
-							v.vy = 0
-						}
-					}
-					if (v.vy < 0) {
-						if (v.y <= v.targetY) {
-							v.vy = 0
-						}
-					}
-					// }
-
-					if (v != null) {
-						v.draw();
-						v.x += v.vx;
-						v.y += v.vy;
-					}
-
 				})
 
 				// console.log('这是第',this.start)
@@ -4202,6 +4246,13 @@
 				// 默认 透明度0.9
 				// rectOpacity = 0.9
 				return {
+					startX: rectX,
+					// y 位置
+					startY: rectY,
+					//移动速度 x
+					startVX: vx,
+					// 移动速度y
+					startVY: vy,
 					// x 位置
 					x: rectX,
 					// y 位置
@@ -4259,7 +4310,7 @@
 
 			// 初始化浮标 对象 List
 			initializationBuoyList() {
-				
+
 				// let buoyInitTimestamp = (new Date()).valueOf();
 				// console.log('buoyInitTimestamp', buoyInitTimestamp)
 				// if (buoyInitTimestamp - this.buoyInitTimestamp < 1000) {
@@ -4269,8 +4320,8 @@
 				// console.log('buoyInitTimestamp没有节流')
 				// this.buoyInitTimestamp = buoyInitTimestamp
 				this.canvasNodeBuoyList = []
-				
-				
+
+
 				let hList = uni.getStorageSync('historyNodeBuoyList')
 				this.ecmArtworkNodeBuoyList.forEach((nodeBuoyList, index) => {
 					let aList = []
@@ -4383,11 +4434,11 @@
 
 					})
 					this.canvasNodeBuoyList.push(aList)
-					console.log("这是初始化",this.canvasNodeBuoyList)
+					
 				})
 				uni.setStorageSync('historyNodeBuoyList', hList)
 				// this.startBuoy()
-
+				console.log("这是初始化", this.canvasNodeBuoyList)
 
 			},
 			// canvas 触摸事件
@@ -4401,13 +4452,14 @@
 
 				let stopFlag = false
 				// console.log('nowBuoyRectList',nowBuoyRectList)
-				console.log('newY',newY,'newX',newX)
+				console.log('newY', newY, 'newX', newX)
 				// console.log('nowBuoyRectList',nowBuoyRectList)
-				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$nowBuoyRectList***********************************",nowBuoyRectList)
+				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$nowBuoyRectList***********************************",
+					nowBuoyRectList)
 
 				nowBuoyRectList.forEach((v, i) => {
 					if (v != null) {
-						
+
 						if (v.x <= newX && (v.x + v.rectW) >= newX) {
 							// 加10 增加判定区域
 							if (v.y <= newY && (v.y + v.rectH) >= newY) {
@@ -4415,28 +4467,28 @@
 								this.optionIndex = i
 								console.log(this.getBuoyPopInfo(i))
 								let buoyPopInfo = this.getBuoyPopInfo(i)
-								console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index2***********************************",i)
+								console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index2***********************************", i)
 								// buoyStatus 弹窗是否开启 1开启 0默认选项
-								if(buoyPopInfo.buoyStatus){
+								if (buoyPopInfo.buoyStatus) {
 									//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
-									if(buoyPopInfo.buoyPopType === 0){
-										this.JumpToOtherApplets(buoyPopInfo.buoyPopAppId,buoyPopInfo.buoyPopContext)
-									}else if(buoyPopInfo.buoyPopType === 1){
+									if (buoyPopInfo.buoyPopType === 0) {
+										this.JumpToOtherApplets(buoyPopInfo.buoyPopAppId, buoyPopInfo.buoyPopContext)
+									} else if (buoyPopInfo.buoyPopType === 1) {
 										this.stopBuoyDraw()
 										this.printContent(buoyPopInfo.buoyPopContext)
 										this.buoyDialogImageFlag = false
 										this.buoyDialogFlag = true
-									}else{
+									} else {
 										this.stopBuoyDraw()
 										this.buoyDialogImageSrc = buoyPopInfo.buoyPopContext + "/mobilePop"
 										this.buoyDialogFlag = true
 										this.buoyDialogImageFlag = true
 									}
-								}else{
+								} else {
 									this.buoyAutoChooseFlag = false
 									this.clickCommonOptionTodo(i)
 								}
-								
+
 								stopFlag = true
 								return
 							}
@@ -4707,37 +4759,40 @@
 				// this.clearAnimation()
 				// this.currentTime 
 				this.buoyRectList.forEach((buoyRect, index) => {
-					if ((buoyRect.targetTime - this.currentTime) > 0) {
-						buoyRect.vx = (buoyRect.targetX - buoyRect.x) / ((buoyRect.targetTime - this.currentTime) * 58)
-						buoyRect.vy = (buoyRect.targetY - buoyRect.y) / ((buoyRect.targetTime - this.currentTime) * 58)
-					} else {
-						// 当前时间
-						let newTime = Math.floor(this.currentTime)
-						this.buoyNewTime = this.currentTime
-						// 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
-						if (this.buoyCurrentTime == newTime || newTime == 0) {
-							return
+					if (buoyRect != null ){
+						if ((buoyRect.targetTime - this.currentTime) > 0) {
+							buoyRect.vx = (buoyRect.targetX - buoyRect.x) / ((buoyRect.targetTime - this.currentTime) * 58)
+							buoyRect.vy = (buoyRect.targetY - buoyRect.y) / ((buoyRect.targetTime - this.currentTime) * 58)
+						} else {
+							// 当前时间
+							// let newTime = Math.floor(this.currentTime)
+							// this.buoyNewTime = this.currentTime
+							// // 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
+							// if (this.buoyCurrentTime == newTime || newTime == 0) {
+							// 	return
+							// }
+						
+							// //获取视频当前时间
+							// this.buoyCurrentTime = newTime
+							// // 遍历 初始化后的可直接用于画图的 类canvas对象2维数组 index 位置下表
+							// this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
+							// 	// 变量 为几号位置 数组
+							// 	// console.log("nodeBuoyList",nodeBuoyList,"index",index)
+							// 	nodeBuoyList.forEach((nodeBuoy) => {
+							// 		if (nodeBuoy.buoySectionTime === newTime) {
+							// 			this.buoyRectList[index] = nodeBuoy
+							// 		}
+							// 	})
+							// })
+						
 						}
-
-						//获取视频当前时间
-						this.buoyCurrentTime = newTime
-						// 遍历 初始化后的可直接用于画图的 类canvas对象2维数组 index 位置下表
-						this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
-							// 变量 为几号位置 数组
-							// console.log("nodeBuoyList",nodeBuoyList,"index",index)
-							nodeBuoyList.forEach((nodeBuoy) => {
-								if (nodeBuoy.buoySectionTime === newTime) {
-									this.buoyRectList[index] = nodeBuoy
-								}
-							})
-						})
-
 					}
+					
 				})
-				if (this.buoyCanvas != null) {
-					// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
-					this.startBuoy()
-				}
+				// if (this.buoyCanvas != null) {
+				// 	// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+				// 	this.startBuoy()
+				// }
 			},
 			startBuoy() {
 				// console.log("启动")
@@ -4796,27 +4851,27 @@
 			},
 			// 获取改浮弹窗信息
 			getBuoyPopInfo(index) {
-				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index3***********************************",index)
-				console.log("$$$$$$$$$$$$$this.ecmArtworkNodeBuoyList*********************************",this.ecmArtworkNodeBuoyList)
-				console.log("$$$$$$$$$$$$$this.ecmArtworkNodeBuoyList*********************************",this.canvasNodeBuoyList)
+				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index3***********************************", index)
+				console.log("$$$$$$$$$$$$$this.ecmArtworkNodeBuoyList*********************************", this.ecmArtworkNodeBuoyList)
+				console.log("$$$$$$$$$$$$$this.ecmArtworkNodeBuoyList*********************************", this.canvasNodeBuoyList)
 				if (this.ecmArtworkNodeBuoyList.length >= index + 1) {
-						if (this.ecmArtworkNodeBuoyList[index][0] == null) {
-						  return null
-						} else {
-							return {
-								//弹窗是否开启 1开启 0默认选项
-								buoyStatus:this.ecmArtworkNodeBuoyList[index][0].buoyStatus,
-								//类型有三种 对应 0其他小程序 1文字 2图片
-								buoyPopType:this.ecmArtworkNodeBuoyList[index][0].buoyPopType,
-								//类型有三种 0小程序的页面路径 1文字的文本信息 2图片的url
-								buoyPopContext:this.ecmArtworkNodeBuoyList[index][0].buoyPopContext,
-								//小程序的appid
-								buoyPopAppId:this.ecmArtworkNodeBuoyList[index][0].buoyPopAppId,
-								fkNodeId:this.ecmArtworkNodeBuoyList[index][0].fkNodeId,
-								pkBuoyId:this.ecmArtworkNodeBuoyList[index][0].pkBuoyId
-							}
+					if (this.ecmArtworkNodeBuoyList[index][0] == null) {
+						return null
+					} else {
+						return {
+							//弹窗是否开启 1开启 0默认选项
+							buoyStatus: this.ecmArtworkNodeBuoyList[index][0].buoyStatus,
+							//类型有三种 对应 0其他小程序 1文字 2图片
+							buoyPopType: this.ecmArtworkNodeBuoyList[index][0].buoyPopType,
+							//类型有三种 0小程序的页面路径 1文字的文本信息 2图片的url
+							buoyPopContext: this.ecmArtworkNodeBuoyList[index][0].buoyPopContext,
+							//小程序的appid
+							buoyPopAppId: this.ecmArtworkNodeBuoyList[index][0].buoyPopAppId,
+							fkNodeId: this.ecmArtworkNodeBuoyList[index][0].fkNodeId,
+							pkBuoyId: this.ecmArtworkNodeBuoyList[index][0].pkBuoyId
 						}
-				}else {
+					}
+				} else {
 					return null
 				}
 			},
