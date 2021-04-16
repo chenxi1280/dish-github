@@ -1015,6 +1015,46 @@
 				}
 				this.isPlay = isPlay;
 			},
+			reCanvasNodeBuoyList(){
+				this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
+					// console.log("nodeBuoyList",nodeBuoyList,"index",index)
+					nodeBuoyList.forEach((nodeBuoy) => {
+							nodeBuoy.x = nodeBuoy.startX 
+							nodeBuoy.y = nodeBuoy.startY 
+							nodeBuoy.vx = nodeBuoy.startVX
+							nodeBuoy.vy = nodeBuoy.startVY
+						}
+					)
+					// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+				})
+			},
+			buoyTouchCurrtime(newTime){
+				this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
+					// 变量 为几号位置 数组
+					this.buoyRectList[index] = null
+					// console.log("nodeBuoyList",nodeBuoyList,"index",index)
+					nodeBuoyList.forEach((nodeBuoy) => {
+						
+						// nodeBuoy.x = nodeBuoy.startX 
+						// nodeBuoy.y = nodeBuoy.startY
+						// nodeBuoy.vx = nodeBuoy.startVX
+						// nodeBuoy.vy = nodeBuoy.startVY
+						
+						//当时间相等时
+						// console.log('时间',nodeBuoy.buoySectionTime === newTime)
+						if (newTime >= nodeBuoy.buoySectionTime && nodeBuoy.targetTime >= newTime) {
+							console.log("nodeBuoy",nodeBuoy)
+							nodeBuoy.x = nodeBuoy.startX + (newTime - nodeBuoy.buoySectionTime) * nodeBuoy.startVX * 60
+							nodeBuoy.y = nodeBuoy.startY + (newTime - nodeBuoy.buoySectionTime) * nodeBuoy.startVY * 60
+							nodeBuoy.vx = nodeBuoy.startVX
+							nodeBuoy.vy = nodeBuoy.startVY
+							this.buoyRectList[index] = nodeBuoy
+						}
+									
+					})
+					// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+				})
+			},
 			// 横屏进度条点击事件
 			onProgressTouchmoveH(e) {
 				const pro = uni.createSelectorQuery().select(".progress_h");
@@ -1036,7 +1076,7 @@
 					// video.play()
 					// console.log(advanceNum, allNum)
 				}).exec()
-				this.buoyTouchFlag = true
+				// console.log("横屏点击",this.canvasNodeBuoyList)
 			},
 			onProgressTouchendH(e) {
 				const pro = uni.createSelectorQuery().select(".progress_h");
@@ -1060,6 +1100,8 @@
 					// console.log(advanceNum, allNum)
 				}).exec()
 				this.buoyTouchFlag = true
+				this.reCanvasNodeBuoyList()
+				console.log("横屏点击",this.canvasNodeBuoyList)
 			},
 			// 竖屏进度条点击事件
 			onProgressTouchmove(e) {
@@ -1082,7 +1124,6 @@
 					// video.play()
 					// console.log(advanceNum, allNum)
 				}).exec()
-				this.buoyTouchFlag = true
 				// video.play()
 			},
 			onProgressTouchend(e) {
@@ -1105,8 +1146,12 @@
 					console.log('这是结束时间', (this.duration - 0) * proportion, proportion)
 					video.seek((this.duration - 0) * proportion);
 					video.play()
+					if (this.bouyNodeFlage) {
+						this.buoyTouchCurrtime((this.duration - 0) * proportion)
+					}
 				}).exec()
 				this.buoyTouchFlag = true
+				this.reCanvasNodeBuoyList()
 			},
 			videoError(e) {
 				uni.setStorageSync("relaunchApplets", true)
@@ -4417,6 +4462,7 @@
 				uni.setStorageSync('historyNodeBuoyList', hList)
 				// this.startBuoy()
 				console.log("这是初始化", this.canvasNodeBuoyList)
+
 
 			},
 			// canvas 触摸事件
