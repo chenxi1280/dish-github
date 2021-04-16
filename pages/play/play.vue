@@ -1028,7 +1028,7 @@
 					if (advanceNum > allNum) {
 						advanceNum = allNum;
 					}
-					const proportion = advanceNum / allNum;
+					let proportion = advanceNum / allNum;
 					if (proportion >= 1) {
 						proportion = 0.95
 					}
@@ -1037,19 +1037,6 @@
 					// console.log(advanceNum, allNum)
 				}).exec()
 				this.buoyTouchFlag = true
-				// return false;
-				// console.log('move', e.touches[0].clientX)
-				// const pro = uni.createSelectorQuery().select(".progress_h");
-				// const video = uni.createVideoContext("myVideo");
-				// // 计算比例
-				// let advanceNum = e.changedTouches[0].clientY - pro.getBoundingClientRect().top;
-				// const allNum = pro.offsetWidth;
-				// if (advanceNum > allNum) {
-				// 	advanceNum = allNum;
-				// }
-				// const proportion = advanceNum / allNum;
-				// video.seek((this.duration - 0) * proportion);
-				// video.play()
 			},
 			onProgressTouchendH(e) {
 				const pro = uni.createSelectorQuery().select(".progress_h");
@@ -1063,7 +1050,7 @@
 					if (advanceNum > allNum) {
 						advanceNum = allNum;
 					}
-					const proportion = advanceNum / allNum;
+					let proportion = advanceNum / allNum;
 					if (proportion >= 1) {
 						proportion = 0.95
 					}
@@ -1073,17 +1060,6 @@
 					// console.log(advanceNum, allNum)
 				}).exec()
 				this.buoyTouchFlag = true
-				// const pro = uni.createSelectorQuery().select(".progress_h");
-				// const video = uni.createVideoContext("myVideo");
-				// // 计算比例
-				// let advanceNum = e.changedTouches[0].clientY - pro.getBoundingClientRect().top;
-				// const allNum = pro.offsetWidth;
-				// if (advanceNum > allNum) {
-				// 	advanceNum = allNum;
-				// }
-				// const proportion = advanceNum / allNum;
-				// video.seek((this.duration - 0) * proportion);
-				// video.play()
 			},
 			// 竖屏进度条点击事件
 			onProgressTouchmove(e) {
@@ -1098,7 +1074,7 @@
 					if (advanceNum > allNum) {
 						advanceNum = allNum;
 					}
-					const proportion = advanceNum / allNum;
+					let proportion = advanceNum / allNum;
 					if (proportion >= 1) {
 						proportion = 0.95
 					}
@@ -1122,7 +1098,7 @@
 					if (advanceNum > allNum) {
 						advanceNum = allNum;
 					}
-					const proportion = advanceNum / allNum;
+					let proportion = advanceNum / allNum;
 					if (proportion >= 1) {
 						proportion = 0.95
 					}
