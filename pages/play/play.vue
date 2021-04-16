@@ -875,7 +875,7 @@
 			}
 			globalBus.$emit('bouyClickCommonOptionTodo')
 			if(this.bouyNodeFlage){
-				this.recoveryBuoyDraw()()()
+				this.recoveryBuoyDraw()
 			}
 		},
 		onUnload() {
@@ -891,6 +891,9 @@
 			//关闭页面时重置节点分数容器
 			uni.setStorageSync('appearConditionMap', null)
 			console.log('离开play1！！！！')
+			if(this.bouyNodeFlage){
+				this.clearAnimation()
+			}
 			globalBus.$off('bouyClickCommonOptionTodo')
 		},
 		onShareAppMessage(res) {
