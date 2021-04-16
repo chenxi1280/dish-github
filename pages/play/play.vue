@@ -3821,39 +3821,41 @@
 					// 当前时间
 
 					this.buoyNewTime = this.currentTime
+					
+					if (this.buoyTouchFlag) {
+						this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
+							// 变量 为几号位置 数组
+							this.buoyRectList[index] = null
+							// console.log("nodeBuoyList",nodeBuoyList,"index",index)
+							nodeBuoyList.forEach((nodeBuoy) => {
+								
+								// nodeBuoy.x = nodeBuoy.startX 
+								// nodeBuoy.y = nodeBuoy.startY
+								// nodeBuoy.vx = nodeBuoy.startVX
+								// nodeBuoy.vy = nodeBuoy.startVY
+								
+								//当时间相等时
+								// console.log('时间',nodeBuoy.buoySectionTime === newTime)
+								if (newTime >= nodeBuoy.buoySectionTime && nodeBuoy.targetTime >= newTime) {
+									console.log("nodeBuoy",nodeBuoy)
+									nodeBuoy.x = nodeBuoy.startX + (newTime - nodeBuoy.buoySectionTime) * nodeBuoy.startVX * 60
+									nodeBuoy.y = nodeBuoy.startY + (newTime - nodeBuoy.buoySectionTime) * nodeBuoy.startVY * 60
+									nodeBuoy.vx = nodeBuoy.startVX
+									nodeBuoy.vy = nodeBuoy.startVY
+									this.buoyRectList[index] = nodeBuoy
+								}
+					
+							})
+							// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
+						})
+						// this.startBuoy()
+						this.buoyTouchFlag = false
+					}
 
 					// 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
 					if (this.buoyCurrentTime == newTime || newTime == 0) {
 						// this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
-						if (this.buoyTouchFlag) {
-							this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
-								// 变量 为几号位置 数组
-								this.buoyRectList[index] = null
-								// console.log("nodeBuoyList",nodeBuoyList,"index",index)
-								nodeBuoyList.forEach((nodeBuoy) => {
-									
-									// nodeBuoy.x = nodeBuoy.startX 
-									// nodeBuoy.y = nodeBuoy.startY
-									// nodeBuoy.vx = nodeBuoy.startVX
-									// nodeBuoy.vy = nodeBuoy.startVY
-									
-									//当时间相等时
-									// console.log('时间',nodeBuoy.buoySectionTime === newTime)
-									if (newTime >= nodeBuoy.buoySectionTime && nodeBuoy.targetTime >= newTime) {
-										console.log("nodeBuoy",nodeBuoy)
-										nodeBuoy.x = nodeBuoy.startX + (newTime - nodeBuoy.buoySectionTime) * nodeBuoy.startVX * 60
-										nodeBuoy.y = nodeBuoy.startY + (newTime - nodeBuoy.buoySectionTime) * nodeBuoy.startVY * 60
-										nodeBuoy.vx = nodeBuoy.startVX
-										nodeBuoy.vy = nodeBuoy.startVY
-										this.buoyRectList[index] = nodeBuoy
-									}
-
-								})
-								// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
-							})
-							// this.startBuoy()
-							this.buoyTouchFlag = false
-						}
+						
 						return
 					}
 					//获取视频当前时间
