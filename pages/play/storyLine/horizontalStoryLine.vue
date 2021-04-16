@@ -240,7 +240,7 @@
 				
 					let onNode = this.floorList[nowFloor][index]
 					// 播放记录 
-					let playHistory = uni.getStorageSync("pkDetailIds")
+					let playHistory = JSON.parse(uni.getStorageSync("pkDetailIds"))
 					// 当前选中楼层的 播放的节点 
 					let playNode = this.floorList[nowFloor][0]
 					// 多节点播放记录
@@ -306,7 +306,7 @@
 					//需要封装 重新吊起
 					uni.setStorageSync("multipleResultLine", moreEndingHistory);
 					// 修改 storage 的播放历史
-					uni.setStorageSync("pkDetailIds", playHistory);
+					uni.setStorageSync("pkDetailIds",JSON.stringify(playHistory));
 					this.$refs.uToast.show({
 						title: '选中跳转到' + onNode.selectTitle,
 						type: 'success',
@@ -390,7 +390,7 @@
 			
 						uni.setStorageSync("multipleResultLine", this.moreEndingHistory);
 						// 修改 storage 的播放历史
-						uni.setStorageSync("pkDetailIds", this.playHistory);
+						uni.setStorageSync("pkDetailIds", JSON.stringify(this.playHistory));
 						this.$refs.uToast.show({
 							title: '选中跳转到' + this.onNode.selectTitle,
 							type: 'success',

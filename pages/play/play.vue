@@ -801,7 +801,7 @@
 			console.log('离开play！！！！')
 			globalBus.$off('bouyClickCommonOptionTodo')
 			if(this.bouyNodeFlage){
-				this.stopBuoyDraw()()
+				this.stopBuoyDraw()
 			}
 		},
 		onShow() {
@@ -818,7 +818,7 @@
 			}
 			globalBus.$emit('bouyClickCommonOptionTodo')
 			if(this.bouyNodeFlage){
-				this.recoveryBuoyDraw()()()
+				this.recoveryBuoyDraw()
 			}
 		},
 		onUnload() {
@@ -1189,6 +1189,8 @@
 			},
 			//返回上级
 			returnToPrevious() {
+				console.log("************this.endFlag1: ",this.endFlag)
+				console.log("************playedHistoryArray: ",JSON.parse(uni.getStorageSync("pkDetailIds")))
 				//设置返回上一级开关 给是否快进视频做标识
 				this.returnToPreviousFlag = true
 				//若parentId是0或-1时点击返回上一级弹框提示（parentId为0根节点为-1多结局作品的结局视频）
@@ -1198,13 +1200,15 @@
 					} else {
 						this.videoContext.pause()
 					}
+					//若作品结构只有两级此时返回到上一级就直接到开场了不会走故事线跳转逻辑所以要把弹故事线开关重置
+					this.endFlag = true
 					return this.returnToPreviouShow = true
 				}
 				//返回上一级时如果是开场不去获取百分比
 				if (this.startDetailId == this.parentId) {
 					this.isShowOptionPercentageFlag = false
 				}
-				let pkDetailIds = uni.getStorageSync("pkDetailIds")
+				let pkDetailIds = JSON.parse(uni.getStorageSync("pkDetailIds"))
 				//获取浮标视频的选项初始渲染时间
 				let historyNodeBuoyList = uni.getStorageSync("historyNodeBuoyList")
 				for (let i = 0; i < historyNodeBuoyList.length; i++) {
@@ -1226,8 +1230,8 @@
 				pkDetailIds.splice(pkDetailIds.length - 2, 2)
 				// console.log("************pkDetailIds: ",pkDetailIds)
 				this.playedHistoryArray = pkDetailIds
-				// console.log("************playedHistoryArray: ",this.playedHistoryArray)
-				uni.setStorageSync("pkDetailIds", this.playedHistoryArray)
+				console.log("************playedHistoryArray: ",this.playedHistoryArray)
+				uni.setStorageSync("pkDetailIds", JSON.stringify(this.playedHistoryArray))
 				//将多结局作品的路径砍掉 对照着播放历史截取
 				if (uni.getStorageSync('isEndings') == 1) {
 					let multipleResultLine = uni.getStorageSync("multipleResultLine")
@@ -1650,7 +1654,7 @@
 				//请求获取子树
 				this.getArtworkTreeByDetailId(option.pkDetailId)
 				//获取播放历史记录
-				this.playedHistoryArray = uni.getStorageSync("pkDetailIds")
+				this.playedHistoryArray = JSON.parse(uni.getStorageSync("pkDetailIds"))
 				//重置多结局数组（故事线跳回时进行重组直接获取就好了）
 				this.multipleResultLine = uni.getStorageSync("multipleResultLine")
 				//获取存放节点数值的容器
@@ -1716,8 +1720,6 @@
 			//对节点播放数据进行筛选和提取
 			initPlayData(artworkTree, isJumpDialogCallbackFlag) {
 				this.isShowMyProgress = true
-				console.log('cookieToken', uni.getStorageInfoSync('cookieToken'))
-				console.log("***********************pkDetailId: ", artworkTree.pkDetailId)
 				if (artworkTree.parentId === 0) {
 					this.startDetailId = artworkTree.pkDetailId
 					if (artworkTree.percentageState == 1) {
@@ -1749,7 +1751,6 @@
 					this.videoShowFlag = false
 					return this.popupWindowByPopupPositonEqualsZero()
 				}
-				console.log('这里不应该被执行')
 				if (!popupWindowRecord) {
 					this.popupCountNumber = 0
 				} else {
@@ -1766,7 +1767,6 @@
 				}
 				//是否是定位选项的标志2是浮标 1是定位选项 其他是普通选项
 				this.isPosition = artworkTree.isPosition
-				console.log('artworkTree', artworkTree)
 				console.log('this.isPosition', this.isPosition)
 				if (this.isPosition == 1) {
 					//获取定位选项位置数据
@@ -1777,22 +1777,7 @@
 					this.ecmArtworkNodeBuoyList = artworkTree.ecmArtworkNodeBuoyVOList
 					this.bouyNodeFlage = true
 					this.showBuoyCanvasFlag = true
-					// console.log('我进来了')
-
 				}
-
-				//获取视频的宽高时长
-				// console.log('artworkTree.videoInfo: ',artworkTree.videoInfo)
-				/* if(typeof(artworkTree.videoInfo) != "undefined" && artworkTree.videoInfo){
-					let arr = artworkTree.videoInfo.split(',')
-					console.log('initPlayData视频信息: ',artworkTree.videoInfo)
-					this.videoHeight = arr[0]
-					this.videoWidth = arr[1]
-					this.duration = arr[2]
-					console.log('时长: ',this.duration,'视频高: ',this.videoHeight,'视频宽: ',this.videoWidth)
-					let date = this.formatDate(this.duration)
-					this.durationStr = date
-				} */
 
 				if (typeof(artworkTree.videoInfo) != "undefined" && artworkTree.videoInfo) {
 					const duration = artworkTree.videoInfo.split(',')[2] - 0
@@ -1862,10 +1847,11 @@
 						}
 						/* //不需要去重 记录故事线走向方便数值选项分数计算
 						this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray)); */
-						uni.setStorageSync("pkDetailIds", this.playedHistoryArray)
+						uni.setStorageSync("pkDetailIds", JSON.stringify(this.playedHistoryArray))
 						this.getTargetTree(mainTree, linkId)
 					} else {
-						//是不是最后一个视频标志 最后一个视频不需要弹窗
+						console.log("endFlag3")
+						//是不是最后一个视频标志 
 						this.endFlag = false;
 					}
 				}
@@ -1884,10 +1870,10 @@
 					}
 					/* //不需要去重 记录故事线走向方便数值选项分数计算
 					this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray)); */
-					uni.setStorageSync("pkDetailIds", this.playedHistoryArray);
+					uni.setStorageSync("pkDetailIds", JSON.stringify(this.playedHistoryArray));
 					this.linkNodeId = null
 				}
-
+				
 			},
 			//视频 播放后弹窗
 			popupWindowByPopupPositonEqualsOne() {
@@ -2307,7 +2293,7 @@
 				this.parentId = this.artworkTree.parentId
 				this.isMultipleResultPlayEnd = true
 				//存储多结局的结局视频播放历史
-				uni.setStorageSync("pkDetailIds", this.playedHistoryArray)
+				uni.setStorageSync("pkDetailIds", JSON.stringify(this.playedHistoryArray))
 				//保存播放记录
 				this.savaPlayRecord()
 			},
@@ -2466,6 +2452,8 @@
 				}
 				this.percent = 100
 				this.isVideoEndFlag = true
+				console.log('this.endFlag2: ', this.endFlag)
+				console.log("************pkDetailIds: ",JSON.parse(uni.getStorageSync("pkDetailIds")))
 				if (this.endFlag) {
 					if (this.isPosition == 1) {
 						this.chooseTipsShowFlag = false
