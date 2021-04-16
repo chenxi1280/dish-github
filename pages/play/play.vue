@@ -127,16 +127,6 @@
 					</view>
 				</view>
 			</view>
-			<!-- 光 -->
-			<!-- <view class="lightBox">
-				<view class="lightIconBox">
-					<icon class="lightIcon"></icon>
-				</view>
-				<view class="lightText">{{'x'+lightNumber}}</view>
-				<view class="addLightIconBox">
-					<icon class="addLightIcon"></icon>
-				</view>
-			</view> -->
 			<!-- 故事线和举报 -->
 			<!-- :style="hiddenBtnFlag?'display: block':'display: none'" -->
 			<!-- 竖屏  hiddenBtnFlag-->
@@ -327,33 +317,6 @@
 				</view>
 			</view>
 		</u-modal>
-		<!-- horizontalControlsFlags -->
-		<!-- <view class="progress-line-box" :style="{'width': videoWidth*0.8+'px'}" v-if="horizontalControlsFlags">
-			<progress :percent="percent" stroke-width="2" active-mode="forwards" active-color="#FF7256"></progress>
-			<view class="progress-time">{{durationStr}}</view>
-		</view> -->
-		<!-- <view class="progress-box" v-if="horizontalControlsFlags">
-			<view class="f-text">首</view>
-			<view class="replayVideoIconBox" @click="replayVideo">
-				<icon></icon>
-			</view>
-			<view class="jumpbackIconBox" @click="jumpbackVideo">
-				<icon></icon>
-			</view>
-		    <view class="suspendIconBox" @click="playVideo" v-if="suspendFlag">
-				<icon></icon>
-		    </view>
-		    <view class="playIconBox" @click="suspendVideo" v-if="!suspendFlag">
-		   		<icon></icon>
-		    </view>
-		    <view class="jumpforwardIconBox" @click="jumpForwardVideo">
-		   		<icon></icon>
-		    </view>
-		    <view class="endVideoIconBox" @click="endVideo">
-		   		<icon></icon>
-		    </view>
-			<view class="t-text">尾</view>
-		</view> -->
 		<view v-if="verticalJumpDialogFlag" style="z-index: 99999;">
 			<vertical-jump-dialog :imageUrl="popupImageUrl" :navigatorUrl="navigatorUrl" :appId="appId" :artworkId="artworkId"
 			:popupPosition="popupPosition" v-on:videoEnd="videoEnd" v-on:initPlayData="initPlayData" :artworkTree="artworkTree"
@@ -559,8 +522,6 @@
 				videoloadFlag: true,
 				//好感度延时函数
 				likabilityDelayFunction: Function,
-				//横屏播放控件延时函数
-				horizontalControlsFunction: Function,
 				//故事线跳转到播放页的当前节点是否已播放标志
 				isPlayedFlag: false,
 				//是否点击了选项开关（用于保存有效观看记录使用）
@@ -573,10 +534,6 @@
 				showStyleFlag: true,
 				//是否显示video原生进度条的开关
 				controlsFlag: false,
-				//横屏视频播放控件开关
-				horizontalControlsFlags: false,
-				//播放暂停控件的开关
-				suspendFlag: false,
 				//视频的当前播放时间 250mm获取一次当前播放时间
 				currentTime: 0,
 				//故事线flag true表示展示竖版的故事线
@@ -1919,43 +1876,10 @@
 					} catch (e) {}
 				}
 				this.savaPopupWindowRecord()
-				// if(this.isPosition == 1 && uni.getStorageSync('playMode') == 1){
-				// 	try{
-				// 		this.horizontalJumpDialogFlag = true
-				// 		this.$refs.horizontalJumpDialog.horizontalJumpDialogFlag = true
-				// 	}catch(e){
-				// 	}
-				// 	this.savaPopupWindowRecord()
-				// }
-				// if(this.isPosition == 1 && uni.getStorageSync('playMode') == 0){
-				// 	try{
-				// 		this.verticalJumpDialogFlag = true
-				// 		this.$refs.verticalJumpDialog.verticalJumpDialogFlag = true
-				// 	}catch(e){
-				// 	}
-				// 	this.savaPopupWindowRecord()
-				// }
-				// if(this.isPosition == 0 && uni.getStorageSync('playMode') == 1){
-				// 	try{
-				// 		this.horizontalJumpDialogFlag = true
-				// 		this.$refs.horizontalJumpDialog.horizontalJumpDialogFlag = true
-				// 	}catch(e){
-				// 	}
-				// 	this.savaPopupWindowRecord()
-				// }
-				// if(this.isPosition == 0 && uni.getStorageSync('playMode') == 0){
-				// 	try{
-				// 		this.verticalJumpDialogFlag = true
-				// 		this.$refs.verticalJumpDialog.verticalJumpDialogFlag = true
-				// 	}catch(e){
-				// 	}
-				// 	this.savaPopupWindowRecord()
-				// }
 			},
 			// 视频播放器 弹窗
 			popupWindowByPopupPositonEqualsZero() {
 				console.log('视频暂停被启用过')
-
 				// 浮标修改
 				if (uni.getStorageSync('playMode') == 1) {
 					try {
@@ -1971,40 +1895,6 @@
 					} catch (e) {}
 				}
 				this.savaPopupWindowRecord()
-
-
-				// if(this.isPosition == 1 && uni.getStorageSync('playMode') == 1){
-				// 	try{
-				// 		this.horizontalJumpDialogFlag = true
-				// 		this.$refs.horizontalJumpDialog.horizontalJumpDialogFlag = true
-				// 	}catch(e){
-				// 	}
-				// 	this.savaPopupWindowRecord()
-				// }
-				// if(this.isPosition == 1 && uni.getStorageSync('playMode') == 0){
-				// 	try{
-				// 		this.verticalJumpDialogFlag = true
-				// 		this.$refs.verticalJumpDialog.verticalJumpDialogFlag = true
-				// 	}catch(e){
-				// 	}
-				// 	this.savaPopupWindowRecord()
-				// }
-				// if(this.isPosition == 0 && uni.getStorageSync('playMode') == 1){
-				// 	try{
-				// 		this.horizontalJumpDialogFlag = true
-				// 		this.$refs.horizontalJumpDialog.horizontalJumpDialogFlag = true
-				// 	}catch(e){
-				// 	}
-				// 	this.savaPopupWindowRecord()
-				// }
-				// if(this.isPosition == 0 && uni.getStorageSync('playMode') == 0){
-				// 	try{
-				// 		this.verticalJumpDialogFlag = true
-				// 		this.$refs.verticalJumpDialog.verticalJumpDialogFlag = true
-				// 	}catch(e){
-				// 	}
-				// 	this.savaPopupWindowRecord()
-				// }
 			},
 			savaPopupWindowRecord() {
 				let popupWindowRecord = uni.getStorageSync('popupWindowRecord')
@@ -2578,10 +2468,6 @@
 							this.clickCommonOptionTodo(0)
 						}
 
-
-
-						// console.log(this.buoyRectList)
-						// return
 					} else {
 						this.showCanvasFlag = false
 						this.hiddenBtnFlag = true
@@ -2648,18 +2534,6 @@
 			changeBackground(index) {
 				/* switch(index){
 					case 0: {
-						this.background.splice(index,1,"#96CDCD");
-						break;
-					}
-					case 1: {
-						this.background.splice(index,1,"#96CDCD");
-						break;
-					}
-					case 2: {
-						this.background.splice(index,1,"#96CDCD");
-						break;
-					}
-					case 3: {
 						this.background.splice(index,1,"#96CDCD");
 						break;
 					}
@@ -2766,19 +2640,6 @@
 					uni.setStorageSync('multipleResultLine', this.multipleResultLine)
 					this.chooseTipsShowFlag = false
 					this.chooseTipsMaskFlag = false
-					// console.log(' this.childs[index]', this.childs[index])
-					// console.log(index)
-					// let child = this.childs[index]
-					// let popupState = this.childs[index].popupState
-					// if(popupState == 1){
-					// 	uni.setStorageSync('pkDetailId', this.childs[index].pkDetailId)
-					// 	let popupSettings = this.childs[index].ecmArtworkNodePopupSettings
-					// 	uni.setStorageSync('popupState',popupState)
-					// 	uni.setStorageSync('popupSettings',popupSettings)
-					// }
-
-
-					// this.initPlayData( this.childs[index],false)
 				} else {
 					let advancedList = this.childs[index].onAdvancedList
 					let userScore = uni.getStorageSync('userScore')
@@ -2807,25 +2668,9 @@
 						this.chooseTipsShowFlag = false
 						this.chooseTipsMaskFlag = false
 						uni.setStorageSync('userScore', userScore)
-						// let popupState = this.childs[index].popupState
-						// if(popupState == 1){
-						// 	uni.setStorageSync('pkDetailId', this.childs[index].pkDetailId)
-						// 	let popupSettings = this.childs[index].ecmArtworkNodePopupSettings
-						// 	uni.setStorageSync('popupState',popupState)
-						// 	uni.setStorageSync('popupSettings',popupSettings)
-						// }
-						// this.initPlayData(this.childs[index], false)
 					} else {
 						this.chooseTipsShowFlag = false
 						this.chooseTipsMaskFlag = false
-						// let popupState = this.childs[index].popupState
-						// if(popupState == 1){
-						// 	uni.setStorageSync('pkDetailId', this.childs[index].pkDetailId)
-						// 	let popupSettings = this.childs[index].ecmArtworkNodePopupSettings
-						// 	uni.setStorageSync('popupState',popupState)
-						// 	uni.setStorageSync('popupSettings',popupSettings)
-						// }
-						// this.initPlayData(this.childs[index], false)
 					}
 				}
 				let popupState = this.childs[index].popupState
@@ -2839,24 +2684,12 @@
 				console.log("重新吊起initPlayData", this.childs[index])
 				this.initPlayData(this.childs[index], false)
 			},
-			/* findmultipleResultChild(){
-				for(let i = 0; i < this.childs.length; i++){
-					if(this.childs[i].isLink == 1){
-						continue;
-					}
-					return this.childs[i]
-				}
-			}, */
 			//点击选项关闭按钮触发事件
 			closeChooseTips() {
 				this.chooseTipsShowFlag = false
 				this.chooseTipsMaskFlag = false
 				this.hiddenBtnFlag = true
 				uni.setStorageSync('isReplay', true)
-				/* if(this.isReplayPopupWindow){
-					uni.setStorageSync('popupState',1)
-					uni.setStorageSync('popupSettings', this.artworkTree.ecmArtworkNodePopupSettings)
-				} */
 				this.initPlayData(this.artworkTree, false)
 			},
 			//点击故事线关闭按钮触发事件
@@ -2874,24 +2707,11 @@
 						this.initPlayData(this.artworkTree, false)
 					}
 				} else {
-					// if(this.isVideoEndFlag){
 					this.storyLineContentFlag = false
 					this.closeStoryLineReplayFlag = true
 					this.clearNodeBuoyInfo()
 					this.initPlayData(this.artworkTree, false)
-					/*} else{
-						if(uni.getStorageSync('isEndings') == 1){
-							this.videoShowFlag = true
-						}
-						this.storyLineContentFlag = false
-						this.videoContext.play()
-					} */
 				}
-				// 需要浮标修改
-				// if (this.bouyNodeFlage) {
-				// 	this.recoveryBuoyDraw()
-				// }
-
 			},
 			//点击举报关闭按钮触发事件
 			closeReportContent() {
@@ -3484,8 +3304,6 @@
 			validateVerticalWindowSize() {
 				let videoInfo = uni.getStorageSync('videoSize')
 				let windowSize = uni.getStorageSync('windowSize')
-				// let videoHeight = this.videoHeight + 0
-				// let videoWidth = this.videoWidth + 0
 				let videoHeight = videoInfo.videoHeight + 0
 				let videoWidth = videoInfo.videoWidth + 0
 				let videoRate = videoWidth / videoHeight
@@ -3585,8 +3403,6 @@
 				let windowSize = uni.getStorageSync('windowSize')
 				let videoHeight = videoInfo.videoHeight + 0
 				let videoWidth = videoInfo.videoWidth + 0
-				// let videoHeight = this.videoHeight + 0
-				// let videoWidth = this.videoWidth + 0
 				let videoRate = videoWidth / videoHeight
 				//dh dw canvas宽高  ch cw是窗口宽高
 				let vh, vw, dh, dw, ch, cw
@@ -3633,14 +3449,6 @@
 				})
 			},
 			goDiscover() {
-				/* console.log('我触发了')
-				this.videoContext.play() */
-				// uni.navigateBack({
-				// 	delta: 1,
-				// 	fail(err) {
-				// 		console.log('跳转失败:', err)
-				// 	}
-				// })
 				uni.switchTab({
 					url: '../dishover/dishover'
 				})
@@ -3651,8 +3459,6 @@
 				if (this.bouyNodeFlage) {
 					//浮标视频不显示原生开关
 					this.controlsFlag = true
-					clearTimeout(this.horizontalControlsFunction)
-					this.horizontalControlsFlags = false
 				}
 				//for ios 浮标作品 不自动播放的问题
 				if (this.bouyNodeFlage) {
@@ -3701,7 +3507,6 @@
 				if (!this.bouyNodeFlage) {
 					//判断是不是故事线跳转过来的第一个视频 第一个视频需要快进到结尾进行播放
 					if (this.isPlayedFlag) {
-						console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", (this.duration - 3).toFixed(0))
 						this.videoContext.seek(parseInt((this.duration - 3).toFixed(0)))
 						this.isPlayedFlag = false
 					}
@@ -3732,21 +3537,12 @@
 					this.playGestureFlag = false
 					this.progressGestureFlag = false
 					//浮标视频不显示自定义开关
-					if (!this.bouyNodeFlage) {
-						//控制自定义开关的标志 horizontalControlsFlags
-						clearTimeout(this.horizontalControlsFunction)
-						this.horizontalControlsFlags = true
-						this.horizontalControlsFunction = setTimeout(() => {
-							this.horizontalControlsFlags = false
-						}, 5000)
-					}
 					this.storyLineFlag = false
 				} else {
 					if (!this.bouyNodeFlage) {
 						//浮标视频不显示原生开关
 						this.controlsFlag = true
 					}
-					this.horizontalControlsFlags = false
 					this.validateVerticalWindowSize()
 				}
 				//初始画布必须等到选项数据先初始化完才能进行
@@ -3773,7 +3569,6 @@
 						for (let i = 0; i < historyNodeBuoyList.length; i++) {
 							let currentId = historyNodeBuoyList[i].fkNodeId
 							let detailId = this.childs[0].pkDetailId
-							console.log("************$$$$$$$$$$$$$$$$$$$$$detailId return: ", detailId)
 							//此处还是不能使用this.detailId来对比要使用历史记录的来对比 因为返回的节点可能是跳转节点
 							if (currentId == detailId) {
 								this.bouySectionTime = historyNodeBuoyList[i].buoySectionTime
@@ -3782,13 +3577,11 @@
 							}
 						}
 					}
-					console.log("************$$$$$$$$$$$$$$$$$$$this.videoContext return: ", this.videoContext)
 					this.videoContext.seek(this.bouySectionTime == 0 ? 0 : parseInt(this.bouySectionTime) - 1)
 					this.returnToPreviousFlag = false
 				}
 			},
 			videoTimeupdate(e) {
-
 				//获取视频当前时间
 				this.currentTime = e.detail.currentTime
 				this.duration = e.detail.duration
@@ -3812,26 +3605,16 @@
 				if (this.bouyNodeFlage) {
 					//速度校准
 					this.buoySpeedCalibration()
-
 					// 当前时间
-
 					this.buoyNewTime = this.currentTime
-
 					// 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
 					if (this.buoyCurrentTime == newTime || newTime == 0) {
-						// this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
 						if (this.buoyTouchFlag) {
 							this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
 								// 变量 为几号位置 数组
 								this.buoyRectList[index] = null
 								// console.log("nodeBuoyList",nodeBuoyList,"index",index)
 								nodeBuoyList.forEach((nodeBuoy) => {
-									
-									// nodeBuoy.x = nodeBuoy.startX 
-									// nodeBuoy.y = nodeBuoy.startY
-									// nodeBuoy.vx = nodeBuoy.startVX
-									// nodeBuoy.vy = nodeBuoy.startVY
-									
 									//当时间相等时
 									// console.log('时间',nodeBuoy.buoySectionTime === newTime)
 									if (newTime >= nodeBuoy.buoySectionTime && nodeBuoy.targetTime >= newTime) {
@@ -3844,9 +3627,7 @@
 									}
 
 								})
-								// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
 							})
-							// this.startBuoy()
 							this.buoyTouchFlag = false
 						}
 						return
@@ -3860,13 +3641,11 @@
 						nodeBuoyList.forEach((nodeBuoy) => {
 
 							//当时间相等时
-							// console.log('时间',nodeBuoy.buoySectionTime === newTime)
 							// console.log(newTime)
 							if (nodeBuoy.buoySectionTime === newTime) {
 								this.buoyRectList[index] = nodeBuoy
 							}
 						})
-						// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
 					})
 				}
 			},
@@ -3876,71 +3655,12 @@
 				let second = (parseInt(date % 60) + '').length == 1 ? '0' + parseInt(date % 60) : parseInt(date % 60)
 				return hour + ":" + minute + ":" + second
 			},
-			replayVideo() {
-				if (!this.suspendFlag) {
-					this.videoContext.seek(0)
-					this.progressBoxTouchEnd()
-				}
-			},
-			jumpbackVideo() {
-				if (!this.suspendFlag) {
-					let currentTime = this.deepCopy(this.currentTime)
-					let targetPlayTime = currentTime - this.duration * 0.15
-					if (targetPlayTime < 0) {
-						this.videoContext.seek(0)
-					} else {
-						this.videoContext.seek(parseInt(targetPlayTime))
-					}
-					this.progressBoxTouchEnd()
-				}
-			},
-			suspendVideo() {
-				this.videoContext.pause()
-				this.suspendFlag = true
-				this.progressBoxTouchEnd()
-			},
-			playVideo() {
-				this.videoContext.play()
-				this.suspendFlag = false
-				this.progressBoxTouchEnd()
-			},
-			jumpForwardVideo() {
-				if (!this.suspendFlag) {
-					let currentTime = this.deepCopy(this.currentTime)
-					let targetPlayTime = currentTime + this.duration * 0.15
-					if (targetPlayTime > parseInt(this.duration - 1)) {
-						this.videoContext.seek(parseInt(this.duration - 1))
-					} else {
-						this.videoContext.seek(parseInt(targetPlayTime))
-					}
-					this.progressBoxTouchEnd()
-				}
-			},
-			endVideo() {
-				if (!this.suspendFlag) {
-					this.videoContext.seek(parseInt(this.duration - 1))
-					this.progressBoxTouchEnd()
-				}
-			},
 			videoTouchstart(e) {
 				this.tsx = e.changedTouches[0].clientX
 				this.tsy = e.changedTouches[0].clientY
 			},
 			videoTouchend(e) {
-				if (uni.getStorageSync('playMode') == 1) {
-					clearTimeout(this.horizontalControlsFunction)
-					this.horizontalControlsFlags = !this.horizontalControlsFlags
-					this.horizontalControlsFunction = setTimeout(() => {
-						this.horizontalControlsFlags = false
-					}, 5000)
-				}
-			},
-			progressBoxTouchEnd() {
-				clearTimeout(this.horizontalControlsFunction)
-				this.horizontalControlsFlags = true
-				this.horizontalControlsFunction = setTimeout(() => {
-					this.horizontalControlsFlags = false
-				}, 5000)
+				
 			},
 			//提交举报
 			async submit() {
@@ -4110,11 +3830,6 @@
 			// 浮标方法
 			//初始化竖屏canvas画布
 			initVerticalBuoyCanvas() {
-				// const buoyCtx = wx.getContext('myCanvas')
-				// // console.log('画布的宽: ',this.canvasWidth)
-				// // console.log('画布的高: ',this.canvasHeight)
-				// buoyCtx.clearRect(0 , 0 , this.canvasWidth, this.canvasHeight)
-
 
 				//wx 方法
 				const query = wx.createSelectorQuery()
@@ -4129,12 +3844,6 @@
 						canvas.width = this.canvasWidth
 						canvas.height = this.canvasHeight
 
-						// canvas.width = 339
-						// canvas.height =  603
-
-
-						// console.log('this.canvasWidth',this.canvasWidth,'this.canvasHeight',this.canvasHeight)
-
 						const ctx = canvas.getContext('2d')
 						this.buoyCtx = ctx
 						this.initializationBuoyList()
@@ -4143,42 +3852,12 @@
 
 					})
 
-				// this.buoyCtx = uni.createCanvasContext('posterCanvas')
-				// console.log(this.buoyCtx)
-				// this.buoyCtx.clearRect(0 , 0 , this.canvasWidth, this.canvasHeight)
-
-				// this.buoyCtx.beginPath();
-				// // this.ctx.fillRect(this.x, this.y, this.rectW, this.rectH)
-				// this.buoyCtx.fillRect(200, 200, 100,100)
-				// // 闭合路径
-				// // this.ctx.closePath();
-				// // this.ctx.fillRect(255, 255, 255,0.5);
-				// this.buoyCtx.setStrokeStyle('rgba(255, 255, 255)')
-				// this.buoyCtx.setFillStyle('rgba(255, 255, 255)')
-				// this.buoyCtx.fill()
-				// //开始描绘
-				// this.buoyCtx.stroke()
-				// this.buoyCtx.draw(true)
-
-				// this.initializationBuoyList()
-				// this.initializationIconPosition()
-
-
 			},
 			// 移动函数
 			buoyDraw() {
 				// 关闭 动画
-				// if (this.buoyRef != null ) {
-				// 	this.clearAnimation()
-				// }
-				// this.clearAnimation()
-				// console.log(this.rect)
 				this.buoyCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
 				this.buoyRectList.forEach((v, index) => {
-
-					// if (this.playMode) {
-				
-					// }else {
 					// 阻止移动出 指定位置
 					if (v != null ){
 						if (v.vx > 0) {
@@ -4210,11 +3889,6 @@
 						}
 					}
 				})
-
-				// console.log('这是第',this.start)
-				// this.start +=1
-
-				// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw());
 			},
 			// 初始化 浮标对象
 			initializationBuoy(rectX, rectY, rectW, rectH, vx, vy, rectOpacity, nodeId, buoySectionTime, buoyType, targetX,
@@ -4256,20 +3930,6 @@
 					// 目标时间
 					targetTime: targetTime,
 					draw: function() {
-						// 开始路径
-						// this.ctx.beginPath();
-						// // this.ctx.fillRect(this.x, this.y, this.rectW, this.rectH)
-						// this.ctx.rect(this.x, this.y, this.rectW, this.rectH)
-						// // 闭合路径
-						// // this.ctx.closePath();
-						// // this.ctx.fillRect(255, 255, 255,0.5);
-						// this.ctx.setStrokeStyle('rgba(255, 255, 255,'+ rectOpacity +')')
-						// this.ctx.setFillStyle('rgba(255, 255, 255, '+ rectOpacity +')')
-						// this.ctx.fill()
-						// //开始描绘
-						// this.ctx.stroke()
-						// this.ctx.draw(true)
-
 
 						// 开始路径
 						this.ctx.beginPath();
@@ -4286,17 +3946,7 @@
 
 			// 初始化浮标 对象 List
 			initializationBuoyList() {
-
-				// let buoyInitTimestamp = (new Date()).valueOf();
-				// console.log('buoyInitTimestamp', buoyInitTimestamp)
-				// if (buoyInitTimestamp - this.buoyInitTimestamp < 1000) {
-				// 	console.log('buoyInitTimestamp节流')
-				// 	return
-				// }
-				// console.log('buoyInitTimestamp没有节流')
-				// this.buoyInitTimestamp = buoyInitTimestamp
 				this.canvasNodeBuoyList = []
-
 
 				let hList = uni.getStorageSync('historyNodeBuoyList')
 				this.ecmArtworkNodeBuoyList.forEach((nodeBuoyList, index) => {
@@ -4401,21 +4051,17 @@
 								}
 								aList.push(buoy)
 							}
-
 						} else {
 							let buoy = this.initializationBuoy(0, 0, 0, 0, 0, 0, 0, v.fkNodeId, parseInt(v.buoySectionTime - 0), v.buoyType,
 								0, 0, 0)
 							aList.push(buoy)
 						}
-
 					})
 					this.canvasNodeBuoyList.push(aList)
-					
 				})
 				uni.setStorageSync('historyNodeBuoyList', hList)
 				// this.startBuoy()
 				console.log("这是初始化", this.canvasNodeBuoyList)
-
 			},
 			// canvas 触摸事件
 			canvasBuoyTouchstart(e) {
@@ -4469,33 +4115,6 @@
 								return
 							}
 						}
-
-						// if(uni.getStorageSync('playMode') === 1) {
-						// 	console.log("横屏")
-						// 	if (v.x <= newX && (v.x + v.rectH) >= newX) {
-						// 		// 加10 增加判定区域
-						// 		if (v.y <= newY && (v.y + v.rectW + 10) >= newY) {
-						// 			console.log("我出发了选项点击")
-						// 			this.optionIndex = i
-						// 			this.clickCommonOptionTodo(i)
-						// 			stopFlag= true
-						// 			return
-						// 		}
-						// 	}
-
-						// }else{
-						// 	console.log("竖屏")
-						// 	if (v.x <= newX && (v.x + v.rectH) >= newX) {
-						// 		// 加10 增加判定区域
-						// 		if (v.y <= newY && (v.y + v.rectW + 10) >= newY) {
-						// 			console.log("我出发了选项点击")
-						// 			this.optionIndex = i
-						// 			this.clickCommonOptionTodo(i)
-						// 			stopFlag= true
-						// 			return
-						// 		}
-						// 	}
-						// }
 					}
 				})
 
@@ -4551,12 +4170,6 @@
 						return
 					}
 				}
-				// if (this.progressWidthMin <= newX && this.progressWidthMax >= newX) {
-				// 	if (this.progressHeightMin <= newY && this.progressHeightMax >= newY) {
-				// 		console.log(进度条)
-				// 	}
-				// }
-
 
 			},
 			// 清除浮标
@@ -4654,12 +4267,6 @@
 					this.advertisingDivHeightMin = this.getPxbyRpx(40) - ch
 					this.advertisingDivHeightMax = this.advertisingDivHeightMin + this.getPxbyRpx(60)
 
-					// console.log("宽",this.advertisingDivWidthMin  ,this.advertisingDivWidthMax  )
-					// console.log("高",this.advertisingDivHeightMin ,this.advertisingDivHeightMax )
-					// this.progressWidthMin = ww
-					// this.progressWidthMax =  ww
-					// this.progressHeightMin = wh - this.getPxbyRpx(20) - 40
-					// this.progressHeightMax = wh - this.getPxbyRpx(20)
 				}
 
 			},
@@ -4669,21 +4276,9 @@
 			},
 			//清除动画
 			clearAnimation() {
-				// if(this.buoyCanvas != null) {
-				// 	this.buoyCanvas.cancelAnimationFrame(this.buoyRef)
-				// 	this.buoyCanvas.cancelAnimationFrame(this.buoyRef -1 )
-				// 	this.buoyCanvas.cancelAnimationFrame(this.buoyRef -2)
-				// 	this.buoyCanvas.cancelAnimationFrame(this.buoyRef +1)
-				// 	if (this.buoyRef !=null ){
-				// 		this.buoyCanvas.cancelAnimationFrame(this.buoyRef)
-				// 	}
-				// }
-
 				if (this.buoyRef != null) {
 					clearInterval(this.buoyRef)
 				}
-
-
 			},
 			// 浮标 视频暂停方法
 			stopBuoyDraw() {
@@ -4691,84 +4286,37 @@
 				this.videoContext.pause()
 				// 关闭canvas
 				this.showBuoyCanvasFlag = false
-				// this.stopBuoyRectList = this.deepCopy(this.buoyRectList )
-				// this.showBuoyCanvasFlag = false
 				//清空动画
 				this.clearAnimation()
-
-				//清空 移动对象
-				// this.buoyRectList = []
-
 				// 关闭canvas
 				this.showBuoyCanvasFlag = false
-
-
 			},
 			// (rectX, rectY, rectH, rectW, vx, vy, rectOpacity, nodeId, buoySectionTime, buoyType)
 			// 浮标 视频回复方法
 			recoveryBuoyDraw() {
-				// 复制方式
-				// this.stopBuoyRectList.forEach((v,i) => {
-				// 	console.log(v)
-				// 	this.buoyRectList.push(this.initializationBuoy(v.x,v.y,v.rectW,v.rectH,v.vx,v.vy,v.opacity,v.nodeId,v.buoySectionTime,v.buoyType))
-				// })
-				// console.log('this.buoyRectList111 ',this.buoyRectList )
 				//视频回复 
 				this.videoContext.play()
 				//canvas 回来
 				this.showBuoyCanvasFlag = true
 				// 动画开启
 				if (this.buoyCanvas != null) {
-					// 	this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
 					this.startBuoy()
 				}
-				// if (this.bouyNodeFlage) {
-				// 	this.showBuoyCanvasFlag = true
-				// }
-
 			},
 			// 速度校准方法
 			buoySpeedCalibration() {
 				// 时间  当前位置  距离  =》  新的 速度
-
-				// console.log('当前时间',this.currentTime)
-				// this.clearAnimation()
-				// this.currentTime 
 				this.buoyRectList.forEach((buoyRect, index) => {
 					if (buoyRect != null ){
 						if ((buoyRect.targetTime - this.currentTime) > 0) {
 							buoyRect.vx = (buoyRect.targetX - buoyRect.x) / ((buoyRect.targetTime - this.currentTime) * 58)
 							buoyRect.vy = (buoyRect.targetY - buoyRect.y) / ((buoyRect.targetTime - this.currentTime) * 58)
 						} else {
-							// 当前时间
-							// let newTime = Math.floor(this.currentTime)
-							// this.buoyNewTime = this.currentTime
-							// // 4舍5入 1s会触发4次 所以 ，修改只能1秒一次 （未知效率）
-							// if (this.buoyCurrentTime == newTime || newTime == 0) {
-							// 	return
-							// }
-						
-							// //获取视频当前时间
-							// this.buoyCurrentTime = newTime
-							// // 遍历 初始化后的可直接用于画图的 类canvas对象2维数组 index 位置下表
-							// this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
-							// 	// 变量 为几号位置 数组
-							// 	// console.log("nodeBuoyList",nodeBuoyList,"index",index)
-							// 	nodeBuoyList.forEach((nodeBuoy) => {
-							// 		if (nodeBuoy.buoySectionTime === newTime) {
-							// 			this.buoyRectList[index] = nodeBuoy
-							// 		}
-							// 	})
-							// })
 						
 						}
 					}
 					
 				})
-				// if (this.buoyCanvas != null) {
-				// 	// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
-				// 	this.startBuoy()
-				// }
 			},
 			startBuoy() {
 				// console.log("启动")
@@ -4777,7 +4325,6 @@
 					this.buoyDraw()
 				}, 16)
 			},
-
 			//视频进入 缓冲
 			waitingVideo() {
 				console.log("**********************等我一下，我在缓冲********************************")
@@ -4785,9 +4332,7 @@
 			// 浮标 加光回调
 			bouyClickCommonOptionTodo() {
 				if (this.clickCommonOptionTodoBuoyFlag) {
-
-
-					if (this.bouyNodeFlage) {
+					if (this.bouyNodeFlage) {ss
 						let buoyTimestamp = (new Date()).valueOf();
 						console.log('buoyTimestamp', buoyTimestamp)
 						if (buoyTimestamp - this.backBuoyTimestamp < 1000) {
@@ -4827,9 +4372,6 @@
 			},
 			// 获取改浮弹窗信息
 			getBuoyPopInfo(index) {
-				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index3***********************************", index)
-				console.log("$$$$$$$$$$$$$this.ecmArtworkNodeBuoyList*********************************", this.ecmArtworkNodeBuoyList)
-				console.log("$$$$$$$$$$$$$this.ecmArtworkNodeBuoyList*********************************", this.canvasNodeBuoyList)
 				if (this.ecmArtworkNodeBuoyList.length >= index + 1) {
 					if (this.ecmArtworkNodeBuoyList[index][0] == null) {
 						return null
@@ -4851,8 +4393,6 @@
 					return null
 				}
 			},
-
-
 		}
 	}
 </script>
@@ -5032,132 +4572,6 @@
       font-size: 30rpx;
       color: white;
       line-height: 60rpx;
-    }
-  }
-
-  .progress-line-box {
-    position: fixed;
-    left: 2%;
-    top: 50%;
-    height: 50rpx;
-    z-index: 10;
-    transform: translate(-50%, -50%) rotateZ(90deg);
-
-    progress {
-      position: absolute;
-      top: 48%;
-      left: 4%;
-      width: 80%;
-    }
-
-    .progress-time {
-      position: absolute;
-      left: 85%;
-      color: white;
-      line-height: 50rpx;
-    }
-  }
-
-  .progress-box {
-    position: fixed;
-    left: 6%;
-    top: 50%;
-    z-index: 10;
-    height: 50rpx;
-    width: 450rpx;
-    display: flex;
-    justify-content: center;
-    border-radius: 20rpx;
-    background-color: rgba(0, 0, 0, 0.5);
-    transform: translate(-50%, -50%) rotateZ(90deg);
-
-    .replayVideoIconBox {
-      width: 50rpx;
-      height: 50rpx;
-
-      icon {
-        width: 100%;
-        height: 100%;
-        background: url(../../static/icon/jumpback.png) no-repeat center;
-        background-size: 50rpx;
-      }
-    }
-
-    .jumpbackIconBox {
-      width: 50rpx;
-      height: 50rpx;
-      margin-left: 30rpx;
-
-      icon {
-        width: 100%;
-        height: 100%;
-        background: url(../../static/icon/jumpback15.png) no-repeat center;
-        background-size: 50rpx;
-      }
-    }
-
-    .suspendIconBox {
-      width: 50rpx;
-      height: 50rpx;
-      margin-left: 30rpx;
-
-      icon {
-        width: 100%;
-        height: 100%;
-        background: url(../../static/icon/suspend.png) no-repeat center;
-        background-size: 50rpx;
-      }
-    }
-
-    .playIconBox {
-      width: 50rpx;
-      height: 50rpx;
-      margin-left: 30rpx;
-
-      icon {
-        width: 100%;
-        height: 100%;
-        background: url(../../static/icon/play.png) no-repeat center;
-        background-size: 50rpx;
-      }
-    }
-
-    .jumpforwardIconBox {
-      width: 50rpx;
-      height: 50rpx;
-      margin-left: 30rpx;
-
-      icon {
-        width: 100%;
-        height: 100%;
-        background: url(../../static/icon/jumpforward15.png) no-repeat center;
-        background-size: 50rpx;
-      }
-    }
-
-    .endVideoIconBox {
-      width: 50rpx;
-      height: 50rpx;
-      margin-left: 30rpx;
-
-      icon {
-        display: block;
-        transform: rotateZ(180deg);
-        width: 100%;
-        height: 100%;
-        background: url(../../static/icon/jumpback.png) no-repeat center;
-        background-size: 50rpx;
-      }
-    }
-
-    .f-text {
-      color: white;
-      line-height: 50rpx;
-    }
-
-    .t-text {
-      color: white;
-      line-height: 50rpx;
     }
   }
 
