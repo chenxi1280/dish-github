@@ -66,7 +66,7 @@
 
 		<view class="play" :style="{'width': mobilePhoneWidth+'px', 'height': mobilePhoneHeight+'px'}">
 			<!-- 定位选项画布 -->
-			<view class="container" v-show="showCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px', 'z-index': '9999'}">
+			<view class="container" v-show="showCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px'}">
 				<canvas canvas-id="myCanvas" @touchstart="getTouchPosition" @touchend="canvasTouchendEvent"></canvas>
 			</view>
 			<view class="container" v-show="showBuoyCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px'}">
@@ -834,9 +834,6 @@
 			//关闭页面时重置节点分数容器
 			uni.setStorageSync('appearConditionMap', null)
 			console.log('离开play1！！！！')
-			if(this.bouyNodeFlage){
-				this.clearAnimation()
-			}
 			globalBus.$off('bouyClickCommonOptionTodo')
 		},
 		onShareAppMessage(res) {
@@ -876,14 +873,6 @@
 			}
 		},
 		methods: {
-			onWaiting () {
-				const video = uni.createVideoContext("myVideo");
-				video.play()
-			},
-			onError () {
-				const video = uni.createVideoContext("myVideo");
-				video.play()
-			},
 			getToken() {
 				let _this = this
 				let openid = uni.getStorageSync("openid")
@@ -1201,7 +1190,7 @@
 			//返回上级
 			returnToPrevious() {
 				console.log("************this.endFlag1: ",this.endFlag)
-				console.log("************playedHistoryArray: ",JSON.parse(uni.getStorageSync("pkDetailIds")))
+				console.log("************playedHistoryArray000: ",JSON.parse(uni.getStorageSync("pkDetailIds")))
 				//设置返回上一级开关 给是否快进视频做标识
 				this.returnToPreviousFlag = true
 				//若parentId是0或-1时点击返回上一级弹框提示（parentId为0根节点为-1多结局作品的结局视频）
@@ -1241,7 +1230,7 @@
 				pkDetailIds.splice(pkDetailIds.length - 2, 2)
 				// console.log("************pkDetailIds: ",pkDetailIds)
 				this.playedHistoryArray = pkDetailIds
-				console.log("************playedHistoryArray: ",this.playedHistoryArray)
+				console.log("************playedHistoryArray001: ",this.playedHistoryArray)
 				uni.setStorageSync("pkDetailIds", JSON.stringify(this.playedHistoryArray))
 				//将多结局作品的路径砍掉 对照着播放历史截取
 				if (uni.getStorageSync('isEndings') == 1) {
@@ -1666,6 +1655,7 @@
 				this.getArtworkTreeByDetailId(option.pkDetailId)
 				//获取播放历史记录
 				this.playedHistoryArray = JSON.parse(uni.getStorageSync("pkDetailIds"))
+				console.log("***********playedHistoryArray111: ",this.playedHistoryArray)
 				//重置多结局数组（故事线跳回时进行重组直接获取就好了）
 				this.multipleResultLine = uni.getStorageSync("multipleResultLine")
 				//获取存放节点数值的容器
@@ -1859,6 +1849,7 @@
 						/* //不需要去重 记录故事线走向方便数值选项分数计算
 						this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray)); */
 						uni.setStorageSync("pkDetailIds", JSON.stringify(this.playedHistoryArray))
+						console.log("***********this.playedHistoryArray222",this.playedHistoryArray)
 						this.getTargetTree(mainTree, linkId)
 					} else {
 						console.log("endFlag3")
@@ -1882,6 +1873,7 @@
 					/* //不需要去重 记录故事线走向方便数值选项分数计算
 					this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray)); */
 					uni.setStorageSync("pkDetailIds", JSON.stringify(this.playedHistoryArray));
+					console.log("***********this.playedHistoryArray223",this.playedHistoryArray)
 					this.linkNodeId = null
 				}
 				
@@ -2305,6 +2297,7 @@
 				this.isMultipleResultPlayEnd = true
 				//存储多结局的结局视频播放历史
 				uni.setStorageSync("pkDetailIds", JSON.stringify(this.playedHistoryArray))
+				console.log("***********this.playedHistoryArray444",this.playedHistoryArray)
 				//保存播放记录
 				this.savaPlayRecord()
 			},
@@ -2464,7 +2457,7 @@
 				this.percent = 100
 				this.isVideoEndFlag = true
 				console.log('this.endFlag2: ', this.endFlag)
-				console.log("************pkDetailIds: ",JSON.parse(uni.getStorageSync("pkDetailIds")))
+				console.log("***********playedHistoryArray333: ",JSON.parse(uni.getStorageSync("pkDetailIds")))
 				if (this.endFlag) {
 					if (this.isPosition == 1) {
 						this.chooseTipsShowFlag = false
@@ -2523,35 +2516,12 @@
 					}
 				}
 			},
-			videoPlay(e) {
-				// this.videoContext.pause()
-				// this.videoContext.play()
+			videoPlay() {
 				this.isPlay = true
 				this.multipleResultFlag = false
 				this.isVideoEndFlag = false
 				this.isGetMultipleFlag = false
 				this.videoloadFlag = false
-				this.showCanvasFlag = false
-				const time = JSON.parse(JSON.stringify(this.currentTime))
-				if (this.isPlay) {
-					const timer = setTimeout(() => {
-						if (time === this.currentTime) {
-							this.videoContext.play()
-						}
-						clearTimeout(timer)
-					}, 300)
-				}
-				// 更新进度条
-				//获取视频当前时间
-				// this.currentTime = e.detail.currentTime
-				// this.duration = e.detail.duration
-				// // 进度条的时间格式化
-				// const mm = parseInt(this.currentTime / 60) >= 10 ? parseInt(this.currentTime / 60) : "0" + parseInt(this.currentTime /
-				// 	60);
-				// const ss = parseInt(this.currentTime % 60) >= 10 ? parseInt(this.currentTime % 60) : "0" + parseInt(this.currentTime %
-				// 	60);
-				// this.durationBeginTimer = mm + ":" + ss;
-				// this.progressWidth = (this.currentTime / this.duration) * 100;
 				if (this.waitingVideoFlag) {
 					if (this.bouyNodeFlage) {
 						console.log('play里面的  recoveryBuoyDraw 被启动了')
@@ -2559,6 +2529,7 @@
 						this.waitingVideoFlag = false
 					}
 				}
+
 			},
 			//视屏暂停操作
 			videoPause() {
@@ -2566,7 +2537,6 @@
 			},
 			//展示故事线内容的时候暂停视频
 			showStoryLineContent() {
-				this.showCanvasFlag = false
 				this.storyLineContentFlag = true
 				if (uni.getStorageSync('isEndings') == 1) {
 					this.videoShowFlag = false
@@ -2581,7 +2551,6 @@
 				this.reportContentFlag = true
 				this.uploadBtnFlag = true
 				this.uploadImageFlag = false
-				this.showCanvasFlag = false
 				this.videoContext.pause()
 			},
 			//触摸选项touchstart事件
@@ -3646,7 +3615,6 @@
 					60);
 				this.durationBeginTimer = mm + ":" + ss;
 				this.progressWidth = (this.currentTime / this.duration) * 100;
-				console.log('在更新吗', this.progressWidth, this.currentTime, this.duration)
 				//获取视频当前时间
 				if (this.duration - this.currentTime > 0.4) {
 					this.percent = parseInt(this.currentTime / this.duration * 100)
@@ -4730,7 +4698,7 @@
       top: 0;
       width: 100%;
       height: 100%;
-      z-index: 9999;
+      z-index: 17;
 
       .chooseTipsMask16 {
         background-color: rgba(255, 255, 255, 0);
@@ -5350,7 +5318,7 @@
 
     .storyLineContentMask16 {
       position: fixed;
-      z-index: 9999;
+      z-index: 999;
       left: 0;
       top: 0;
       width: 100%;
