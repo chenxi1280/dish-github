@@ -66,7 +66,7 @@
 
 		<view class="play" :style="{'width': mobilePhoneWidth+'px', 'height': mobilePhoneHeight+'px'}">
 			<!-- 定位选项画布 -->
-			<view class="container" v-show="showCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px'}">
+			<view class="container" v-show="showCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px', 'z-index': '9999'}">
 				<canvas canvas-id="myCanvas" @touchstart="getTouchPosition" @touchend="canvasTouchendEvent"></canvas>
 			</view>
 			<view class="container" v-show="showBuoyCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px'}">
@@ -2537,6 +2537,7 @@
 			},
 			//展示故事线内容的时候暂停视频
 			showStoryLineContent() {
+				this.showCanvasFlag = false
 				this.storyLineContentFlag = true
 				if (uni.getStorageSync('isEndings') == 1) {
 					this.videoShowFlag = false
@@ -2551,6 +2552,7 @@
 				this.reportContentFlag = true
 				this.uploadBtnFlag = true
 				this.uploadImageFlag = false
+				this.showCanvasFlag = false
 				this.videoContext.pause()
 			},
 			//触摸选项touchstart事件
@@ -4698,7 +4700,7 @@
       top: 0;
       width: 100%;
       height: 100%;
-      z-index: 17;
+      z-index: 9999;
 
       .chooseTipsMask16 {
         background-color: rgba(255, 255, 255, 0);
