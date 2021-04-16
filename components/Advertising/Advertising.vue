@@ -123,6 +123,22 @@
 				} else {
 					this.isShowNumTwo = false
 				}
+				if (!limit) {
+					this.isShowMax = false
+					const timer = setTimeout(() => {
+						if (!num) {
+							uni.setStorageSync('lightNumber', 0)
+						} else {
+							if (num >= 9) {
+								uni.setStorageSync('lightNumber', 0)
+							} else {
+								uni.setStorageSync('lightNumber', num + 1)
+							}
+						}
+						this.isShowNumber()
+						clearTimeout(timer)
+					}, 1000)
+				}
 				// console.log('初始化', num, this.isShowMax)
 				if (num >= 10) {
 					const numberOne = ((num + '').charAt(0) - 0)
@@ -251,34 +267,34 @@
 </script>
 
 <style lang="scss">
-	.light_container {
-		.add_icon {
-			position: absolute;
-			display: inline-block;
-			width: 40rpx;
-			height: 40rpx;
-			border: 2rpx solid #fff;
-			border-radius: 20rpx;
-			box-sizing: border-box;
-			right: 10rpx;
-			.line {
-				width: 20rpx;
-				height: 4rpx;
-				background-color: #fff;
-				border-radius: 4rpx;
-				margin-left: 8rpx;
-				margin-top: 16rpx;
-				&::after {
-					content: ' ';
-					display: block;
-					width: 4rpx;
-					height: 20rpx;
-					background-color: #fff;
-					border-radius: 4rpx;
-					margin-left: 8rpx;
-					transform: translateY(-8rpx);
-				}
-			}
-		}
-	}
+.light_container {
+  .add_icon {
+    position: absolute;
+    display: inline-block;
+    width: 40rpx;
+    height: 40rpx;
+    border: 2rpx solid #fff;
+    border-radius: 20rpx;
+    box-sizing: border-box;
+    right: 10rpx;
+    .line {
+      width: 20rpx;
+      height: 4rpx;
+      background-color: #fff;
+      border-radius: 4rpx;
+      margin-left: 8rpx;
+      margin-top: 16rpx;
+      &::after {
+        content: " ";
+        display: block;
+        width: 4rpx;
+        height: 20rpx;
+        background-color: #fff;
+        border-radius: 4rpx;
+        margin-left: 8rpx;
+        transform: translateY(-8rpx);
+      }
+    }
+  }
+}
 </style>

@@ -6,8 +6,8 @@
 				 :effect3d-previous-margin="80" @change="columnChange" @click="goPlay" :nowFloor="floor"></mswiper>
 			</swiper-item>
 		</swiper>
-		<view class="cpt-mask-tips-bottom"> </view>
-		<view class="cpt-mask-tips-top"> </view>
+		<!-- <view class="cpt-mask-tips-bottom"> </view> -->
+		<!-- <view class="cpt-mask-tips-top"> </view> -->
 		<u-toast ref="uToast" />
 		<view>
 			<u-modal v-model="showAdvertisingFlagStory" title="温馨提示" :show-confirm-button="false" z-index="999">

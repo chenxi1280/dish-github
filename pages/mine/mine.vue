@@ -26,6 +26,7 @@
 						<view class="problem" @click="customerService">
 							<icon class="headset"></icon>
 						</view>
+						<view class="open_VR" @click="openVR">open-VR</view>
 					</view>
 				</view>
 				<view class="mid">
@@ -154,6 +155,13 @@
 			}
 		},
 		methods: {
+			// 全景视频入口
+			openVR () {
+				console.log('进入全景视频')
+				uni.navigateTo({
+					url: 'vr/vr'
+				})
+			},
 			// 初始化光数量
 			getLightNum () {
 				this.lightNumber = uni.getStorageSync('lightNumber')

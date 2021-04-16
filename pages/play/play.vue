@@ -139,24 +139,24 @@
 			</view> -->
 			<!-- 故事线和举报 -->
 			<!-- :style="hiddenBtnFlag?'display: block':'display: none'" -->
-			<!-- 竖屏 -->
-			<view v-if="hiddenBtnFlag" :style="showStyleFlag?'display: block':'display: none'" class="verticalBox">
+			<!-- 竖屏  hiddenBtnFlag-->
+			<view  v-if="hiddenBtnFlag" :style="showStyleFlag?'display: block':'display: none'" class="verticalBox">
 				<!-- 自制进度条 -->
-				<view class="my_progress" style="z-index: 999;" v-if="isShowMyProgress">
-					<view class="play_btn">
-						<view class="play_v" v-if="!isPlay" @click="toggleIsPlay(true)"></view>
-						<view class="pause_v" v-else @click="toggleIsPlay(false)"></view>
-					</view>
-					<view class="progress_contaier">
-						<view class="begin_timer">{{ durationBeginTimer }}</view>
-						<view class="progress_event_box" @touchmove="onProgressTouchmove" @touchend="onProgressTouchend">
-							<view class="progress">
-								<view class="on_progress" :style="{width: progressWidth + '%'}"></view>
-							</view>
-						</view>
-						<view class="over_timer">{{ durationOverTimer }}</view>
-					</view>
-				</view>
+				<view class="my_progress" style="z-index: 999;" v-if="isShowMyProgress && hiddenBtnFlag">
+          <view class="play_btn">
+            <view class="play_v" v-if="!isPlay" @click="toggleIsPlay(true)"></view>
+            <view class="pause_v" v-else @click="toggleIsPlay(false)"></view>
+          </view>
+          <view class="progress_contaier">
+            <view class="begin_timer">{{ durationBeginTimer }}</view>
+            <view class="progress_event_box" @touchmove="onProgressTouchmove" @touchend="onProgressTouchend">
+              <view class="progress">
+                <view class="on_progress" :style="{width: progressWidth + '%'}"></view>
+              </view>
+            </view>
+            <view class="over_timer">{{ durationOverTimer }}</view>
+          </view>
+        </view>
 				<view class="reportBox" @click="showReportContent">
 					<view class="reportIconBox">
 						<icon class="reportIcon"></icon>
@@ -182,24 +182,24 @@
 					<view class="returnToPrevious">返回上级</view>
 				</view>
 			</view>
-			<!-- 横屏 -->
-			<view v-if="hiddenBtnFlag" :style="!showStyleFlag?'display: block':'display: none'" class="horizontalBox">
+			<!-- 横屏 hiddenBtnFlag-->
+			<view  v-if="hiddenBtnFlag" :style="!showStyleFlag?'display: block':'display: none'" class="horizontalBox">
 				<!-- 自制进度条 -->
-				<view class="my_progress_h" v-if="isShowMyProgress">
-					<view class="play_btn">
-						<view class="play_v" v-if="!isPlay" @click="toggleIsPlay(true)"></view>
-						<view class="pause_v" v-else @click="toggleIsPlay(false)"></view>
-					</view>
-					<view class="progress_contaier">
-						<view class="begin_timer">{{ durationBeginTimer }}</view>
-						<view class="progress_event_box_h" @touchmove="onProgressTouchmoveH" @touchend="onProgressTouchendH">
-							<view class="progress_h">
-								<view class="on_progress_h" :style="{width: progressWidth + '%'}"></view>
-							</view>
-						</view>
-						<view class="over_timer">{{ durationOverTimer }}</view>
-					</view>
-				</view>
+				<view class="my_progress_h" v-if="isShowMyProgress && hiddenBtnFlag">
+          <view class="play_btn">
+            <view class="play_v" v-if="!isPlay" @click="toggleIsPlay(true)"></view>
+            <view class="pause_v" v-else @click="toggleIsPlay(false)"></view>
+          </view>
+          <view class="progress_contaier">
+            <view class="begin_timer">{{ durationBeginTimer }}</view>
+            <view class="progress_event_box_h" @touchmove="onProgressTouchmoveH" @touchend="onProgressTouchendH">
+              <view class="progress_h">
+                <view class="on_progress_h" :style="{width: progressWidth + '%'}"></view>
+              </view>
+            </view>
+            <view class="over_timer">{{ durationOverTimer }}</view>
+          </view>
+        </view>
 				<view class="reportBox" @click="showReportContent">
 					<view class="reportIconBox">
 						<icon class="reportIcon"></icon>
@@ -254,7 +254,7 @@
 							<checkbox-group @change="checkboxChange">
 								<label class="checkBox" v-for="item in items" :key="item.value">
 									<view>
-										<checkbox :value="item.value" :checked="item.checked" />
+										<checkbox :value="item.value" :checked="item.checked"/>
 									</view>
 									<view class="nameBox">
 										<view class="name">{{item.name}}</view>
@@ -262,21 +262,23 @@
 								</label>
 							</checkbox-group>
 						</view>
+						<view class="content_tips">为帮助审核人员尽快处理，请补充详细信息</view>
 						<view class="uni-textarea">
-							<textarea v-model="textareaContent" />
+							<textarea v-model="textareaContent" style="background-color: #e5e5e5;padding: 10rpx;box-sizing: border-box;" />
 							</view>
 						<view class="uploadBox">
 							<view class="subTitle">上传图片</view>
 							<view class="uploadBtnBox" v-if="uploadBtnFlag" @click="uploadImage">
-								<icon></icon>
+								<view class="add_btn">
+									<view></view>
+									<view></view>
+								</view>
 							</view>
-							<view class="uploadImageBox" v-if="uploadImageFlag">
+							<view class="uploadImageBox" v-if="uploadImageFlag" @click="uploadImage">
 								<image :src="headImage" mode="scaleToFill"></image>
 							</view>
 						</view>
-						<view class="submitBtnBox" @click="submit">
-							<view class="btnText">提交</view>
-						</view>
+						<u-button type="error" style="margin-top: 20rpx;display: inline-block; width: 90%;margin-left: 5%;" @click="submit">提交举报</u-button>
 					</view>
 				</view>
 			</view>
@@ -1026,25 +1028,15 @@
 					if (advanceNum > allNum) {
 						advanceNum = allNum;
 					}
-					const proportion = advanceNum / allNum;
+					let proportion = advanceNum / allNum;
+					if (proportion >= 1) {
+						proportion = 0.95
+					}
 					video.seek((this.duration - 0) * proportion);
 					// video.play()
 					// console.log(advanceNum, allNum)
 				}).exec()
 				this.buoyTouchFlag = true
-				// return false;
-				// console.log('move', e.touches[0].clientX)
-				// const pro = uni.createSelectorQuery().select(".progress_h");
-				// const video = uni.createVideoContext("myVideo");
-				// // 计算比例
-				// let advanceNum = e.changedTouches[0].clientY - pro.getBoundingClientRect().top;
-				// const allNum = pro.offsetWidth;
-				// if (advanceNum > allNum) {
-				// 	advanceNum = allNum;
-				// }
-				// const proportion = advanceNum / allNum;
-				// video.seek((this.duration - 0) * proportion);
-				// video.play()
 			},
 			onProgressTouchendH(e) {
 				const pro = uni.createSelectorQuery().select(".progress_h");
@@ -1058,23 +1050,16 @@
 					if (advanceNum > allNum) {
 						advanceNum = allNum;
 					}
-					const proportion = advanceNum / allNum;
+					let proportion = advanceNum / allNum;
+					if (proportion >= 1) {
+						proportion = 0.95
+					}
+					console.log('这是结束时间', (this.duration - 0) * proportion, video.currentTime)
 					video.seek((this.duration - 0) * proportion);
 					video.play()
 					// console.log(advanceNum, allNum)
 				}).exec()
 				this.buoyTouchFlag = true
-				// const pro = uni.createSelectorQuery().select(".progress_h");
-				// const video = uni.createVideoContext("myVideo");
-				// // 计算比例
-				// let advanceNum = e.changedTouches[0].clientY - pro.getBoundingClientRect().top;
-				// const allNum = pro.offsetWidth;
-				// if (advanceNum > allNum) {
-				// 	advanceNum = allNum;
-				// }
-				// const proportion = advanceNum / allNum;
-				// video.seek((this.duration - 0) * proportion);
-				// video.play()
 			},
 			// 竖屏进度条点击事件
 			onProgressTouchmove(e) {
@@ -1089,7 +1074,10 @@
 					if (advanceNum > allNum) {
 						advanceNum = allNum;
 					}
-					const proportion = advanceNum / allNum;
+					let proportion = advanceNum / allNum;
+					if (proportion >= 1) {
+						proportion = 0.95
+					}
 					video.seek((this.duration - 0) * proportion);
 					// video.play()
 					// console.log(advanceNum, allNum)
@@ -1110,10 +1098,13 @@
 					if (advanceNum > allNum) {
 						advanceNum = allNum;
 					}
-					const proportion = advanceNum / allNum;
+					let proportion = advanceNum / allNum;
+					if (proportion >= 1) {
+						proportion = 0.95
+					}
+					console.log('这是结束时间', (this.duration - 0) * proportion, proportion)
 					video.seek((this.duration - 0) * proportion);
 					video.play()
-					// console.log(advanceNum, allNum)
 				}).exec()
 				this.buoyTouchFlag = true
 			},
@@ -2560,7 +2551,7 @@
 						this.chooseTipsMaskFlag = false
 						this.screenshotShowFlag = true
 						this.videoShowFlag = true
-						this.hiddenBtnFlag = false
+						this.hiddenBtnFlag = true
 						this.showCanvasFlag = true
 						this.videoUrl = ''
 					}
@@ -2570,7 +2561,7 @@
 						let buoyTimestamp = (new Date()).valueOf()
 						console.log('buoyTimestamp', buoyTimestamp)
 						if (buoyTimestamp - this.buoyTimestamp < 100) {
-							console.log('没节流')
+							console.log('没节流.')
 							return
 						}
 						console.log('没有节流')
@@ -2593,7 +2584,7 @@
 						// return
 					} else {
 						this.showCanvasFlag = false
-						this.hiddenBtnFlag = false
+						this.hiddenBtnFlag = true
 						this.chooseTipsShowFlag = true
 						this.chooseTipsMaskFlag = true
 					}
@@ -3644,11 +3635,14 @@
 			goDiscover() {
 				/* console.log('我触发了')
 				this.videoContext.play() */
-				uni.navigateBack({
-					delta: 1,
-					fail(err) {
-						console.log('跳转失败:', err)
-					}
+				// uni.navigateBack({
+				// 	delta: 1,
+				// 	fail(err) {
+				// 		console.log('跳转失败:', err)
+				// 	}
+				// })
+				uni.switchTab({
+					url: '../dishover/dishover'
 				})
 			},
 			loadeddata(e) {
@@ -3797,6 +3791,7 @@
 
 				//获取视频当前时间
 				this.currentTime = e.detail.currentTime
+				this.duration = e.detail.duration
 				// 进度条的时间格式化
 				const mm = parseInt(this.currentTime / 60) >= 10 ? parseInt(this.currentTime / 60) : "0" + parseInt(this.currentTime /
 					60);
@@ -4865,1187 +4860,1182 @@
 </script>
 
 <style lang="scss">
-	.playBox {
-		width: 100%;
-		height: 100%;
+.playBox {
+  width: 100%;
+  height: 100%;
 
-		.u-drawer {
-			z-index: 9999 !important;
-		}
+  .u-drawer {
+    z-index: 9999 !important;
+  }
 
-		.popupBox {
-			width: 100%;
-			height: 100%;
-			position: fixed;
-			left: 0;
-			top: 0;
-			background-color: rgba(255, 255, 255, 0);
-			z-index: 16;
+  .popupBox {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background-color: rgba(255, 255, 255, 0);
+    z-index: 16;
+    .horizontalCloseIcon {
+      position: absolute;
+      right: 13%;
+      top: 71%;
+      width: 60rpx;
+      height: 60rpx;
+      background: url(../../static/icon/dialogClose.png) no-repeat center;
+      background-size: 60rpx;
+    }
 
-			.horizontalCloseIcon {
+    .verticalCloseIcon {
+      position: absolute;
+      right: 7%;
+      top: 33%;
+      width: 60rpx;
+      height: 60rpx;
+      background: url(../../static/icon/dialogClose.png) no-repeat center;
+      background-size: 60rpx;
+    }
+
+    .buoyDialog {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 500rpx;
+      height: 500rpx;
+
+      .buoyDialogImage {
+        width: 100%;
+        height: 100%;
+        margin-top: 50rpx;
+
+        image {
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      .buoyDialogPrintWords {
+        // border: 2rpx solid red;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.5);
+        margin-top: 50rpx;
+
+        textarea {
+          margin: 20rpx 20rpx;
+          font-size: 38rpx;
+          width: 90%;
+          height: 90%;
+        }
+      }
+    }
+  }
+
+  .verticalOptionPercentagesBox {
+    position: fixed;
+    right: 5%;
+    top: 12%;
+    height: 600rpx;
+    width: 290rpx;
+    z-index: 15;
+
+    // background-color: rgba(255,255,255,.5);
+    .optionPercentages {
+      height: 50rpx;
+      width: 100%;
+
+      .optionPercentageBox {
+        margin-top: 10rpx;
+        padding: 10rpx 20rpx;
+        height: 50rpx;
+        border-radius: 20rpx;
+        background-color: rgba(0, 0, 0, 0.3);
+        text-align: left;
+
+        .optionPercentage {
+          color: white;
+          font-size: 30rpx;
+          line-height: 30rpx;
+        }
+      }
+    }
+  }
+
+  .horizontalOptionPercentagesBox {
+    position: fixed;
+    left: 40%;
+    top: 81%;
+    height: 600rpx;
+    width: 290rpx;
+    transform: translate(-50%, -50%) rotateZ(90deg);
+    z-index: 15;
+
+    // background-color: rgba(255,255,255,.5);
+    .optionPercentages {
+      height: 50rpx;
+      width: 100%;
+
+      .optionPercentageBox {
+        margin-top: 10rpx;
+        padding: 10rpx 20rpx;
+        height: 50rpx;
+        border-radius: 20rpx;
+        background-color: rgba(0, 0, 0, 0.3);
+        text-align: left;
+
+        .optionPercentage {
+          color: white;
+          font-size: 30rpx;
+          line-height: 30rpx;
+        }
+      }
+    }
+  }
+
+  .multipleResultPlayEndMask {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    background-color: black;
+    z-index: 8;
+  }
+
+  .verticalPopupNameBox {
+    position: fixed;
+    left: 5%;
+    top: 7%;
+    width: 460rpx;
+    height: 60rpx;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 30rpx;
+    text-align: left;
+
+    text {
+      padding: 20rpx;
+      font-size: 30rpx;
+      color: white;
+      line-height: 60rpx;
+    }
+  }
+
+  .horizontalPopupNameBox {
+    position: fixed;
+    left: 84%;
+    top: 21%;
+    width: 460rpx;
+    height: 60rpx;
+    transform: translate(-50%, -50%) rotateZ(90deg);
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 30rpx;
+    text-align: left;
+
+    text {
+      padding: 20rpx;
+      font-size: 30rpx;
+      color: white;
+      line-height: 60rpx;
+    }
+  }
+
+  .progress-line-box {
+    position: fixed;
+    left: 2%;
+    top: 50%;
+    height: 50rpx;
+    z-index: 10;
+    transform: translate(-50%, -50%) rotateZ(90deg);
+
+    progress {
+      position: absolute;
+      top: 48%;
+      left: 4%;
+      width: 80%;
+    }
+
+    .progress-time {
+      position: absolute;
+      left: 85%;
+      color: white;
+      line-height: 50rpx;
+    }
+  }
+
+  .progress-box {
+    position: fixed;
+    left: 6%;
+    top: 50%;
+    z-index: 10;
+    height: 50rpx;
+    width: 450rpx;
+    display: flex;
+    justify-content: center;
+    border-radius: 20rpx;
+    background-color: rgba(0, 0, 0, 0.5);
+    transform: translate(-50%, -50%) rotateZ(90deg);
+
+    .replayVideoIconBox {
+      width: 50rpx;
+      height: 50rpx;
+
+      icon {
+        width: 100%;
+        height: 100%;
+        background: url(../../static/icon/jumpback.png) no-repeat center;
+        background-size: 50rpx;
+      }
+    }
+
+    .jumpbackIconBox {
+      width: 50rpx;
+      height: 50rpx;
+      margin-left: 30rpx;
+
+      icon {
+        width: 100%;
+        height: 100%;
+        background: url(../../static/icon/jumpback15.png) no-repeat center;
+        background-size: 50rpx;
+      }
+    }
+
+    .suspendIconBox {
+      width: 50rpx;
+      height: 50rpx;
+      margin-left: 30rpx;
+
+      icon {
+        width: 100%;
+        height: 100%;
+        background: url(../../static/icon/suspend.png) no-repeat center;
+        background-size: 50rpx;
+      }
+    }
+
+    .playIconBox {
+      width: 50rpx;
+      height: 50rpx;
+      margin-left: 30rpx;
+
+      icon {
+        width: 100%;
+        height: 100%;
+        background: url(../../static/icon/play.png) no-repeat center;
+        background-size: 50rpx;
+      }
+    }
+
+    .jumpforwardIconBox {
+      width: 50rpx;
+      height: 50rpx;
+      margin-left: 30rpx;
+
+      icon {
+        width: 100%;
+        height: 100%;
+        background: url(../../static/icon/jumpforward15.png) no-repeat center;
+        background-size: 50rpx;
+      }
+    }
+
+    .endVideoIconBox {
+      width: 50rpx;
+      height: 50rpx;
+      margin-left: 30rpx;
+
+      icon {
+        display: block;
+        transform: rotateZ(180deg);
+        width: 100%;
+        height: 100%;
+        background: url(../../static/icon/jumpback.png) no-repeat center;
+        background-size: 50rpx;
+      }
+    }
+
+    .f-text {
+      color: white;
+      line-height: 50rpx;
+    }
+
+    .t-text {
+      color: white;
+      line-height: 50rpx;
+    }
+  }
+
+  .videoLoadImageBox {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+
+    image {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .play {
+    background-color: black;
+    position: relative;
+    overflow: hidden;
+
+    .container {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      margin: 0 auto;
+      z-index: 25;
+
+      canvas {
 				position: absolute;
-				right: 13%;
-				top: 71%;
-				width: 60rpx;
-				height: 60rpx;
-				background: url(../../static/icon/dialogClose.png) no-repeat center;
-				background-size: 60rpx;
-			}
+				z-index: -1;
+        width: 100%;
+        height: 100%;
+      }
+    }
 
-			.verticalCloseIcon {
-				position: absolute;
-				right: 7%;
-				top: 33%;
-				width: 60rpx;
-				height: 60rpx;
-				background: url(../../static/icon/dialogClose.png) no-repeat center;
-				background-size: 60rpx;
-			}
+    .videoBox {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      // transform: translate(-50%, -50%);修改为了行内样式
+      overflow: hidden;
 
-			.buoyDialog {
-				position: absolute;
-				left: 50%;
-				top: 50%;
-				width: 500rpx;
-				height: 500rpx;
+      video {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 7;
+        width: 100%;
+        height: 100%;
+      }
 
-				.buoyDialogImage {
-					width: 100%;
-					height: 100%;
-					margin-top: 50rpx;
+      .screenshot {
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 9;
+        width: 100%;
+        height: 100%;
+      }
+    }
 
-					image {
+    .chooseTipsMask15 {
+      background-color: rgba(0, 0, 0, 0.1);
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 17;
+
+      .chooseTipsMask16 {
+        background-color: rgba(255, 255, 255, 0);
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        // transform: translate(-50%, -50%);
+        width: 650rpx;
+        height: 38%;
+        z-index: 18;
+        border-radius: 20rpx;
+
+        .chooseTips {
+          width: 100%;
+          z-index: 25;
+          // background-color: rgba(0,0,0,1);
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+
+          .closeBox {
+            position: absolute;
+            width: 46rpx;
+            height: 46rpx;
+            right: 20rpx;
+            top: 20rpx;
+
+            .closeIcon {
+              width: 100%;
+              height: 100%;
+              background: url(../../static/playIcon/close.png) no-repeat center;
+              background-size: 46rpx;
+            }
+          }
+
+          .title { 
+            text-align: center;
+            color: white;
+            font-size: 36rpx;
+            line-height: 100rpx;
+          }
+
+          .tips {
+            position: relative;
+
+            .optionBox {
+              background: url("https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1606382670960frame.png")
+                no-repeat center;
+              background-size: 100% 100%;
+              width: 100%;
+              margin: 0 auto;
+              margin-bottom: 20rpx;
+              line-height: 80rpx;
+              display: flex;
+              justify-content: space-between;
+
+              .option {
+                color: white;
+                padding-left: 20rpx;
+                font-size: 34rpx;
+
+                .iconBox {
+                  position: absolute;
+                  right: 0;
+                  top: -18rpx;
+                  // background-color: #7E4DAB;
+                  background-color: rgba(#ffffff, 0.6);
+                  height: 50rpx;
+                  width: 180rpx;
+                  border-radius: 25rpx;
+                  display: flex;
+                  justify-content: flex-start;
+
+                  icon {
+                    display: inline-block;
+                    margin-left: 12rpx;
+                    line-height: 50rpx;
+                    background: url(../../static/icon/advertisement.png)
+                      no-repeat center;
+                    width: 50rpx;
+                    height: 50rpx;
+                    background-size: 50rpx;
+                  }
+
+                  text {
+                    margin-left: 8rpx;
+                    line-height: 50rpx;
+                    color: #707070;
+                    font-size: 24rpx;
+                  }
+                }
+              }
+            }
+          }
+
+          .video_rebroadcast {
+            width: 80rpx;
+            height: 80rpx;
+            padding: 10rpx;
+            background-color: rgba(#000, 0.2);
+            border-radius: 40rpx;
+            margin: 0 auto;
+
+            img {
+              width: 100%;
+              height: 100%;
+              // transform: rotateY(180deg);
+            }
+          }
+        }
+      }
+    }
+
+    .verticalLikabilityBox {
+      .likabilityTips {
+        position: fixed;
+        left: 5%;
+        top: 12%;
+        height: 600rpx;
+        width: 420rpx;
+        z-index: 15;
+
+        // background-color: rgba(255,255,255,.5);
+        .lbtips {
+          height: 50rpx;
+          width: 100%;
+
+          .likabilityBox {
+            margin-top: 10rpx;
+            padding: 10rpx 20rpx;
+            height: 50rpx;
+            border-radius: 20rpx;
+            background-color: rgba(0, 0, 0, 0.3);
+            text-align: left;
+
+            .likability {
+              color: white;
+              font-size: 30rpx;
+              line-height: 30rpx;
+            }
+          }
+        }
+      }
+    }
+
+    .horizontalLikabilityBox {
+      .likabilityTips {
+        position: fixed;
+        left: 40%;
+        top: 19%;
+        height: 600rpx;
+        width: 420rpx;
+        transform: translate(-50%, -50%) rotateZ(90deg);
+        z-index: 15;
+
+        // background-color: rgba(255,255,255,.5);
+        .lbtips {
+          height: 50rpx;
+          width: 100%;
+
+          .likabilityBox {
+            margin-top: 10rpx;
+            padding: 10rpx 20rpx;
+            height: 50rpx;
+            border-radius: 20rpx;
+            background-color: rgba(0, 0, 0, 0.3);
+            text-align: left;
+
+            .likability {
+              color: white;
+              font-size: 30rpx;
+              line-height: 30rpx;
+            }
+          }
+        }
+      }
+    }
+
+    .lightBox {
+      position: fixed;
+      left: 6%;
+      top: 4%;
+      height: 40rpx;
+      width: 160rpx;
+      z-index: 15;
+      background-color: rgba(255, 255, 255, 0.5);
+      border-radius: 20rpx;
+      display: flex;
+      justify-content: flex-start;
+
+      .lightIconBox {
+        width: 40rpx;
+        height: 40rpx;
+        margin-left: 10rpx;
+
+        .lightIcon {
+          width: 100%;
+          height: 100%;
+          background: url(../../static/icon/hourglass.png) no-repeat center;
+          background-size: 40rpx;
+        }
+      }
+
+      .lightText {
+        font-size: 24rpx;
+        color: white;
+        line-height: 40rpx;
+        margin-left: 10rpx;
+      }
+
+      .addLightIconBox {
+        width: 40rpx;
+        height: 40rpx;
+        margin-left: 26rpx;
+
+        .addLightIcon {
+          width: 100%;
+          height: 100%;
+          background: url(../../static/icon/addofplay.png) no-repeat center;
+          background-size: 40rpx;
+        }
+      }
+    }
+
+    .verticalBox {
+			z-index: 90;
+      .my_progress {
+        position: fixed;
+        width: 100%;
+        z-index: 999;
+        padding: 0 20rpx;
+        border-radius: 40rpx;
+        height: 40px;
+        left: 0;
+        bottom: 20rpx;
+        background-color: rgba($color: #fff, $alpha: 0.15);
+        display: flex;
+        .play_btn {
+          width: 40px;
+          height: 40px;
+          view {
+            width: 100%;
+            height: 100%;
+            display: block;
+          }
+          .play_v {
+            background: url("../../static/playIcon/play.png") no-repeat center;
+            background-size: 40rpx;
+          }
+          .pause_v {
+            background: url("../../static/playIcon/pause.png") no-repeat center;
+            background-size: 40rpx;
+          }
+        }
+        .progress_contaier {
+          flex: 1;
+          // width: calc(100% - 40rpx);
+          position: relative;
+          top: 50%;
+          transform: translateY(-50%);
+          display: flex;
+          line-height: 40px;
+          .begin_timer,
+          .over_timer {
+            width: 84rpx;
+            text-align: left;
+            color: #fff;
+          }
+          .progress_event_box {
+            flex: 1;
+            height: 40px;
+            margin: 0 20rpx;
+            .progress {
+              height: 8rpx;
+              border-radius: 6rpx;
+              background-color: #808080;
+              position: relative;
+              top: 50%;
+              transform: translateY(-50%);
+              overflow: hidden;
+              .on_progress {
+                transition: all 0.1s;
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                background-color: #fff;
+              }
+            }
+          }
+        }
+      }
+      .storyLineBox {
+        position: fixed;
+        right: 6%;
+        top: 37%;
+        height: 80rpx;
+        width: 100rpx;
+        z-index: 30;
+        background-color: rgba(0, 0, 0, 0.3);
+        border-radius: 20rpx;
+
+        .storyLineIconBox {
+          width: 100rpx;
+          height: 50rpx;
+          text-align: center;
+
+          .storyLineIcon {
+            width: 50rpx;
+            height: 50rpx;
+            background: url(../../static/icon/fenzhi.png) no-repeat center;
+            background-size: 50rpx;
+          }
+        }
+
+        .storyLine {
+          text-align: center;
+          color: white;
+          font-size: 20rpx;
+          line-height: 30rpx;
+        }
+      }
+
+      .reportBox {
+        position: fixed;
+        right: 6%;
+        top: 45%;
+        height: 80rpx;
+        width: 100rpx;
+        z-index: 30;
+        background-color: rgba(0, 0, 0, 0.3);
+        border-radius: 20rpx;
+
+        .reportIconBox {
+          width: 100rpx;
+          height: 50rpx;
+          text-align: center;
+
+          .reportIcon {
+            width: 50rpx;
+            height: 50rpx;
+            background: url(../../static/icon/report.png) no-repeat center;
+            background-size: 50rpx;
+          }
+        }
+
+        .report {
+          text-align: center;
+          color: white;
+          font-size: 20rpx;
+          line-height: 30rpx;
+        }
+      }
+
+      .seeMoreBox {
+        position: fixed;
+        right: 6%;
+        top: 53%;
+        height: 80rpx;
+        width: 100rpx;
+        z-index: 30;
+        background-color: rgba(0, 0, 0, 0.3);
+        border-radius: 20rpx;
+
+        .seeMoreIconBox {
+          width: 100rpx;
+          height: 50rpx;
+          text-align: center;
+
+          .seeMoreIcon {
+            width: 50rpx;
+            height: 50rpx;
+            background: url(../../static/icon/seeMore.png) no-repeat center;
+            background-size: 50rpx;
+          }
+        }
+
+        .seeMore {
+          text-align: center;
+          color: white;
+          font-size: 20rpx;
+          line-height: 30rpx;
+        }
+      }
+
+      .returnToPreviousBox {
+        position: fixed;
+        right: 6%;
+        top: 61%;
+        height: 80rpx;
+        width: 100rpx;
+        z-index: 30;
+        background-color: rgba(0, 0, 0, 0.3);
+        border-radius: 20rpx;
+
+        .returnToPreviousIconBox {
+          width: 100rpx;
+          height: 50rpx;
+          text-align: center;
+
+          .returnToPreviousIcon {
+            width: 50rpx;
+            height: 50rpx;
+            background: url(../../static/icon/returnToPrevious.png) no-repeat
+              center;
+            background-size: 50rpx;
+          }
+        }
+
+        .returnToPrevious {
+          text-align: center;
+          color: white;
+          font-size: 20rpx;
+          line-height: 30rpx;
+        }
+      }
+    }
+
+    .horizontalBox {
+      .my_progress_h {
+        position: fixed;
+        // width: calc(100vh - 80rpx);
+        width: 133.3%;
+        z-index: 999;
+        padding: 0 20rpx;
+        border-radius: 40rpx;
+        height: 40px;
+        left: calc(-66.1% + 50rpx);
+        top: calc(50% - 40rpx);
+        transform: rotate(90deg);
+        background-color: rgba($color: #fff, $alpha: 0.15);
+        display: flex;
+        .play_btn {
+          width: 40px;
+          height: 40px;
+          view {
+            width: 100%;
+            height: 100%;
+            display: block;
+          }
+          .play_v {
+            background: url("../../static/playIcon/play.png") no-repeat center;
+            background-size: 40rpx;
+          }
+          .pause_v {
+            background: url("../../static/playIcon/pause.png") no-repeat center;
+            background-size: 40rpx;
+          }
+        }
+        .progress_contaier {
+          flex: 1;
+          // width: calc(100% - 40rpx);
+          position: relative;
+          top: 50%;
+          transform: translateY(-50%);
+          display: flex;
+          line-height: 40px;
+          .begin_timer,
+          .over_timer {
+            width: 84rpx;
+            text-align: left;
+            color: #fff;
+          }
+          .progress_event_box_h {
+            flex: 1;
+            height: 40px;
+            margin: 0 20rpx;
+            .progress_h {
+              height: 8rpx;
+              border-radius: 6rpx;
+              background-color: #808080;
+              position: relative;
+              top: 50%;
+              transform: translateY(-50%);
+              overflow: hidden;
+              .on_progress_h {
+                transition: all 0.1s;
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                background-color: #fff;
+              }
+            }
+          }
+        }
+      }
+      .storyLineBox {
+        position: fixed;
+        right: 0;
+        top: 60%;
+        height: 80rpx;
+        width: 100rpx;
+        transform: translate(-50%, -50%) rotateZ(90deg);
+        z-index: 30;
+        background-color: rgba(0, 0, 0, 0.3);
+        border-radius: 20rpx;
+
+        .storyLineIconBox {
+          width: 100rpx;
+          height: 50rpx;
+          text-align: center;
+
+          .storyLineIcon {
+            width: 50rpx;
+            height: 50rpx;
+            background: url(../../static/icon/fenzhi.png) no-repeat center;
+            background-size: 50rpx;
+          }
+        }
+
+        .storyLine {
+          text-align: center;
+          color: white;
+          font-size: 20rpx;
+          line-height: 30rpx;
+        }
+      }
+
+      .reportBox {
+        position: fixed;
+        right: 0;
+        top: 70%;
+        transform: translate(-50%, -50%) rotateZ(90deg);
+        height: 80rpx;
+        width: 100rpx;
+        z-index: 30;
+        background-color: rgba(0, 0, 0, 0.3);
+        border-radius: 20rpx;
+
+        .reportIconBox {
+          width: 100rpx;
+          height: 50rpx;
+          text-align: center;
+
+          .reportIcon {
+            width: 50rpx;
+            height: 50rpx;
+            background: url(../../static/icon/report.png) no-repeat center;
+            background-size: 50rpx;
+          }
+        }
+
+        .report {
+          text-align: center;
+          color: white;
+          font-size: 20rpx;
+          line-height: 30rpx;
+        }
+      }
+
+      .seeMoreBox {
+        position: fixed;
+        right: 0;
+        top: 80%;
+        transform: translate(-50%, -50%) rotateZ(90deg);
+        height: 80rpx;
+        width: 100rpx;
+        z-index: 30;
+        background-color: rgba(0, 0, 0, 0.3);
+        border-radius: 20rpx;
+
+        .seeMoreIconBox {
+          width: 100rpx;
+          height: 50rpx;
+          text-align: center;
+
+          .seeMoreIcon {
+            width: 50rpx;
+            height: 50rpx;
+            background: url(../../static/icon/seeMore.png) no-repeat center;
+            background-size: 50rpx;
+          }
+        }
+
+        .seeMore {
+          text-align: center;
+          color: white;
+          font-size: 20rpx;
+          line-height: 30rpx;
+        }
+      }
+
+      .returnToPreviousBox {
+        position: fixed;
+        right: 0;
+        top: 90%;
+        transform: translate(-50%, -50%) rotateZ(90deg);
+        height: 80rpx;
+        width: 100rpx;
+        z-index: 30;
+        background-color: rgba(0, 0, 0, 0.3);
+        border-radius: 20rpx;
+
+        .returnToPreviousIconBox {
+          width: 100rpx;
+          height: 50rpx;
+          text-align: center;
+
+          .returnToPreviousIcon {
+            width: 50rpx;
+            height: 50rpx;
+            background: url(../../static/icon/returnToPrevious.png) no-repeat
+              center;
+            background-size: 50rpx;
+          }
+        }
+
+        .returnToPrevious {
+          text-align: center;
+          color: white;
+          font-size: 20rpx;
+          line-height: 30rpx;
+        }
+      }
+    }
+
+    .storyLineContentMask16 {
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.9);
+
+      .storyLineContentBox {
+        width: 100%;
+        height: 100%;
+        z-index: 17;
+        background-color: rgba(0, 0, 0, 0.3);
+
+        .title {
+          text-align: center;
+          font-size: 36rpx;
+          color: white;
+          line-height: 100rpx;
+        }
+
+        .splitLine {
+          border-top: 2rpx solid #d3d3d3;
+          width: 80%;
+          margin: 0 auto;
+        }
+
+        .closeBox {
+          position: absolute;
+          width: 46rpx;
+          height: 46rpx;
+          right: 20rpx;
+          top: 20rpx;
+
+          .closeIcon {
+            width: 100%;
+            height: 100%;
+            background: url(../../static/playIcon/close.png) no-repeat center;
+            background-size: 46rpx;
+          }
+        }
+      }
+    }
+
+    .reportContentMask16 {
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100vh;
+			padding-bottom: 20rpx;
+      background-color: rgba($color: #fff, $alpha: 1);
+			color: #1a1a1a!important;
+			overflow: auto;
+			
+
+      .reportContentBox {
+        width: 100%;
+        z-index: 17;
+				color: #1a1a1a;
+        .title {
+					color: #1a1a1a;
+          text-align: center;
+          font-size: 36rpx;
+          line-height: 100rpx;
+        }
+
+        .splitLine {
+          border-top: 2rpx solid #d3d3d3;
+          width: 100%;
+          margin: 0 auto;
+        }
+
+        .subTitle {
+          color: #1a1a1a;
+          margin: 10rpx 0 0 10rpx;
+          font-size: 30rpx;
+        }
+
+        .closeBox {
+          position: absolute;
+          width: 46rpx;
+          height: 46rpx;
+          right: 20rpx;
+          top: 20rpx;
+
+          .closeIcon {
+            width: 100%;
+            height: 100%;
+            background: url(../../static/playIcon/close.png) no-repeat center;
+            background-size: 46rpx;
+          }
+        }
+
+        .reportContent {
+          .uni-list {
+            .checkBox {
+              margin: 30rpx 0 0 30rpx;
+              display: flex;
+              justify-content: flex-start;
+
+              .nameBox {
+                height: 48rpx;
+
+                .name {
+                  line-height: 48rpx;
+                  color: #1a1a1a;
+                }
+              }
+            }
+          }
+					.content_tips {
+						margin-left: 26rpx;
+						transform: translateY(20rpx);
+						color: #1a1a1a;
+						font-size: 20rpx;
+					}
+          .uni-textarea {
 						width: 100%;
-						height: 100%;
-					}
-				}
+						padding: 30rpx 0 0 30rpx;
 
-				.buoyDialogPrintWords {
-					// border: 2rpx solid red;
-					width: 100%;
-					height: 100%;
-					background-color: rgba(255, 255, 255, 0.5);
-					margin-top: 50rpx;
+            textarea {
+							width: calc(100% - 30rpx);
+              background: white;
+            }
+          }
 
-					textarea {
-						margin: 20rpx 20rpx;
-						font-size: 38rpx;
-						width: 90%;
-						height: 90%;
-					}
-				}
-			}
-		}
+          .uploadBox {
+            margin: 30rpx 0 0 0;
 
-		.verticalOptionPercentagesBox {
-			position: fixed;
-			right: 5%;
-			top: 12%;
-			height: 600rpx;
-			width: 290rpx;
-			z-index: 15;
+            .subTitle {
+              color: #1a1a1a;
+              font-size: 30rpx;
+            }
 
-			// background-color: rgba(255,255,255,.5);
-			.optionPercentages {
-				height: 50rpx;
-				width: 100%;
+            .uploadBtnBox {
+              margin: 30rpx 0 0 30rpx;
+              border: 2rpx dashed #1a1a1a;
+              width: 200rpx;
+              height: 200rpx;
 
-				.optionPercentageBox {
-					margin-top: 10rpx;
-					padding: 10rpx 20rpx;
-					height: 50rpx;
-					border-radius: 20rpx;
-					background-color: rgba(0, 0, 0, 0.3);
-					text-align: left;
-
-					.optionPercentage {
-						color: white;
-						font-size: 30rpx;
-						line-height: 30rpx;
-					}
-				}
-			}
-		}
-
-		.horizontalOptionPercentagesBox {
-			position: fixed;
-			left: 40%;
-			top: 81%;
-			height: 600rpx;
-			width: 290rpx;
-			transform: translate(-50%, -50%) rotateZ(90deg);
-			z-index: 15;
-
-			// background-color: rgba(255,255,255,.5);
-			.optionPercentages {
-				height: 50rpx;
-				width: 100%;
-
-				.optionPercentageBox {
-					margin-top: 10rpx;
-					padding: 10rpx 20rpx;
-					height: 50rpx;
-					border-radius: 20rpx;
-					background-color: rgba(0, 0, 0, 0.3);
-					text-align: left;
-
-					.optionPercentage {
-						color: white;
-						font-size: 30rpx;
-						line-height: 30rpx;
-					}
-				}
-			}
-		}
-
-		.multipleResultPlayEndMask {
-			position: fixed;
-			left: 50%;
-			top: 50%;
-			background-color: black;
-			z-index: 8;
-		}
-
-		.verticalPopupNameBox {
-			position: fixed;
-			left: 5%;
-			top: 7%;
-			width: 460rpx;
-			height: 60rpx;
-			background-color: rgba(0, 0, 0, 0.3);
-			border-radius: 30rpx;
-			text-align: left;
-
-			text {
-				padding: 20rpx;
-				font-size: 30rpx;
-				color: white;
-				line-height: 60rpx;
-			}
-		}
-
-		.horizontalPopupNameBox {
-			position: fixed;
-			left: 84%;
-			top: 21%;
-			width: 460rpx;
-			height: 60rpx;
-			transform: translate(-50%, -50%) rotateZ(90deg);
-			background-color: rgba(0, 0, 0, 0.3);
-			border-radius: 30rpx;
-			text-align: left;
-
-			text {
-				padding: 20rpx;
-				font-size: 30rpx;
-				color: white;
-				line-height: 60rpx;
-			}
-		}
-
-		.progress-line-box {
-			position: fixed;
-			left: 2%;
-			top: 50%;
-			height: 50rpx;
-			z-index: 10;
-			transform: translate(-50%, -50%) rotateZ(90deg);
-
-			progress {
-				position: absolute;
-				top: 48%;
-				left: 4%;
-				width: 80%;
-			}
-
-			.progress-time {
-				position: absolute;
-				left: 85%;
-				color: white;
-				line-height: 50rpx;
-			}
-		}
-
-		.progress-box {
-			position: fixed;
-			left: 6%;
-			top: 50%;
-			z-index: 10;
-			height: 50rpx;
-			width: 450rpx;
-			display: flex;
-			justify-content: center;
-			border-radius: 20rpx;
-			background-color: rgba(0, 0, 0, 0.5);
-			transform: translate(-50%, -50%) rotateZ(90deg);
-
-			.replayVideoIconBox {
-				width: 50rpx;
-				height: 50rpx;
-
-				icon {
-					width: 100%;
-					height: 100%;
-					background: url(../../static/icon/jumpback.png) no-repeat center;
-					background-size: 50rpx;
-				}
-			}
-
-			.jumpbackIconBox {
-				width: 50rpx;
-				height: 50rpx;
-				margin-left: 30rpx;
-
-				icon {
-					width: 100%;
-					height: 100%;
-					background: url(../../static/icon/jumpback15.png) no-repeat center;
-					background-size: 50rpx;
-				}
-			}
-
-			.suspendIconBox {
-				width: 50rpx;
-				height: 50rpx;
-				margin-left: 30rpx;
-
-				icon {
-					width: 100%;
-					height: 100%;
-					background: url(../../static/icon/suspend.png) no-repeat center;
-					background-size: 50rpx;
-				}
-			}
-
-			.playIconBox {
-				width: 50rpx;
-				height: 50rpx;
-				margin-left: 30rpx;
-
-				icon {
-					width: 100%;
-					height: 100%;
-					background: url(../../static/icon/play.png) no-repeat center;
-					background-size: 50rpx;
-				}
-			}
-
-			.jumpforwardIconBox {
-				width: 50rpx;
-				height: 50rpx;
-				margin-left: 30rpx;
-
-				icon {
-					width: 100%;
-					height: 100%;
-					background: url(../../static/icon/jumpforward15.png) no-repeat center;
-					background-size: 50rpx;
-				}
-			}
-
-			.endVideoIconBox {
-				width: 50rpx;
-				height: 50rpx;
-				margin-left: 30rpx;
-
-				icon {
-					display: block;
-					transform: rotateZ(180deg);
-					width: 100%;
-					height: 100%;
-					background: url(../../static/icon/jumpback.png) no-repeat center;
-					background-size: 50rpx;
-				}
-			}
-
-			.f-text {
-				color: white;
-				line-height: 50rpx;
-			}
-
-			.t-text {
-				color: white;
-				line-height: 50rpx;
-			}
-		}
-
-		.videoLoadImageBox {
-			position: absolute;
-			left: 0;
-			top: 0;
-			width: 100%;
-			height: 100%;
-
-			image {
-				width: 100%;
-				height: 100%;
-			}
-		}
-
-		.play {
-			background-color: black;
-			position: relative;
-			overflow: hidden;
-
-			.container {
-				position: fixed;
-				left: 50%;
-				top: 50%;
-				transform: translate(-50%, -50%);
-				margin: 0 auto;
-				z-index: 25;
-
-				canvas {
-					width: 100%;
-					height: 100%;
-				}
-			}
-
-			.videoBox {
-				position: absolute;
-				left: 50%;
-				top: 50%;
-				// transform: translate(-50%, -50%);修改为了行内样式
-				overflow: hidden;
-
-				video {
-					position: fixed;
-					left: 0;
-					top: 0;
-					bottom: 0;
-					z-index: 7;
-					width: 100%;
-					height: 100%;
-				}
-
-				.screenshot {
-					position: absolute;
-					left: 0;
-					top: 0;
-					z-index: 9;
-					width: 100%;
-					height: 100%;
-				}
-			}
-
-			.chooseTipsMask15 {
-				background-color: rgba(0, 0, 0, 0.1);
-				position: fixed;
-				left: 0;
-				top: 0;
-				width: 100%;
-				height: 100%;
-				z-index: 17;
-
-				.chooseTipsMask16 {
-					background-color: rgba(255, 255, 255, 0);
-					position: fixed;
-					left: 50%;
-					top: 50%;
-					// transform: translate(-50%, -50%);
-					width: 650rpx;
-					height: 38%;
-					z-index: 18;
-					border-radius: 20rpx;
-
-					.chooseTips {
-						width: 100%;
-						z-index: 25;
-						// background-color: rgba(0,0,0,1);
-						position: absolute;
-						top: 50%;
-						transform: translateY(-50%);
-
-						.closeBox {
-							position: absolute;
-							width: 46rpx;
-							height: 46rpx;
-							right: 20rpx;
-							top: 20rpx;
-
-							.closeIcon {
-								width: 100%;
-								height: 100%;
-								background: url(../../static/icon/close.png) no-repeat center;
-								background-size: 46rpx;
-							}
-						}
-
-						.title {
-							text-align: center;
-							color: white;
-							font-size: 36rpx;
-							line-height: 100rpx;
-						}
-
-						.tips {
-							position: relative;
-
-							.optionBox {
-								background: url("https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1606382670960frame.png") no-repeat center;
-								background-size: 100% 100%;
-								width: 100%;
-								margin: 0 auto;
-								margin-bottom: 20rpx;
-								line-height: 80rpx;
-								display: flex;
-								justify-content: space-between;
-
-								.option {
-									color: white;
-									padding-left: 20rpx;
-									font-size: 34rpx;
-
-									.iconBox {
+              .add_btn {
+								position: relative;
+								top: 50%;
+								transform: translateY(-50%);
+								view {
+									height: 60rpx;
+									width: 8rpx;
+									border-radius: 4rpx;
+									background-color: black;
+									position: absolute;
+									left: 50%;
+									top: 50%;
+									transform: translate(-50%, -50%);
+									&:nth-child(2) {
 										position: absolute;
-										right: 0;
-										top: -18rpx;
-										// background-color: #7E4DAB;
-										background-color: rgba(#ffffff, 0.6);
-										height: 50rpx;
-										width: 180rpx;
-										border-radius: 25rpx;
-										display: flex;
-										justify-content: flex-start;
-
-										icon {
-											display: inline-block;
-											margin-left: 12rpx;
-											line-height: 50rpx;
-											background: url(../../static/icon/advertisement.png) no-repeat center;
-											width: 50rpx;
-											height: 50rpx;
-											background-size: 50rpx;
-										}
-
-										text {
-											margin-left: 8rpx;
-											line-height: 50rpx;
-											color: #707070;
-											font-size: 24rpx;
-										}
+										left: 50%;
+										top: 50%;
+										transform: translate(-50%, -50%) rotate(90deg);
 									}
 								}
 							}
-						}
-
-						.video_rebroadcast {
-							width: 80rpx;
-							height: 80rpx;
-							padding: 10rpx;
-							background-color: rgba(#000, 0.2);
-							border-radius: 40rpx;
-							margin: 0 auto;
-
-							img {
-								width: 100%;
-								height: 100%;
-								// transform: rotateY(180deg);
-							}
-						}
-					}
-				}
-			}
-
-			.verticalLikabilityBox {
-				.likabilityTips {
-					position: fixed;
-					left: 5%;
-					top: 12%;
-					height: 600rpx;
-					width: 420rpx;
-					z-index: 15;
-
-					// background-color: rgba(255,255,255,.5);
-					.lbtips {
-						height: 50rpx;
-						width: 100%;
-
-						.likabilityBox {
-							margin-top: 10rpx;
-							padding: 10rpx 20rpx;
-							height: 50rpx;
-							border-radius: 20rpx;
-							background-color: rgba(0, 0, 0, 0.3);
-							text-align: left;
-
-							.likability {
-								color: white;
-								font-size: 30rpx;
-								line-height: 30rpx;
-							}
-						}
-					}
-				}
-			}
-
-			.horizontalLikabilityBox {
-				.likabilityTips {
-					position: fixed;
-					left: 40%;
-					top: 19%;
-					height: 600rpx;
-					width: 420rpx;
-					transform: translate(-50%, -50%) rotateZ(90deg);
-					z-index: 15;
-
-					// background-color: rgba(255,255,255,.5);
-					.lbtips {
-						height: 50rpx;
-						width: 100%;
-
-						.likabilityBox {
-							margin-top: 10rpx;
-							padding: 10rpx 20rpx;
-							height: 50rpx;
-							border-radius: 20rpx;
-							background-color: rgba(0, 0, 0, 0.3);
-							text-align: left;
-
-							.likability {
-								color: white;
-								font-size: 30rpx;
-								line-height: 30rpx;
-							}
-						}
-					}
-				}
-			}
-
-			.lightBox {
-				position: fixed;
-				left: 6%;
-				top: 4%;
-				height: 40rpx;
-				width: 160rpx;
-				z-index: 15;
-				background-color: rgba(255, 255, 255, 0.5);
-				border-radius: 20rpx;
-				display: flex;
-				justify-content: flex-start;
-
-				.lightIconBox {
-					width: 40rpx;
-					height: 40rpx;
-					margin-left: 10rpx;
-
-					.lightIcon {
-						width: 100%;
-						height: 100%;
-						background: url(../../static/icon/hourglass.png) no-repeat center;
-						background-size: 40rpx;
-					}
-				}
-
-				.lightText {
-					font-size: 24rpx;
-					color: white;
-					line-height: 40rpx;
-					margin-left: 10rpx;
-				}
-
-				.addLightIconBox {
-					width: 40rpx;
-					height: 40rpx;
-					margin-left: 26rpx;
-
-					.addLightIcon {
-						width: 100%;
-						height: 100%;
-						background: url(../../static/icon/addofplay.png) no-repeat center;
-						background-size: 40rpx;
-					}
-				}
-			}
-
-			.verticalBox {
-				.my_progress {
-					position: fixed;
-					width: 100%;
-					z-index: 999;
-					padding: 0 20rpx;
-					border-radius: 40rpx;
-					height: 40px;
-					left: 0;
-					bottom: 20rpx;
-					background-color: rgba($color: #fff, $alpha: 0.15);
-					display: flex;
-
-					.play_btn {
-						width: 40px;
-						height: 40px;
-
-						view {
-							width: 100%;
-							height: 100%;
-							display: block;
-						}
-
-						.play_v {
-							background: url("../../static/playIcon/play.png") no-repeat center;
-							background-size: 40rpx;
-						}
-
-						.pause_v {
-							background: url("../../static/playIcon/pause.png") no-repeat center;
-							background-size: 40rpx;
-						}
-					}
-
-					.progress_contaier {
-						flex: 1;
-						// width: calc(100% - 40rpx);
-						position: relative;
-						top: 50%;
-						transform: translateY(-50%);
-						display: flex;
-						line-height: 40px;
-
-						.begin_timer,
-						.over_timer {
-							width: 84rpx;
-							text-align: left;
-							color: #fff;
-						}
-
-						.progress_event_box {
-							flex: 1;
-							height: 40px;
-							margin: 0 20rpx;
-
-							.progress {
-								height: 8rpx;
-								border-radius: 6rpx;
-								background-color: #808080;
-								position: relative;
-								top: 50%;
-								transform: translateY(-50%);
-								overflow: hidden;
-
-								.on_progress {
-									transition: all 0.1s;
-									position: absolute;
-									left: 0;
-									top: 0;
-									height: 100%;
-									background-color: #fff;
-								}
-							}
-						}
-					}
-				}
-
-				.storyLineBox {
-					position: fixed;
-					right: 6%;
-					top: 37%;
-					height: 80rpx;
-					width: 100rpx;
-					z-index: 15;
-					background-color: rgba(0, 0, 0, 0.3);
-					border-radius: 20rpx;
-
-					.storyLineIconBox {
-						width: 100rpx;
-						height: 50rpx;
-						text-align: center;
-
-						.storyLineIcon {
-							width: 50rpx;
-							height: 50rpx;
-							background: url(../../static/icon/fenzhi.png) no-repeat center;
-							background-size: 50rpx;
-						}
-					}
-
-					.storyLine {
-						text-align: center;
-						color: white;
-						font-size: 20rpx;
-						line-height: 30rpx;
-					}
-				}
-
-				.reportBox {
-					position: fixed;
-					right: 6%;
-					top: 45%;
-					height: 80rpx;
-					width: 100rpx;
-					z-index: 15;
-					background-color: rgba(0, 0, 0, 0.3);
-					border-radius: 20rpx;
-
-					.reportIconBox {
-						width: 100rpx;
-						height: 50rpx;
-						text-align: center;
-
-						.reportIcon {
-							width: 50rpx;
-							height: 50rpx;
-							background: url(../../static/icon/report.png) no-repeat center;
-							background-size: 50rpx;
-						}
-					}
-
-					.report {
-						text-align: center;
-						color: white;
-						font-size: 20rpx;
-						line-height: 30rpx;
-					}
-				}
-
-				.seeMoreBox {
-					position: fixed;
-					right: 6%;
-					top: 53%;
-					height: 80rpx;
-					width: 100rpx;
-					z-index: 15;
-					background-color: rgba(0, 0, 0, 0.3);
-					border-radius: 20rpx;
-
-					.seeMoreIconBox {
-						width: 100rpx;
-						height: 50rpx;
-						text-align: center;
-
-						.seeMoreIcon {
-							width: 50rpx;
-							height: 50rpx;
-							background: url(../../static/icon/seeMore.png) no-repeat center;
-							background-size: 50rpx;
-						}
-					}
-
-					.seeMore {
-						text-align: center;
-						color: white;
-						font-size: 20rpx;
-						line-height: 30rpx;
-					}
-				}
-
-				.returnToPreviousBox {
-					position: fixed;
-					right: 6%;
-					top: 61%;
-					height: 80rpx;
-					width: 100rpx;
-					z-index: 15;
-					background-color: rgba(0, 0, 0, 0.3);
-					border-radius: 20rpx;
-
-					.returnToPreviousIconBox {
-						width: 100rpx;
-						height: 50rpx;
-						text-align: center;
-
-						.returnToPreviousIcon {
-							width: 50rpx;
-							height: 50rpx;
-							background: url(../../static/icon/returnToPrevious.png) no-repeat center;
-							background-size: 50rpx;
-						}
-					}
-
-					.returnToPrevious {
-						text-align: center;
-						color: white;
-						font-size: 20rpx;
-						line-height: 30rpx;
-					}
-				}
-			}
-
-			.horizontalBox {
-				.my_progress_h {
-					position: fixed;
-					// width: calc(100vh - 80rpx);
-					width: 133.3%;
-					z-index: 999;
-					padding: 0 20rpx;
-					border-radius: 40rpx;
-					height: 40px;
-					left: calc(-66.1% + 50rpx);
-					top: calc(50% - 40rpx);
-					transform: rotate(90deg);
-					background-color: rgba($color: #fff, $alpha: 0.15);
-					display: flex;
-
-					.play_btn {
-						width: 40px;
-						height: 40px;
-
-						view {
-							width: 100%;
-							height: 100%;
-							display: block;
-						}
-
-						.play_v {
-							background: url("../../static/playIcon/play.png") no-repeat center;
-							background-size: 40rpx;
-						}
-
-						.pause_v {
-							background: url("../../static/playIcon/pause.png") no-repeat center;
-							background-size: 40rpx;
-						}
-					}
-
-					.progress_contaier {
-						flex: 1;
-						// width: calc(100% - 40rpx);
-						position: relative;
-						top: 50%;
-						transform: translateY(-50%);
-						display: flex;
-						line-height: 40px;
-
-						.begin_timer,
-						.over_timer {
-							width: 84rpx;
-							text-align: left;
-							color: #fff;
-						}
-
-						.progress_event_box_h {
-							flex: 1;
-							height: 40px;
-							margin: 0 20rpx;
-
-							.progress_h {
-								height: 8rpx;
-								border-radius: 6rpx;
-								background-color: #808080;
-								position: relative;
-								top: 50%;
-								transform: translateY(-50%);
-								overflow: hidden;
-
-								.on_progress_h {
-									transition: all 0.1s;
-									position: absolute;
-									left: 0;
-									top: 0;
-									height: 100%;
-									background-color: #fff;
-								}
-							}
-						}
-					}
-				}
-
-				.storyLineBox {
-					position: fixed;
-					right: 0;
-					top: 60%;
-					height: 80rpx;
-					width: 100rpx;
-					transform: translate(-50%, -50%) rotateZ(90deg);
-					z-index: 15;
-					background-color: rgba(0, 0, 0, 0.3);
-					border-radius: 20rpx;
-
-					.storyLineIconBox {
-						width: 100rpx;
-						height: 50rpx;
-						text-align: center;
-
-						.storyLineIcon {
-							width: 50rpx;
-							height: 50rpx;
-							background: url(../../static/icon/fenzhi.png) no-repeat center;
-							background-size: 50rpx;
-						}
-					}
-
-					.storyLine {
-						text-align: center;
-						color: white;
-						font-size: 20rpx;
-						line-height: 30rpx;
-					}
-				}
-
-				.reportBox {
-					position: fixed;
-					right: 0;
-					top: 70%;
-					transform: translate(-50%, -50%) rotateZ(90deg);
-					height: 80rpx;
-					width: 100rpx;
-					z-index: 15;
-					background-color: rgba(0, 0, 0, 0.3);
-					border-radius: 20rpx;
-
-					.reportIconBox {
-						width: 100rpx;
-						height: 50rpx;
-						text-align: center;
-
-						.reportIcon {
-							width: 50rpx;
-							height: 50rpx;
-							background: url(../../static/icon/report.png) no-repeat center;
-							background-size: 50rpx;
-						}
-					}
-
-					.report {
-						text-align: center;
-						color: white;
-						font-size: 20rpx;
-						line-height: 30rpx;
-					}
-				}
-
-				.seeMoreBox {
-					position: fixed;
-					right: 0;
-					top: 80%;
-					transform: translate(-50%, -50%) rotateZ(90deg);
-					height: 80rpx;
-					width: 100rpx;
-					z-index: 15;
-					background-color: rgba(0, 0, 0, 0.3);
-					border-radius: 20rpx;
-
-					.seeMoreIconBox {
-						width: 100rpx;
-						height: 50rpx;
-						text-align: center;
-
-						.seeMoreIcon {
-							width: 50rpx;
-							height: 50rpx;
-							background: url(../../static/icon/seeMore.png) no-repeat center;
-							background-size: 50rpx;
-						}
-					}
-
-					.seeMore {
-						text-align: center;
-						color: white;
-						font-size: 20rpx;
-						line-height: 30rpx;
-					}
-				}
-
-				.returnToPreviousBox {
-					position: fixed;
-					right: 0;
-					top: 90%;
-					transform: translate(-50%, -50%) rotateZ(90deg);
-					height: 80rpx;
-					width: 100rpx;
-					z-index: 15;
-					background-color: rgba(0, 0, 0, 0.3);
-					border-radius: 20rpx;
-
-					.returnToPreviousIconBox {
-						width: 100rpx;
-						height: 50rpx;
-						text-align: center;
-
-						.returnToPreviousIcon {
-							width: 50rpx;
-							height: 50rpx;
-							background: url(../../static/icon/returnToPrevious.png) no-repeat center;
-							background-size: 50rpx;
-						}
-					}
-
-					.returnToPrevious {
-						text-align: center;
-						color: white;
-						font-size: 20rpx;
-						line-height: 30rpx;
-					}
-				}
-			}
-
-			.storyLineContentMask16 {
-				position: fixed;
-				z-index: 999;
-				left: 0;
-				top: 0;
-				width: 100%;
-				height: 100%;
-				background-color: rgba(255, 255, 255, 0.9);
-
-				.storyLineContentBox {
-					width: 100%;
-					height: 100%;
-					z-index: 17;
-					background-color: rgba(0, 0, 0, 0.3);
-
-					.title {
-						text-align: center;
-						font-size: 36rpx;
-						color: white;
-						line-height: 100rpx;
-					}
-
-					.splitLine {
-						border: 2rpx solid #d3d3d3;
-						width: 80%;
-						margin: 0 auto;
-					}
-
-					.closeBox {
-						position: absolute;
-						width: 46rpx;
-						height: 46rpx;
-						right: 20rpx;
-						top: 20rpx;
-
-						.closeIcon {
-							width: 100%;
-							height: 100%;
-							background: url(../../static/icon/close.png) no-repeat center;
-							background-size: 46rpx;
-						}
-					}
-				}
-			}
-
-			.reportContentMask16 {
-				position: fixed;
-				z-index: 999;
-				left: 0;
-				top: 0;
-				width: 100%;
-				height: 100%;
-				background-color: rgba(255, 255, 255, 0.9);
-
-				.reportContentBox {
-					width: 100%;
-					height: 100%;
-					z-index: 17;
-					background-color: rgba(0, 0, 0, 0.3);
-
-					.title {
-						text-align: center;
-						font-size: 36rpx;
-						color: white;
-						line-height: 100rpx;
-					}
-
-					.splitLine {
-						border: 2rpx solid #d3d3d3;
-						width: 100%;
-						margin: 0 auto;
-					}
-
-					.subTitle {
-						color: white;
-						margin: 10rpx 0 0 10rpx;
-						font-size: 30rpx;
-					}
-
-					.closeBox {
-						position: absolute;
-						width: 46rpx;
-						height: 46rpx;
-						right: 20rpx;
-						top: 20rpx;
-
-						.closeIcon {
-							width: 100%;
-							height: 100%;
-							background: url(../../static/icon/close.png) no-repeat center;
-							background-size: 46rpx;
-						}
-					}
-
-					.reportContent {
-						.uni-list {
-							.checkBox {
-								margin: 30rpx 0 0 30rpx;
-								display: flex;
-								justify-content: flex-start;
-
-								.nameBox {
-									height: 48rpx;
-
-									.name {
-										line-height: 48rpx;
-										color: white;
-									}
-								}
-							}
-						}
-
-						.uni-textarea {
-							margin: 30rpx 0 0 30rpx;
-
-							textarea {
-								background: white;
-							}
-						}
-
-						.uploadBox {
-							margin: 30rpx 0 0 0;
-
-							.subTitle {
-								color: white;
-								font-size: 30rpx;
-							}
-
-							.uploadBtnBox {
-								margin: 30rpx 0 0 30rpx;
-								border: 2rpx solid white;
-								width: 200rpx;
-								height: 300rpx;
-
-								icon {
-									width: 100%;
-									height: 100%;
-									background: url(../../static/icon/add.png) no-repeat center;
-									background-size: 200rpx 200rpx;
-								}
-							}
-
-							.uploadImageBox {
-								margin: 30rpx 0 0 30rpx;
-								border: 2rpx solid red;
-								width: 200rpx;
-								height: 300rpx;
-								border: 2rpx solid white;
-
-								image {
-									width: 100%;
-									height: 100%;
-								}
-							}
-						}
-
-						.submitBtnBox {
-							margin: 0 auto;
-							margin-top: 20rpx;
-							font-size: 30rpx;
-							width: 150rpx;
-							height: 60rpx;
-							color: white;
-							border: 2rpx solid white;
-
-							.btnText {
-								line-height: 60rpx;
-								text-align: center;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	page {
-		width: 100%;
-		height: 100%;
-	}
+            }
+
+            .uploadImageBox {
+              margin: 30rpx 0 0 30rpx;
+              border: 2rpx solid red;
+              width: 200rpx;
+              height: 300rpx;
+              border: 2rpx solid white;
+
+              image {
+                width: 100%;
+                height: 100%;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+page {
+  width: 100%;
+  height: 100%;
+}
 </style>

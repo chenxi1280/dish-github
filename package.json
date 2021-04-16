@@ -8,6 +8,7 @@
     "cos-wx-sdk-v5": "^0.7.11",
     "crypto-js": "^4.0.0",
     "eruda": "^2.4.1",
+    "three": "^0.127.0",
     "uni-simple-router": "^1.5.5",
     "uview-ui": "file:uview-ui"
   },
