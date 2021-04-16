@@ -2462,7 +2462,7 @@
 					if (this.isPosition == 1) {
 						this.chooseTipsShowFlag = false
 						this.chooseTipsMaskFlag = false
-						// this.screenshotShowFlag = true
+						this.screenshotShowFlag = true
 						this.videoShowFlag = true
 						this.hiddenBtnFlag = true
 						this.showCanvasFlag = true
@@ -3613,11 +3613,11 @@
 				}
 			},
 			videoTimeupdate(e) {
-				if (this.duration - this.currentTime < 0.4) {
+				/* if (this.duration - this.currentTime < 0.4) {
 					if (this.isPosition == 1) {
 						this.screenshotShowFlag = true
 					}
-				}
+				} */
 				//获取视频当前时间
 				this.currentTime = e.detail.currentTime
 				this.duration = e.detail.duration
