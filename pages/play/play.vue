@@ -1097,10 +1097,13 @@
 				this.reCanvasNodeBuoyList()
 			},
 			videoError(e) {
-				uni.setStorageSync("relaunchApplets", true)
-				uni.switchTab({
-					url: '../dishover/dishover'
-				})
+				if(this.parentId === 0){
+					uni.setStorageSync("relaunchApplets", true)
+					uni.switchTab({
+						url: '../dishover/dishover'
+					})
+				}
+				
 				console.log("********************我报错了*********: ", e)
 			},
 			//点击浮标选项弹窗关闭按钮事件
@@ -1720,6 +1723,8 @@
 			},
 			//对节点播放数据进行筛选和提取
 			initPlayData(artworkTree, isJumpDialogCallbackFlag) {
+				//定位选项最后一帧截屏开关 预防直接显示了最后一帧截图
+				this.screenshotShowFlag = false
 				this.isShowMyProgress = true
 				if (artworkTree.parentId === 0) {
 					this.startDetailId = artworkTree.pkDetailId
@@ -2484,9 +2489,30 @@
 						let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
 						// buoyStatus 弹窗是否开启 1开启 0默认选项
 						if (buoyPopInfo.buoyStatus) {
-							//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
+							//如果是弹窗开启那么就重播
 							this.againPlayVideo()
 						} else {
+							//TODO 需要根据后台判断标志来判断
+							/* if(true){
+								//拉回到浮标出现位置
+								//获取浮标视频的选项初始渲染时间
+								console.log("canvasNodeBuoyList: ",this.canvasNodeBuoyList)
+								let min = this.canvasNodeBuoyList[0][0].buoySectionTime
+								for (let i = 0; i < this.canvasNodeBuoyList.length; i++) {
+									//找出最小的buoySectionTime
+									let time = this.canvasNodeBuoyList[i][0].buoySectionTime
+									if(time < min){
+										min = time
+									}
+								}
+								console.log("*********min time:",min-1)
+								this.videoContext.seek(parseInt(min-1))
+								this.videoContext.play()
+							}else{
+								//默认选A
+								this.buoyAutoChooseFlag = true
+								this.clickCommonOptionTodo(0)
+							} */
 							this.buoyAutoChooseFlag = true
 							this.clickCommonOptionTodo(0)
 						}
@@ -2534,11 +2560,6 @@
 			},
 			//视屏暂停操作
 			videoPause() {
-				console.log(1111111111111111111)
-				if(this.isVideoEndFlag){
-					console.log(1111111111111111111)
-					this.screenshotShowFlag = true
-				}
 				this.isPlay = false
 			},
 			//展示故事线内容的时候暂停视频
@@ -3229,6 +3250,7 @@
 				}
 			},
 			clickPositionOptionTodo() {
+				this.screenshotShowFlag = false
 				//返回上一级的开关在这个视频播放结束时应该被关闭
 				this.returnToPreviousFlag = false
 				//保存用户的选择记录
@@ -3257,7 +3279,6 @@
 						this.likabilityArray = []
 						clearTimeout(this.optionPercentageFunction)
 						clearTimeout(this.likabilityDelayFunction)
-						this.screenshotShowFlag = false
 						this.canvasTouchendEventTodo()
 						this.likabilityFlag = false
 						this.videoShowFlag = true
@@ -3613,11 +3634,6 @@
 				}
 			},
 			videoTimeupdate(e) {
-				/* if (this.duration - this.currentTime < 0.4) {
-					if (this.isPosition == 1) {
-						this.screenshotShowFlag = true
-					}
-				} */
 				//获取视频当前时间
 				this.currentTime = e.detail.currentTime
 				this.duration = e.detail.duration
