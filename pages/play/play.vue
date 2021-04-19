@@ -400,6 +400,7 @@
 		},
 		data() {
 			return {
+				nowDate: null,
 				// 是否显示进度条
 				isShowMyProgress: true,
 				progressWidth: 0,
@@ -1392,17 +1393,20 @@
 					this.advertising.offClose()
 					// this.advertising.destroy()
 				}
-				if ((Math.random() * 10) > 5) {
-					this.advertising = wx.createRewardedVideoAd({
-						adUnitId: 'adunit-7423fd1b2c7c5724'
-						// multiton: true
-					})
-				} else {
-					this.advertising = wx.createRewardedVideoAd({
-						adUnitId: 'adunit-8d7f7b5a86ac5537'
-						// multiton: true
-					})
-				}
+				this.advertising = wx.createRewardedVideoAd({
+					adUnitId: 'adunit-7423fd1b2c7c5724'
+				})
+				// if ((Math.random() * 10) > 5) {
+				// 	this.advertising = wx.createRewardedVideoAd({
+				// 		adUnitId: 'adunit-7423fd1b2c7c5724'
+				// 		// multiton: true
+				// 	})
+				// } else {
+				// 	this.advertising = wx.createRewardedVideoAd({
+				// 		adUnitId: 'adunit-8d7f7b5a86ac5537'
+				// 		// multiton: true
+				// 	})
+				// }
 				//捕捉错误
 				this.advertising.onError(err => {
 					console.log(err)
@@ -1528,8 +1532,11 @@
 									this.customLightSuccessCallBack(this.touchRectNum)
 								} else {
 									console.log('给光')
-									this.addLight()
-
+									const nowDate = new Date().getTime()
+									if (nowDate === null || nowDate - this.nowDate > 5000 ) {
+										this.nowDate = nowDate
+										this.addLight()
+									}
 									// 浮标修改
 									if (this.bouyNodeFlage) {
 										this.recoveryBuoyDraw()
@@ -1547,7 +1554,11 @@
 									this.customLightSuccessCallBack(this.optionIndex)
 								} else {
 									console.log('给光')
-									this.addLight()
+									const nowDate = new Date().getTime()
+									if (nowDate === null || nowDate - this.nowDate > 5000 ) {
+										this.nowDate = nowDate
+										this.addLight()
+									}
 								}
 							}
 						}
@@ -2523,6 +2534,17 @@
 				this.isVideoEndFlag = false
 				this.isGetMultipleFlag = false
 				this.videoloadFlag = false
+
+				// 用于解决进度条卡顿问题
+				const time = JSON.parse(JSON.stringify(this.currentTime))
+				if (this.isPlay) {
+					const timer = setTimeout(() => {
+						if (time === this.currentTime) {
+							this.videoContext.play()
+						}
+						clearTimeout(timer)
+					}, 300)
+				}
 				if (this.waitingVideoFlag) {
 					if (this.bouyNodeFlage) {
 						console.log('play里面的  recoveryBuoyDraw 被启动了')
