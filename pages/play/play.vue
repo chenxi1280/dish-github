@@ -794,6 +794,7 @@
 				//作品id 初始化之后需要取拿作品信息存起来待用
 				this.getPlayArtworkInfo(this.artworkId)
 			}
+			this.getNextAd()
 		},
 		onHide() {
 			// this.videoShowFlag = false
@@ -1388,225 +1389,195 @@
 				}
 
 			},
-
-			// 观看激励广告
-			openAdvertising() {
-				this.showAdvertisingFlag = false
-				if (this.advertising != null) {
+            openAdvertising2() {
+                this.showAdvertisingFlag = false
+            },
+			getNextAd(){
+				if(this.adErr){
+					console.log('因为上次有错误，删除了ad')
+					this.advertising.offError()
 					this.advertising.offClose()
-					// this.advertising.destroy()
+					this.advertising.destroy()
+					this.advertising = null
 				}
-				this.advertising = wx.createRewardedVideoAd({
-					adUnitId: 'adunit-7423fd1b2c7c5724'
-				})
-				// if ((Math.random() * 10) > 5) {
-				// 	this.advertising = wx.createRewardedVideoAd({
-				// 		adUnitId: 'adunit-7423fd1b2c7c5724'
-				// 		// multiton: true
-				// 	})
-				// } else {
-				// 	this.advertising = wx.createRewardedVideoAd({
-				// 		adUnitId: 'adunit-8d7f7b5a86ac5537'
-				// 		// multiton: true
-				// 	})
-				// }
-				//捕捉错误
-				this.advertising.onError(err => {
-					console.log(err)
-					uni.showToast({
-						icon: 'none',
-						title: '当前没有适合您的激励视频，请待会再试'
+			    if(!this.advertising){
+					console.log('获得新的广告')
+                    this.advertising = wx.createRewardedVideoAd({ adUnitId: 'adunit-7423fd1b2c7c5724' })
+					this.advertising.onError(err => {
+					    console.log(err)
+						this.adErr  = err
 					})
-					if (this.isVideoEndFlag) {
-						if (this.isGetMultipleFlag) {
-							this.multipleResultAdvertiseShow = true
-						}
-						if (this.isPosition == 1) {
-							if (this.playMode == 1) {
-								this.initHorizontalCanvas()
-							} else {
-								this.initVerticalCanvas()
-							}
-							this.showCanvasFlag = true
-						}
-						if (this.bouyNodeFlage) {
-							this.showConditionAdvertisingFlag = false
-							this.againPlayVideo()
-						}
-					} else {
-
-						if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
-							this.recoveryBuoyDraw()
-						}
-						this.videoContext.play()
-					}
-					this.advertising.offClose()
-					// this.advertising.destroy()
-					this.clickCommonOptionTodoBuoyFlag = false
-
-				})
-				// 激励广告显示并加载
-				if (this.advertising) {
+                }else {
+					console.log('使用老的广告')
+                    this.advertising.offClose()
+				}
+			},
+			//广告新逻辑：onload就会拉取，拉去之后存错误码，拉取失败才会临时拉取
+            openAdvertising() {
+                this.showAdvertisingFlag = false
+                this.getNextAd()
+                //捕捉错误
+				this.adErr && this.handleAdError()
+           
+                // 激励广告显示并加载
+				this.advertising.load().then(() => {
+					this.advertising.show().then(() => {})
+				}).catch(() => {
+					//如果播完了并且是定位选项，需要展示canvas
+					//this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
 					this.advertising.load().then(() => {
 						this.advertising.show().then(() => {})
 					}).catch(() => {
-						if (this.isVideoEndFlag) {
-							if (this.isPosition == 1) {
-								this.showCanvasFlag = true
-							}
-						}
-						this.advertising.load().then(() => {
-							this.advertising.show().then(() => {})
-						}).catch(() => {
-							if (this.isVideoEndFlag) {
-								if (this.isPosition == 1) {
-									this.showCanvasFlag = true
-								}
-							}
-							uni.showToast({
-								icon: 'none',
-								title: '当前没有适合您的激励视频，请待会再试'
-							})
-							if (this.isVideoEndFlag) {
-								if (this.isGetMultipleFlag) {
-									this.multipleResultAdvertiseShow = true
-								}
-								if (this.isPosition == 1) {
-									if (this.playMode == 1) {
-										this.initHorizontalCanvas()
-									} else {
-										this.initVerticalCanvas()
-									}
-									this.showCanvasFlag = true
-								}
-								if (this.bouyNodeFlage) {
-									this.showConditionAdvertisingFlag = false
-									this.againPlayVideo()
-								}
-							} else {
-								if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
-									this.recoveryBuoyDraw()
-								}
-								this.videoContext.play()
-							}
-							//加载失败取消监听用户点击 关闭广告 按钮的事件
-							this.advertising.offClose()
-							//加载失败销毁对象实例
-							// this.advertising.destroy()
-						})
-						this.advertising.offClose()
-						// this.advertising.destroy()
-						this.clickCommonOptionTodoBuoyFlag = false
+						this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
+						//处理调取光失败方法
+						this.handleAdError()
 					})
-				}
-				// 监听激励广告关闭
-				this.advertising.onClose((status) => {
-					this.showConditionAdvertisingFlag = false
-					if (this.isVideoEndFlag) {
-						if (this.isPosition == 1) {
-							if (this.playMode == 1) {
-								this.initHorizontalCanvas()
-							} else {
-								this.initVerticalCanvas()
-							}
-							this.showCanvasFlag = true
-						}
-					} else {
-						// 浮标修改
-						if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
-							this.recoveryBuoyDraw()
-						} else {
-							this.videoContext.play()
-						}
-					}
-					//status.isEnded
-					if (status.isEnded) {
-						// 关闭条件浮标 弹窗
-						this.showConditionAdvertisingFlag = false
-						if (this.isPosition == 1) {
-							//获取多结局作品开关
-							if (this.isGetMultipleFlag) {
-								this.multipleResultAdvertiseShow = false
-								this.multipleResultCallbackTodo(false)
-							} else {
-								if (this.conditionState[this.touchRectNum] == 1) {
-									//成功播放完广告
-
-									this.customLightSuccessCallBack(this.touchRectNum)
-								} else {
-									console.log('给光')
-									const nowDate = new Date().getTime()
-									if (nowDate === null || nowDate - this.nowDate > 5000 ) {
-										this.nowDate = nowDate
-										this.addLight()
-									}
-									// 浮标修改
-									if (this.bouyNodeFlage) {
-										this.recoveryBuoyDraw()
-									}
-								}
-							}
-						} else {
-							if (this.isGetMultipleFlag) {
-								this.multipleResultAdvertiseShow = false
-								this.multipleResultCallbackTodo(false)
-							} else {
-								// 条件 广告
-								if (this.conditionState[this.optionIndex] == 1) {
-									//成功播放完广告
-									this.customLightSuccessCallBack(this.optionIndex)
-								} else {
-									console.log('给光')
-									const nowDate = new Date().getTime()
-									if (nowDate === null || nowDate - this.nowDate > 5000 ) {
-										this.nowDate = nowDate
-										this.addLight()
-									}
-								}
-							}
-						}
-						this.advertising.offClose()
-						// this.advertising.destroy()
-					} else {
-						if (this.isVideoEndFlag) {
-							if (this.isGetMultipleFlag) {
-								this.multipleResultAdvertiseShow = true
-							}
-							if (this.isPosition == 1) {
-								if (this.playMode == 1) {
-									this.initHorizontalCanvas()
-								} else {
-									this.initVerticalCanvas()
-								}
-								this.showCanvasFlag = true
-							}
-							// console.log('我进下面了')
-							if (this.bouyNodeFlage) {
-								this.buoyRectList = []
-								this.canvasNodeBuoyList = []
-								console.log('重新播放')
-								this.againPlayVideo()
-							}
-						} else {
-							// 浮标修改
-							if (this.bouyNodeFlage) {
-								if (this.showConditionAdvertisingFlag) {
-									this.showConditionAdvertisingFlag = false
-								}
-								this.recoveryBuoyDraw()
-							}
-						}
-						// 浮标 结尾 广告 未看完 时间添加
-						console.log('憨批用户不给光')
-						this.clickCommonOptionTodoBuoyFlag = false
-						//广告拉取取消监听用户点击 关闭广告 按钮的事件
-						this.advertising.offClose()
-						//广告拉取失败销毁对象实例
-						// this.advertising.destroy()
-					}
-
 				})
+                // 监听激励广告关闭
+                this.advertising.onClose((status) => {
+                    this.showConditionAdvertisingFlag = false
+                    if (status.isEnded) {
+                        // 关闭条件浮标 弹窗
+                        this.showConditionAdvertisingFlag = false
+						//广告正确关闭业务处理
+						this.handleAdBusiness()
+                        this.advertising.offClose()
+                        // this.advertising.destroy()
+                    } else {
+						this.handleAdUnfinishedBusiness()
+                        // 浮标 结尾 广告 未看完 时间添加
+                        console.log('憨批用户不给光')
+                        this.clickCommonOptionTodoBuoyFlag = false
+                    }
+                    this.handleAdEnded()
+                })
 			},
+			handleAdEnded() {
+				if (this.isVideoEndFlag) {
+					if (this.isPosition == 1) {
+						if (this.playMode == 1) {
+							this.initHorizontalCanvas()
+						} else {
+							this.initVerticalCanvas()
+						}
+						this.showCanvasFlag = true
+					}
+				} else {
+					// 浮标修改
+					if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
+						this.recoveryBuoyDraw()
+					} else {
+						this.videoContext.play()
+					}
+				}
+			},
+            handleAdUnfinishedBusiness(){
+                if (this.isVideoEndFlag) {
+                    if (this.isGetMultipleFlag) {
+                        this.multipleResultAdvertiseShow = true
+                    }
+                    if (this.isPosition == 1) {
+                        if (this.playMode == 1) {
+                            this.initHorizontalCanvas()
+                        } else {
+                            this.initVerticalCanvas()
+                        }
+                        this.showCanvasFlag = true
+                    }
+                    // console.log('我进下面了')
+                    if (this.bouyNodeFlage) {
+                        this.buoyRectList = []
+                        this.canvasNodeBuoyList = []
+                        console.log('重新播放')
+                        this.againPlayVideo()
+                    }
+                } else {
+                    // 浮标修改
+                    if (this.bouyNodeFlage) {
+                        if (this.showConditionAdvertisingFlag) {
+                            this.showConditionAdvertisingFlag = false
+                        }
+                        this.recoveryBuoyDraw()
+                    }
+                }
+			},
+			handleAdBusiness(){
+                if (this.isPosition == 1) {
+                    //获取多结局作品开关
+                    if (this.isGetMultipleFlag) {
+                        this.multipleResultAdvertiseShow = false
+                        this.multipleResultCallbackTodo(false)
+                    } else {
+                        if (this.conditionState[this.touchRectNum] == 1) {
+                            //成功播放完广告
+
+                            this.customLightSuccessCallBack(this.touchRectNum)
+                        } else {
+                            console.log('给光')
+                            const nowDate = new Date().getTime()
+                            if (nowDate === null || nowDate - this.nowDate > 5000 ) {
+                                this.nowDate = nowDate
+                                this.addLight()
+                            }
+                            // 浮标修改
+                            if (this.bouyNodeFlage) {
+                                this.recoveryBuoyDraw()
+                            }
+                        }
+                    }
+                } else {
+                    if (this.isGetMultipleFlag) {
+                        this.multipleResultAdvertiseShow = false
+                        this.multipleResultCallbackTodo(false)
+                    } else {
+                        // 条件 广告
+                        if (this.conditionState[this.optionIndex] == 1) {
+                            //成功播放完广告
+                            this.customLightSuccessCallBack(this.optionIndex)
+                        } else {
+                            console.log('给光')
+                            const nowDate = new Date().getTime()
+                            if (nowDate === null || nowDate - this.nowDate > 5000 ) {
+                                this.nowDate = nowDate
+                                this.addLight()
+                            }
+                        }
+                    }
+                }
+			},
+			handleAdError(){
+                uni.showToast({
+                    icon: 'none',
+                    title: '当前没有适合您的激励视频，请待会再试'
+                })
+                if (this.isVideoEndFlag) {
+                    if (this.isGetMultipleFlag) {
+                        this.multipleResultAdvertiseShow = true
+                    }
+                    if (this.isPosition == 1) {
+                        if (this.playMode == 1) {
+                            this.initHorizontalCanvas()
+                        } else {
+                            this.initVerticalCanvas()
+                        }
+                        this.showCanvasFlag = true
+                    }
+                    if (this.bouyNodeFlage) {
+                        this.showConditionAdvertisingFlag = false
+                        this.againPlayVideo()
+                    }
+                } else {
+
+                    if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
+                        this.recoveryBuoyDraw()
+                    }
+                    this.videoContext.play()
+                }
+                this.clickCommonOptionTodoBuoyFlag = false
+
+            },
+			// 观看激励广告
+
 			openVideoShowFlag() {
 				this.videoShowFlag = true
 			},
