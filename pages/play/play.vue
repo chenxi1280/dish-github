@@ -317,7 +317,7 @@
 				</view>
 			</view>
 		</u-modal>
-		<view v-if="verticalJumpDialogFlag" style="z-index: 9999999;width: 100vw; height: 100vh">
+		<view v-if="verticalJumpDialogFlag" style="z-index: 9999;">
 			<vertical-jump-dialog :imageUrl="popupImageUrl" :navigatorUrl="navigatorUrl" :appId="appId" :artworkId="artworkId"
 			:popupPosition="popupPosition" v-on:videoEnd="videoEnd" v-on:initPlayData="initPlayData" :artworkTree="artworkTree"
 			ref="verticalJumpDialog" v-on:multipleResultCallbackTodo="multipleResultCallbackTodo" >
@@ -1720,6 +1720,7 @@
 			},
 			//对节点播放数据进行筛选和提取
 			initPlayData(artworkTree, isJumpDialogCallbackFlag) {
+				this.screenshotShowFlag = false
 				this.isShowMyProgress = true
 				if (artworkTree.parentId === 0) {
 					this.startDetailId = artworkTree.pkDetailId
@@ -3229,6 +3230,7 @@
 				}
 			},
 			clickPositionOptionTodo() {
+				this.screenshotShowFlag = false
 				//返回上一级的开关在这个视频播放结束时应该被关闭
 				this.returnToPreviousFlag = false
 				//保存用户的选择记录
@@ -3257,7 +3259,6 @@
 						this.likabilityArray = []
 						clearTimeout(this.optionPercentageFunction)
 						clearTimeout(this.likabilityDelayFunction)
-						this.screenshotShowFlag = false
 						this.canvasTouchendEventTodo()
 						this.likabilityFlag = false
 						this.videoShowFlag = true
