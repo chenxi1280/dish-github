@@ -835,6 +835,11 @@
 			uni.setStorageSync('appearConditionMap', null)
 			console.log('离开play1！！！！')
 			globalBus.$off('bouyClickCommonOptionTodo')
+			//20210422xuezx清除页面定时器
+			if (this.buoyRef != null) {
+				console.log('定时器存在并已清除')
+				clearInterval(this.buoyRef)
+			}
 		},
 		onShareAppMessage(res) {
 			let artworkInfo = uni.getStorageSync('artworkInfo')
