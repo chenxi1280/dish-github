@@ -101,7 +101,6 @@ page {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.8);
-    z-index: 17;
     image {
       position: absolute;
       left: 50%;
@@ -110,7 +109,7 @@ page {
       width: 500rpx;
       height: 500rpx;
       // border-radius: 40rpx;
-      z-index: 18;
+      z-index: 9999;
     }
     icon {
       position: absolute;

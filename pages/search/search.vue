@@ -17,7 +17,7 @@
 
 <script>
 	import {
-		baseURL
+		baseURL,versionId
 	} from '../login/config/config.js'
 	export default {
 		data() {
@@ -35,7 +35,8 @@
 				data: {
 					page: 1,
 					limit: 10,
-					playClient: 1
+					playClient: 1,
+					versionId: versionId
 				},
 				success: res => {
 					if (res.data.data != null) {

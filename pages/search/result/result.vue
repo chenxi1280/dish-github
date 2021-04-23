@@ -9,7 +9,7 @@
 
 	import waterfall from '../waterfall_view/waterfall.vue'
 	import {
-			baseURL
+			baseURL,versionId
 		} from '../../login/config/config.js'
 	export default {
 		components: {
@@ -40,7 +40,8 @@
 						page: this.page,
 						limit: this.limit,
 						searchText: this.searchText,
-						playClient: 1
+						playClient: 1,
+						versionId: versionId
 					},
 					success: res => {
 						if(res.data.data != null){

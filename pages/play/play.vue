@@ -73,10 +73,10 @@
 				<!-- <canvas canvas-id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas> -->
 				<canvas type="2d" id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas>
 			</view>
-			<!-- 播放主体   @click="showButton" @timeupdate="videoTimeupdate" @loadedmetadata="loadeddata"  :controls="controlsFlag" -->
+			<!-- 播放主体  @click="showButton" @timeupdate="videoTimeupdate" @loadedmetadata="loadeddata"  :controls="controlsFlag" -->
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform} ">
 				<video v-if="videoShowFlag" :controls="false" :src="videoUrl" :show-mute-btn="false" :show-fullscreen-btn="false"
-				 :autoplay="autopalyFlag" id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="false"
+				 :autoplay="autopalyFlag" id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="false" :loop="false"
 				 @ended="videoEnd(false)" @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart" @error="videoError"
 				 auto-pause-if-navigate @timeupdate="videoTimeupdate" @play="videoPlay" @waiting="waitingVideo" @loadedmetadata="loadeddata"
 				 :show-play-btn="false" @click="toggleProgress"></video>
@@ -317,7 +317,7 @@
 				</view>
 			</view>
 		</u-modal>
-		<view v-if="verticalJumpDialogFlag" style="z-index: 99999;">
+		<view v-if="verticalJumpDialogFlag" style="z-index: 9999999;width: 100vw; height: 100vh">
 			<vertical-jump-dialog :imageUrl="popupImageUrl" :navigatorUrl="navigatorUrl" :appId="appId" :artworkId="artworkId"
 			:popupPosition="popupPosition" v-on:videoEnd="videoEnd" v-on:initPlayData="initPlayData" :artworkTree="artworkTree"
 			ref="verticalJumpDialog" v-on:multipleResultCallbackTodo="multipleResultCallbackTodo" >
@@ -834,9 +834,6 @@
 			//关闭页面时重置节点分数容器
 			uni.setStorageSync('appearConditionMap', null)
 			console.log('离开play1！！！！')
-			if(this.bouyNodeFlage){
-				this.clearAnimation()
-			}
 			globalBus.$off('bouyClickCommonOptionTodo')
 			//20210422xuezx清除页面定时器
 			if (this.buoyRef != null) {
@@ -881,14 +878,6 @@
 			}
 		},
 		methods: {
-			onWaiting () {
-				const video = uni.createVideoContext("myVideo");
-				video.play()
-			},
-			onError () {
-				const video = uni.createVideoContext("myVideo");
-				video.play()
-			},
 			getToken() {
 				let _this = this
 				let openid = uni.getStorageSync("openid")
@@ -1206,7 +1195,7 @@
 			//返回上级
 			returnToPrevious() {
 				console.log("************this.endFlag1: ",this.endFlag)
-				console.log("************playedHistoryArray: ",JSON.parse(uni.getStorageSync("pkDetailIds")))
+				console.log("************playedHistoryArray000: ",JSON.parse(uni.getStorageSync("pkDetailIds")))
 				//设置返回上一级开关 给是否快进视频做标识
 				this.returnToPreviousFlag = true
 				//若parentId是0或-1时点击返回上一级弹框提示（parentId为0根节点为-1多结局作品的结局视频）
@@ -1246,7 +1235,7 @@
 				pkDetailIds.splice(pkDetailIds.length - 2, 2)
 				// console.log("************pkDetailIds: ",pkDetailIds)
 				this.playedHistoryArray = pkDetailIds
-				console.log("************playedHistoryArray: ",this.playedHistoryArray)
+				console.log("************playedHistoryArray001: ",this.playedHistoryArray)
 				uni.setStorageSync("pkDetailIds", JSON.stringify(this.playedHistoryArray))
 				//将多结局作品的路径砍掉 对照着播放历史截取
 				if (uni.getStorageSync('isEndings') == 1) {
@@ -1671,6 +1660,7 @@
 				this.getArtworkTreeByDetailId(option.pkDetailId)
 				//获取播放历史记录
 				this.playedHistoryArray = JSON.parse(uni.getStorageSync("pkDetailIds"))
+				console.log("***********playedHistoryArray111: ",this.playedHistoryArray)
 				//重置多结局数组（故事线跳回时进行重组直接获取就好了）
 				this.multipleResultLine = uni.getStorageSync("multipleResultLine")
 				//获取存放节点数值的容器
@@ -1810,7 +1800,7 @@
 				this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
 				this.parentId = artworkTree.parentId
 				this.imageSrc = artworkTree.nodeLastImgUrl
-
+				console.log("this.imageSrc: ",this.imageSrc)
 				//如果是根节点初始化存储节点分值的容器
 				if (this.parentId === 0) {
 					//存进缓存是防止故事线进入时重置了data里面的数据
@@ -1864,6 +1854,7 @@
 						/* //不需要去重 记录故事线走向方便数值选项分数计算
 						this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray)); */
 						uni.setStorageSync("pkDetailIds", JSON.stringify(this.playedHistoryArray))
+						console.log("***********this.playedHistoryArray222",this.playedHistoryArray)
 						this.getTargetTree(mainTree, linkId)
 					} else {
 						console.log("endFlag3")
@@ -1887,6 +1878,7 @@
 					/* //不需要去重 记录故事线走向方便数值选项分数计算
 					this.playedHistoryArray = Array.from(new Set(this.playedHistoryArray)); */
 					uni.setStorageSync("pkDetailIds", JSON.stringify(this.playedHistoryArray));
+					console.log("***********this.playedHistoryArray223",this.playedHistoryArray)
 					this.linkNodeId = null
 				}
 				
@@ -2310,6 +2302,7 @@
 				this.isMultipleResultPlayEnd = true
 				//存储多结局的结局视频播放历史
 				uni.setStorageSync("pkDetailIds", JSON.stringify(this.playedHistoryArray))
+				console.log("***********this.playedHistoryArray444",this.playedHistoryArray)
 				//保存播放记录
 				this.savaPlayRecord()
 			},
@@ -2469,7 +2462,7 @@
 				this.percent = 100
 				this.isVideoEndFlag = true
 				console.log('this.endFlag2: ', this.endFlag)
-				console.log("************pkDetailIds: ",JSON.parse(uni.getStorageSync("pkDetailIds")))
+				console.log("***********playedHistoryArray333: ",JSON.parse(uni.getStorageSync("pkDetailIds")))
 				if (this.endFlag) {
 					if (this.isPosition == 1) {
 						this.chooseTipsShowFlag = false
@@ -2528,35 +2521,13 @@
 					}
 				}
 			},
-			videoPlay(e) {
-				// this.videoContext.pause()
-				// this.videoContext.play()
+			videoPlay() {
+				console.log(123456000011123)
 				this.isPlay = true
 				this.multipleResultFlag = false
 				this.isVideoEndFlag = false
 				this.isGetMultipleFlag = false
 				this.videoloadFlag = false
-				this.showCanvasFlag = false
-				const time = JSON.parse(JSON.stringify(this.currentTime))
-				if (this.isPlay) {
-					const timer = setTimeout(() => {
-						if (time === this.currentTime) {
-							this.videoContext.play()
-						}
-						clearTimeout(timer)
-					}, 300)
-				}
-				// 更新进度条
-				//获取视频当前时间
-				// this.currentTime = e.detail.currentTime
-				// this.duration = e.detail.duration
-				// // 进度条的时间格式化
-				// const mm = parseInt(this.currentTime / 60) >= 10 ? parseInt(this.currentTime / 60) : "0" + parseInt(this.currentTime /
-				// 	60);
-				// const ss = parseInt(this.currentTime % 60) >= 10 ? parseInt(this.currentTime % 60) : "0" + parseInt(this.currentTime %
-				// 	60);
-				// this.durationBeginTimer = mm + ":" + ss;
-				// this.progressWidth = (this.currentTime / this.duration) * 100;
 				if (this.waitingVideoFlag) {
 					if (this.bouyNodeFlage) {
 						console.log('play里面的  recoveryBuoyDraw 被启动了')
@@ -2564,9 +2535,15 @@
 						this.waitingVideoFlag = false
 					}
 				}
+
 			},
 			//视屏暂停操作
 			videoPause() {
+				console.log(1111111111111111111)
+				if(this.isVideoEndFlag){
+					console.log(1111111111111111111)
+					this.screenshotShowFlag = true
+				}
 				this.isPlay = false
 			},
 			//展示故事线内容的时候暂停视频
@@ -3641,6 +3618,11 @@
 				}
 			},
 			videoTimeupdate(e) {
+				/* if (this.duration - this.currentTime < 0.4) {
+					if (this.isPosition == 1) {
+						this.screenshotShowFlag = true
+					}
+				} */
 				//获取视频当前时间
 				this.currentTime = e.detail.currentTime
 				this.duration = e.detail.duration
@@ -3651,7 +3633,6 @@
 					60);
 				this.durationBeginTimer = mm + ":" + ss;
 				this.progressWidth = (this.currentTime / this.duration) * 100;
-				console.log('在更新吗', this.progressWidth, this.currentTime, this.duration)
 				//获取视频当前时间
 				if (this.duration - this.currentTime > 0.4) {
 					this.percent = parseInt(this.currentTime / this.duration * 100)
@@ -5355,7 +5336,7 @@
 
     .storyLineContentMask16 {
       position: fixed;
-      z-index: 9999;
+      z-index: 999;
       left: 0;
       top: 0;
       width: 100%;

@@ -125,9 +125,10 @@
 				}
 				if (!limit) {
 					this.isShowMax = false
+					this.isShowNumOne = true
 					const timer = setTimeout(() => {
 						if (!num) {
-							uni.setStorageSync('lightNumber', 0)
+							uni.setStorageSync('lightNumber', 1)
 						} else {
 							if (num >= 9) {
 								uni.setStorageSync('lightNumber', 0)
