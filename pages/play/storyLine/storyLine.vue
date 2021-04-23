@@ -1,6 +1,6 @@
 <template>
 	<view class="wrap">
-		<swiper :vertical="true" :previous-margin="'170'" :next-margin="'280'" :current="onfloor" @change="floorChange" style="width: 100%; height: 650px; ">
+		<swiper :vertical="true" :previous-margin="'170'" :next-margin="'270'" :current="onfloor" @change="floorChange" style="width: 100%; height: 650px; ">
 			<swiper-item v-for="(item, floor) in floorList" :key="floor" style="margin-top: 12rpx; height: 224px; ">
 				<mswiper :list="item" :title="true" :circular="false" :autoplay="false" :height="416" :effect3d="true" :isBig="onfloor == floor"
 				 :effect3d-previous-margin="80" @change="columnChange" @click="goPlay" :nowFloor="floor"></mswiper>

@@ -5,7 +5,7 @@
 			   <view class="title">请输入邀请码</view>
 		   </view>
 		   <view class="message-box">
-				<input class="message" :style="{'line-height': lineHeight,'margin': margin}"></input>
+				<input class="message" :style="{'line-height': lineHeight,'margin': margin}">
 		   </view>
 		   <view class="btn-box">
 			   <view class="concel-btn-box">

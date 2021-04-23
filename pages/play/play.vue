@@ -317,7 +317,7 @@
 				</view>
 			</view>
 		</u-modal>
-		<view v-if="verticalJumpDialogFlag" style="z-index: 99999;">
+		<view v-if="verticalJumpDialogFlag" style="z-index: 9999999;width: 100vw; height: 100vh">
 			<vertical-jump-dialog :imageUrl="popupImageUrl" :navigatorUrl="navigatorUrl" :appId="appId" :artworkId="artworkId"
 			:popupPosition="popupPosition" v-on:videoEnd="videoEnd" v-on:initPlayData="initPlayData" :artworkTree="artworkTree"
 			ref="verticalJumpDialog" v-on:multipleResultCallbackTodo="multipleResultCallbackTodo" >
