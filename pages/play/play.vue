@@ -358,14 +358,16 @@
 		</view>
 		<!-- 浮标视频点击选项显示图片和打印文字 -->
 		<view class="popupBox"  v-if="buoyDialogFlag">
-			<icon @click="closeBuoyDialog" class="horizontalCloseIcon" v-if="playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
-			<icon @click="closeBuoyDialog" class="verticalCloseIcon" v-if="!playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
-			<view class="buoyDialog" :style="{'transform': transform , 'z-index': 17}">		
-				<view class="buoyDialogImage"  v-if="buoyDialogImageFlag">
-					<image :src = "buoyDialogImageSrc"></image>
-				</view>
-				<view class="buoyDialogPrintWords"  v-if="!buoyDialogImageFlag">
-					<textarea v-model="buoyDialogWords" disabled = "true"></textarea>
+			<view class="buoyDialog_mask">
+				<icon @click="closeBuoyDialog" class="horizontalCloseIcon" v-if="playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
+				<icon @click="closeBuoyDialog" class="verticalCloseIcon" v-if="!playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
+				<view class="buoyDialog" :style="{'transform': transform , 'z-index': 17}">		
+					<view class="buoyDialogImage"  v-if="buoyDialogImageFlag">
+						<image :src = "buoyDialogImageSrc"></image>
+					</view>
+					<view class="buoyDialogPrintWords"  v-if="!buoyDialogImageFlag">
+						<textarea v-model="buoyDialogWords" disabled = "true"></textarea>
+							</view>
 						</view>
 					</view>
 				</view>
@@ -2540,11 +2542,6 @@
 			},
 			//视屏暂停操作
 			videoPause() {
-				console.log(1111111111111111111)
-				if(this.isVideoEndFlag){
-					console.log(1111111111111111111)
-					this.screenshotShowFlag = true
-				}
 				this.isPlay = false
 			},
 			//展示故事线内容的时候暂停视频
@@ -4487,7 +4484,12 @@
     left: 0;
     top: 0;
     background-color: rgba(255, 255, 255, 0);
-    z-index: 16;
+    z-index: 9999;
+		.buoyDialog_mask {
+			width: 100%;
+			height: 100%;
+			background-color: rgba($color: #000000, $alpha: .8);
+		}
     .horizontalCloseIcon {
       position: absolute;
       right: 13%;
