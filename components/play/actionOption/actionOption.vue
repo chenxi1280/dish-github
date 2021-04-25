@@ -26,7 +26,7 @@
 				<!-- 竖屏 -->
 				<view :style="{position: 'fixed',
 						left: actionOptionStyleArray[index].right+'px',
-						backgroundColor: 'rgba(255, 255, 255, 0.5)',
+						backgroundColor: 'rgba(255, 255, 255, 0)',
 						top: actionOptionStyleArray[index].top+'px',
 						}" v-if="!playMode" 
 						@touchstart="touchstart(index,$event)" 
@@ -77,7 +77,8 @@
 				areaRight: 0,
 				areatop: 0,
 				isValid: false,
-				paramArray: null
+				paramArray: null,
+				moveFlag: false
 			}
 		},
 		onReady() {
@@ -136,6 +137,7 @@
 				// console.log("**************e：",e)
 				let x = e.touches[0].pageX
 				let y = e.touches[0].pageY
+				this.moveFlag = true
 				console.log("*********x: ",x,"*********y: ",y)
 				if(this.playMode === 0){
 					if(this.isValid){
@@ -220,7 +222,7 @@
 				let y = e.changedTouches[0].pageY
 				console.log("*********x: ",x,"*********y: ",y)
 				if(this.playMode === 0){
-					if(this.isValid){
+					if(this.isValid && this.moveFlag){
 						let infos = this.actionOptionStyleArray[index]
 						let xLowLimit = infos.right
 						let xUpLimit = infos.right + infos.areaWidth
@@ -235,15 +237,17 @@
 								if(currentFknodeId === referenceFknodeId){
 									this.$parent.optionIndex = i
 									this.$parent.clickCommonOptionTodo(i)
+									this.moveFlag = false
 									break
 								}
 							}
 						}else{
 							this.isValid = false
 						}
+						this.moveFlag = false
 					}
 				}else{
-					if(this.isValid){
+					if(this.isValid && this.moveFlag){
 						let infos = this.paramArray[index]
 						let right = infos.actionCoordinateY*this.windowWidth
 						let top = infos.actionCoordinateX*this.windowHeight
@@ -262,12 +266,14 @@
 								if(currentFknodeId === referenceFknodeId){
 									this.$parent.optionIndex = i
 									this.$parent.clickCommonOptionTodo(i)
+									this.moveFlag = false
 									break
 								}
 							}
 						}else{
 							this.isValid = false
 						}
+						this.moveFlag = false
 					}
 				}
 			},
@@ -281,7 +287,7 @@
 		height: 100%;
 	}
 	.maskBox{
-		background-color: rgba(255, 255, 255, 0.5);
+		background-color: rgba(255, 255, 255, 0);
 		width: 100%;
 		height: 100%;
 	}

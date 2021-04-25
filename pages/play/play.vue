@@ -717,7 +717,9 @@
 				//动作作品展示开关
 				actionOptionFlag: false,
 				//动作作品的组件绑定数组
-				bindActionOptionArray: []
+				bindActionOptionArray: [],
+				//动作选项被选择的时间点
+				actionSectionTime: 0
 			}
 		},
 		onReady() {
@@ -1246,6 +1248,17 @@
 					if (currentId == detailId) {
 						this.bouySectionTime = historyNodeBuoyList[i].buoySectionTime
 						console.log("*************bouySectionTime1: ", this.bouySectionTime)
+						break
+					}
+				}
+				for (let i = 0; i < this.ecmArtworkNodeActionVOList.length; i++) {
+					let currentId = this.ecmArtworkNodeActionVOList[i].fkNodeId
+					let detailId = pkDetailIds[pkDetailIds.length - 1]
+					console.log("************detailId return: ", detailId)
+					//此处还是不能使用this.detailId来对比要使用历史记录的来对比 因为返回的节点可能是跳转节点
+					if (currentId == detailId) {
+						this.actionSectionTime = this.ecmArtworkNodeActionVOList[i].actionSectionTime
+						console.log("*************actionSectionTime1: ", this.actionSectionTime)
 						break
 					}
 				}
@@ -2523,6 +2536,8 @@
 						}
 
 					} else if(this.isPosition === 3){
+						// 默认选A
+						this.optionIndex = 0
 						let autoChooseFlag = this.ecmArtworkNodeActionVOList[0].actionPlayEndType
 						if(autoChooseFlag === -1){
 							//拉回到动作出现位置
@@ -2533,7 +2548,7 @@
 							this.videoContext.play()
 						}else{
 							//默认选A
-							this.clickCommonOptionTodo(0)
+							this.clickCommonOptionTodo(this.optionIndex)
 						}
 					} else {
 						this.showCanvasFlag = false
@@ -3622,14 +3637,19 @@
 				this.durationStr = date
 				// 浮标修改
 				console.log("!this.bouyNodeFlage", !this.bouyNodeFlage)
-				if (!this.bouyNodeFlage) {
+				if (!this.bouyNodeFlage && this.isPosition !== 3) {
 					//判断是不是故事线跳转过来的第一个视频 第一个视频需要快进到结尾进行播放
 					if (this.isPlayedFlag) {
 						this.videoContext.seek(parseInt((this.duration - 3).toFixed(0)))
 						this.isPlayedFlag = false
 					}
 				} else {
-					this.isPlayedFlag = false
+					if(this.isPosition === 3){
+						this.videoContext.seek(parseInt(this.actionSectionTime - 1))
+						this.isPlayedFlag = false
+					}else{
+						this.isPlayedFlag = false
+					}
 				}
 				//加载完成将入场loading关闭
 				//this.videoloadFlag = false
@@ -4817,7 +4837,7 @@
       top: 0;
       width: 100%;
       height: 100%;
-      z-index: 999;
+      z-index: 9999;
 
       .chooseTipsMask16 {
         background-color: rgba(255, 255, 255, 0);
@@ -4827,12 +4847,10 @@
         // transform: translate(-50%, -50%);
         width: 650rpx;
         height: 38%;
-        z-index: 18;
         border-radius: 20rpx;
 
         .chooseTips {
           width: 100%;
-          z-index: 25;
           // background-color: rgba(0,0,0,1);
           position: absolute;
           top: 50%;
