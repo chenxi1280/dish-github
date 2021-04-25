@@ -6,7 +6,7 @@
 					<view style="position: absolute; top: 10rpx;left: 8rpx">
 						<Advertising :lightNumber.sync="lightNumber" :ecmUserLightUpLimit.sync="ecmUserLightUpLimit" color="#7d3b90"></Advertising>
 					</view>
-					<view class="author_box" v-if="loginedFlag">
+					<view class="author_box" v-if="loginedFlag" @click="test">
 						<view class = "avatarUrl" v-if="realFlag">
 							<image :src="image" ></image>
 						</view>
@@ -14,7 +14,7 @@
 							<text>没有头像</text>
 						</view>
 					</view>
-					<view class="wx_author_box" v-if="!loginedFlag">
+					<view class="wx_author_box" v-if="!loginedFlag" @click="test">
 						<view class = "wx_avatarUrl">
 							<open-data type="userAvatarUrl"></open-data>
 						</view>
@@ -26,6 +26,7 @@
 						<view class="problem" @click="customerService">
 							<icon class="headset"></icon>
 						</view>
+						<!-- <view class="open_VR" @click="openVR">open-VR</view> -->
 					</view>
 				</view>
 				<view class="mid">
@@ -75,7 +76,9 @@
 				//是否登录开关
 				loginedFlag: false,
 				lightNumber: 0,
-				ecmUserLightUpLimit: 0
+				ecmUserLightUpLimit: 0,
+				//点击头像次数计数
+				i: 0
 			}
 		},
 		components: {
@@ -85,8 +88,12 @@
 		},
 		onLoad(options) {
 			uni.showShareMenu({
-			  withShareTicket: true
+				withShareTicket: true,
+				menus: ['shareAppMessage','shareTimeline']
 			})
+			/* uni.hideShareMenu({
+				menus: ['shareTimeline']
+			}) */ 
 			this.current = uni.getStorageSync("mine_current")
 			let token = uni.getStorageSync("token")
 			if(token != null && typeof(token) != "undefined" && token.length != 0){
@@ -150,6 +157,47 @@
 			}
 		},
 		methods: {
+			test(){
+				this.i++
+				if(this.i === 5){
+					this.checkUpdate()
+					this.i = 0
+				}
+			},
+			checkUpdate(){
+				let _that = this
+				const updateManager = uni.getUpdateManager();
+				updateManager.onCheckForUpdate((res) => {
+				    // 请求完新版本信息的回调
+					console.log("是否有更新: ",res.hasUpdate);
+					if(res.hasUpdate){
+						console.log("1111111111111111111")
+						updateManager.onUpdateReady((res) => {
+							console.log("2222222222222222222")
+						    uni.showModal({
+								title: '更新提示',
+								content: '新版本已经准备好，是否重启应用？',
+								success(res) {
+									if (res.confirm) {
+										 // 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
+										updateManager.applyUpdate();
+									}
+								}
+							});
+						});
+					}
+				});
+				updateManager.onUpdateFailed((res) => {
+					_that.checkUpdate()
+				});
+			},
+			// 全景视频入口
+			// openVR () {
+			// 	console.log('进入全景视频')
+			// 	uni.navigateTo({
+			// 		url: 'vr/vr'
+			// 	})
+			// },
 			// 初始化光数量
 			getLightNum () {
 				this.lightNumber = uni.getStorageSync('lightNumber')

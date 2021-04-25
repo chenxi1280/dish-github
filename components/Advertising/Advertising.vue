@@ -63,7 +63,9 @@
 				rewardLight: 0,
 				isShowMax: false,
 				isShowNumOne: false,
-				isShowNumTwo: false
+				isShowNumTwo: false,
+				// 当前的时间戳
+				nowDate: null
 			}
 		},
 		props:{
@@ -123,6 +125,23 @@
 				} else {
 					this.isShowNumTwo = false
 				}
+				if (!limit) {
+					this.isShowMax = false
+					this.isShowNumOne = true
+					const timer = setTimeout(() => {
+						if (!num) {
+							uni.setStorageSync('lightNumber', 1)
+						} else {
+							if (num >= 9) {
+								uni.setStorageSync('lightNumber', 0)
+							} else {
+								uni.setStorageSync('lightNumber', num + 1)
+							}
+						}
+						this.isShowNumber()
+						clearTimeout(timer)
+					}, 1000)
+				}
 				// console.log('初始化', num, this.isShowMax)
 				if (num >= 10) {
 					const numberOne = ((num + '').charAt(0) - 0)
@@ -167,17 +186,20 @@
 				this.showAdvertisingFlag = false
 				
 				//add
-				if ((Math.random() * 10) > 5) {
-					this.advertising = wx.createRewardedVideoAd({
-						adUnitId: 'adunit-7423fd1b2c7c5724'
-						// multiton: true
-					})
-				} else {
-					this.advertising = wx.createRewardedVideoAd({
-						adUnitId: 'adunit-8d7f7b5a86ac5537'
-						// multiton: true
-					})
-				}
+				this.advertising = wx.createRewardedVideoAd({
+					adUnitId: 'adunit-7423fd1b2c7c5724'
+				})
+				// if ((Math.random() * 10) > 5) {
+				// 	this.advertising = wx.createRewardedVideoAd({
+				// 		adUnitId: 'adunit-7423fd1b2c7c5724'
+				// 		// multiton: true
+				// 	})
+				// } else {
+				// 	this.advertising = wx.createRewardedVideoAd({
+				// 		adUnitId: 'adunit-8d7f7b5a86ac5537'
+				// 		// multiton: true
+				// 	})
+				// }
 				
 				//origional
 				/* this.advertising = wx.createRewardedVideoAd({
@@ -211,8 +233,12 @@
 				// 监听激励广告关闭
 				this.advertising.onClose((status) => {
 					if (status.isEnded) {
+						const nowDate = new Date().getTime()
+						if (nowDate === null || nowDate - this.nowDate > 5000 ) {
+							this.nowDate = nowDate
+							globalBus.$emit('requestOfAES')
+						}
 						// console.log('给光')
-						globalBus.$emit('requestOfAES')
 						
 					} else {
 						// console.log('憨批用户不给光')
@@ -251,34 +277,34 @@
 </script>
 
 <style lang="scss">
-	.light_container {
-		.add_icon {
-			position: absolute;
-			display: inline-block;
-			width: 40rpx;
-			height: 40rpx;
-			border: 2rpx solid #fff;
-			border-radius: 20rpx;
-			box-sizing: border-box;
-			right: 10rpx;
-			.line {
-				width: 20rpx;
-				height: 4rpx;
-				background-color: #fff;
-				border-radius: 4rpx;
-				margin-left: 8rpx;
-				margin-top: 16rpx;
-				&::after {
-					content: ' ';
-					display: block;
-					width: 4rpx;
-					height: 20rpx;
-					background-color: #fff;
-					border-radius: 4rpx;
-					margin-left: 8rpx;
-					transform: translateY(-8rpx);
-				}
-			}
-		}
-	}
+.light_container {
+  .add_icon {
+    position: absolute;
+    display: inline-block;
+    width: 40rpx;
+    height: 40rpx;
+    border: 2rpx solid #fff;
+    border-radius: 20rpx;
+    box-sizing: border-box;
+    right: 10rpx;
+    .line {
+      width: 20rpx;
+      height: 4rpx;
+      background-color: #fff;
+      border-radius: 4rpx;
+      margin-left: 8rpx;
+      margin-top: 16rpx;
+      &::after {
+        content: " ";
+        display: block;
+        width: 4rpx;
+        height: 20rpx;
+        background-color: #fff;
+        border-radius: 4rpx;
+        margin-left: 8rpx;
+        transform: translateY(-8rpx);
+      }
+    }
+  }
+}
 </style>

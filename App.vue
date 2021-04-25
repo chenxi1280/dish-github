@@ -17,30 +17,31 @@
 		},
 		 methods: {
 			checkUpdate(){
+				let _that = this
 				const updateManager = uni.getUpdateManager();
-				updateManager.onCheckForUpdate(function (res) {
+				updateManager.onCheckForUpdate((res) => {
 				    // 请求完新版本信息的回调
 					console.log("是否有更新: ",res.hasUpdate);
 					if(res.hasUpdate){
-						this.updateApplets()
+						console.log("1111111111111111111")
+						console.log("updateManager: ",updateManager)
+						updateManager.onUpdateReady((res) => {
+							console.log("2222222222222222222")
+						    uni.showModal({
+								title: '更新提示',
+								content: '新版本已经准备好，是否重启应用？',
+								success(res) {
+									if (res.confirm) {
+										 // 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
+										updateManager.applyUpdate();
+									}
+								}
+							});
+						});
 					}
 				});
-				updateManager.onUpdateFailed(function (res) {
-					this.checkUpdate()
-				});
-			},
-			updateApplets(){
-				updateManager.onUpdateReady(function (res) {
-				    uni.showModal({
-						title: '更新提示',
-						content: '新版本已经准备好，是否重启应用？',
-						success(res) {
-							if (res.confirm) {
-								 // 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
-								updateManager.applyUpdate();
-							}
-						}
-					});
+				updateManager.onUpdateFailed((res) => {
+					_that.checkUpdate()
 				});
 			},
 			login() {

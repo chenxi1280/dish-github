@@ -1,13 +1,13 @@
 <template>
 	<view class="wrap">
-		<swiper :vertical="true" :previous-margin="'170'" :next-margin="'280'" :current="onfloor" @change="floorChange" style="width: 100%; height: 650px; ">
+		<swiper :vertical="true" :previous-margin="'170'" :next-margin="'270'" :current="onfloor" @change="floorChange" style="width: 100%; height: 650px; ">
 			<swiper-item v-for="(item, floor) in floorList" :key="floor" style="margin-top: 12rpx; height: 224px; ">
 				<mswiper :list="item" :title="true" :circular="false" :autoplay="false" :height="416" :effect3d="true" :isBig="onfloor == floor"
 				 :effect3d-previous-margin="80" @change="columnChange" @click="goPlay" :nowFloor="floor"></mswiper>
 			</swiper-item>
 		</swiper>
-		<view class="cpt-mask-tips-bottom"> </view>
-		<view class="cpt-mask-tips-top"> </view>
+		<!-- <view class="cpt-mask-tips-bottom"> </view> -->
+		<!-- <view class="cpt-mask-tips-top"> </view> -->
 		<u-toast ref="uToast" />
 		<view>
 			<u-modal v-model="showAdvertisingFlagStory" title="温馨提示" :show-confirm-button="false" z-index="999">
@@ -238,7 +238,7 @@
 					// 跳转的 节点
 					let onNode = this.floorList[nowFloor][index]
 					// 播放记录 
-					let playHistory = uni.getStorageSync("pkDetailIds")
+					let playHistory = JSON.parse(uni.getStorageSync("pkDetailIds"))
 					// 当前选中楼层的 播放的节点 
 					let playNode = this.floorList[nowFloor][0]
 					// 多节点播放记录
@@ -303,7 +303,7 @@
 					//需要封装 重新吊起
 					uni.setStorageSync("multipleResultLine", moreEndingHistory);
 					// 修改 storage 的播放历史
-					uni.setStorageSync("pkDetailIds", playHistory);
+					uni.setStorageSync("pkDetailIds", JSON.stringify(playHistory));
 					this.$refs.uToast.show({
 						title: '选中跳转到' + onNode.selectTitle,
 						type: 'success',
@@ -388,7 +388,7 @@
 
 						uni.setStorageSync("multipleResultLine", this.moreEndingHistory);
 						// 修改 storage 的播放历史
-						uni.setStorageSync("pkDetailIds", this.playHistory);
+						uni.setStorageSync("pkDetailIds", JSON.stringify(this.playHistory));
 						this.$refs.uToast.show({
 							title: '选中跳转到' + this.onNode.selectTitle,
 							type: 'success',

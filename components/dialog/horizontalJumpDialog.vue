@@ -93,37 +93,37 @@
 </script>
 
 <style lang="scss">
-	page{
-		background-color: white;
-		.popup-box{
-			position: fixed;
-			left: 0;
-			top: 0;
-			width: 100%;
-			height: 100%;
-			background-color: rgba(0, 0, 0, .8);
-			z-index: 17;
-			image{
-				position: absolute;
-				left: 50%;
-				top: 50%;
-				transform: translate(-50%, -50%) rotateZ(90deg);
-				width: 500rpx;
-				height: 500rpx;
-				// border-radius: 40rpx;
-				z-index: 18;
-			}
-			icon{
-				position: absolute;
-				right: 10%;
-				top: 70%;
-				width: 60rpx;
-				height: 60rpx;
-				background: url(../../static/icon/dialogClose.png) no-repeat center;
-				background-size: 60rpx;
-				z-index: 18;
-			}
-		}
-	}
+page {
+  background-color: white;
+  .popup-box {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 99999;
+    image {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) rotateZ(90deg);
+      width: 500rpx;
+      height: 500rpx;
+      // border-radius: 40rpx;
+      z-index: 18;
+    }
+    icon {
+      position: absolute;
+      right: 10%;
+      top: 70%;
+      width: 60rpx;
+      height: 60rpx;
+      background: url(../../static/icon/dialogClose.png) no-repeat center;
+      background-size: 60rpx;
+      z-index: 18;
+    }
+  }
+}
 </style>
 
