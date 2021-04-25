@@ -9,9 +9,9 @@
 						top: actionOptionStyleArray[index].top+'px',
 						transform: 'rotate(90deg)'
 						}" v-if="playMode" 
-						@touchstart="touchstart" 
-						@touchend="touchend(index,$event)" 
-						@touchmove="touchmove">
+						@touchstart="touchstart(index,$event)" 
+						@touchend="touchend(index,$event)"
+						@touchmove="touchmove(index,$event)">
 					<view class="imageBox" :style="{width: actionOptionStyleArray[index].areaWidth+'px',
 						height: actionOptionStyleArray[index].areaHeight+'px',
 						}">
@@ -29,9 +29,9 @@
 						backgroundColor: 'rgba(255, 255, 255, 0.5)',
 						top: actionOptionStyleArray[index].top+'px',
 						}" v-if="!playMode" 
-						@touchstart="touchstart" 
+						@touchstart="touchstart(index,$event)" 
 						@touchend="touchend(index,$event)" 
-						@touchmove="touchmove">
+						@touchmove="touchmove(index,$event)">
 					<view class="imageBox" :style="{width: actionOptionStyleArray[index].areaWidth+'px',
 						height: actionOptionStyleArray[index].areaHeight+'px', 
 						}">
@@ -97,6 +97,7 @@
 				]
 				this.actionOptionStyleArray = []
 				for(let i = 0; i < array.length; i++){
+					let eventType = array[i].actionEventType
 					if(this.playMode == 0){
 						this.areaWidth = parseInt(this.array[i].actionWide*this.windowWidth)
 						this.areaHeight = parseInt(this.array[i].actionHigh*this.windowWidth)
@@ -106,15 +107,15 @@
 						//横屏就是乘以屏幕的长边 竖屏就是乘以屏幕的短边
 						this.areaWidth = parseInt(array[i].actionWide*this.windowHeight)
 						this.areaHeight = parseInt(array[i].actionHigh*this.windowHeight)
-						this.areaRight = parseInt(array[i].actionCoordinateY*this.windowWidth)
-						this.areatop = parseInt(array[i].actionCoordinateX*this.windowHeight)
+						this.areaRight = parseInt(array[i].actionCoordinateY*this.windowWidth + 0.5*this.areaHeight - 0.5*this.areaWidth)
+						this.areatop = parseInt(array[i].actionCoordinateX*this.windowHeight +  0.5*this.areaWidth - 0.5*this.areaHeight)
 					}
 					// console.log("******left: ",this.areaRight)
 					// console.log("******top: ",this.areatop)
 					let scale = array[i].actionScale
 					let imageWidth = parseInt(this.areaWidth*scale)
 					let imageHeight = parseInt(this.areaHeight*scale)
-					let src = verticalImageSrc[array[i].actionEventType]
+					let src = verticalImageSrc[eventType]
 					let imageOpacity = array[i].actionOpacity
 					let transform = array[i].actionTransform
 					let obj = {
@@ -131,17 +132,37 @@
 					this.actionOptionStyleArray.push(obj)
 				}
 			},
-			touchmove(e){
+			touchmove(index,e){
 				// console.log("**************e：",e)
 				let x = e.touches[0].pageX
 				let y = e.touches[0].pageY
-				// console.log("*********x: ",x,"*********y: ",y)
+				console.log("*********x: ",x,"*********y: ",y)
 				if(this.playMode === 0){
 					if(this.isValid){
-						let xLowLimit = this.areaRight
-						let xUpLimit = this.areaRight + this.areaWidth
-						let yLowLimit = this.areatop
-						let yUpLimit = this.areatop + this.areaHeight
+						let infos = this.actionOptionStyleArray[index]
+						let xLowLimit = infos.right
+						let xUpLimit = infos.right + infos.areaWidth
+						let yLowLimit = infos.top
+						let yUpLimit = infos.top + infos.areaHeight
+						// console.log("************xLowLimit: ",xLowLimit,"**********xUpLimit: ",xUpLimit,
+						// "**********yLowLimit: ",yLowLimit,"**********yUpLimit: ",yUpLimit)
+						if(x >= xLowLimit && x <= xUpLimit && y >= yLowLimit && y <= yUpLimit){
+							this.isValid = true
+						}else{
+							this.isValid = false
+						}
+					}
+				}else{
+					if(this.isValid){
+						let infos = this.paramArray[index]
+						let right = infos.actionCoordinateY*this.windowWidth
+						let top = infos.actionCoordinateX*this.windowHeight
+						let areaWidth = parseInt(infos.actionWide*this.windowHeight)
+						let areaHeight = parseInt(infos.actionHigh*this.windowHeight)
+						let xUpLimit = this.windowWidth - right
+						let xLowLimit = xUpLimit - areaHeight
+						let yLowLimit = top
+						let yUpLimit = top + areaWidth
 						// console.log("************xLowLimit: ",xLowLimit,"**********xUpLimit: ",xUpLimit,
 						// "**********yLowLimit: ",yLowLimit,"**********yUpLimit: ",yUpLimit)
 						if(x >= xLowLimit && x <= xUpLimit && y >= yLowLimit && y <= yUpLimit){
@@ -153,17 +174,35 @@
 				}
 				console.log("***********isValid2: ",this.isValid)
 			},
-			touchstart(e){
+			touchstart(index,e){
 				console.log(1)
 				// console.log("**************e：",e)
 				let x = e.touches[0].pageX
 				let y = e.touches[0].pageY
-				// console.log("*********x: ",x,"*********y: ",y)
+				console.log("*********x: ",x,"*********y: ",y)
 				if(this.playMode === 0){
-					let xLowLimit = this.areaRight
-					let xUpLimit = this.areaRight + this.areaWidth
-					let yLowLimit = this.areatop
-					let yUpLimit = this.areatop + this.areaHeight
+					let infos = this.actionOptionStyleArray[index]
+					let xLowLimit = infos.right
+					let xUpLimit = infos.right + infos.areaWidth
+					let yLowLimit = infos.top
+					let yUpLimit = infos.top + infos.areaHeight
+					// console.log("************xLowLimit: ",xLowLimit,"**********xUpLimit: ",xUpLimit,
+					// "**********yLowLimit: ",yLowLimit,"**********yUpLimit: ",yUpLimit)
+					if(x >= xLowLimit && x <= xUpLimit && y >= yLowLimit && y <= yUpLimit){
+						this.isValid = true
+					}else{
+						this.isValid = false
+					}
+				}else{
+					let infos = this.paramArray[index]
+					let right = infos.actionCoordinateY*this.windowWidth
+					let top = infos.actionCoordinateX*this.windowHeight
+					let areaWidth = parseInt(infos.actionWide*this.windowHeight)
+					let areaHeight = parseInt(infos.actionHigh*this.windowHeight)
+					let xUpLimit = this.windowWidth - right
+					let xLowLimit = xUpLimit - areaHeight
+					let yLowLimit = top
+					let yUpLimit = top + areaWidth
 					// console.log("************xLowLimit: ",xLowLimit,"**********xUpLimit: ",xUpLimit,
 					// "**********yLowLimit: ",yLowLimit,"**********yUpLimit: ",yUpLimit)
 					if(x >= xLowLimit && x <= xUpLimit && y >= yLowLimit && y <= yUpLimit){
@@ -179,13 +218,14 @@
 				console.log(3)
 				let x = e.changedTouches[0].pageX
 				let y = e.changedTouches[0].pageY
-				// console.log("*********x: ",x,"*********y: ",y)
+				console.log("*********x: ",x,"*********y: ",y)
 				if(this.playMode === 0){
 					if(this.isValid){
-						let xLowLimit = this.areaRight
-						let xUpLimit = this.areaRight + this.areaWidth
-						let yLowLimit = this.areatop
-						let yUpLimit = this.areatop + this.areaHeight
+						let infos = this.actionOptionStyleArray[index]
+						let xLowLimit = infos.right
+						let xUpLimit = infos.right + infos.areaWidth
+						let yLowLimit = infos.top
+						let yUpLimit = infos.top + infos.areaHeight
 						// console.log("************xLowLimit: ",xLowLimit,"**********xUpLimit: ",xUpLimit,
 						// "**********yLowLimit: ",yLowLimit,"**********yUpLimit: ",yUpLimit)
 						if(x >= xLowLimit && x <= xUpLimit && y >= yLowLimit && y <= yUpLimit){
@@ -195,7 +235,33 @@
 								if(currentFknodeId === referenceFknodeId){
 									this.$parent.optionIndex = i
 									this.$parent.clickCommonOptionTodo(i)
-									this.$parent.actionOptionFlag = false
+									break
+								}
+							}
+						}else{
+							this.isValid = false
+						}
+					}
+				}else{
+					if(this.isValid){
+						let infos = this.paramArray[index]
+						let right = infos.actionCoordinateY*this.windowWidth
+						let top = infos.actionCoordinateX*this.windowHeight
+						let areaWidth = parseInt(infos.actionWide*this.windowHeight)
+						let areaHeight = parseInt(infos.actionHigh*this.windowHeight)
+						let xUpLimit = this.windowWidth - right
+						let xLowLimit = xUpLimit - areaHeight
+						let yLowLimit = top
+						let yUpLimit = top + areaWidth
+						// console.log("************xLowLimit: ",xLowLimit,"**********xUpLimit: ",xUpLimit,
+						// "**********yLowLimit: ",yLowLimit,"**********yUpLimit: ",yUpLimit)
+						if(x >= xLowLimit && x <= xUpLimit && y >= yLowLimit && y <= yUpLimit){
+							for(let i = 0; i < this.referenceArray.length; i++){
+								let currentFknodeId = this.paramArray[index].fkNodeId
+								let referenceFknodeId = this.referenceArray[i].fkNodeId
+								if(currentFknodeId === referenceFknodeId){
+									this.$parent.optionIndex = i
+									this.$parent.clickCommonOptionTodo(i)
 									break
 								}
 							}
@@ -204,7 +270,6 @@
 						}
 					}
 				}
-				console.log("***********isValid1: ",this.isValid)
 			},
 		}
 	}

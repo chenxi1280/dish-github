@@ -2681,6 +2681,8 @@
 				}
 			},
 			clickCommonOptionTodo(index) {
+				console.log("********isPosition: ",this.isPosition)
+				console.log("********actionOptionFlag: ",this.actionOptionFlag)
 				//返回上一级的开关在这个视频播放结束时应该被关闭
 				this.returnToPreviousFlag = false
 				this.clickCommonOptionTodoBuoyFlag = true
@@ -2739,7 +2741,9 @@
 			optionTouchendTodo(index) {
 				if(this.isPosition === 3 ){
 					this.isPosition = this.childs[index].isPosition
+					this.actionOptionFlag = false
 				}
+				console.log("********isPosition2: ",this.isPosition)
 				console.log('touchend我被触发了')
 				// 浮标修改
 				if (this.bouyNodeFlage) {
