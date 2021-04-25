@@ -317,7 +317,7 @@
 				</view>
 			</view>
 		</u-modal>
-		<view v-if="verticalJumpDialogFlag" style="z-index: 99999;">
+		<view v-if="verticalJumpDialogFlag" style="z-index: 9999;">
 			<vertical-jump-dialog :imageUrl="popupImageUrl" :navigatorUrl="navigatorUrl" :appId="appId" :artworkId="artworkId"
 			:popupPosition="popupPosition" v-on:videoEnd="videoEnd" v-on:initPlayData="initPlayData" :artworkTree="artworkTree"
 			ref="verticalJumpDialog" v-on:multipleResultCallbackTodo="multipleResultCallbackTodo" >
@@ -358,14 +358,16 @@
 		</view>
 		<!-- 浮标视频点击选项显示图片和打印文字 -->
 		<view class="popupBox"  v-if="buoyDialogFlag">
-			<icon @click="closeBuoyDialog" class="horizontalCloseIcon" v-if="playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
-			<icon @click="closeBuoyDialog" class="verticalCloseIcon" v-if="!playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
-			<view class="buoyDialog" :style="{'transform': transform , 'z-index': 17}">		
-				<view class="buoyDialogImage"  v-if="buoyDialogImageFlag">
-					<image :src = "buoyDialogImageSrc"></image>
-				</view>
-				<view class="buoyDialogPrintWords"  v-if="!buoyDialogImageFlag">
-					<textarea v-model="buoyDialogWords" disabled = "true"></textarea>
+			<view class="buoyDialog_mask">
+				<icon @click="closeBuoyDialog" class="horizontalCloseIcon" v-if="playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
+				<icon @click="closeBuoyDialog" class="verticalCloseIcon" v-if="!playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
+				<view class="buoyDialog" :style="{'transform': transform , 'z-index': 17}">		
+					<view class="buoyDialogImage"  v-if="buoyDialogImageFlag">
+						<image :src = "buoyDialogImageSrc"></image>
+					</view>
+					<view class="buoyDialogPrintWords"  v-if="!buoyDialogImageFlag">
+						<textarea v-model="buoyDialogWords" disabled = "true"></textarea>
+							</view>
 				</view>
 			</view>
 		</view>
@@ -852,6 +854,11 @@
 			uni.setStorageSync('appearConditionMap', null)
 			console.log('离开play1！！！！')
 			globalBus.$off('bouyClickCommonOptionTodo')
+			//20210422xuezx清除页面定时器
+			if (this.buoyRef != null) {
+				console.log('定时器存在并已清除')
+				clearInterval(this.buoyRef)
+			}
 		},
 		onShareAppMessage(res) {
 			let artworkInfo = uni.getStorageSync('artworkInfo')
@@ -4571,7 +4578,12 @@
     left: 0;
     top: 0;
     background-color: rgba(255, 255, 255, 0);
-    z-index: 16;
+    z-index: 9999;
+		.buoyDialog_mask {
+			width: 100%;
+			height: 100%;
+			background-color: rgba($color: #000000, $alpha: .8);
+		}
     .horizontalCloseIcon {
       position: absolute;
       right: 13%;
@@ -4801,7 +4813,7 @@
       top: 0;
       width: 100%;
       height: 100%;
-      z-index: 9999;
+      z-index: 999;
 
       .chooseTipsMask16 {
         background-color: rgba(255, 255, 255, 0);
