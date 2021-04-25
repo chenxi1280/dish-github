@@ -3,10 +3,10 @@
 		"^u-(.*)": "@/uview-ui/components/u-$1/u-$1.vue"
 	},
 	"pages": [
-
-		// {
-		// 	"path": "pages/ad/adPage"
-		// },
+	
+		/* {
+			"path": "pages/play/actionOption/actionOption"
+		}, */
 		{
 			"path": "pages/dishover/dishover",
 			"style": {

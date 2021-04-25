@@ -366,10 +366,17 @@
 				</view>
 				<view class="buoyDialogPrintWords"  v-if="!buoyDialogImageFlag">
 					<textarea v-model="buoyDialogWords" disabled = "true"></textarea>
-						</view>
-					</view>
 				</view>
 			</view>
+		</view>
+		<view v-if="actionOptionFlag">
+			<action-option :array.sync="bindActionOptionArray" ref="actionOptionChild" :playMode="playMode"
+				:referenceArray="ecmArtworkNodeActionVOList"
+				:style="{width: mobilePhoneWidth+'px',height: mobilePhoneHeight+'px', 
+				position: 'fixed',left: '0', top:'0',zIndex: '998'}">
+				</action-option>
+		</view>
+	</view>
 </template>
 
 <script>
@@ -390,13 +397,15 @@
 	import {
 		horizontalJumpDialog
 	} from '../../components/dialog/horizontalJumpDialog.vue'
+	import{ actionOption } from '../../components/play/actionOption/actionOption.vue'
 	export default {
 		components: {
 			storyLine,
 			horizontalStoryLine,
 			Advertising,
 			verticalJumpDialog,
-			horizontalJumpDialog
+			horizontalJumpDialog,
+			actionOption
 		},
 		data() {
 			return {
@@ -700,7 +709,13 @@
 				buoyAutoChooseFlag: false,
 				//跳转到其他小程序的节流历史时间参数
 				historyTimestamp: 0,
-				buoyTouchFlag:false
+				buoyTouchFlag:false,
+				//动作作品的相关参数
+				ecmArtworkNodeActionVOList: [],
+				//动作作品展示开关
+				actionOptionFlag: false,
+				//动作作品的组件绑定数组
+				bindActionOptionArray: []
 			}
 		},
 		onReady() {
@@ -1794,6 +1809,9 @@
 					this.ecmArtworkNodeBuoyList = artworkTree.ecmArtworkNodeBuoyVOList
 					this.bouyNodeFlage = true
 					this.showBuoyCanvasFlag = true
+				}else if(this.isPosition === 3){
+					//动作选项
+					this.ecmArtworkNodeActionVOList = artworkTree.ecmArtworkNodeActionVOList
 				}
 
 				if (typeof(artworkTree.videoInfo) != "undefined" && artworkTree.videoInfo) {
@@ -1850,6 +1868,7 @@
 							this.childs.push(childs[i])
 						}
 					}
+					console.log("***********this.childs: ",this.childs)
 					this.tipsArray.length = this.option.length
 				} else {
 					//islink不是null且值为1说明该节点是跳转节点 需要注意叶子节点的孩子也是空的可能会走进else故要考虑过是否是叶子节点
@@ -2189,6 +2208,7 @@
 							uni.setStorageSync("mainArtworkTree", res.data.data)
 							//传到播放页面带pkDetailId参数 说明故事线跳转，只需要存一棵主树跳转节点不用去播放视频
 							uni.setStorageSync('playMode', res.data.data.playMode)
+							this.playMode = res.data.data.playMode
 							uni.setStorageSync('isEndings', res.data.data.isEndings)
 							uni.setStorageSync('popupState', res.data.data.popupState)
 							this.popupTotalNumber = res.data.data.nodePopupCount
@@ -2220,6 +2240,7 @@
 							this.videoShowFlag = true
 							uni.setStorageSync("artworkTree", res.data.data);
 							uni.setStorageSync('playMode', res.data.data.playMode);
+							this.playMode = res.data.data.playMode
 							uni.setStorageSync('isEndings', res.data.data.isEndings);
 							uni.setStorageSync('popupState', res.data.data.popupState)
 							this.popupState = res.data.data.popupState
@@ -2503,19 +2524,14 @@
 							//如果是弹窗开启那么就重播
 							this.againPlayVideo()
 						} else {
-							//TODO 需要根据后台判断标志来判断
-							/* if(true){
+							//TODO 需要根据后台判断标志来判断 -1重播 0自动选A 判断是浮标还是动作 动作和浮标的key不一样
+							let historyNodeBuoyList = uni.getStorageSync("historyNodeBuoyList")
+							let autoChooseFlag = historyNodeBuoyList[0].buoyPlayEndType
+							if(autoChooseFlag === -1){
 								//拉回到浮标出现位置
 								//获取浮标视频的选项初始渲染时间
 								console.log("canvasNodeBuoyList: ",this.canvasNodeBuoyList)
-								let min = this.canvasNodeBuoyList[0][0].buoySectionTime
-								for (let i = 0; i < this.canvasNodeBuoyList.length; i++) {
-									//找出最小的buoySectionTime
-									let time = this.canvasNodeBuoyList[i][0].buoySectionTime
-									if(time < min){
-										min = time
-									}
-								}
+								let min = this.getInitialTimePoint(2)
 								console.log("*********min time:",min-1)
 								this.videoContext.seek(parseInt(min-1))
 								this.videoContext.play()
@@ -2523,11 +2539,24 @@
 								//默认选A
 								this.buoyAutoChooseFlag = true
 								this.clickCommonOptionTodo(0)
-							} */
+							}
 							this.buoyAutoChooseFlag = true
 							this.clickCommonOptionTodo(0)
 						}
 
+					} else if(this.isPosition === 3){
+						let autoChooseFlag = this.ecmArtworkNodeActionVOList[0].actionPlayEndType
+						if(autoChooseFlag === -1){
+							//拉回到动作出现位置
+							//获取动作视频的选项初始渲染时间
+							let min = this.getInitialTimePoint(3)
+							console.log("*********min time:",min-1)
+							this.videoContext.seek(parseInt(min-1))
+							this.videoContext.play()
+						}else{
+							//默认选A
+							this.clickCommonOptionTodo(0)
+						}
 					} else {
 						this.showCanvasFlag = false
 						this.hiddenBtnFlag = true
@@ -2552,6 +2581,36 @@
 						this.statisticsStorylineNaturalshow()
 					}
 				}
+			},
+			getInitialTimePoint(isPosition){
+				if(isPosition === 2){
+					//拉回到浮标出现位置
+					//获取浮标视频的选项初始渲染时间
+					console.log("canvasNodeBuoyList: ",this.canvasNodeBuoyList)
+					let min = this.canvasNodeBuoyList[0][0].buoySectionTime
+					for (let i = 0; i < this.canvasNodeBuoyList.length; i++) {
+						//找出最小的buoySectionTime
+						let time = this.canvasNodeBuoyList[i][0].buoySectionTime
+						if(time < min){
+							min = time
+						}
+					}
+					return min
+				}else{
+					//拉回到动作出现位置
+					//获取动作的选项初始渲染时间
+					console.log("canvasNodeBuoyList: ",this.ecmArtworkNodeActionVOList)
+					let min = this.ecmArtworkNodeActionVOList[0].actionSectionTime
+					for (let i = 0; i < this.canvasNodeBuoyList.length; i++) {
+						//找出最小的buoySectionTime
+						let time = this.ecmArtworkNodeActionVOList[i].actionSectionTime
+						if(time < min){
+							min = time
+						}
+					}
+					return min
+				}
+				
 			},
 			videoPlay() {
 				console.log(123456000011123)
@@ -2700,6 +2759,9 @@
 			},
 			// 选项touchend事件触发时所做的操作
 			optionTouchendTodo(index) {
+				if(this.isPosition === 3 ){
+					this.isPosition = this.childs[index].isPosition
+				}
 				console.log('touchend我被触发了')
 				// 浮标修改
 				if (this.bouyNodeFlage) {
@@ -3656,6 +3718,25 @@
 				}
 			},
 			videoTimeupdate(e) {
+				let currentTime = e.detail.currentTime
+				if(this.isPosition === 3){
+					this.bindActionOptionArray = []
+					for(let i = 0; i < this.ecmArtworkNodeActionVOList.length; i++){
+						let appearTime = this.ecmArtworkNodeActionVOList[i].actionSectionTime
+						let disappearTime = this.ecmArtworkNodeActionVOList[i].actionEndTime
+						if(currentTime >= appearTime && currentTime <= disappearTime){
+							this.bindActionOptionArray.push(this.ecmArtworkNodeActionVOList[i])
+						}
+					}
+					if(this.bindActionOptionArray.length !== 0){
+						this.actionOptionFlag = true
+						if(this.$refs.actionOptionChild && this.$refs.actionOptionChild.init){
+							this.$refs.actionOptionChild.init(this.bindActionOptionArray);
+						}
+					}else{
+						this.actionOptionFlag = false
+					}
+				}
 				//获取视频当前时间
 				this.currentTime = e.detail.currentTime
 				this.duration = e.detail.duration
