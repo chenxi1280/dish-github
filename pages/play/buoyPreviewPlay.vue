@@ -128,7 +128,7 @@
 						this.artworkId = a;
 						this.pkDetailId = b
 				}
-				
+				console.log('this.artworkId',this.artworkId,"this.pkDetailId",this.pkDetailId)
 				let token = uni.getStorageSync("token")
 				if (token == null || token == '') {
 					this.previewShow = true
@@ -507,7 +507,7 @@
 					dataType: 'json',
 					data: {
 						pkArtworkId: this.artworkId,
-						pkDetailId: this.pkDetailId,
+						detailId: this.pkDetailId,
 						userId: uni.getStorageSync("userId"),
 						token: uni.getStorageSync("token")
 					},
