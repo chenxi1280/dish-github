@@ -3,17 +3,27 @@
 		<view style="position: relative;height: 80rpx;width: 750rpx;padding: 0 20rpx;box-sizing: border-box;padding-top: 10rpx;display: flex;">
 <!-- 			<icon class="search_icon"></icon>
 			<input class="search_input" type="" placeholder=" 查找你想看的视频" disabled="" /> -->
-			<view style="position: fixed;z-index: 999;">
+			
+			<view class="banner_container" @click="this.isShowBannerImg = true" v-if="isShowBanner">
+				<image src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1619490668848%E5%9B%BE%E5%B1%82%20138.png" style="display: block;width: 100%;height:100%"/>
+			</view>
+			<scroll-view class="banner_bigImg" scroll-y="true" v-if="isShowBannerImg">
+				<view style="position: fixed; right: 20rpx;top:20rpx;width:80rpx;height: 80rpx;background: #000;border-radius: 40rpx;" @click="isShowBannerImg = false">
+					<image src="/static/icon/dialogClose.png" style="display: block;width: 100%;height: 100%;"/>
+				</view>
+				<image mode="widthFix" src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1619494260074%E7%81%B5%E5%B7%AB%E4%BA%92%E5%8A%A8%E4%BA%A7%E5%93%81%E5%AE%A3%E4%BC%A0.jpg"/>
+			</scroll-view>
+			<view class="nav_container" :style="{top: `${isShowBanner ? '300rpx' : '0'}`}">
 				<Advertising :lightNumber.sync="lightNumber" :ecmUserLightUpLimit.sync="ecmUserLightUpLimit"></Advertising>
-			</view>
-			<view style="width: calc(50% - 20rpx);position: absolute;right: 20rpx;border: 1px solid #e5e5e5;height: 70rpx; border-radius: 30rpx;flex: 1;" @click="go_search_page">
-				<u-search :show-action="false" @click="go_search_page"></u-search>
-			</view>
+				<view class="search_main" @click="go_search_page">
+					<u-search :show-action="false" ></u-search>
+				</view>
+			</view> 
 		</view>
 		<incentive :lightNumber="lightNumber" :ecmUserLightUpLimit="ecmUserLightUpLimit"></incentive>
 		
 		<!-- <u-subsection :list="items" :current="0" @change="sectionChange"></u-subsection> -->
-		<view class="content">
+		<view class="content" :style="{marginTop: `${isShowBanner ? '310rpx' : '0'}`}">
 			<waterfall :flowList="hotList" :status="hotloadStatus"></waterfall>
 			<u-loadmore :bg-color="'#f2f2f2'" :status="hotLoadStatus"  :icon="true" :icon-type="'circle'" :load-text="loadText" />
 <!-- 			<view v-if="current === 0">
@@ -85,6 +95,10 @@
 		},
 		data() {
 			return {
+				// banner
+				isShowBanner: true,
+				// banner大图显示
+				isShowBannerImg: false,
 				loadText: {
 					loadmore: '轻轻上拉',
 					loading: '努力加载中',
@@ -136,6 +150,12 @@
 			}
 		},
 		onShow() {
+			// banner显示与消失
+			this.isShowBanner = true
+			const timer = setTimeout(() => {
+				this.isShowBanner = false
+				clearTimeout(timer)
+			}, 10000)
 			this.getLight()
 			console.log("*****************************************relaunchApplets",uni.getStorageSync("relaunchApplets"))
 			if(uni.getStorageSync("relaunchApplets") == true){
@@ -164,7 +184,6 @@
 			this.addRandomDataHot()
 		},
 		onHide() {
-			
 		},
 		onShareAppMessage (res) {
 		    return {
@@ -193,9 +212,14 @@
 			}
 		},
 		onPullDownRefresh() {
-			setTimeout(function() {
-				uni.stopPullDownRefresh();
-			}, 1000);
+			if (this.scrollTop === 0 && !this.isShowBanner) {
+				this.isShowBanner = true
+				const timer = setTimeout(() => {
+					this.isShowBanner = false
+					clearTimeout(timer)
+				}, 10000)
+			}
+			uni.stopPullDownRefresh();
 		},
 		onReady () {
 			this.isRequestAes()
@@ -205,6 +229,9 @@
 				this.getAddLightCount()
 			}
 			this.isAppReady()
+		},
+		onPageScroll(e) {
+			this.scrollTop = e.scrollTop;
 		},
 		methods: {
 			// 游客登录时  监听app页面是否就绪  就绪则加载
@@ -293,6 +320,7 @@
 				})
 			},
 			go_search_page() {
+				console.log('123')
 				uni.navigateTo({
 					url: "../search/search"
 				})
@@ -303,9 +331,6 @@
 				if (this.current == 1) {
 					this.addRandomDataSort();
 				}
-			},
-			onPageScroll(e) {
-				this.scrollTop = e.scrollTop;
 			},
 			changeSort(index) {
 				console.log(index)
@@ -438,6 +463,50 @@
 
 </script>
 <style lang="scss">
+	.banner_container {
+		z-index: 99;
+		width: calc(100% - 40rpx);
+		height: 300rpx;
+		background-color: pink;
+		position: fixed;
+		top: 0;
+	}
+	.banner_bigImg {
+		z-index: 999;
+		width: 100%;
+		height: 100%;
+		background-color: pink;
+		position: fixed;
+		left: 0;
+		top: 0;
+		image {
+			display: block;
+			width: 100%;
+		}
+	}
+	.nav_container {
+		z-index: 99;
+		position: fixed;
+		width: calc(100% - 40rpx);
+		height: 80rpx;
+		top: 300rpx;
+		display: flex;
+		justify-items: space-between;
+		background-color: #fff;
+		border-radius: 0 0 10rpx 10rpx;
+		transition: all .3s;
+		.search_main {
+			width: calc(50% - 20rpx);
+			background-color: #fff;
+			position: absolute;
+			right: 0rpx;
+			top: 6rpx;
+		}
+	}
+	.content {
+		margin-top: 310rpx;
+		transition: all .3s;
+	}
 
 	.artWorkImgDiv {
 		width: 100%;
