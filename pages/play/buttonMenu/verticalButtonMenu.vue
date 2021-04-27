@@ -444,13 +444,14 @@
 						this.$parent.videoContext.pause()
 					}
 					//控制父组件变量
+					this.$parent.endFlag = true
 					return this.returnToPreviouShow = true
 				}
 				//返回上一级时如果是开场不去获取百分比
 				if (this.startDetailId == this.parentId) {
 					this.$parent.isShowOptionPercentageFlag = false
 				}
-				let pkDetailIds = uni.getStorageSync("pkDetailIds")
+				let pkDetailIds = JSON.parse(uni.getStorageSync("pkDetailIds"))
 				//获取浮标视频的选项初始渲染时间
 				let historyNodeBuoyList = uni.getStorageSync("historyNodeBuoyList")
 				for (let i = 0; i < historyNodeBuoyList.length; i++) {
@@ -485,7 +486,7 @@
 				// console.log("************pkDetailIds: ",pkDetailIds)
 				this.$parent.playedHistoryArray = pkDetailIds
 				// console.log("************playedHistoryArray: ",this.playedHistoryArray)
-				uni.setStorageSync("pkDetailIds", this.playedHistoryArray)
+				uni.setStorageSync("pkDetailIds", JSON.stringify(pkDetailIds))
 				//将多结局作品的路径砍掉 对照着播放历史截取
 				if (uni.getStorageSync('isEndings') == 1) {
 					let multipleResultLine = uni.getStorageSync("multipleResultLine")

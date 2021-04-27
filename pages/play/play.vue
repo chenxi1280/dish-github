@@ -209,18 +209,6 @@
 				</view>
 			</view>
 		</u-modal>
-		<u-modal v-model="returnToPreviouShow" title="温馨提示" :show-confirm-button="false" z-index="999">
-			<view class="slot-content">
-				<view style="padding: 0 20rpx;padding-top: 40rpx;">
-					<view style="text-align: center;">
-						<view >别点了，真的回不去了</view>
-					</view>
-					<view @click="returnToPreviouConfirm" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
-						<view style="display: inline-block;margin-left: 10rpx;color: #fff;transform: translateY(-4rpx);">确定</view>
-					</view>
-				</view>
-			</view>
-		</u-modal>
 		<view v-if="verticalJumpDialogFlag" style="z-index: 9999;">
 			<vertical-jump-dialog :imageUrl="popupImageUrl" :navigatorUrl="navigatorUrl" :appId="appId" :artworkId="artworkId"
 			:popupPosition="popupPosition" v-on:videoEnd="videoEnd" v-on:initPlayData="initPlayData" :artworkTree="artworkTree"
