@@ -2531,10 +2531,7 @@
 								this.buoyAutoChooseFlag = true
 								this.clickCommonOptionTodo(0)
 							}
-							this.buoyAutoChooseFlag = true
-							this.clickCommonOptionTodo(0)
 						}
-
 					} else if(this.isPosition === 3){
 						// 默认选A
 						this.optionIndex = 0
