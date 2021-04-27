@@ -49,7 +49,7 @@
 					</view>
 					
 					<view :style=' " background:url(" + item.logoPath + ") center; background-size: cover;" ' class="artWorkImgDiv" v-if="item.code  != 'ad' "
-					 @click="goPlayPage(item.pkArtworkId)">
+					 @click="goPlayPage(item.pkArtworkId,item.playMode)">
 
 						<view :style=' "height: " + item.high + "px;  display: flex;  flex-direction: column-reverse;" '>
 
@@ -110,11 +110,17 @@
 			console.log(this.flowList)
 		},
 		methods: {
-			goPlayPage(pkArtworkId) {
-				console.log(pkArtworkId)
-				uni.navigateTo({
-					url: "../play/play?pkArtworkId=" + pkArtworkId,
-				})
+			goPlayPage(pkArtworkId,playMode) {
+				console.log("************playMode: ",playMode)
+				if(playMode === 2){
+					uni.navigateTo({
+						url: "../vrTransition/vrTransition?pkArtworkId=" + pkArtworkId,
+					})
+				}else{
+					uni.navigateTo({
+						url: "../play/play?pkArtworkId=" + pkArtworkId,
+					})
+				}
 			},
 			goADPage(adCode) {
 				uni.navigateTo({

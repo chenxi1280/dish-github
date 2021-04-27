@@ -87,6 +87,11 @@
 			color: {
 				type: String,
 				default: '#7E4DAB'
+			},
+			//不传值默认为0
+			symbol: {
+				type: Number,
+				default: 0
 			}
 		},
 		mounted () {
@@ -232,11 +237,16 @@
 				}
 				// 监听激励广告关闭
 				this.advertising.onClose((status) => {
+					// status.isEnded 
 					if (status.isEnded) {
 						const nowDate = new Date().getTime()
 						if (nowDate === null || nowDate - this.nowDate > 5000 ) {
 							this.nowDate = nowDate
-							globalBus.$emit('requestOfAES')
+							if(this.symbol === 0){
+								globalBus.$emit('requestOfAES')
+							}else{
+								this.$parent.getToken()
+							}
 						}
 						// console.log('给光')
 						

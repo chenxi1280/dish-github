@@ -5,7 +5,7 @@
 	"pages": [
 	
 		/* {
-			"path": "pages/play/actionOption/actionOption"
+			"path": "pages/vrTransition/vrTransition"
 		}, */
 		{
 			"path": "pages/dishover/dishover",
@@ -73,6 +73,12 @@
 			"style": {
 				"navigationBarTitleText": "搜索结果"
 			}
+		},
+		{
+			"path": "pages/vrTransition/vrWebView"
+		},
+		{
+			"path": "pages/vrTransition/vrTransition"
 		}
     ],
 	"tabBar": {
