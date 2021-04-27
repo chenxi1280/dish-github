@@ -128,149 +128,53 @@
 				</view>
 			</view>
 			<!-- 故事线和举报 -->
-			<!-- :style="hiddenBtnFlag?'display: block':'display: none'" -->
-			<!-- 竖屏  hiddenBtnFlag-->
-			<view  v-if="hiddenBtnFlag" :style="showStyleFlag?'display: block':'display: none'" class="verticalBox">
+			<!-- 竖屏 -->
+			<view v-if="hiddenBtnFlag" :style="showStyleFlag?'display: block':'display: none'" class="verticalBox">
 				<!-- 自制进度条 -->
-				<view class="my_progress" style="z-index: 999;" v-if="isShowMyProgress && hiddenBtnFlag">
-          <view class="play_btn">
-            <view class="play_v" v-if="!isPlay" @click="toggleIsPlay(true)"></view>
-            <view class="pause_v" v-else @click="toggleIsPlay(false)"></view>
-          </view>
-          <view class="progress_contaier">
-            <view class="begin_timer">{{ durationBeginTimer }}</view>
-            <view class="progress_event_box" @touchmove="onProgressTouchmove" @touchend="onProgressTouchend">
-              <view class="progress">
-                <view class="on_progress" :style="{width: progressWidth + '%'}"></view>
-              </view>
-            </view>
-            <view class="over_timer">{{ durationOverTimer }}</view>
-          </view>
-        </view>
-				<view class="reportBox" @click="showReportContent">
-					<view class="reportIconBox">
-						<icon class="reportIcon"></icon>
+				<view class="my_progress" style="z-index: 999;">
+				  <view class="play_btn">
+					<view class="play_v" v-if="!isPlay" @click="toggleIsPlay(true)"></view>
+					<view class="pause_v" v-else @click="toggleIsPlay(false)"></view>
+				  </view>
+				  <view class="progress_contaier">
+					<view class="begin_timer">{{ durationBeginTimer }}</view>
+					<view class="progress_event_box" @touchmove="onProgressTouchmove" @touchend="onProgressTouchend">
+					  <view class="progress">
+						<view class="on_progress" :style="{width: progressWidth + '%'}"></view>
+					  </view>
 					</view>
-					<view class="report">举报</view>
+					<view class="over_timer">{{ durationOverTimer }}</view>
+				  </view>
 				</view>
-				<view class="storyLineBox" @click="showStoryLineContent">
-					<view class="storyLineIconBox">
-						<icon class="storyLineIcon"></icon>
-					</view>
-					<view class="storyLine">换个选择</view>
-				</view>
-				<view class="seeMoreBox" @click="goDiscover">
-					<view class="seeMoreIconBox">
-						<icon class="seeMoreIcon"></icon>
-					</view>
-					<view class="seeMore">看更多</view>
-				</view>
-				<view class="returnToPreviousBox" @click="returnToPrevious">
-					<view class="returnToPreviousIconBox">
-						<icon class="returnToPreviousIcon"></icon>
-					</view>
-					<view class="returnToPrevious">返回上级</view>
-				</view>
+				<verticalButtonMenu :storyLineFlag="storyLineFlag" :parentId="parentId" :artworkId="artworkId" :playedHistoryArray="playedHistoryArray"
+					:multipleResultLine="multipleResultLine" :bouyNodeFlage="bouyNodeFlage" :artworkTree="artworkTree"
+					:multipleResultReplayFlag="multipleResultReplayFlag"
+					>
+				</verticalButtonMenu>
 			</view>
-			<!-- 横屏 hiddenBtnFlag-->
-			<view  v-if="hiddenBtnFlag" :style="!showStyleFlag?'display: block':'display: none'" class="horizontalBox">
+			<!-- 横屏 -->
+			<view v-if="hiddenBtnFlag" :style="!showStyleFlag?'display: block':'display: none'" class="horizontalBox">
 				<!-- 自制进度条 -->
-				<view class="my_progress_h" v-if="isShowMyProgress && hiddenBtnFlag">
-          <view class="play_btn">
-            <view class="play_v" v-if="!isPlay" @click="toggleIsPlay(true)"></view>
-            <view class="pause_v" v-else @click="toggleIsPlay(false)"></view>
-          </view>
-          <view class="progress_contaier">
-            <view class="begin_timer">{{ durationBeginTimer }}</view>
-            <view class="progress_event_box_h" @touchmove="onProgressTouchmoveH" @touchend="onProgressTouchendH">
-              <view class="progress_h">
-                <view class="on_progress_h" :style="{width: progressWidth + '%'}"></view>
-              </view>
-            </view>
-            <view class="over_timer">{{ durationOverTimer }}</view>
-          </view>
-        </view>
-				<view class="reportBox" @click="showReportContent">
-					<view class="reportIconBox">
-						<icon class="reportIcon"></icon>
+				<view class="my_progress_h">
+				  <view class="play_btn">
+					<view class="play_v" v-if="!isPlay" @click="toggleIsPlay(true)"></view>
+					<view class="pause_v" v-else @click="toggleIsPlay(false)"></view>
+				  </view>
+				  <view class="progress_contaier">
+					<view class="begin_timer">{{ durationBeginTimer }}</view>
+					<view class="progress_event_box_h" @touchmove="onProgressTouchmoveH" @touchend="onProgressTouchendH">
+					  <view class="progress_h">
+						<view class="on_progress_h" :style="{width: progressWidth + '%'}"></view>
+					  </view>
 					</view>
-					<view class="report">举报</view>
+					<view class="over_timer">{{ durationOverTimer }}</view>
+				  </view>
 				</view>
-				<view class="storyLineBox" @click="showStoryLineContent">
-					<view class="storyLineIconBox">
-						<icon class="storyLineIcon"></icon>
-					</view>
-					<view class="storyLine">换个选择</view>
-				</view>
-				<view class="seeMoreBox" @click="goDiscover">
-					<view class="seeMoreIconBox">
-						<icon class="seeMoreIcon"></icon>
-					</view>
-					<view class="seeMore">看更多</view>
-				</view>
-				<view class="returnToPreviousBox" @click="returnToPrevious">
-					<view class="returnToPreviousIconBox">
-						<icon class="returnToPreviousIcon"></icon>
-					</view>
-					<view class="returnToPrevious">返回上级</view>
-				</view>
-			</view>
-			<!-- 故事线内容呈现在蒙板之上 -->
-			<view class="storyLineContentMask16" v-if="storyLineContentFlag">
-				<view class="storyLineContentBox">
-					<view class="closeBox" @click="closeStoryLineContent">
-						<icon class="closeIcon"></icon>
-					</view>
-					<view class="title">故事线</view>
-					<view class="splitLine"></view>
-					<view class="storyLineContent">
-						<horizontalStoryLine :pkArtworkId="artworkId" :pkDetailIds="playedHistoryArray" @goPlay="storyLineJumpPlayTodo"
-						 v-if="!storyLineFlag"></horizontalStoryLine>
-						<storyLine :pkArtworkId="artworkId" :pkDetailIds="playedHistoryArray" @goPlay="storyLineJumpPlayTodo" v-if="storyLineFlag"></storyLine>
-					</view>
-				</view>
-			</view>
-			<!-- 举报内容呈现在蒙板之上 -->
-			<view class="reportContentMask16" v-if="reportContentFlag">
-				<view class="reportContentBox">
-					<view class="closeBox" @click="closeReportContent">
-						<icon class="closeIcon"></icon>
-					</view>
-					<view class="title">举报</view>
-					<view class="splitLine"></view>
-					<view class="subTitle">举报内容：</view>
-					<view class="reportContent">
-						<view class="uni-list">
-							<checkbox-group @change="checkboxChange">
-								<label class="checkBox" v-for="item in items" :key="item.value">
-									<view>
-										<checkbox :value="item.value" :checked="item.checked"/>
-									</view>
-									<view class="nameBox">
-										<view class="name">{{item.name}}</view>
-									</view>
-								</label>
-							</checkbox-group>
-						</view>
-						<view class="content_tips">为帮助审核人员尽快处理，请补充详细信息</view>
-						<view class="uni-textarea">
-							<textarea v-model="textareaContent" style="background-color: #e5e5e5;padding: 10rpx;box-sizing: border-box;" />
-							</view>
-						<view class="uploadBox">
-							<view class="subTitle">上传图片</view>
-							<view class="uploadBtnBox" v-if="uploadBtnFlag" @click="uploadImage">
-								<view class="add_btn">
-									<view></view>
-									<view></view>
-								</view>
-							</view>
-							<view class="uploadImageBox" v-if="uploadImageFlag" @click="uploadImage">
-								<image :src="headImage" mode="scaleToFill"></image>
-							</view>
-						</view>
-						<u-button type="error" style="margin-top: 20rpx;display: inline-block; width: 90%;margin-left: 5%;" @click="submit">提交举报</u-button>
-					</view>
-				</view>
+				<verticalButtonMenu :storyLineFlag="storyLineFlag" :parentId="parentId" :artworkId="artworkId" :playedHistoryArray="playedHistoryArray"
+					:multipleResultLine="multipleResultLine" :bouyNodeFlage="bouyNodeFlage" :artworkTree="artworkTree"
+					:multipleResultReplayFlag="multipleResultReplayFlag"
+					>
+				</verticalButtonMenu>
 			</view>
 		</view>
 		<u-modal v-model="previewShow"
@@ -400,6 +304,9 @@
 		horizontalJumpDialog
 	} from '../../components/dialog/horizontalJumpDialog.vue'
 	import{ actionOption } from '../../components/play/actionOption/actionOption.vue'
+	import {
+			verticalButtonMenu
+		} from './buttonMenu/verticalButtonMenu.vue'
 	export default {
 		components: {
 			storyLine,
@@ -407,7 +314,8 @@
 			Advertising,
 			verticalJumpDialog,
 			horizontalJumpDialog,
-			actionOption
+			actionOption,
+			verticalButtonMenu
 		},
 		data() {
 			return {
@@ -463,27 +371,6 @@
 				childs: [],
 				//通过tipsArray数组长度控制选项个数
 				tipsArray: [],
-				//举报类型
-				reportType: "",
-				//举报内容
-				textareaContent: "",
-				//云端举报图片url
-				headImage: "",
-				//举报类型选项数组
-				items: [{
-						value: 1,
-						name: '侵犯版权'
-					},
-					{
-						value: 2,
-						name: '出现违规内容',
-						// checked: 'true'
-					},
-					{
-						value: 3,
-						name: '其它'
-					}
-				],
 				//canvas画布的宽度
 				canvasWidth: 0,
 				//canvas画布的高度
@@ -711,6 +598,12 @@
 				buoyAutoChooseFlag: false,
 				//跳转到其他小程序的节流历史时间参数
 				historyTimestamp: 0,
+				//是否展示百分比开关
+				isShowOptionPercentageFlag: false,
+				//故事线跳回重置多结局作品的结局视频关闭故事线的回调标志
+				multipleResultReplayFlag: false,
+				//是否为关闭故事线重播开关 次开关是控制是否保存播放记录使用
+				closeStoryLineReplayFlag: false,
 				buoyTouchFlag:false,
 				//动作作品的相关参数
 				ecmArtworkNodeActionVOList: [],
@@ -1206,87 +1099,6 @@
 						}
 					})
 				}
-			},
-			//返回上一级弹窗的确认事件
-			returnToPreviouConfirm() {
-				if (this.bouyNodeFlage) {
-					this.recoveryBuoyDraw()
-				} else {
-					this.videoContext.play()
-				}
-				this.returnToPreviouShow = false
-			},
-			//返回上级
-			returnToPrevious() {
-				console.log("************this.endFlag1: ",this.endFlag)
-				console.log("************playedHistoryArray000: ",JSON.parse(uni.getStorageSync("pkDetailIds")))
-				//设置返回上一级开关 给是否快进视频做标识
-				this.returnToPreviousFlag = true
-				//若parentId是0或-1时点击返回上一级弹框提示（parentId为0根节点为-1多结局作品的结局视频）
-				if (this.parentId == -1 || this.parentId == 0) {
-					if (this.bouyNodeFlage) {
-						this.stopBuoyDraw()
-					} else {
-						this.videoContext.pause()
-					}
-					//若作品结构只有两级此时返回到上一级就直接到开场了不会走故事线跳转逻辑所以要把弹故事线开关重置
-					this.endFlag = true
-					return this.returnToPreviouShow = true
-				}
-				//返回上一级时如果是开场不去获取百分比
-				if (this.startDetailId == this.parentId) {
-					this.isShowOptionPercentageFlag = false
-				}
-				let pkDetailIds = JSON.parse(uni.getStorageSync("pkDetailIds"))
-				//获取浮标视频的选项初始渲染时间
-				let historyNodeBuoyList = uni.getStorageSync("historyNodeBuoyList")
-				for (let i = 0; i < historyNodeBuoyList.length; i++) {
-					let currentId = historyNodeBuoyList[i].fkNodeId
-					let detailId = pkDetailIds[pkDetailIds.length - 1]
-					console.log("************detailId return: ", detailId)
-					//此处还是不能使用this.detailId来对比要使用历史记录的来对比 因为返回的节点可能是跳转节点
-					if (currentId == detailId) {
-						this.bouySectionTime = historyNodeBuoyList[i].buoySectionTime
-						console.log("*************bouySectionTime1: ", this.bouySectionTime)
-						break
-					}
-				}
-				for (let i = 0; i < this.ecmArtworkNodeActionVOList.length; i++) {
-					let currentId = this.ecmArtworkNodeActionVOList[i].fkNodeId
-					let detailId = pkDetailIds[pkDetailIds.length - 1]
-					console.log("************detailId return: ", detailId)
-					//此处还是不能使用this.detailId来对比要使用历史记录的来对比 因为返回的节点可能是跳转节点
-					if (currentId == detailId) {
-						this.actionSectionTime = this.ecmArtworkNodeActionVOList[i].actionSectionTime
-						console.log("*************actionSectionTime1: ", this.actionSectionTime)
-						break
-					}
-				}
-				// console.log("************pkDetailIds: ",pkDetailIds)
-				//返回上一级不使用parentId 使用播放历史记录的倒数第二个detailid
-				let currentDetailId = pkDetailIds[pkDetailIds.length - 2]
-				// console.log("************currentDetailId: ",currentDetailId)
-				//砍掉倒数两个detailId 因为播放时会再存一次当前的播放记录
-				pkDetailIds.splice(pkDetailIds.length - 2, 2)
-				// console.log("************pkDetailIds: ",pkDetailIds)
-				this.playedHistoryArray = pkDetailIds
-				console.log("************playedHistoryArray001: ",this.playedHistoryArray)
-				uni.setStorageSync("pkDetailIds", JSON.stringify(this.playedHistoryArray))
-				//将多结局作品的路径砍掉 对照着播放历史截取
-				if (uni.getStorageSync('isEndings') == 1) {
-					let multipleResultLine = uni.getStorageSync("multipleResultLine")
-					//砍掉倒数第一个多结局作品的线路记录
-					multipleResultLine.splice(multipleResultLine.length - 1, 1)
-					this.multipleResultLine = multipleResultLine
-					uni.setStorageSync("multipleResultLine", this.multipleResultLine)
-				}
-				//走故事线逻辑 组装option参数
-				let option = {
-					"pkArtworkId": this.artworkId,
-					"pkDetailId": currentDetailId,
-					"jumpFlag": true
-				}
-				this.storyLineJumpPlayTodo(option)
 			},
 			//截取选项的名称
 			getOptionPercentageNames(option) {
@@ -2825,53 +2637,6 @@
 				uni.setStorageSync('isReplay', true)
 				this.initPlayData(this.artworkTree, false)
 			},
-			//点击故事线关闭按钮触发事件
-			closeStoryLineContent() {
-				//新需求统一逻辑故事线关闭需要重头播放并且展示视频的前后弹窗
-				if (uni.getStorageSync('isEndings') == 1) {
-					if (this.multipleResultReplayFlag) {
-						this.storyLineContentFlag = false
-						//是否存放播放记录的标志 开关故事线重播但是不保存播放记录
-						this.closeStoryLineReplayFlag = true
-						this.multipleResultCallbackTodo(false)
-					} else {
-						this.storyLineContentFlag = false
-						this.closeStoryLineReplayFlag = true
-						this.initPlayData(this.artworkTree, false)
-					}
-				} else {
-					this.storyLineContentFlag = false
-					this.closeStoryLineReplayFlag = true
-					this.clearNodeBuoyInfo()
-					this.initPlayData(this.artworkTree, false)
-				}
-			},
-			//点击举报关闭按钮触发事件
-			closeReportContent() {
-				this.reportContentFlag = false
-				this.items = [{
-						value: 1,
-						name: '侵犯版权',
-						checked: false
-					},
-					{
-						value: 2,
-						name: '出现违规内容',
-						checked: false
-					},
-					{
-						value: 3,
-						name: '其它',
-						checked: false
-					}
-				]
-				this.textareaContent = ''
-				this.videoContext.play()
-				// 浮标修改
-				if (this.bouyNodeFlage) {
-					this.recoveryBuoyDraw()
-				}
-			},
 			//初始化竖屏canvas画布
 			initVerticalCanvas() {
 				this.rectArray = []
@@ -3850,171 +3615,6 @@
 			videoTouchend(e) {
 				
 			},
-			//提交举报
-			async submit() {
-				if (!this.reportType || !this.checkBoxValue) {
-					return uni.showToast({
-						icon: 'none',
-						title: '请选择举报类型'
-					})
-				}
-				const regPhone = /([\u4e00-\u9fa5]|[\（\）\《\》\——\；\，\。\“\”\<\>\！\？]){8}/.test(this.textareaContent);
-				if (!regPhone) {
-					return uni.showToast({
-						icon: 'none',
-						title: '请填写举报内容，不少于8个字'
-					})
-				}
-				await uni.request({
-					url: baseURL + "/wxPlay/savaReportInfo",
-					method: 'POST',
-					dataType: 'json',
-					data: {
-						imgUrl: this.headImage,
-						content: this.textareaContent,
-						reportStatue: this.reportType,
-						token: this.token,
-						fkArtworkNodeId: uni.getStorageSync("detailId"),
-						fkArtworkId: this.artworkId
-					},
-					success: res => {
-						if (res.data.status == 200) {
-							uni.showToast({
-								icon: 'none',
-								title: "举报成功,待管理员审核",
-								position: 'center'
-							})
-							this.reportContentFlag = false
-							//举报提交之后接着播放
-							this.videoContext.play()
-							this.items = [{
-									value: 1,
-									name: '侵犯版权',
-									checked: false
-								},
-								{
-									value: 2,
-									name: '出现违规内容',
-									checked: false
-								},
-								{
-									value: 3,
-									name: '其它',
-									checked: false
-								}
-							]
-							this.textareaContent = ''
-						}
-					}
-				})
-			},
-			//举报页面复选框
-			checkboxChange(e) {
-				let items = this.items
-				let values = e.detail.value
-				//那用户最后点击的那个checkbox 实现单选
-				const value = values[values.length - 1]
-				this.checkBoxValue = value
-				// console.log('this.checkBoxValue: ',this.checkBoxValue)
-				//避免用户单次数的点击导致values为空
-				if (!value) {
-					return;
-				}
-				for (var i = 0, lenI = items.length; i < lenI; ++i) {
-					const item = items[i]
-					if (value.includes(item.value)) {
-						this.$set(item, 'checked', true)
-						this.reportType = item.value
-					} else {
-						this.$set(item, 'checked', false)
-					}
-				}
-			},
-			// 举报页面上传截图到腾讯云
-			uploadImage() {
-				var COS = require('cos-wx-sdk-v5');
-				let that = this;
-				uni.chooseImage({
-					count: 1,
-					sizeType: ['original'],
-					sourceType: ['album', 'camera'],
-					success: res => {
-						//显示上传loading
-						uni.showLoading({
-							title: '加载中',
-							mask: true
-						});
-						uni.request({
-							url: baseURL + "/artworkMaking/findCosSingature",
-							method: 'POST',
-							success: result => {
-								// console.log(JSON.parse(res.data.data))
-								const data = JSON.parse(result.data.data);
-								// 创建COS实例  获取签名
-								const cos = new COS({
-									// 必选参数
-									getAuthorization: (options, callback) => {
-										const obj = {
-											TmpSecretId: data.credentials.tmpSecretId,
-											TmpSecretKey: data.credentials.tmpSecretKey,
-											XCosSecurityToken: data.credentials.sessionToken,
-											StartTime: data.startTime, // 时间戳，单位秒，如：1580000000
-											ExpiredTime: data.expiredTime // 时间戳，单位秒，如：1580000900
-										}
-										callback(obj)
-									}
-								});
-								//获取文件路径
-								let filePath = res.tempFilePaths[0];
-								//这里指定上传的文件名
-								let Key = filePath.substr(filePath.lastIndexOf('/') + 1);
-								let dateObj = new Date();
-								let timestamp = dateObj.getTime();
-								let nowDate = dateObj.toLocaleDateString();
-								//格式斜杠日期
-								let formatDate = nowDate.replace(/\//g, '-');
-								//cos上定义目录
-								let newKey = formatDate + '/' + timestamp + Key;
-								let tempObj = {};
-								tempObj.imgLocation = 'https://' + 'sike-1259692143' + '.cos.' + 'ap-chongqing' + '.myqcloud.com/' +
-									newKey; //返回上传的绝对 URL
-								//SDK 提供的cos上传函数，如果想批量上传，可以在这里加上for循环。
-								cos.postObject({
-									//存储桶名称
-									Bucket: 'sike-1259692143',
-									//地域名字
-									Region: 'ap-chongqing',
-									Key: newKey,
-									//本地文件临时地址
-									FilePath: filePath,
-								}, function(err, data) {
-									if (err) {
-										wx.showModal({
-											title: '返回错误',
-											content: '请求失败' + err,
-											showCancel: false
-										})
-									} else {
-										if (data) {
-											// 这里是返回的图片URL
-											that.headImage = data.headers.Location;
-											//上传结束关闭上传loading
-											uni.hideLoading();
-											uni.showToast({
-												icon: 'none',
-												title: '上传成功'
-											})
-											that.uploadBtnFlag = false;
-											that.uploadImageFlag = true;
-										}
-									}
-								})
-							},
-						})
-					}
-				})
-			},
-
 			// 浮标方法
 			//初始化竖屏canvas画布
 			initVerticalBuoyCanvas() {
@@ -5059,201 +4659,75 @@
         }
       }
     }
-
-    .verticalBox {
-			z-index: 90;
-      .my_progress {
-        position: fixed;
-        width: 100%;
-        z-index: 999;
-        padding: 0 20rpx;
-        border-radius: 40rpx;
-        height: 40px;
-        left: 0;
-        bottom: 20rpx;
-        background-color: rgba($color: #fff, $alpha: 0.15);
-        display: flex;
-        .play_btn {
-          width: 40px;
-          height: 40px;
-          view {
-            width: 100%;
-            height: 100%;
-            display: block;
-          }
-          .play_v {
-            background: url("../../static/playIcon/play.png") no-repeat center;
-            background-size: 40rpx;
-          }
-          .pause_v {
-            background: url("../../static/playIcon/pause.png") no-repeat center;
-            background-size: 40rpx;
-          }
-        }
-        .progress_contaier {
-          flex: 1;
-          // width: calc(100% - 40rpx);
-          position: relative;
-          top: 50%;
-          transform: translateY(-50%);
-          display: flex;
-          line-height: 40px;
-          .begin_timer,
-          .over_timer {
-            width: 84rpx;
-            text-align: left;
-            color: #fff;
-          }
-          .progress_event_box {
-            flex: 1;
-            height: 40px;
-            margin: 0 20rpx;
-            .progress {
-              height: 8rpx;
-              border-radius: 6rpx;
-              background-color: #808080;
-              position: relative;
-              top: 50%;
-              transform: translateY(-50%);
-              overflow: hidden;
-              .on_progress {
-                transition: all 0.1s;
-                position: absolute;
-                left: 0;
-                top: 0;
-                height: 100%;
-                background-color: #fff;
-              }
-            }
-          }
-        }
-      }
-      .storyLineBox {
-        position: fixed;
-        right: 6%;
-        top: 37%;
-        height: 80rpx;
-        width: 100rpx;
-        z-index: 30;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 20rpx;
-
-        .storyLineIconBox {
-          width: 100rpx;
-          height: 50rpx;
-          text-align: center;
-
-          .storyLineIcon {
-            width: 50rpx;
-            height: 50rpx;
-            background: url(../../static/icon/fenzhi.png) no-repeat center;
-            background-size: 50rpx;
-          }
-        }
-
-        .storyLine {
-          text-align: center;
-          color: white;
-          font-size: 20rpx;
-          line-height: 30rpx;
-        }
-      }
-
-      .reportBox {
-        position: fixed;
-        right: 6%;
-        top: 45%;
-        height: 80rpx;
-        width: 100rpx;
-        z-index: 30;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 20rpx;
-
-        .reportIconBox {
-          width: 100rpx;
-          height: 50rpx;
-          text-align: center;
-
-          .reportIcon {
-            width: 50rpx;
-            height: 50rpx;
-            background: url(../../static/icon/report.png) no-repeat center;
-            background-size: 50rpx;
-          }
-        }
-
-        .report {
-          text-align: center;
-          color: white;
-          font-size: 20rpx;
-          line-height: 30rpx;
-        }
-      }
-
-      .seeMoreBox {
-        position: fixed;
-        right: 6%;
-        top: 53%;
-        height: 80rpx;
-        width: 100rpx;
-        z-index: 30;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 20rpx;
-
-        .seeMoreIconBox {
-          width: 100rpx;
-          height: 50rpx;
-          text-align: center;
-
-          .seeMoreIcon {
-            width: 50rpx;
-            height: 50rpx;
-            background: url(../../static/icon/seeMore.png) no-repeat center;
-            background-size: 50rpx;
-          }
-        }
-
-        .seeMore {
-          text-align: center;
-          color: white;
-          font-size: 20rpx;
-          line-height: 30rpx;
-        }
-      }
-
-      .returnToPreviousBox {
-        position: fixed;
-        right: 6%;
-        top: 61%;
-        height: 80rpx;
-        width: 100rpx;
-        z-index: 30;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 20rpx;
-
-        .returnToPreviousIconBox {
-          width: 100rpx;
-          height: 50rpx;
-          text-align: center;
-
-          .returnToPreviousIcon {
-            width: 50rpx;
-            height: 50rpx;
-            background: url(../../static/icon/returnToPrevious.png) no-repeat
-              center;
-            background-size: 50rpx;
-          }
-        }
-
-        .returnToPrevious {
-          text-align: center;
-          color: white;
-          font-size: 20rpx;
-          line-height: 30rpx;
-        }
-      }
-    }
-
+	.verticalBox {
+		z-index: 90;
+	  .my_progress {
+		position: fixed;
+		width: 100%;
+		z-index: 999;
+		padding: 0 20rpx;
+		border-radius: 40rpx;
+		height: 40px;
+		left: 0;
+		bottom: 20rpx;
+		background-color: rgba($color: #fff, $alpha: 0.15);
+		display: flex;
+		.play_btn {
+		  width: 40px;
+		  height: 40px;
+		  view {
+			width: 100%;
+			height: 100%;
+			display: block;
+		  }
+		  .play_v {
+			background: url("../../static/playIcon/play.png") no-repeat center;
+			background-size: 40rpx;
+		  }
+		  .pause_v {
+			background: url("../../static/playIcon/pause.png") no-repeat center;
+			background-size: 40rpx;
+		  }
+		}
+		.progress_contaier {
+		  flex: 1;
+		  // width: calc(100% - 40rpx);
+		  position: relative;
+		  top: 50%;
+		  transform: translateY(-50%);
+		  display: flex;
+		  line-height: 40px;
+		  .begin_timer,
+		  .over_timer {
+			width: 84rpx;
+			text-align: left;
+			color: #fff;
+		  }
+		  .progress_event_box {
+			flex: 1;
+			height: 40px;
+			margin: 0 20rpx;
+			.progress {
+			  height: 8rpx;
+			  border-radius: 6rpx;
+			  background-color: #808080;
+			  position: relative;
+			  top: 50%;
+			  transform: translateY(-50%);
+			  overflow: hidden;
+			  .on_progress {
+				transition: all 0.1s;
+				position: absolute;
+				left: 0;
+				top: 0;
+				height: 100%;
+				background-color: #fff;
+			  }
+			}
+		  }
+		}
+	  }
+	}
     .horizontalBox {
       .my_progress_h {
         position: fixed;
@@ -5453,188 +4927,6 @@
       }
     }
 
-    .storyLineContentMask16 {
-      position: fixed;
-      z-index: 999;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(255, 255, 255, 0.9);
-
-      .storyLineContentBox {
-        width: 100%;
-        height: 100%;
-        z-index: 17;
-        background-color: rgba(0, 0, 0, 0.3);
-
-        .title {
-          text-align: center;
-          font-size: 36rpx;
-          color: white;
-          line-height: 100rpx;
-        }
-
-        .splitLine {
-          border-top: 2rpx solid #d3d3d3;
-          width: 80%;
-          margin: 0 auto;
-        }
-
-        .closeBox {
-          position: absolute;
-          width: 46rpx;
-          height: 46rpx;
-          right: 20rpx;
-          top: 20rpx;
-
-          .closeIcon {
-            width: 100%;
-            height: 100%;
-            background: url(../../static/playIcon/close.png) no-repeat center;
-            background-size: 46rpx;
-          }
-        }
-      }
-    }
-
-    .reportContentMask16 {
-      position: fixed;
-      z-index: 999;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100vh;
-			padding-bottom: 20rpx;
-      background-color: rgba($color: #fff, $alpha: 1);
-			color: #1a1a1a!important;
-			overflow: auto;
-			
-
-      .reportContentBox {
-        width: 100%;
-        z-index: 17;
-				color: #1a1a1a;
-        .title {
-					color: #1a1a1a;
-          text-align: center;
-          font-size: 36rpx;
-          line-height: 100rpx;
-        }
-
-        .splitLine {
-          border-top: 2rpx solid #d3d3d3;
-          width: 100%;
-          margin: 0 auto;
-        }
-
-        .subTitle {
-          color: #1a1a1a;
-          margin: 10rpx 0 0 10rpx;
-          font-size: 30rpx;
-        }
-
-        .closeBox {
-          position: absolute;
-          width: 46rpx;
-          height: 46rpx;
-          right: 20rpx;
-          top: 20rpx;
-
-          .closeIcon {
-            width: 100%;
-            height: 100%;
-            background: url(../../static/playIcon/close.png) no-repeat center;
-            background-size: 46rpx;
-          }
-        }
-
-        .reportContent {
-          .uni-list {
-            .checkBox {
-              margin: 30rpx 0 0 30rpx;
-              display: flex;
-              justify-content: flex-start;
-
-              .nameBox {
-                height: 48rpx;
-
-                .name {
-                  line-height: 48rpx;
-                  color: #1a1a1a;
-                }
-              }
-            }
-          }
-					.content_tips {
-						margin-left: 26rpx;
-						transform: translateY(20rpx);
-						color: #1a1a1a;
-						font-size: 20rpx;
-					}
-          .uni-textarea {
-						width: 100%;
-						padding: 30rpx 0 0 30rpx;
-
-            textarea {
-							width: calc(100% - 30rpx);
-              background: white;
-            }
-          }
-
-          .uploadBox {
-            margin: 30rpx 0 0 0;
-
-            .subTitle {
-              color: #1a1a1a;
-              font-size: 30rpx;
-            }
-
-            .uploadBtnBox {
-              margin: 30rpx 0 0 30rpx;
-              border: 2rpx dashed #1a1a1a;
-              width: 200rpx;
-              height: 200rpx;
-
-              .add_btn {
-								position: relative;
-								top: 50%;
-								transform: translateY(-50%);
-								view {
-									height: 60rpx;
-									width: 8rpx;
-									border-radius: 4rpx;
-									background-color: black;
-									position: absolute;
-									left: 50%;
-									top: 50%;
-									transform: translate(-50%, -50%);
-									&:nth-child(2) {
-										position: absolute;
-										left: 50%;
-										top: 50%;
-										transform: translate(-50%, -50%) rotate(90deg);
-									}
-								}
-							}
-            }
-
-            .uploadImageBox {
-              margin: 30rpx 0 0 30rpx;
-              border: 2rpx solid red;
-              width: 200rpx;
-              height: 300rpx;
-              border: 2rpx solid white;
-
-              image {
-                width: 100%;
-                height: 100%;
-              }
-            }
-          }
-        }
-      }
-    }
   }
 }
 
