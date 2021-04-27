@@ -247,6 +247,7 @@
 			// 监听增加光请求
 			isRequestAes () {
 				globalBus.$on('requestOfAES', (res) => {
+					console.log("***************requestOfAES")
 					uni.request({
 						url: baseURL + '/wxPlay/addLight',
 						method: 'POST',
@@ -330,7 +331,7 @@
 							versionId: versionId
 						},
 						success: res => {
-							console.log(res.data)
+							console.log("********res.data: ",res.data)
 							if(res.data.status == 500) {
 								this.hotLoadStatus = 'nomore'
 								return
