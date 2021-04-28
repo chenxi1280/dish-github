@@ -147,7 +147,7 @@
             <view class="over_timer">{{ durationOverTimer }}</view>
           </view>
         </view>
-				<view class="reportBox" @click="showReportContent">
+				<view class="reportBox" @clickss="showReportContent">
 					<view class="reportIconBox">
 						<icon class="reportIcon"></icon>
 					</view>
@@ -371,11 +371,12 @@
 				</view>
 			</view>
 		</view>
+		<!-- 'z-index': 999, -->
 		<view v-if="actionOptionFlag">
 			<action-option :array.sync="bindActionOptionArray" ref="actionOptionChild" :playMode="playMode"
-				:referenceArray="ecmArtworkNodeActionVOList"
+				:referenceArray="ecmArtworkNodeActionVOList" :width="videoWidth" :height="videoHeight"
 				:style="{width: mobilePhoneWidth+'px',height: mobilePhoneHeight+'px', 
-				position: 'fixed',left: '0', top:'0',zIndex: '998'}">
+				position: 'fixed',left: '0', top:'0'}">
 				</action-option>
 		</view>
 	</view>
