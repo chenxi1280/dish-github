@@ -5,25 +5,6 @@
 		<view >
 			<view class="content" v-for="(item, index) in actionOptionStyleArray" :key="index">
 				<!-- 横屏 -->
-				<!-- <view :style="{position: 'fixed', 
-						left: actionOptionStyleArray[index].right+'px',
-						top: actionOptionStyleArray[index].top+'px',
-						transform: 'rotate('+actionOptionStyleArray[index].transform+'deg)',
-						zIndex: '998'
-						}" v-if="playMode" 
-						@touchstart="touchstart(index,$event)" 
-						@touchend="touchend(index,$event)"
-						@touchmove="touchmove(index,$event)">
-					<view class="imageBox" :style="{width: actionOptionStyleArray[index].areaWidth+'px',
-						height: actionOptionStyleArray[index].areaHeight+'px',
-						}">
-						<image :style="{opacity: actionOptionStyleArray[index].opacity,
-						width: actionOptionStyleArray[index].imageWidth +'px', 
-						height: actionOptionStyleArray[index].imageHeight+'px'
-						}"
-						:src="actionOptionStyleArray[index].src"></image>
-					</view>
-				</view> -->
 				<view class="imageBox"
 				 :style="{position: 'absolute',
 				left: arrData[index].actionCoordinateX * 100 + '%',
@@ -146,38 +127,12 @@
 						this.areaHeight = parseInt(array[i].actionHigh*this.windowWidth)
 						this.areaRight = parseInt(array[i].actionCoordinateX*this.windowWidth)
 						this.areatop = parseInt(array[i].actionCoordinateY*this.windowHeight)
-						/* if(array[i].actionWide > array[i].actionHigh){
-							this.areaWidth = parseInt(array[i].actionWide*this.windowWidth)
-							this.areaHeight = parseInt(array[i].actionWide*this.windowWidth)
-							this.areaRight = parseInt(array[i].actionCoordinateX*this.windowWidth)
-							this.areatop = parseInt(array[i].actionCoordinateY*this.windowHeight)
-						}else{
-							this.areaWidth = parseInt(array[i].actionHigh*this.windowWidth)
-							this.areaHeight = parseInt(array[i].actionHigh*this.windowWidth)
-							this.areaRight = parseInt(array[i].actionCoordinateX*this.windowWidth)
-							this.areatop = parseInt(array[i].actionCoordinateY*this.windowHeight)
-						} */
 					}else{
-						// this.frontAreaHeight = parseInt(array[i].actionHigh*this.windowHeight)
-						// this.frontAreaWidth = parseInt(array[i].actionWide*this.windowHeight)
 						//横屏就是乘以屏幕的长边 竖屏就是乘以屏幕的短边
 						this.areaWidth = parseInt(array[i].actionWide*this.windowHeight)
 						this.areaHeight = parseInt(array[i].actionHigh*this.windowHeight)
 						this.areaRight = parseInt(array[i].actionCoordinateX*this.windowWidth)
 						this.areatop = parseInt(array[i].actionCoordinateY*this.windowHeight)
-						/* if(array[i].actionWide > array[i].actionHigh){
-							//横屏就是乘以屏幕的长边 竖屏就是乘以屏幕的短边
-							this.areaWidth = parseInt(array[i].actionWide*this.windowHeight)
-							this.areaHeight = parseInt(array[i].actionWide*this.windowHeight)
-							this.areaRight = parseInt(array[i].actionCoordinateY*this.windowWidth + 0.5*this.frontAreaHeight - 0.5*this.frontAreaWidth)
-							this.areatop = parseInt(array[i].actionCoordinateX*this.windowHeight +  0.5*this.frontAreaWidth - 0.5*this.frontAreaHeight)
-						}else{
-							//横屏就是乘以屏幕的长边 竖屏就是乘以屏幕的短边
-							this.areaWidth = parseInt(array[i].actionHigh*this.windowHeight)
-							this.areaHeight = parseInt(array[i].actionHigh*this.windowHeight)
-							this.areaRight = parseInt(array[i].actionCoordinateY*this.windowWidth + 0.5*this.frontAreaHeight - 0.5*this.frontAreaWidth)
-							this.areatop = parseInt(array[i].actionCoordinateX*this.windowHeight +  0.5*this.frontAreaWidth - 0.5*this.frontAreaHeight)
-						} */
 					}
 					// console.log("******left: ",this.areaRight)
 					// console.log("******top: ",this.areatop)
@@ -187,15 +142,6 @@
 					let src = verticalImageSrc[eventType]
 					let imageOpacity = array[i].actionOpacity
 					let transform = array[i].actionTransform
-					//找到矩形的中心点 x起始点+0.5*宽 y起始点+0.5*高 竖屏
-					// let startX = parseInt(array[i].actionCoordinateX*this.windowWidth)
-					// let startY = parseInt(array[i].actionCoordinateY*this.windowHeight)
-					// let midX =  parseInt(startX + 0.5*this.areaWidth)
-					// let midY =  parseInt(startY + 0.5*this.areaHeight)
-					//根据逆时针旋转公式
-					// console.log("********Math.cos(transform): ",Math.cos(transform*Math.PI/180))
-					// this.areaRight = parseInt((startX-midX)*Math.cos(transform) + (startY-midY)*Math.sin(transform) + midX)
-					// this.areatop = parseInt((startY-midY)*Math.cos(transform) - (startX-midX)*Math.sin(transform) + midY)
 					let obj = {
 						areaWidth: this.areaWidth,
 						areaHeight: this.areaHeight ,
@@ -303,56 +249,52 @@
 				console.log("*********x: ",x,"*********y: ",y)
 				if(this.playMode === 0){
 					if(this.isValid && this.moveFlag){
-						let infos = this.actionOptionStyleArray[index]
-						let xLowLimit = infos.right
-						let xUpLimit = infos.right + infos.areaWidth
-						let yLowLimit = infos.top
-						let yUpLimit = infos.top + infos.areaHeight
+						// let infos = this.actionOptionStyleArray[index]
+						// let xLowLimit = infos.right
+						// let xUpLimit = infos.right + infos.areaWidth
+						// let yLowLimit = infos.top
+						// let yUpLimit = infos.top + infos.areaHeight
 						// console.log("************xLowLimit: ",xLowLimit,"**********xUpLimit: ",xUpLimit,
 						// "**********yLowLimit: ",yLowLimit,"**********yUpLimit: ",yUpLimit)
-						if(x >= xLowLimit && x <= xUpLimit && y >= yLowLimit && y <= yUpLimit){
-							for(let i = 0; i < this.referenceArray.length; i++){
-								let currentFknodeId = this.paramArray[index].fkNodeId
-								let referenceFknodeId = this.referenceArray[i].fkNodeId
-								if(currentFknodeId === referenceFknodeId){
-									this.$parent.optionIndex = i
-									this.$parent.clickCommonOptionTodo(i)
-									this.moveFlag = false
-									break
-								}
+						// if(x >= xLowLimit && x <= xUpLimit && y >= yLowLimit && y <= yUpLimit){
+						for(let i = 0; i < this.referenceArray.length; i++){
+							let currentFknodeId = this.paramArray[index].fkNodeId
+							let referenceFknodeId = this.referenceArray[i].fkNodeId
+							if(currentFknodeId === referenceFknodeId){
+								this.$parent.optionIndex = i
+								this.$parent.clickCommonOptionTodo(i)
+								this.moveFlag = false
+								break
 							}
-						}else{
-							this.isValid = false
 						}
+						this.isValid = false
 						this.moveFlag = false
 					}
 				}else{
 					if(this.isValid && this.moveFlag){
-						let infos = this.paramArray[index]
-						let right = infos.actionCoordinateY*this.windowWidth
-						let top = infos.actionCoordinateX*this.windowHeight
-						let areaWidth = parseInt(infos.actionWide*this.windowHeight)
-						let areaHeight = parseInt(infos.actionHigh*this.windowHeight)
-						let xUpLimit = this.windowWidth - right
-						let xLowLimit = xUpLimit - areaHeight
-						let yLowLimit = top
-						let yUpLimit = top + areaWidth
+						// let infos = this.paramArray[index]
+						// let right = infos.actionCoordinateY*this.windowWidth
+						// let top = infos.actionCoordinateX*this.windowHeight
+						// let areaWidth = parseInt(infos.actionWide*this.windowHeight)
+						// let areaHeight = parseInt(infos.actionHigh*this.windowHeight)
+						// let xUpLimit = this.windowWidth - right
+						// let xLowLimit = xUpLimit - areaHeight
+						// let yLowLimit = top
+						// let yUpLimit = top + areaWidth
 						// console.log("************xLowLimit: ",xLowLimit,"**********xUpLimit: ",xUpLimit,
 						// "**********yLowLimit: ",yLowLimit,"**********yUpLimit: ",yUpLimit)
-						if(x >= xLowLimit && x <= xUpLimit && y >= yLowLimit && y <= yUpLimit){
-							for(let i = 0; i < this.referenceArray.length; i++){
-								let currentFknodeId = this.paramArray[index].fkNodeId
-								let referenceFknodeId = this.referenceArray[i].fkNodeId
-								if(currentFknodeId === referenceFknodeId){
-									this.$parent.optionIndex = i
-									this.$parent.clickCommonOptionTodo(i)
-									this.moveFlag = false
-									break
-								}
+						// if(x >= xLowLimit && x <= xUpLimit && y >= yLowLimit && y <= yUpLimit){
+						for(let i = 0; i < this.referenceArray.length; i++){
+							let currentFknodeId = this.paramArray[index].fkNodeId
+							let referenceFknodeId = this.referenceArray[i].fkNodeId
+							if(currentFknodeId === referenceFknodeId){
+								this.$parent.optionIndex = i
+								this.$parent.clickCommonOptionTodo(i)
+								this.moveFlag = false
+								break
 							}
-						}else{
-							this.isValid = false
 						}
+						this.isValid = false
 						this.moveFlag = false
 					}
 				}
