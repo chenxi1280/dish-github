@@ -148,7 +148,7 @@
 				</view>
 				<verticalButtonMenu :storyLineFlag="storyLineFlag" :parentId="parentId" :artworkId="artworkId" :playedHistoryArray="playedHistoryArray"
 					:multipleResultLine="multipleResultLine" :bouyNodeFlage="bouyNodeFlage" :artworkTree="artworkTree"
-					:multipleResultReplayFlag="multipleResultReplayFlag"
+					:multipleResultReplayFlag="multipleResultReplayFlag" ref="verticalMenu"
 					>
 				</verticalButtonMenu>
 			</view>
@@ -172,7 +172,7 @@
 				</view>
 				<verticalButtonMenu :storyLineFlag="storyLineFlag" :parentId="parentId" :artworkId="artworkId" :playedHistoryArray="playedHistoryArray"
 					:multipleResultLine="multipleResultLine" :bouyNodeFlage="bouyNodeFlage" :artworkTree="artworkTree"
-					:multipleResultReplayFlag="multipleResultReplayFlag"
+					:multipleResultReplayFlag="multipleResultReplayFlag" ref="horizontalMenu"
 					>
 				</verticalButtonMenu>
 			</view>
@@ -654,7 +654,6 @@
 			})
 			//初始化video对象
 			this.videoContext = uni.createVideoContext('myVideo', this)
-			console.log("%%%%%%%%%%%%%%%%%%%%%videoContext%%%%%%%%%%%", this.videoContext)
 			// 初始化看广告获取光的数量
 			this.rewardLight = uni.getStorageSync('rewardLight') || 3
 			this.randomText()
@@ -1420,8 +1419,8 @@
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option) {
 				console.log("故事线跳转")
-				//清除视频的画面缓存直接删除video控件
-				this.videoShowFlag = false
+				//清除视频的画面缓存直接删除video控件 TODO 待观察
+				// this.videoShowFlag = false
 				//故事线跳回重置关闭故事重播不去保存播放记录的开关closeStoryLineReplayFlag为true不去保存播放记录
 				this.closeStoryLineReplayFlag = false
 				//重置是否展示百分比开关
@@ -2371,7 +2370,7 @@
 							this.statisticsStorylineNaturalshow()
 						}
 					} else {
-						this.storyLineContentFlag = true
+						this.$refs.verticalMenu.storyLineContentFlag = true
 						this.statisticsStorylineNaturalshow()
 					}
 				}
