@@ -4526,7 +4526,7 @@
 			// 浮标 加光回调
 			bouyClickCommonOptionTodo() {
 				if (this.clickCommonOptionTodoBuoyFlag) {
-					if (this.bouyNodeFlage) {ss
+					if (this.bouyNodeFlage) {
 						let buoyTimestamp = (new Date()).valueOf();
 						console.log('buoyTimestamp', buoyTimestamp)
 						if (buoyTimestamp - this.backBuoyTimestamp < 1000) {
