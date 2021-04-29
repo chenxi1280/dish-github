@@ -86,7 +86,7 @@
 					})
 				}else{
 					uni.navigateTo({
-						url: "./web-view/webView?src=" + navigatorUrl
+						url: "./web-view/webView?src=" + this.navigatorUrl
 					})
 				}
 			}
