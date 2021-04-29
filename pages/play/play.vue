@@ -576,6 +576,7 @@
 				//节流时间
 				backBuoyTimestamp: 0,
 				clickCommonOptionTodoBuoyFlag: false,
+				clickCommonOptionTodoActionFlag: false,
 				//浮标选项的打印内容
 				buoyDialogWords: null,
 				//浮标选项点击是否是展示图片
@@ -1147,9 +1148,16 @@
 						})
 						this.getLight()
 						if(!this.bouyNodeFlage) {
+							console.log("加光 自动选择",this.optionIndex)
+							console.log("this.isVideoEndFlag",this.isVideoEndFlag)
 							if (this.isVideoEndFlag) {
 								console.log("加光 自动选择",this.optionIndex)
 								this.clickCommonOptionTodo(this.optionIndex)
+							}
+							if(this.clickCommonOptionTodoActionFlag){
+								console.log("加光 自动选择",this.optionIndex)
+								this.clickCommonOptionTodo(this.optionIndex)
+								this.clickCommonOptionTodoActionFlag = false
 							}
 						}else{
 							this.bouyClickCommonOptionTodo()
@@ -1302,6 +1310,7 @@
                         // 浮标 结尾 广告 未看完 时间添加
                         console.log('憨批用户不给光')
                         this.clickCommonOptionTodoBuoyFlag = false
+						this.clickCommonOptionTodoActionFlag = false
                     }
                     this.handleAdEnded()
                 })
@@ -1428,6 +1437,7 @@
                     this.videoContext.play()
                 }
                 this.clickCommonOptionTodoBuoyFlag = false
+				this.clickCommonOptionTodoActionFlag = false
 
             },
 			// 观看激励广告
@@ -2541,7 +2551,9 @@
 				}
 			},
 			clickCommonOptionTodo(index) {
-				this.optionIndex = index
+				if(this.isPosition === 3 ){
+					this.clickCommonOptionTodoActionFlag = true
+				}
 				console.log("********isPosition: ",this.isPosition)
 				console.log("********actionOptionFlag: ",this.actionOptionFlag)
 				//返回上一级的开关在这个视频播放结束时应该被关闭
@@ -2577,6 +2589,7 @@
 
 				} else {
 					if (!this.iscustomLightFlag) {
+						//动作执行扣光时将视频播放结束标志置位true
 						if (this.storyLineJumpFlag) {
 							return this.customLightByUserId(3)
 						} else {
