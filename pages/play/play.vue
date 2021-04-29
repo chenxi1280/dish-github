@@ -170,11 +170,11 @@
 					<view class="over_timer">{{ durationOverTimer }}</view>
 				  </view>
 				</view>
-				<verticalButtonMenu :storyLineFlag="storyLineFlag" :parentId="parentId" :artworkId="artworkId" :playedHistoryArray="playedHistoryArray"
+				<horizontalButtonMenu :storyLineFlag="storyLineFlag" :parentId="parentId" :artworkId="artworkId" :playedHistoryArray="playedHistoryArray"
 					:multipleResultLine="multipleResultLine" :bouyNodeFlage="bouyNodeFlage" :artworkTree="artworkTree"
 					:multipleResultReplayFlag="multipleResultReplayFlag" ref="horizontalMenu"
 					>
-				</verticalButtonMenu>
+				</horizontalButtonMenu>
 			</view>
 		</view>
 		<u-modal v-model="previewShow"
@@ -296,6 +296,9 @@
 	import {
 			verticalButtonMenu
 		} from './buttonMenu/verticalButtonMenu.vue'
+	import {
+			horizontalButtonMenu
+		} from './buttonMenu/horizontalButtonMenu.vue'
 	export default {
 		components: {
 			storyLine,
@@ -304,7 +307,8 @@
 			verticalJumpDialog,
 			horizontalJumpDialog,
 			actionOption,
-			verticalButtonMenu
+			verticalButtonMenu,
+			horizontalButtonMenu
 		},
 		data() {
 			return {
@@ -2072,8 +2076,13 @@
 								this.multipleResultCallbackTodo(false)
 							}
 						} else {
-							this.storyLineContentFlag = true
-							console.log('我去请求500')
+							if(this.playMode === 0){
+								this.$refs.verticalMenu.storyLineContentFlag = true
+								console.log('我去请求500')
+							}else{
+								this.$refs.horizontalMenu.storyLineContentFlag = true
+								console.log('我去请求500')
+							}
 						}
 					}
 				})
@@ -2365,12 +2374,20 @@
 						if (this.parentId != -1) {
 							this.getMultipleResultLastVideo()
 						} else {
-							this.storyLineContentFlag = true
+							if(this.playMode === 0){
+								this.$refs.verticalMenu.storyLineContentFlag = true
+							}else{
+								this.$refs.horizontalMenu.storyLineContentFlag = true
+							}
 							this.videoShowFlag = false
 							this.statisticsStorylineNaturalshow()
 						}
 					} else {
-						this.$refs.verticalMenu.storyLineContentFlag = true
+						if(this.playMode === 0){
+							this.$refs.verticalMenu.storyLineContentFlag = true
+						}else{
+							this.$refs.horizontalMenu.storyLineContentFlag = true
+						}
 						this.statisticsStorylineNaturalshow()
 					}
 				}
@@ -2439,7 +2456,11 @@
 			//展示故事线内容的时候暂停视频
 			showStoryLineContent() {
 				this.showCanvasFlag = false
-				this.storyLineContentFlag = true
+				if(this.playMode === 0){
+					this.$refs.verticalMenu.storyLineContentFlag = true
+				}else{
+					this.$refs.horizontalMenu.storyLineContentFlag = true
+				}
 				if (uni.getStorageSync('isEndings') == 1) {
 					this.videoShowFlag = false
 				}
@@ -2450,7 +2471,11 @@
 			},
 			//展示举报内容的时候暂停视频
 			showReportContent() {
-				this.reportContentFlag = true
+				if(this.playMode === 0){
+					this.$refs.verticalMenu.reportContentFlag = true
+				}else{
+					this.$refs.horizontalMenu.reportContentFlag = true
+				}
 				this.uploadBtnFlag = true
 				this.uploadImageFlag = false
 				this.showCanvasFlag = false
@@ -4785,134 +4810,7 @@
           }
         }
       }
-      .storyLineBox {
-        position: fixed;
-        right: 0;
-        top: 60%;
-        height: 80rpx;
-        width: 100rpx;
-        transform: translate(-50%, -50%) rotateZ(90deg);
-        z-index: 30;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 20rpx;
-
-        .storyLineIconBox {
-          width: 100rpx;
-          height: 50rpx;
-          text-align: center;
-
-          .storyLineIcon {
-            width: 50rpx;
-            height: 50rpx;
-            background: url(../../static/icon/fenzhi.png) no-repeat center;
-            background-size: 50rpx;
-          }
-        }
-
-        .storyLine {
-          text-align: center;
-          color: white;
-          font-size: 20rpx;
-          line-height: 30rpx;
-        }
-      }
-
-      .reportBox {
-        position: fixed;
-        right: 0;
-        top: 70%;
-        transform: translate(-50%, -50%) rotateZ(90deg);
-        height: 80rpx;
-        width: 100rpx;
-        z-index: 30;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 20rpx;
-
-        .reportIconBox {
-          width: 100rpx;
-          height: 50rpx;
-          text-align: center;
-
-          .reportIcon {
-            width: 50rpx;
-            height: 50rpx;
-            background: url(../../static/icon/report.png) no-repeat center;
-            background-size: 50rpx;
-          }
-        }
-
-        .report {
-          text-align: center;
-          color: white;
-          font-size: 20rpx;
-          line-height: 30rpx;
-        }
-      }
-
-      .seeMoreBox {
-        position: fixed;
-        right: 0;
-        top: 80%;
-        transform: translate(-50%, -50%) rotateZ(90deg);
-        height: 80rpx;
-        width: 100rpx;
-        z-index: 30;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 20rpx;
-
-        .seeMoreIconBox {
-          width: 100rpx;
-          height: 50rpx;
-          text-align: center;
-
-          .seeMoreIcon {
-            width: 50rpx;
-            height: 50rpx;
-            background: url(../../static/icon/seeMore.png) no-repeat center;
-            background-size: 50rpx;
-          }
-        }
-
-        .seeMore {
-          text-align: center;
-          color: white;
-          font-size: 20rpx;
-          line-height: 30rpx;
-        }
-      }
-
-      .returnToPreviousBox {
-        position: fixed;
-        right: 0;
-        top: 90%;
-        transform: translate(-50%, -50%) rotateZ(90deg);
-        height: 80rpx;
-        width: 100rpx;
-        z-index: 30;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 20rpx;
-
-        .returnToPreviousIconBox {
-          width: 100rpx;
-          height: 50rpx;
-          text-align: center;
-
-          .returnToPreviousIcon {
-            width: 50rpx;
-            height: 50rpx;
-            background: url(../../static/icon/returnToPrevious.png) no-repeat
-              center;
-            background-size: 50rpx;
-          }
-        }
-
-        .returnToPrevious {
-          text-align: center;
-          color: white;
-          font-size: 20rpx;
-          line-height: 30rpx;
-        }
-      }
+	  
     }
 
   }

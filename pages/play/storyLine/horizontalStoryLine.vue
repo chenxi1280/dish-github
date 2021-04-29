@@ -318,7 +318,7 @@
 						'jumpFlag': jumpFlag
 					}
 					this.$parent.$parent.storyLineJumpPlayTodo(option)
-					
+					this.$parent.storyLineContentFlag = false
 				} else {
 					this.showToast('请滑动至选择中心位进行跳转')
 				}
