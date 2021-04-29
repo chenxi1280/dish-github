@@ -1,5 +1,5 @@
 <template>
-	<view class="verticalButtonMenu">
+	<view class="horizontalButtonMenu">
 		<view class="reportBox" @click="showReportContent">
 			<view class="reportIconBox">
 				<icon class="reportIcon"></icon>
@@ -514,7 +514,7 @@
 	  width: 100%;
 	  height: 100%;
 	}
-	.verticalButtonMenu{
+	.horizontalButtonMenu{
 		z-index: 90;
 		.storyLineBox {
 		  position: fixed;

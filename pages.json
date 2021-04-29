@@ -79,6 +79,9 @@
 		},
 		{
 			"path": "pages/vrTransition/vrTransition"
+		},
+		{
+			"path": "pages/play/web-view/webView"
 		}
     ],
 	"tabBar": {

@@ -47,7 +47,9 @@
 				//光不足弹窗控制开关
 				showAdvertisingFlag: false,
 				// 当前的时间戳
-				nowDate: null
+				nowDate: null,
+				//作品ID
+				pkArtworkId: 0
 			}
 		},
 		onReady(){
@@ -55,7 +57,8 @@
 			this.mobilePhoneHeight= windowHeight
 			this.mobilePhoneWidth = windowWidth
 		},
-		onLoad() {
+		onLoad(option) {
+			this.pkArtworkId = option.pkArtworkId
 			this.imageSrc = 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1609384346693loading2.gif'
 			this.token = uni.getStorageSync('token')
 			if (!this.token) {
@@ -225,7 +228,7 @@
 							console.log("***************result.data.data light:", result.data.data)
 							this.setLight(result.data.data)
 							uni.navigateTo({
-								url: './vrWebView?pkArtworkId=10270'
+								url: './vrWebView?pkArtworkId=' + this.pkArtworkId
 							})
 						} else if (result.data.status == 10086) {
 							console.log("扣光失败")

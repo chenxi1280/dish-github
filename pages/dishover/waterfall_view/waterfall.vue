@@ -10,7 +10,7 @@
 					</view>
 					
 					<view :style=' " background:url(" + item.logoPath + ") no-repeat center ;background-size: 100% 100%; " ' class="artWorkImgDiv" v-if ="item.code  != 'ad'"
-					 @click="goPlayPage(item.pkArtworkId)">
+					 @click="goPlayPage(item.pkArtworkId,item.playMode)">
 
 						<view :style=' "height: " + item.high + "px;  display: flex;  flex-direction: column-reverse;" '>
 

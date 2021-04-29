@@ -1052,44 +1052,51 @@
 
 			//浮标选项点击跳转到其他小程序
 			JumpToOtherApplets(appId, navigatorUrl) {
-				//节流
-				let currentTimestamp = (new Date()).valueOf()
-				// console.log("***************************currentTimestamp:",currentTimestamp, this.historyTimestamp)
-				// console.log("***************************historyTimestamp:",this.historyTimestamp)
-				// console.log('buoyTimestamp', buoyTimestamp)
-				if (this.historyTimestamp !== 0 && currentTimestamp - this.historyTimestamp < 500) {
-					console.log("***************************111111111111111111111")
-					this.historyTimestamp = currentTimestamp
-					return
-				}
-				console.log("***************************2222222222222222222222222")
-				this.historyTimestamp = currentTimestamp
-				//把用过的时间赋值给历史时间
-				this.videoContext.pause()
-				this.otherAppletsReturnFlag = true
-				console.log("进来跳转了")
-				if (appId && navigatorUrl) {
-					uni.navigateToMiniProgram({
-						appId: appId,
-						path: navigatorUrl,
-						envVersion: 'release',
-						extraData: {
-							source: 'CandleWitches',
-							miniProgramName: '灵巫互动',
-							artwork: this.artworkId
-						},
-						success(res) {
-							console.log('跳转成功')
-						},
-						fail(res) {
-							console.log('跳转失败: ', res)
-							let videoContext = uni.createVideoContext('myVideo')
-							videoContext.play()
-						},
-						complete(res) {
-
-						}
+				if(navigatorUrl.search('https') !== -1){
+					this.videoContext.pause()
+					uni.navigateTo({
+						url: "./web-view/webView?src=" + navigatorUrl
 					})
+				}else{
+					//节流
+					let currentTimestamp = (new Date()).valueOf()
+					// console.log("***************************currentTimestamp:",currentTimestamp, this.historyTimestamp)
+					// console.log("***************************historyTimestamp:",this.historyTimestamp)
+					// console.log('buoyTimestamp', buoyTimestamp)
+					if (this.historyTimestamp !== 0 && currentTimestamp - this.historyTimestamp < 500) {
+						console.log("***************************111111111111111111111")
+						this.historyTimestamp = currentTimestamp
+						return
+					}
+					console.log("***************************2222222222222222222222222")
+					this.historyTimestamp = currentTimestamp
+					//把用过的时间赋值给历史时间
+					this.videoContext.pause()
+					this.otherAppletsReturnFlag = true
+					console.log("进来跳转了")
+					if (appId && navigatorUrl) {
+						uni.navigateToMiniProgram({
+							appId: appId,
+							path: navigatorUrl,
+							envVersion: 'release',
+							extraData: {
+								source: 'CandleWitches',
+								miniProgramName: '灵巫互动',
+								artwork: this.artworkId
+							},
+							success(res) {
+								console.log('跳转成功')
+							},
+							fail(res) {
+								console.log('跳转失败: ', res)
+								let videoContext = uni.createVideoContext('myVideo')
+								videoContext.play()
+							},
+							complete(res) {
+					
+							}
+						})
+					}
 				}
 			},
 			//截取选项的名称
