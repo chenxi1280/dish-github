@@ -1135,7 +1135,13 @@
 							title: '恭喜成功获得光'
 						})
 						this.getLight()
-						this.bouyClickCommonOptionTodo()
+						if(!this.bouyNodeFlage) {
+							if (this.isVideoEndFlag) {
+								this.clickCommonOptionTodo(this.optionIndex)
+							}
+						}else{
+							this.bouyClickCommonOptionTodo()
+						}
 
 					}
 				})
