@@ -1282,7 +1282,8 @@
                 // 监听激励广告关闭
                 this.advertising.onClose((status) => {
                     this.showConditionAdvertisingFlag = false
-                    if (status.isEnded) {
+					//status.isEnded for test
+                    if (true) {
                         // 关闭条件浮标 弹窗
                         this.showConditionAdvertisingFlag = false
 						//广告正确关闭业务处理
