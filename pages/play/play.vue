@@ -147,7 +147,7 @@
             <view class="over_timer">{{ durationOverTimer }}</view>
           </view>
         </view>
-				<view class="reportBox" @clickss="showReportContent">
+				<view class="reportBox" @click="showReportContent">
 					<view class="reportIconBox">
 						<icon class="reportIcon"></icon>
 					</view>
