@@ -67,7 +67,7 @@
 			},
 			JumpToOtherApplets(){
 				console.log("进来跳转了")
-				if(this.appId && this.navigatorUrl){
+				if(this.navigatorUrl.search('https') === -1){
 					uni.navigateToMiniProgram({
 						appId: this.appId,
 						path: this.navigatorUrl,
@@ -83,6 +83,10 @@
 						fail(res){
 							console.log('跳转失败: ',res)
 						}
+					})
+				}else{
+					uni.navigateTo({
+						url: "./web-view/webView?src=" + navigatorUrl
 					})
 				}
 			}

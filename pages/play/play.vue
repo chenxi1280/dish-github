@@ -148,7 +148,7 @@
 				</view>
 				<verticalButtonMenu :storyLineFlag="storyLineFlag" :parentId="parentId" :artworkId="artworkId" :playedHistoryArray="playedHistoryArray"
 					:multipleResultLine="multipleResultLine" :bouyNodeFlage="bouyNodeFlage" :artworkTree="artworkTree"
-					:multipleResultReplayFlag="multipleResultReplayFlag"
+					:multipleResultReplayFlag="multipleResultReplayFlag" ref="verticalMenu"
 					>
 				</verticalButtonMenu>
 			</view>
@@ -170,11 +170,11 @@
 					<view class="over_timer">{{ durationOverTimer }}</view>
 				  </view>
 				</view>
-				<verticalButtonMenu :storyLineFlag="storyLineFlag" :parentId="parentId" :artworkId="artworkId" :playedHistoryArray="playedHistoryArray"
+				<horizontalButtonMenu :storyLineFlag="storyLineFlag" :parentId="parentId" :artworkId="artworkId" :playedHistoryArray="playedHistoryArray"
 					:multipleResultLine="multipleResultLine" :bouyNodeFlage="bouyNodeFlage" :artworkTree="artworkTree"
-					:multipleResultReplayFlag="multipleResultReplayFlag"
+					:multipleResultReplayFlag="multipleResultReplayFlag" ref="horizontalMenu"
 					>
-				</verticalButtonMenu>
+				</horizontalButtonMenu>
 			</view>
 		</view>
 		<u-modal v-model="previewShow"
@@ -263,11 +263,12 @@
 				</view>
 			</view>
 		</view>
+		<!-- 'z-index': 999, -->
 		<view v-if="actionOptionFlag">
 			<action-option :array.sync="bindActionOptionArray" ref="actionOptionChild" :playMode="playMode"
-				:referenceArray="ecmArtworkNodeActionVOList"
+				:referenceArray="ecmArtworkNodeActionVOList" :width="videoWidth" :height="videoHeight"
 				:style="{width: mobilePhoneWidth+'px',height: mobilePhoneHeight+'px', 
-				position: 'fixed',left: '0', top:'0',zIndex: '998'}">
+				position: 'fixed',left: '0', top:'0'}">
 				</action-option>
 		</view>
 	</view>
@@ -277,10 +278,10 @@
 	import {
 		baseURL
 	} from '../login/config/config.js'
-	import storyLine from './storyLine/storyLine.vue'
+	import storyLine from '../../components/play/storyLine/storyLine.vue'
 	import {
 		horizontalStoryLine
-	} from './storyLine/horizontalStoryLine.vue'
+	} from '../../components/play/storyLine/horizontalStoryLine.vue'
 	import Advertising from '../../components/Advertising/Advertising.vue'
 	import {
 		globalBus
@@ -294,7 +295,10 @@
 	import{ actionOption } from '../../components/play/actionOption/actionOption.vue'
 	import {
 			verticalButtonMenu
-		} from './buttonMenu/verticalButtonMenu.vue'
+		} from '../../components/play/buttonMenu/verticalButtonMenu.vue'
+	import {
+			horizontalButtonMenu
+		} from '../../components/play/buttonMenu/horizontalButtonMenu.vue'
 	export default {
 		components: {
 			storyLine,
@@ -303,7 +307,8 @@
 			verticalJumpDialog,
 			horizontalJumpDialog,
 			actionOption,
-			verticalButtonMenu
+			verticalButtonMenu,
+			horizontalButtonMenu
 		},
 		data() {
 			return {
@@ -653,7 +658,6 @@
 			})
 			//初始化video对象
 			this.videoContext = uni.createVideoContext('myVideo', this)
-			console.log("%%%%%%%%%%%%%%%%%%%%%videoContext%%%%%%%%%%%", this.videoContext)
 			// 初始化看广告获取光的数量
 			this.rewardLight = uni.getStorageSync('rewardLight') || 3
 			this.randomText()
@@ -1048,44 +1052,51 @@
 
 			//浮标选项点击跳转到其他小程序
 			JumpToOtherApplets(appId, navigatorUrl) {
-				//节流
-				let currentTimestamp = (new Date()).valueOf()
-				// console.log("***************************currentTimestamp:",currentTimestamp, this.historyTimestamp)
-				// console.log("***************************historyTimestamp:",this.historyTimestamp)
-				// console.log('buoyTimestamp', buoyTimestamp)
-				if (this.historyTimestamp !== 0 && currentTimestamp - this.historyTimestamp < 500) {
-					console.log("***************************111111111111111111111")
-					this.historyTimestamp = currentTimestamp
-					return
-				}
-				console.log("***************************2222222222222222222222222")
-				this.historyTimestamp = currentTimestamp
-				//把用过的时间赋值给历史时间
-				this.videoContext.pause()
-				this.otherAppletsReturnFlag = true
-				console.log("进来跳转了")
-				if (appId && navigatorUrl) {
-					uni.navigateToMiniProgram({
-						appId: appId,
-						path: navigatorUrl,
-						envVersion: 'release',
-						extraData: {
-							source: 'CandleWitches',
-							miniProgramName: '灵巫互动',
-							artwork: this.artworkId
-						},
-						success(res) {
-							console.log('跳转成功')
-						},
-						fail(res) {
-							console.log('跳转失败: ', res)
-							let videoContext = uni.createVideoContext('myVideo')
-							videoContext.play()
-						},
-						complete(res) {
-
-						}
+				if(navigatorUrl.search('https') !== -1){
+					this.videoContext.pause()
+					uni.navigateTo({
+						url: "./web-view/webView?src=" + navigatorUrl
 					})
+				}else{
+					//节流
+					let currentTimestamp = (new Date()).valueOf()
+					// console.log("***************************currentTimestamp:",currentTimestamp, this.historyTimestamp)
+					// console.log("***************************historyTimestamp:",this.historyTimestamp)
+					// console.log('buoyTimestamp', buoyTimestamp)
+					if (this.historyTimestamp !== 0 && currentTimestamp - this.historyTimestamp < 500) {
+						console.log("***************************111111111111111111111")
+						this.historyTimestamp = currentTimestamp
+						return
+					}
+					console.log("***************************2222222222222222222222222")
+					this.historyTimestamp = currentTimestamp
+					//把用过的时间赋值给历史时间
+					this.videoContext.pause()
+					this.otherAppletsReturnFlag = true
+					console.log("进来跳转了")
+					if (appId && navigatorUrl) {
+						uni.navigateToMiniProgram({
+							appId: appId,
+							path: navigatorUrl,
+							envVersion: 'release',
+							extraData: {
+								source: 'CandleWitches',
+								miniProgramName: '灵巫互动',
+								artwork: this.artworkId
+							},
+							success(res) {
+								console.log('跳转成功')
+							},
+							fail(res) {
+								console.log('跳转失败: ', res)
+								let videoContext = uni.createVideoContext('myVideo')
+								videoContext.play()
+							},
+							complete(res) {
+					
+							}
+						})
+					}
 				}
 			},
 			//截取选项的名称
@@ -1424,8 +1435,9 @@
 			},
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option) {
-				//清除视频的画面缓存直接删除video控件
-				this.videoShowFlag = false
+				console.log("故事线跳转")
+				//清除视频的画面缓存直接删除video控件 TODO 待观察
+				// this.videoShowFlag = false
 				//故事线跳回重置关闭故事重播不去保存播放记录的开关closeStoryLineReplayFlag为true不去保存播放记录
 				this.closeStoryLineReplayFlag = false
 				//重置是否展示百分比开关
@@ -1623,7 +1635,9 @@
 				const uuid = Math.random().toString(36).substring(2)
 				//初始化视频及选项
 				const url = (artworkTree.videoUrl + '').split("://")
-				this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				setTimeout(() => {
+					this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				}, 1000)
 				this.parentId = artworkTree.parentId
 				this.imageSrc = artworkTree.nodeLastImgUrl
 				console.log("this.imageSrc: ",this.imageSrc)
@@ -2075,8 +2089,13 @@
 								this.multipleResultCallbackTodo(false)
 							}
 						} else {
-							this.storyLineContentFlag = true
-							console.log('我去请求500')
+							if(this.playMode === 0){
+								this.$refs.verticalMenu.storyLineContentFlag = true
+								console.log('我去请求500')
+							}else{
+								this.$refs.horizontalMenu.storyLineContentFlag = true
+								console.log('我去请求500')
+							}
 						}
 					}
 				})
@@ -2337,10 +2356,7 @@
 								this.buoyAutoChooseFlag = true
 								this.clickCommonOptionTodo(0)
 							}
-							this.buoyAutoChooseFlag = true
-							this.clickCommonOptionTodo(0)
 						}
-
 					} else if(this.isPosition === 3){
 						// 默认选A
 						this.optionIndex = 0
@@ -2371,12 +2387,20 @@
 						if (this.parentId != -1) {
 							this.getMultipleResultLastVideo()
 						} else {
-							this.storyLineContentFlag = true
+							if(this.playMode === 0){
+								this.$refs.verticalMenu.storyLineContentFlag = true
+							}else{
+								this.$refs.horizontalMenu.storyLineContentFlag = true
+							}
 							this.videoShowFlag = false
 							this.statisticsStorylineNaturalshow()
 						}
 					} else {
-						this.storyLineContentFlag = true
+						if(this.playMode === 0){
+							this.$refs.verticalMenu.storyLineContentFlag = true
+						}else{
+							this.$refs.horizontalMenu.storyLineContentFlag = true
+						}
 						this.statisticsStorylineNaturalshow()
 					}
 				}
@@ -2445,7 +2469,11 @@
 			//展示故事线内容的时候暂停视频
 			showStoryLineContent() {
 				this.showCanvasFlag = false
-				this.storyLineContentFlag = true
+				if(this.playMode === 0){
+					this.$refs.verticalMenu.storyLineContentFlag = true
+				}else{
+					this.$refs.horizontalMenu.storyLineContentFlag = true
+				}
 				if (uni.getStorageSync('isEndings') == 1) {
 					this.videoShowFlag = false
 				}
@@ -2456,7 +2484,11 @@
 			},
 			//展示举报内容的时候暂停视频
 			showReportContent() {
-				this.reportContentFlag = true
+				if(this.playMode === 0){
+					this.$refs.verticalMenu.reportContentFlag = true
+				}else{
+					this.$refs.horizontalMenu.reportContentFlag = true
+				}
 				this.uploadBtnFlag = true
 				this.uploadImageFlag = false
 				this.showCanvasFlag = false
@@ -4791,134 +4823,7 @@
           }
         }
       }
-      .storyLineBox {
-        position: fixed;
-        right: 0;
-        top: 60%;
-        height: 80rpx;
-        width: 100rpx;
-        transform: translate(-50%, -50%) rotateZ(90deg);
-        z-index: 30;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 20rpx;
-
-        .storyLineIconBox {
-          width: 100rpx;
-          height: 50rpx;
-          text-align: center;
-
-          .storyLineIcon {
-            width: 50rpx;
-            height: 50rpx;
-            background: url(../../static/icon/fenzhi.png) no-repeat center;
-            background-size: 50rpx;
-          }
-        }
-
-        .storyLine {
-          text-align: center;
-          color: white;
-          font-size: 20rpx;
-          line-height: 30rpx;
-        }
-      }
-
-      .reportBox {
-        position: fixed;
-        right: 0;
-        top: 70%;
-        transform: translate(-50%, -50%) rotateZ(90deg);
-        height: 80rpx;
-        width: 100rpx;
-        z-index: 30;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 20rpx;
-
-        .reportIconBox {
-          width: 100rpx;
-          height: 50rpx;
-          text-align: center;
-
-          .reportIcon {
-            width: 50rpx;
-            height: 50rpx;
-            background: url(../../static/icon/report.png) no-repeat center;
-            background-size: 50rpx;
-          }
-        }
-
-        .report {
-          text-align: center;
-          color: white;
-          font-size: 20rpx;
-          line-height: 30rpx;
-        }
-      }
-
-      .seeMoreBox {
-        position: fixed;
-        right: 0;
-        top: 80%;
-        transform: translate(-50%, -50%) rotateZ(90deg);
-        height: 80rpx;
-        width: 100rpx;
-        z-index: 30;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 20rpx;
-
-        .seeMoreIconBox {
-          width: 100rpx;
-          height: 50rpx;
-          text-align: center;
-
-          .seeMoreIcon {
-            width: 50rpx;
-            height: 50rpx;
-            background: url(../../static/icon/seeMore.png) no-repeat center;
-            background-size: 50rpx;
-          }
-        }
-
-        .seeMore {
-          text-align: center;
-          color: white;
-          font-size: 20rpx;
-          line-height: 30rpx;
-        }
-      }
-
-      .returnToPreviousBox {
-        position: fixed;
-        right: 0;
-        top: 90%;
-        transform: translate(-50%, -50%) rotateZ(90deg);
-        height: 80rpx;
-        width: 100rpx;
-        z-index: 30;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 20rpx;
-
-        .returnToPreviousIconBox {
-          width: 100rpx;
-          height: 50rpx;
-          text-align: center;
-
-          .returnToPreviousIcon {
-            width: 50rpx;
-            height: 50rpx;
-            background: url(../../static/icon/returnToPrevious.png) no-repeat
-              center;
-            background-size: 50rpx;
-          }
-        }
-
-        .returnToPrevious {
-          text-align: center;
-          color: white;
-          font-size: 20rpx;
-          line-height: 30rpx;
-        }
-      }
+	  
     }
 
   }

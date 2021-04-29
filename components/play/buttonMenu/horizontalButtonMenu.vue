@@ -1,5 +1,5 @@
 <template>
-	<view class="verticalButtonMenu">
+	<view class="horizontalButtonMenu">
 		<view class="reportBox" @click="showReportContent">
 			<view class="reportIconBox">
 				<icon class="reportIcon"></icon>
@@ -34,9 +34,7 @@
 				<view class="title">故事线</view>
 				<view class="splitLine"></view>
 				<view class="storyLineContent">
-					<horizontalStoryLine :pkArtworkId="artworkId" :pkDetailIds="playedHistoryArray" @goPlay="storyLineJumpPlayTodo"
-					 v-if="!storyLineFlag"></horizontalStoryLine>
-					<storyLine :pkArtworkId="artworkId" :pkDetailIds="playedHistoryArray" @goPlay="storyLineJumpPlayTodo" v-if="storyLineFlag"></storyLine>
+					<horizontalStoryLine :pkArtworkId="artworkId" :pkDetailIds="playedHistoryArray"></horizontalStoryLine>
 				</view>
 			</view>
 		</view>
@@ -103,12 +101,10 @@
 </template>
 
 <script>
-	import { baseURL } from '../../login/config/config.js'
-	import storyLine from '../storyLine/storyLine.vue'
+	import { baseURL } from '../../../pages/dishover/config/config.js'
 	import { horizontalStoryLine } from '../storyLine/horizontalStoryLine.vue'
 	export default {
 		components: {
-			storyLine,
 			horizontalStoryLine,
 		},
 		props: {
@@ -188,10 +184,6 @@
 			
 		},
 		methods: {
-			storyLineJumpPlayTodo(option){
-				this.$parent.storyLineJumpPlayTodo(option)
-				this.storyLineContentFlag = false
-			},
 			//提交举报
 			async submit() {
 				if (!this.reportType || !this.checkBoxValue) {
@@ -415,6 +407,7 @@
 				this.$parent.videoContext.pause()
 			},
 			showStoryLineContent() {
+				console.log("**********showStoryLineContent")
 				this.storyLineContentFlag = true
 				if (uni.getStorageSync('isEndings') == 1) {
 					this.$parent.videoShowFlag = false
@@ -521,156 +514,175 @@
 	  width: 100%;
 	  height: 100%;
 	}
-	.verticalButtonMenu{
+	.horizontalButtonMenu{
 		z-index: 90;
-	  .storyLineBox {
-		position: fixed;
-		right: 6%;
-		top: 37%;
-		height: 80rpx;
-		width: 100rpx;
-        z-index: 30;
-		background-color: rgba(0, 0, 0, 0.3);
-		border-radius: 20rpx;
-		.storyLineIconBox {
+		.storyLineBox {
+		  position: fixed;
+		  right: 0;
+		  top: 60%;
+		  height: 80rpx;
 		  width: 100rpx;
-		  height: 50rpx;
-		  text-align: center;
-		  .storyLineIcon {
-			width: 50rpx;
-			height: 50rpx;
-			background: url(../../../static/icon/fenzhi.png) no-repeat center;
-			background-size: 50rpx;
+		  transform: translate(-50%, -50%) rotateZ(90deg);
+		  z-index: 30;
+		  background-color: rgba(0, 0, 0, 0.3);
+		  border-radius: 20rpx;
+		
+		  .storyLineIconBox {
+		    width: 100rpx;
+		    height: 50rpx;
+		    text-align: center;
+		
+		    .storyLineIcon {
+		      width: 50rpx;
+		      height: 50rpx;
+		      background: url(../../../static/icon/fenzhi.png) no-repeat center;
+		      background-size: 50rpx;
+		    }
+		  }
+		
+		  .storyLine {
+		    text-align: center;
+		    color: white;
+		    font-size: 20rpx;
+		    line-height: 30rpx;
 		  }
 		}
-		.storyLine {
-		  text-align: center;
-		  color: white;
-		  font-size: 20rpx;
-		  line-height: 30rpx;
-		}
-	  }
-	  .reportBox {
-		position: fixed;
-		right: 6%;
-		top: 45%;
-		height: 80rpx;
-		width: 100rpx;
-        z-index: 30;
-		background-color: rgba(0, 0, 0, 0.3);
-		border-radius: 20rpx;
-		.reportIconBox {
+		
+		.reportBox {
+		  position: fixed;
+		  right: 0;
+		  top: 70%;
+		  transform: translate(-50%, -50%) rotateZ(90deg);
+		  height: 80rpx;
 		  width: 100rpx;
-		  height: 50rpx;
-		  text-align: center;
-		  .reportIcon {
-			width: 50rpx;
-			height: 50rpx;
-			background: url(../../../static/icon/report.png) no-repeat center;
-			background-size: 50rpx;
+		  z-index: 30;
+		  background-color: rgba(0, 0, 0, 0.3);
+		  border-radius: 20rpx;
+		
+		  .reportIconBox {
+		    width: 100rpx;
+		    height: 50rpx;
+		    text-align: center;
+		
+		    .reportIcon {
+		      width: 50rpx;
+		      height: 50rpx;
+		      background: url(../../../static/icon/report.png) no-repeat center;
+		      background-size: 50rpx;
+		    }
+		  }
+		
+		  .report {
+		    text-align: center;
+		    color: white;
+		    font-size: 20rpx;
+		    line-height: 30rpx;
 		  }
 		}
-		.report {
-		  text-align: center;
-		  color: white;
-		  font-size: 20rpx;
-		  line-height: 30rpx;
-		}
-	  }
-	  .seeMoreBox {
-		position: fixed;
-		right: 6%;
-		top: 53%;
-		height: 80rpx;
-		width: 100rpx;
-        z-index: 30;
-		background-color: rgba(0, 0, 0, 0.3);
-		border-radius: 20rpx;
-		.seeMoreIconBox {
+		
+		.seeMoreBox {
+		  position: fixed;
+		  right: 0;
+		  top: 80%;
+		  transform: translate(-50%, -50%) rotateZ(90deg);
+		  height: 80rpx;
 		  width: 100rpx;
-		  height: 50rpx;
-		  text-align: center;
-		  .seeMoreIcon {
-			width: 50rpx;
-			height: 50rpx;
-			background: url(../../../static/icon/seeMore.png) no-repeat center;
-			background-size: 50rpx;
+		  z-index: 30;
+		  background-color: rgba(0, 0, 0, 0.3);
+		  border-radius: 20rpx;
+		
+		  .seeMoreIconBox {
+		    width: 100rpx;
+		    height: 50rpx;
+		    text-align: center;
+		
+		    .seeMoreIcon {
+		      width: 50rpx;
+		      height: 50rpx;
+		      background: url(../../../static/icon/seeMore.png) no-repeat center;
+		      background-size: 50rpx;
+		    }
+		  }
+		
+		  .seeMore {
+		    text-align: center;
+		    color: white;
+		    font-size: 20rpx;
+		    line-height: 30rpx;
 		  }
 		}
-		.seeMore {
-		  text-align: center;
-		  color: white;
-		  font-size: 20rpx;
-		  line-height: 30rpx;
-		}
-	  }
-	  .returnToPreviousBox {
-		position: fixed;
-		right: 6%;
-		top: 61%;
-		height: 80rpx;
-		width: 100rpx;
-		z-index: 30;
-		background-color: rgba(0, 0, 0, 0.3);
-		border-radius: 20rpx;
-		.returnToPreviousIconBox {
+		
+		.returnToPreviousBox {
+		  position: fixed;
+		  right: 0;
+		  top: 90%;
+		  transform: translate(-50%, -50%) rotateZ(90deg);
+		  height: 80rpx;
 		  width: 100rpx;
-		  height: 50rpx;
-		  text-align: center;
-		  .returnToPreviousIcon {
-			width: 50rpx;
-			height: 50rpx;
-			background: url(../../../static/icon/returnToPrevious.png) no-repeat
-			  center;
-			background-size: 50rpx;
+		  z-index: 30;
+		  background-color: rgba(0, 0, 0, 0.3);
+		  border-radius: 20rpx;
+		
+		  .returnToPreviousIconBox {
+		    width: 100rpx;
+		    height: 50rpx;
+		    text-align: center;
+		
+		    .returnToPreviousIcon {
+		      width: 50rpx;
+		      height: 50rpx;
+		      background: url(../../../static/icon/returnToPrevious.png) no-repeat
+		        center;
+		      background-size: 50rpx;
+		    }
+		  }
+		
+		  .returnToPrevious {
+		    text-align: center;
+		    color: white;
+		    font-size: 20rpx;
+		    line-height: 30rpx;
 		  }
 		}
-		.returnToPrevious {
-		  text-align: center;
-		  color: white;
-		  font-size: 20rpx;
-		  line-height: 30rpx;
+		.storyLineContentMask16 {
+		  position: fixed;
+		  z-index: 999;
+		  left: 0;
+		  top: 0;
+		  width: 100%;
+		  height: 100%;
+		  background-color: rgba(255, 255, 255, 0.9);
+		  .storyLineContentBox {
+		    width: 100%;
+		    height: 100%;
+		    z-index: 999;
+		    background-color: rgba(0, 0, 0, 0.3);
+		    .title {
+		      text-align: center;
+		      font-size: 36rpx;
+		      color: white;
+		      line-height: 100rpx;
+		    }
+		    .splitLine {
+		      border: 2rpx solid #d3d3d3;
+		      width: 80%;
+		      margin: 0 auto;
+		    }
+		    .closeBox {
+		      position: absolute;
+		      width: 46rpx;
+		      height: 46rpx;
+		      right: 20rpx;
+		      top: 20rpx;
+		      .closeIcon {
+		        width: 100%;
+		        height: 100%;
+		        background: url(../../../static/icon/close.png) no-repeat center;
+		        background-size: 46rpx;
+		      }
+		    }
+		  }
 		}
-	  }
-	  .storyLineContentMask16 {
-	    position: fixed;
-	    z-index: 999;
-	    left: 0;
-	    top: 0;
-	    width: 100%;
-	    height: 100%;
-	    background-color: rgba(255, 255, 255, 0.9);
-	    .storyLineContentBox {
-	      width: 100%;
-	      height: 100%;
-	      z-index: 999;
-	      background-color: rgba(0, 0, 0, 0.3);
-	      .title {
-	        text-align: center;
-	        font-size: 36rpx;
-	        color: white;
-	        line-height: 100rpx;
-	      }
-	      .splitLine {
-	        border: 2rpx solid #d3d3d3;
-	        width: 80%;
-	        margin: 0 auto;
-	      }
-	      .closeBox {
-	        position: absolute;
-	        width: 46rpx;
-	        height: 46rpx;
-	        right: 20rpx;
-	        top: 20rpx;
-	        .closeIcon {
-	          width: 100%;
-	          height: 100%;
-	          background: url(../../../static/icon/close.png) no-repeat center;
-	          background-size: 46rpx;
-	        }
-	      }
-	    }
-	  }
 	  .reportContentMask16 {
 		position: fixed;
 		z-index: 999;
