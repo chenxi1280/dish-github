@@ -16,8 +16,8 @@
 			 @customCloseEvent="closeDialog" :lightNumber="lightNumber" :ecmUserLightUpLimit="ecmUserLightUpLimit"></Advertising>
 		</view>
 		<!-- 确认观看激励视频广告的弹窗 -->
-		<view v-if="playMode">
-			<u-modal v-model="showAdvertisingFlag" title="温馨提示" :show-confirm-button="false" z-index="9999">
+		<view v-if="playMode"  style="z-index: 999999;">
+			<u-modal v-model="showAdvertisingFlag" title="温馨提示" :show-confirm-button="false" z-index="999999">
 				<view class="slot-content">
 					<view style="padding: 0 20rpx;padding-top: 40rpx;">
 						<view v-if="isHaveLight">观看作品过程中会消耗光，完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view>
@@ -32,8 +32,8 @@
 			</u-modal>
 		</view>
 
-		<view v-if="!playMode">
-			<u-modal v-model="showAdvertisingFlag" title="温馨提示" :show-confirm-button="false" z-index="999">
+		<view v-if="!playMode" style="z-index: 99999999;">
+			<u-modal v-model="showAdvertisingFlag" title="温馨提示" :show-confirm-button="false" z-index="99999">
 				<view class="slot-content">
 					<view style="padding: 0 20rpx;padding-top: 40rpx;">
 						<view v-if="isHaveLight">观看作品过程中会消耗光，完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view>
@@ -1146,7 +1146,14 @@
 							title: '恭喜成功获得光'
 						})
 						this.getLight()
-						this.bouyClickCommonOptionTodo()
+						if(!this.bouyNodeFlage) {
+							if (this.isVideoEndFlag) {
+								console.log("加光 自动选择",this.optionIndex)
+								this.clickCommonOptionTodo(this.optionIndex)
+							}
+						}else{
+							this.bouyClickCommonOptionTodo()
+						}
 
 					}
 				})
@@ -2534,6 +2541,7 @@
 				}
 			},
 			clickCommonOptionTodo(index) {
+				this.optionIndex = index
 				console.log("********isPosition: ",this.isPosition)
 				console.log("********actionOptionFlag: ",this.actionOptionFlag)
 				//返回上一级的开关在这个视频播放结束时应该被关闭
@@ -3095,6 +3103,7 @@
 						// console.log('y轴终点: ',yUpperLimit)
 						if (touchX > xLowLimit && touchX < xUpperLimit && touchY > yLowLimit && touchY < yUpperLimit) {
 							this.touchRectNum = i;
+							this.optionIndex = i
 							console.log('this.touchRectNum: ' + this.touchRectNum)
 						}
 					}
@@ -4463,7 +4472,7 @@
       top: 0;
       width: 100%;
       height: 100%;
-      z-index: 9999;
+      z-index: 1000;
 
       .chooseTipsMask16 {
         background-color: rgba(255, 255, 255, 0);
