@@ -34,9 +34,9 @@
 				<view class="title">故事线</view>
 				<view class="splitLine"></view>
 				<view class="storyLineContent">
-					<horizontalStoryLine :pkArtworkId="artworkId" :pkDetailIds="playedHistoryArray" @goPlay="storyLineJumpPlayTodo"
+					<horizontalStoryLine :pkArtworkId="artworkId" :pkDetailIds="playedHistoryArray" 
 					 v-if="!storyLineFlag"></horizontalStoryLine>
-					<storyLine :pkArtworkId="artworkId" :pkDetailIds="playedHistoryArray" @goPlay="storyLineJumpPlayTodo" v-if="storyLineFlag"></storyLine>
+					<storyLine :pkArtworkId="artworkId" :pkDetailIds="playedHistoryArray" v-if="storyLineFlag"></storyLine>
 				</view>
 			</view>
 		</view>
@@ -188,10 +188,6 @@
 			
 		},
 		methods: {
-			storyLineJumpPlayTodo(option){
-				this.$parent.storyLineJumpPlayTodo(option)
-				this.storyLineContentFlag = false
-			},
 			//提交举报
 			async submit() {
 				if (!this.reportType || !this.checkBoxValue) {

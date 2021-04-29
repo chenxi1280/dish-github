@@ -1419,6 +1419,7 @@
 			},
 			//故事线跳转播放页
 			storyLineJumpPlayTodo(option) {
+				console.log("故事线跳转")
 				//清除视频的画面缓存直接删除video控件
 				this.videoShowFlag = false
 				//故事线跳回重置关闭故事重播不去保存播放记录的开关closeStoryLineReplayFlag为true不去保存播放记录

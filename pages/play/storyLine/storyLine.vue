@@ -309,11 +309,13 @@
 						type: 'success',
 					})
 					//使用组件跳转方式 传参
-					this.$emit("goPlay", {
+					let option = {
 						'pkArtworkId': this.pkArtworkId,
 						'pkDetailId': onNode.pkDetailId,
 						'jumpFlag': jumpFlag
-					})
+					}
+					this.$parent.$parent.storyLineJumpPlayTodo(option)
+					this.$parent.storyLineContentFlag = false
 				} else {
 					this.showToast('请滑动至选择中心位进行跳转')
 				}
