@@ -1818,10 +1818,15 @@
 				const uuid = Math.random().toString(36).substring(2)
 				//初始化视频及选项
 				const url = (artworkTree.videoUrl + '').split("://")
-				setTimeout(() => {
-					this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
-				}, 1000)
-				this.parentId = artworkTree.parentId
+                this.parentId = artworkTree.parentId
+
+                if(this.parentId === 0){
+                    setTimeout(() => {
+                        this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+                    }, 1000)
+				} else {
+                    this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+                }
 				this.imageSrc = artworkTree.nodeLastImgUrl
 				console.log("this.imageSrc: ",this.imageSrc)
 				//如果是根节点初始化存储节点分值的容器
