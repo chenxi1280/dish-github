@@ -1,16 +1,13 @@
 <template>
 	<view class="wrap">
-
-		<!-- <u-mask :show="true" style="width: 375px ; height: 100px;  position: fixed; left: 0; top: 0;z-index: 10;" ></u-mask> -->
-		<!-- <view class="cpt-mask"> </view> -->
-		<swiper :vertical="true" :previous-margin="'150'" :next-margin="'280'" :current="onfloor" @change="floorChange" style="width: 100%; height: 650px; ">
-			<swiper-item v-for="(item, floor) in floorList" :key="floor" style="margin-top: 12rpx; height: 334px; ">
-				<mswiper :list="item" :title="true" :circular="false" :autoplay="false" :height="420" :effect3d="true" :isBig="onfloor == floor"
+		<swiper :vertical="true" :previous-margin="'170'" :next-margin="'270'" :current="onfloor" @change="floorChange" style="width: 100%; height: 650px; ">
+			<swiper-item v-for="(item, floor) in floorList" :key="floor" style="margin-top: 12rpx; height: 224px; ">
+				<mswiper :list="item" :title="true" :circular="false" :autoplay="false" :height="416" :effect3d="true" :isBig="onfloor == floor"
 				 :effect3d-previous-margin="80" @change="columnChange" @click="goPlay" :nowFloor="floor"></mswiper>
 			</swiper-item>
 		</swiper>
-<!-- 		<view class="cpt-mask-tips-bottom"> </view>
-		<view class="cpt-mask-tips-top"> </view> -->
+		<!-- <view class="cpt-mask-tips-bottom"> </view> -->
+		<!-- <view class="cpt-mask-tips-top"> </view> -->
 		<u-toast ref="uToast" />
 		<view>
 			<u-modal v-model="showAdvertisingFlagStory" title="温馨提示" :show-confirm-button="false" z-index="999">
@@ -27,13 +24,15 @@
 			</u-modal>
 		</view>
 	</view>
+
+
 </template>
 
 <script>
-	import mswiper from '../../../components/h-swiper/h-swiper'
+	import mswiper from '../../m-swiper/m-swiper.vue'
 	import {
 		baseURL
-	} from '../../login/config/config.js'
+	} from '../../../pages/dishover/config/config.js'
 	export default {
 		props: {
 			//需要传递的2个值pkArtworkId 作品id ，pkDetailIds 播放过的节点id数组
@@ -63,9 +62,9 @@
 				onfloor: 5, // 当前楼
 				oncolumn: 0, // 当前列
 				lockFloor: 0, // 锁定楼层
-				lockColumn: 0 ,// 锁定列
-				isNumberFlag:false,
-				resData:[],
+				lockColumn: 0, // 锁定列
+				isNumberFlag: false,
+				resData: [],
 				endingFlag: false,
 				lockEndingFloor: -1,
 				showAdvertisingFlagStory: false
@@ -74,13 +73,14 @@
 		},
 
 		onReady(option) {
-			
+
 			this.onfloor = this.pkDetailIds.length - 1
+			this.endingFlag = uni.getStorageSync("isEndings")
+			
 			let token = uni.getStorageSync("token")
 			let pkArtworkEndingNodeId = uni.getStorageSync("fkNodeId")
-			this.endingFlag =  uni.getStorageSync("isEndings")
 			uni.request({
-				url:  baseURL + '/Ecmartwork/getArtWorkNodes',
+				url: baseURL + '/Ecmartwork/getArtWorkNodes',
 				// url: 'http://192.168.1.15:8008/Ecmartwork/getArtWorkNodes',
 				method: 'POST',
 				data: {
@@ -88,38 +88,41 @@
 					intVideoId: this.pkDetailIds[this.onfloor],
 					token: token,
 					pkArtworkEndingNodeId: pkArtworkEndingNodeId,
-					endingFlag:this.endingFlag
+					endingFlag: this.endingFlag
 				},
 				success: res => {
-					// console.log(res.data.data)
 					this.resData = res.data.data
-					this.pkDetailIds.forEach( v => {
+					this.pkDetailIds.forEach(v => {
 						res.data.data.forEach(node => {
 							if (node.nodeImgUrl != null) {
-								if (node.nodeImgUrl.indexOf( '/story_horizontal') == -1) {
-									node.nodeImgUrl = node.nodeImgUrl + '/story_horizontal'
+								if (node.nodeImgUrl.indexOf( '/story_vertical') == -1) {
+									node.nodeImgUrl = node.nodeImgUrl + '/story_vertical'
 								}
 							}
 							if (v === node.pkDetailId) {
+								// 是否为 跳转节点
 								if (node.isLink == 1) {
-									res.data.data.forEach( item => {
-										if (node.linkUrl == item.pkDetailId) {		
-											this.setNode(node.brotherNode, v,item)
+									res.data.data.forEach(item => {
+										if (node.linkUrl == item.pkDetailId) {
+											this.setNode(node.brotherNode, v, item)
 											this.list.push(node.brotherNode)
 											this.floorList.push(node.brotherNode)
 										}
 									})
-								}else {
+								} else {
 									this.setNode(node.brotherNode, v)
 									this.list.push(node.brotherNode)
 									this.floorList.push(node.brotherNode)
 								}
+								// // 是否为 为多结局
+								// if (node.isEndings === 1) {
+
+								// }
+
 							}
 						})
 					})
-					// console.log(this.list)
-					console.log(this.floorList)
-					if (this.floorList[this.floorList.length -1][0].parentId == - 1 )  {
+					if (this.floorList[this.floorList.length - 1][0].parentId == -1) {
 						// this.endingFlag = true
 						this.lockEndingFloor = this.floorList.length - 2
 					}
@@ -127,19 +130,19 @@
 				}
 			})
 			
-			
+			console.log(this.floorList)
 		},
 		methods: {
 			// 换位置，并 修改title img 
-			setNode(data, pkNodeId,item) {
-				if (data != null && data.length >= 1){
+			setNode(data, pkNodeId, item) {
+				if (data != null && data.length >= 1) {
 					for (let i = 0; i < data.length; i++) {
 						data[i].title = data[i].selectTitle
 						data[i].image = data[i].nodeImgUrl
 						//是否展示问号
 						data[i].isWatch = false
 						if (pkNodeId === data[i].pkDetailId) {
-							if (item != null )  data[i].image = item.nodeImgUrl
+							if (item != null) data[i].image = item.nodeImgUrl
 							data[i].isWatch = true
 							data.unshift(data[i])
 							data.splice(i + 1, 1)
@@ -170,22 +173,18 @@
 				}
 
 			},
-			// 切换楼层
 			floorChange(e) {
 				let current = e.detail.current;
 				// this.clearnBrother()	
-				console.log("当前楼层："+ current,"当前列："+ this.oncolumn)
+
 				for (let i = 0; i < this.floorList.length; i++) {
 					//原来的楼层
 					if (this.onfloor == i) {
 						if (this.oncolumn == 0) {
-							console.log(11)
 							// this.floorList = this.deepCopy(this.list)
-							console.log()
 							this.floorList[i].splice(1, this.floorList[i].length - 1)
 						}
 						if (this.onfloor != this.lockFloor) {
-							console.log(22)
 							this.floorList[i].splice(1, this.floorList[i].length - 1)
 						}
 					}
@@ -195,15 +194,14 @@
 						this.floorList[i] = a[i]
 					}
 				}
-				if(this.onfloor > current) {
+				if (this.onfloor > current) {
 					this.lockColumn = this.oncolumn
 					this.oncolumn = 0
-				}else {
+				} else {
 					this.oncolumn = this.lockColumn
 				}
-				console.log("原来的楼层"+ this.onfloor,"现在的列:"+ this.oncolumn)
 				this.onfloor = current
-				// this.oncolumn = 0
+
 			},
 			//清除兄弟
 			clearnBrother() {
@@ -237,7 +235,7 @@
 			},
 			goPlay(index, nowFloor) {
 				if (nowFloor == this.onfloor && index == this.oncolumn) {
-				
+					// 跳转的 节点
 					let onNode = this.floorList[nowFloor][index]
 					// 播放记录 
 					let playHistory = JSON.parse(uni.getStorageSync("pkDetailIds"))
@@ -245,7 +243,7 @@
 					let playNode = this.floorList[nowFloor][0]
 					// 多节点播放记录
 					let moreEndingHistory = uni.getStorageSync("multipleResultLine")
-					
+
 					if (onNode.parentId == -1) {
 						this.showToast('请选择上面有选项的进行跳转！')
 						return
@@ -283,7 +281,6 @@
 									moreEndingHistory.splice(i - 1)
 								}
 							}
-					
 						}
 					}
 					if (this.endingFlag) {
@@ -306,7 +303,7 @@
 					//需要封装 重新吊起
 					uni.setStorageSync("multipleResultLine", moreEndingHistory);
 					// 修改 storage 的播放历史
-					uni.setStorageSync("pkDetailIds",JSON.stringify(playHistory));
+					uni.setStorageSync("pkDetailIds", JSON.stringify(playHistory));
 					this.$refs.uToast.show({
 						title: '选中跳转到' + onNode.selectTitle,
 						type: 'success',
@@ -329,29 +326,31 @@
 					type: 'error',
 				})
 			},
-			finduexTreeByPkDetailId (pkDetailId) {
-			  const newNodeData =  uni.getStorageSync("mainArtworkTree")
-			  let a 
-			  finduexTree(pkDetailId, newNodeData)
-			  return  a
-			  function finduexTree (pkDetileId, newNodeData) {
-			    if (newNodeData.pkDetileId == pkDetileId) {
-			       a = -1
-			    } else {
-			      if (newNodeData.childs != null) {
-			        newNodeData.childs.forEach( (v,i) => {
-			          if (v.pkDetailId == pkDetileId) {
-						a = i
-			            // return i
-			          }else{
-						  finduexTree( pkDetileId, v)
-					  }
-			        })
-			      }
-			    }
-			  }
-			 
+			finduexTreeByPkDetailId(pkDetailId) {
+				const newNodeData = uni.getStorageSync("mainArtworkTree")
+				let a
+				finduexTree(pkDetailId, newNodeData)
+				return a
+
+				function finduexTree(pkDetileId, newNodeData) {
+					if (newNodeData.pkDetileId == pkDetileId) {
+						a = -1
+					} else {
+						if (newNodeData.childs != null) {
+							newNodeData.childs.forEach((v, i) => {
+								if (v.pkDetailId == pkDetileId) {
+									a = i
+									// return i
+								} else {
+									finduexTree(pkDetileId, v)
+								}
+							})
+						}
+					}
+				}
+
 			},
+			//关闭广告框
 			closeDialog() {
 				this.showAdvertisingFlagStory = false
 			},
@@ -375,7 +374,7 @@
 					}).catch(() => {
 						this.advertising.load().then(() => {
 							this.advertising.show().then(() => {
-			
+
 							})
 						}).catch(() => {
 							uni.showToast({
@@ -388,7 +387,7 @@
 				// 监听激励广告关闭
 				this.advertising.onClose((status) => {
 					if (status.isEnded) {
-			
+
 						uni.setStorageSync("multipleResultLine", this.moreEndingHistory);
 						// 修改 storage 的播放历史
 						uni.setStorageSync("pkDetailIds", JSON.stringify(this.playHistory));
@@ -403,8 +402,8 @@
 							'jumpFlag': this.jumpFlag
 						})
 						console.log('给光')
-			
-			
+
+
 					} else {
 						uni.showToast({
 							icon: 'none',

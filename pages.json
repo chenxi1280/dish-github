@@ -16,12 +16,6 @@
 			"enablePullDownRefresh": true
 		},
 		{
-			"path": "pages/play/storyLine/storyLine"
-		},
-		{
-			"path": "pages/play/storyLine/horizontalStoryLine"
-		},
-		{
 			"path": "pages/play/play",
 			"style": {
 				"navigationBarTextStyle":"white",

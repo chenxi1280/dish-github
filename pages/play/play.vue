@@ -278,10 +278,10 @@
 	import {
 		baseURL
 	} from '../login/config/config.js'
-	import storyLine from './storyLine/storyLine.vue'
+	import storyLine from '../../components/play/storyLine/storyLine.vue'
 	import {
 		horizontalStoryLine
-	} from './storyLine/horizontalStoryLine.vue'
+	} from '../../components/play/storyLine/horizontalStoryLine.vue'
 	import Advertising from '../../components/Advertising/Advertising.vue'
 	import {
 		globalBus
@@ -295,10 +295,10 @@
 	import{ actionOption } from '../../components/play/actionOption/actionOption.vue'
 	import {
 			verticalButtonMenu
-		} from './buttonMenu/verticalButtonMenu.vue'
+		} from '../../components/play/buttonMenu/verticalButtonMenu.vue'
 	import {
 			horizontalButtonMenu
-		} from './buttonMenu/horizontalButtonMenu.vue'
+		} from '../../components/play/buttonMenu/horizontalButtonMenu.vue'
 	export default {
 		components: {
 			storyLine,

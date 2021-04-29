@@ -67,7 +67,7 @@
 			},
 			JumpToOtherApplets(){
 				console.log("进来跳转了")
-				if(navigatorUrl.search('https') === -1){
+				if(this.navigatorUrl.search('https') === -1){
 					uni.navigateToMiniProgram({
 						appId: this.appId,
 						path: this.navigatorUrl,
