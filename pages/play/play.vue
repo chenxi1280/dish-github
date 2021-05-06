@@ -371,11 +371,12 @@
 				</view>
 			</view>
 		</view>
+		<!-- 'z-index': 999, -->
 		<view v-if="actionOptionFlag">
 			<action-option :array.sync="bindActionOptionArray" ref="actionOptionChild" :playMode="playMode"
-				:referenceArray="ecmArtworkNodeActionVOList"
+				:referenceArray="ecmArtworkNodeActionVOList" :width="videoWidth" :height="videoHeight"
 				:style="{width: mobilePhoneWidth+'px',height: mobilePhoneHeight+'px', 
-				position: 'fixed',left: '0', top:'0',zIndex: '998'}">
+				position: 'fixed',left: '0', top:'0'}">
 				</action-option>
 		</view>
 	</view>
@@ -1817,8 +1818,15 @@
 				const uuid = Math.random().toString(36).substring(2)
 				//初始化视频及选项
 				const url = (artworkTree.videoUrl + '').split("://")
-				this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
-				this.parentId = artworkTree.parentId
+                this.parentId = artworkTree.parentId
+
+                if(this.parentId === 0){
+                    setTimeout(() => {
+                        this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+                    }, 1000)
+				} else {
+                    this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+                }
 				this.imageSrc = artworkTree.nodeLastImgUrl
 				console.log("this.imageSrc: ",this.imageSrc)
 				//如果是根节点初始化存储节点分值的容器
@@ -2531,10 +2539,7 @@
 								this.buoyAutoChooseFlag = true
 								this.clickCommonOptionTodo(0)
 							}
-							this.buoyAutoChooseFlag = true
-							this.clickCommonOptionTodo(0)
 						}
-
 					} else if(this.isPosition === 3){
 						// 默认选A
 						this.optionIndex = 0
@@ -4521,7 +4526,7 @@
 			// 浮标 加光回调
 			bouyClickCommonOptionTodo() {
 				if (this.clickCommonOptionTodoBuoyFlag) {
-					if (this.bouyNodeFlage) {ss
+					if (this.bouyNodeFlage) {
 						let buoyTimestamp = (new Date()).valueOf();
 						console.log('buoyTimestamp', buoyTimestamp)
 						if (buoyTimestamp - this.backBuoyTimestamp < 1000) {

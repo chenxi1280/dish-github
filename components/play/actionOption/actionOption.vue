@@ -1,48 +1,45 @@
 <template>
-	<view>
-		<view :style="{width: windowWidth+'px', height: windowHeight+'px', zIndex: '998'}">
-			<view class="maskBox"></view>
+	<view :class="playMode ? 'horizontal-moment-box' : ''" :style="{width: playMode ? windowHeight - marginh +'px' : windowWidth - marginw + 'px',
+	 height: playMode ? windowWidth +'px' : windowHeight +'px', zIndex: '998', position: 'absolute'}">
+		<!-- :style="{width: windowWidth+'px', height: windowHeight+'px', zIndex: '998'}" -->
+		<view >
 			<view class="content" v-for="(item, index) in actionOptionStyleArray" :key="index">
 				<!-- 横屏 -->
-				<view :style="{position: 'fixed', 
-						right: actionOptionStyleArray[index].right+'px',
-						top: actionOptionStyleArray[index].top+'px',
-						transform: 'rotate(90deg)'
-						}" v-if="playMode" 
-						@touchstart="touchstart(index,$event)" 
-						@touchend="touchend(index,$event)"
-						@touchmove="touchmove(index,$event)">
-					<view class="imageBox" :style="{width: actionOptionStyleArray[index].areaWidth+'px',
-						height: actionOptionStyleArray[index].areaHeight+'px',
-						}">
-						<image :style="{opacity: actionOptionStyleArray[index].opacity,
-						width: actionOptionStyleArray[index].imageWidth +'px', 
-						height: actionOptionStyleArray[index].imageHeight+'px',
-						transform: 'rotate('+actionOptionStyleArray[index].transform+'deg)'
-						}"
-						:src="actionOptionStyleArray[index].src"></image>
-					</view>
-				</view>
+				<view class="imageBox"
+				 :style="{position: 'absolute',
+				left: arrData[index].actionCoordinateX * 100 + '%',
+				backgroundColor: 'rgba(255, 255, 255, 0)',
+				top: arrData[index].actionCoordinateY * 100 +'%',
+				transform: 'rotate('+actionOptionStyleArray[index].transform+'deg)',
+				zIndex: '998',width: actionOptionStyleArray[index].areaWidth+'px',
+				height: actionOptionStyleArray[index].areaHeight+'px'}" v-if="playMode" 
+				@touchstart="touchstart(index,$event)" 
+				@touchend="touchend(index,$event)" 
+				@touchmove="touchmove(index,$event)">
+					<image :style="{opacity: actionOptionStyleArray[index].opacity,
+					width: actionOptionStyleArray[index].areaWidth * 0.618 + 'px', 
+					height: actionOptionStyleArray[index].areaHeight * 0.618 +'px'
+					}"
+					:src="actionOptionStyleArray[index].src"></image>
+				</view> 
 				<!-- 竖屏 -->
-				<view :style="{position: 'fixed',
-						left: actionOptionStyleArray[index].right+'px',
-						backgroundColor: 'rgba(255, 255, 255, 0)',
-						top: actionOptionStyleArray[index].top+'px',
-						}" v-if="!playMode" 
-						@touchstart="touchstart(index,$event)" 
-						@touchend="touchend(index,$event)" 
-						@touchmove="touchmove(index,$event)">
-					<view class="imageBox" :style="{width: actionOptionStyleArray[index].areaWidth+'px',
-						height: actionOptionStyleArray[index].areaHeight+'px', 
-						}">
-						<image :style="{opacity: actionOptionStyleArray[index].opacity,
-						width: actionOptionStyleArray[index].imageWidth +'px', 
-						height: actionOptionStyleArray[index].imageHeight+'px',
-						transform: 'rotate('+actionOptionStyleArray[index].transform+'deg)'
-						}"
-						:src="actionOptionStyleArray[index].src"></image>
-					</view>
-				</view>
+				<view class="imageBox"
+				 :style="{position: 'absolute',
+				left: arrData[index].actionCoordinateX * 100 + '%',
+				backgroundColor: 'rgba(255, 255, 255, 0)',
+				top: arrData[index].actionCoordinateY * 100 +'%',
+				transform: 'rotate('+actionOptionStyleArray[index].transform+'deg)',
+				zIndex: '998',width: actionOptionStyleArray[index].areaWidth+'px',
+				height: actionOptionStyleArray[index].areaHeight+'px'}" v-if="!playMode" 
+				@touchstart="touchstart(index,$event)" 
+				@touchend="touchend(index,$event)" 
+				@touchmove="touchmove(index,$event)">
+					<image :style="{opacity: actionOptionStyleArray[index].opacity,
+					width: actionOptionStyleArray[index].areaWidth * 0.618 + 'px', 
+					height: actionOptionStyleArray[index].areaHeight * 0.618 +'px'
+					}"
+					:src="actionOptionStyleArray[index].src"></image>
+				</view> 
 			</view>
 		</view>
 	</view>
@@ -63,6 +60,14 @@
 			playMode: {
 				type: Number,
 				default: 0
+			},
+			width: {
+				type: Number,
+				default: 0
+			},
+			height: {
+				type: Number,
+				default: 0
 			}
 		},
 		data() {
@@ -78,17 +83,35 @@
 				areatop: 0,
 				isValid: false,
 				paramArray: null,
-				moveFlag: false
+				moveFlag: false,
+				//前端传过来的可触区域的高
+				frontAreaHeight: 0,
+				//前端传过来的可触区域的宽
+				frontAreaWidth: 0,
+				marginw: 0,
+				marginh: 0,
+				arrData: null
 			}
 		},
 		onReady() {
 			//将用户手机窗口尺寸记录方便在方法中调用
 			const {windowWidth,windowHeight} = uni.getSystemInfoSync()
-			this.windowHeight = windowHeight
-			this.windowWidth = windowWidth
+			if (this.playMode) {
+				this.marginw = windowHeight - this.width
+				this.marginh = windowWidth - this.height
+				this.windowHeight = windowHeight - this.marginw
+				this.windowWidth = windowWidth - this.marginh
+			}else {
+				this.marginw = windowWidth - this.width
+				this.marginh = windowHeight - this.height
+				this.windowHeight = windowHeight - this.marginw
+				this.windowWidth = windowWidth - this.marginh
+			}
+			console.log(this.marginw, this.marginh, this.width, this.height, '--------------------')
 		},
 		methods: {
 			init(array){
+				this.arrData = array
 				this.paramArray = array
 				//圆 短箭头 长箭头
 				let verticalImageSrc = [
@@ -100,16 +123,16 @@
 				for(let i = 0; i < array.length; i++){
 					let eventType = array[i].actionEventType
 					if(this.playMode == 0){
-						this.areaWidth = parseInt(this.array[i].actionWide*this.windowWidth)
-						this.areaHeight = parseInt(this.array[i].actionHigh*this.windowWidth)
+						this.areaWidth = parseInt(array[i].actionWide*this.windowWidth)
+						this.areaHeight = parseInt(array[i].actionHigh*this.windowWidth)
 						this.areaRight = parseInt(array[i].actionCoordinateX*this.windowWidth)
 						this.areatop = parseInt(array[i].actionCoordinateY*this.windowHeight)
 					}else{
 						//横屏就是乘以屏幕的长边 竖屏就是乘以屏幕的短边
 						this.areaWidth = parseInt(array[i].actionWide*this.windowHeight)
 						this.areaHeight = parseInt(array[i].actionHigh*this.windowHeight)
-						this.areaRight = parseInt(array[i].actionCoordinateY*this.windowWidth + 0.5*this.areaHeight - 0.5*this.areaWidth)
-						this.areatop = parseInt(array[i].actionCoordinateX*this.windowHeight +  0.5*this.areaWidth - 0.5*this.areaHeight)
+						this.areaRight = parseInt(array[i].actionCoordinateX*this.windowWidth)
+						this.areatop = parseInt(array[i].actionCoordinateY*this.windowHeight)
 					}
 					// console.log("******left: ",this.areaRight)
 					// console.log("******top: ",this.areatop)
@@ -121,7 +144,7 @@
 					let transform = array[i].actionTransform
 					let obj = {
 						areaWidth: this.areaWidth,
-						areaHeight: this.areaHeight,
+						areaHeight: this.areaHeight ,
 						imageWidth: imageWidth,
 						imageHeight: imageHeight,
 						src: src,
@@ -137,9 +160,11 @@
 				// console.log("**************e：",e)
 				let x = e.touches[0].pageX
 				let y = e.touches[0].pageY
-				this.moveFlag = true
-				console.log("*********x: ",x,"*********y: ",y)
-				if(this.playMode === 0){
+				if(this.isValid){
+					this.moveFlag = true
+				}
+				// console.log("*********x: ",x,"*********y: ",y)
+				/* if(this.playMode === 0){
 					if(this.isValid){
 						let infos = this.actionOptionStyleArray[index]
 						let xLowLimit = infos.right
@@ -173,16 +198,17 @@
 							this.isValid = false
 						}
 					}
-				}
-				console.log("***********isValid2: ",this.isValid)
+				} */
+				// console.log("***********isValid2: ",this.isValid)
 			},
 			touchstart(index,e){
+				this.isValid = true
 				console.log(1)
 				// console.log("**************e：",e)
 				let x = e.touches[0].pageX
 				let y = e.touches[0].pageY
 				console.log("*********x: ",x,"*********y: ",y)
-				if(this.playMode === 0){
+				/* if(this.playMode === 0){
 					let infos = this.actionOptionStyleArray[index]
 					let xLowLimit = infos.right
 					let xUpLimit = infos.right + infos.areaWidth
@@ -212,7 +238,7 @@
 					}else{
 						this.isValid = false
 					}
-				}
+				} */
 				console.log("***********isValid1: ",this.isValid)
 			},
 			touchend(index,e){
@@ -223,56 +249,52 @@
 				console.log("*********x: ",x,"*********y: ",y)
 				if(this.playMode === 0){
 					if(this.isValid && this.moveFlag){
-						let infos = this.actionOptionStyleArray[index]
-						let xLowLimit = infos.right
-						let xUpLimit = infos.right + infos.areaWidth
-						let yLowLimit = infos.top
-						let yUpLimit = infos.top + infos.areaHeight
+						// let infos = this.actionOptionStyleArray[index]
+						// let xLowLimit = infos.right
+						// let xUpLimit = infos.right + infos.areaWidth
+						// let yLowLimit = infos.top
+						// let yUpLimit = infos.top + infos.areaHeight
 						// console.log("************xLowLimit: ",xLowLimit,"**********xUpLimit: ",xUpLimit,
 						// "**********yLowLimit: ",yLowLimit,"**********yUpLimit: ",yUpLimit)
-						if(x >= xLowLimit && x <= xUpLimit && y >= yLowLimit && y <= yUpLimit){
-							for(let i = 0; i < this.referenceArray.length; i++){
-								let currentFknodeId = this.paramArray[index].fkNodeId
-								let referenceFknodeId = this.referenceArray[i].fkNodeId
-								if(currentFknodeId === referenceFknodeId){
-									this.$parent.optionIndex = i
-									this.$parent.clickCommonOptionTodo(i)
-									this.moveFlag = false
-									break
-								}
+						// if(x >= xLowLimit && x <= xUpLimit && y >= yLowLimit && y <= yUpLimit){
+						for(let i = 0; i < this.referenceArray.length; i++){
+							let currentFknodeId = this.paramArray[index].fkNodeId
+							let referenceFknodeId = this.referenceArray[i].fkNodeId
+							if(currentFknodeId === referenceFknodeId){
+								this.$parent.optionIndex = i
+								this.$parent.clickCommonOptionTodo(i)
+								this.moveFlag = false
+								break
 							}
-						}else{
-							this.isValid = false
 						}
+						this.isValid = false
 						this.moveFlag = false
 					}
 				}else{
 					if(this.isValid && this.moveFlag){
-						let infos = this.paramArray[index]
-						let right = infos.actionCoordinateY*this.windowWidth
-						let top = infos.actionCoordinateX*this.windowHeight
-						let areaWidth = parseInt(infos.actionWide*this.windowHeight)
-						let areaHeight = parseInt(infos.actionHigh*this.windowHeight)
-						let xUpLimit = this.windowWidth - right
-						let xLowLimit = xUpLimit - areaHeight
-						let yLowLimit = top
-						let yUpLimit = top + areaWidth
+						// let infos = this.paramArray[index]
+						// let right = infos.actionCoordinateY*this.windowWidth
+						// let top = infos.actionCoordinateX*this.windowHeight
+						// let areaWidth = parseInt(infos.actionWide*this.windowHeight)
+						// let areaHeight = parseInt(infos.actionHigh*this.windowHeight)
+						// let xUpLimit = this.windowWidth - right
+						// let xLowLimit = xUpLimit - areaHeight
+						// let yLowLimit = top
+						// let yUpLimit = top + areaWidth
 						// console.log("************xLowLimit: ",xLowLimit,"**********xUpLimit: ",xUpLimit,
 						// "**********yLowLimit: ",yLowLimit,"**********yUpLimit: ",yUpLimit)
-						if(x >= xLowLimit && x <= xUpLimit && y >= yLowLimit && y <= yUpLimit){
-							for(let i = 0; i < this.referenceArray.length; i++){
-								let currentFknodeId = this.paramArray[index].fkNodeId
-								let referenceFknodeId = this.referenceArray[i].fkNodeId
-								if(currentFknodeId === referenceFknodeId){
-									this.$parent.optionIndex = i
-									this.$parent.clickCommonOptionTodo(i)
-									this.moveFlag = false
-									break
-								}
+						// if(x >= xLowLimit && x <= xUpLimit && y >= yLowLimit && y <= yUpLimit){
+						for(let i = 0; i < this.referenceArray.length; i++){
+							let currentFknodeId = this.paramArray[index].fkNodeId
+							let referenceFknodeId = this.referenceArray[i].fkNodeId
+							if(currentFknodeId === referenceFknodeId){
+								this.$parent.optionIndex = i
+								this.$parent.clickCommonOptionTodo(i)
+								this.moveFlag = false
+								break
 							}
-						}else{
-							this.isValid = false
 						}
+						this.isValid = false
 						this.moveFlag = false
 					}
 				}
@@ -285,6 +307,11 @@
 	page{
 		width: 100%;
 		height: 100%;
+	}
+	.horizontal-moment-box {
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%) rotate(90deg);
 	}
 	.maskBox{
 		background-color: rgba(255, 255, 255, 0);

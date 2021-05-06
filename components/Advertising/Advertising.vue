@@ -140,7 +140,7 @@
 						}
 						this.isShowNumber()
 						clearTimeout(timer)
-					}, 1000)
+					}, 100)
 				}
 				// console.log('初始化', num, this.isShowMax)
 				if (num >= 10) {

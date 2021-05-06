@@ -10,7 +10,7 @@
 						<view class = "avatarUrl" v-if="realFlag">
 							<image :src="image" ></image>
 						</view>
-						<view class = "unreal"  v-if="!realFlag">
+						<view class = "unreal"  v-if="!realFlag" @click="test">
 							<text>没有头像</text>
 						</view>
 					</view>
