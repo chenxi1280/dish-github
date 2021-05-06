@@ -19,8 +19,12 @@
 			"path": "pages/play/play",
 			"style": {
 				"navigationBarTextStyle":"white",
-				"navigationBarBackgroundColor":"#000000"
-			}
+				"navigationBarBackgroundColor":"#000000",
+				"disableScroll": true,
+				"enablePullDownRefresh": false
+			},
+			"disableScroll": true,
+			"enablePullDownRefresh": false
 		},
 		{
 			"path": "pages/mine/mine",

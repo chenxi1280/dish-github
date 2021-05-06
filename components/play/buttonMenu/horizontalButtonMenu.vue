@@ -24,7 +24,14 @@
 			</view>
 			<view class="returnToPrevious">返回上级</view>
 		</view>
-		
+		<!-- open-type="share" -->
+		<view class="shareBox" @click="share">
+			<view class="shareIconBox">
+				<icon class="shareIcon"></icon>
+			</view>
+			<view class="share">分享</view>
+		</view>
+		<button open-type="share" class="shareButton"></button>
 		<!-- 故事线内容呈现在蒙板之上 -->
 		<view class="storyLineContentMask16" v-if="storyLineContentFlag" style="z-index: 999;">
 			<view class="storyLineContentBox">
@@ -181,7 +188,28 @@
 			}
 		},
 		onLoad() {
-			
+			uni.showShareMenu({
+				withShareTicket: true,
+				menus: ['shareAppMessage', 'shareTimeline']
+			})
+		},
+		onShareAppMessage(res) {
+			let artworkInfo = uni.getStorageSync('artworkInfo')
+			let param = 'artWorkId=' + artworkInfo.pkArtworkId + '=status=4'
+			let title = artworkInfo.artworkName
+			let imageUrl = artworkInfo.artworkDescribe
+			if (artworkInfo.artworkStatus !== 4) {
+				param = 'artWorkId=' + artworkInfo.pkArtworkId + '=status=1'
+				title = '灵巫互动'
+				imageUrl =
+					'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605600100857%E5%9C%86%E5%BD%A2%E7%94%A8JPG.jpg'
+			}
+			return {
+				title: title,
+				imageUrl: imageUrl,
+				path: 'pages/play/play?scene=' + param
+			}
+		
 		},
 		methods: {
 			//提交举报
@@ -516,6 +544,46 @@
 	}
 	.horizontalButtonMenu{
 		z-index: 90;
+		.shareBox{
+			position: fixed;
+			right: 0;
+			top: 50%;
+			height: 80rpx;
+			width: 100rpx;
+			transform: translate(-50%, -50%) rotateZ(90deg);
+			z-index: 30;
+			background-color: rgba(0, 0, 0, 0.3);
+			border-radius: 20rpx;
+			.shareIconBox {
+			  width: 100rpx;
+			  height: 50rpx;
+			  text-align: center;
+			  .shareIcon {
+				width: 50rpx;
+				height: 50rpx;
+				background: url(../../../static/icon/share.png) no-repeat center;
+				background-size: 50rpx;
+			  }
+			}
+			.share {
+			  text-align: center;
+			  color: white;
+			  font-size: 20rpx;
+			  line-height: 30rpx;
+			}
+		}
+		.shareButton{
+			position: fixed;
+			right: 0;
+			top: 50%;
+			height: 80rpx;
+			width: 100rpx;
+			transform: translate(-50%, -50%) rotateZ(90deg);
+			z-index: 30;
+			background-color: rgba(0, 0, 0, 0);
+			border-radius: 20rpx;
+		}
+		
 		.storyLineBox {
 		  position: fixed;
 		  right: 0;
@@ -644,6 +712,7 @@
 		    line-height: 30rpx;
 		  }
 		}
+		
 		.storyLineContentMask16 {
 		  position: fixed;
 		  z-index: 999;

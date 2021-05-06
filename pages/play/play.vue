@@ -131,7 +131,7 @@
 			<!-- 竖屏 -->
 			<view v-if="hiddenBtnFlag" :style="showStyleFlag?'display: block':'display: none'" class="verticalBox">
 				<!-- 自制进度条 -->
-				<view class="my_progress" style="z-index: 999;">
+				<view class="my_progress" style="z-index: 999;" v-if="myProgressFlag">
 				  <view class="play_btn">
 					<view class="play_v" v-if="!isPlay" @click="toggleIsPlay(true)"></view>
 					<view class="pause_v" v-else @click="toggleIsPlay(false)"></view>
@@ -155,7 +155,7 @@
 			<!-- 横屏 -->
 			<view v-if="hiddenBtnFlag" :style="!showStyleFlag?'display: block':'display: none'" class="horizontalBox">
 				<!-- 自制进度条 -->
-				<view class="my_progress_h">
+				<view class="my_progress_h" v-if="myProgressFlag">
 				  <view class="play_btn">
 					<view class="play_v" v-if="!isPlay" @click="toggleIsPlay(true)"></view>
 					<view class="pause_v" v-else @click="toggleIsPlay(false)"></view>
@@ -405,7 +405,7 @@
 				//入场loading的开关
 				videoloadFlag: true,
 				//好感度延时函数
-				likabilityDelayFunction: Function,
+				likabilityDelayFunction: null,
 				//故事线跳转到播放页的当前节点是否已播放标志
 				isPlayedFlag: false,
 				//是否点击了选项开关（用于保存有效观看记录使用）
@@ -518,7 +518,7 @@
 				//横屏选项百分比开关
 				horizontalOptionPercentageFlag: false,
 				//百分比延时函数
-				optionPercentageFunction: Function,
+				optionPercentageFunction: null,
 				//选项百分比的值
 				optionPercentageValues: [],
 				// 浮标
@@ -606,7 +606,11 @@
 				//动作作品的组件绑定数组
 				bindActionOptionArray: [],
 				//动作选项被选择的时间点
-				actionSectionTime: 0
+				actionSectionTime: 0,
+				//自制进度条开关
+				myProgressFlag: true,
+				//自制进度条延时函数
+				myProgressDelayFunction: null				
 			}
 		},
 		onReady() {
@@ -1474,10 +1478,6 @@
 				this.clearNodeBuoyInfo()
 
 				this.storyLineJumpFlag = true
-				//故事线跳转时清除好感度延时函数
-				clearTimeout(this.likabilityDelayFunction)
-				//故事线跳转时清除选项百分比延时函数
-				clearTimeout(this.optionPercentageFunction)
 				//是否是最后一个视频的标志在页面加载时要设置成true 不然不会弹框
 				this.endFlag = true;
 				//重置用户选项分数
@@ -1720,8 +1720,6 @@
 						this.endFlag = false;
 					}
 				}
-				//加载视频数据
-				// this.loadeddata()
 
 				//非跳转节点的目标节点存播放记录
 				if (this.linkNodeId != this.detailId) {
@@ -1994,9 +1992,7 @@
 				} else {
 					this.iscustomLightFlag = true
 				}
-				clearTimeout(this.optionPercentageFunction)
 				this.likabilityArray = []
-				clearTimeout(this.likabilityDelayFunction)
 				this.likabilityFlag = false
 				if (this.isPosition == 1) {
 					this.screenshotShowFlag = false
@@ -2599,9 +2595,6 @@
 						this.likabilityArray = []
 						this.background.splice(index, 1, "")
 						this.likabilityFlag = false
-						// 播放结束清除延时函数
-						clearTimeout(this.optionPercentageFunction)
-						clearTimeout(this.likabilityDelayFunction)
 						this.optionTouchendTodo(index)
 						//保存有效观看记录
 						if (!this.isClickOptionFlag) {
@@ -3171,8 +3164,6 @@
 						}
 					} else {
 						this.likabilityArray = []
-						clearTimeout(this.optionPercentageFunction)
-						clearTimeout(this.likabilityDelayFunction)
 						this.canvasTouchendEventTodo()
 						this.likabilityFlag = false
 						this.videoShowFlag = true
@@ -3400,8 +3391,9 @@
 				})
 			},
 			loadeddata(e) {
+				//展示自制进度条
+				this.myProgressFlag = true
 				// 浮标作品 禁用所有的进度条
-				console.log("%%%%%%%%%%%%%%%%%%%%%videoContext%%%%%%%%%%%", this.videoContext)
 				if (this.bouyNodeFlage) {
 					//浮标视频不显示原生开关
 					this.controlsFlag = true
@@ -3415,6 +3407,8 @@
 				console.log('this.isPlayedFlag: ', this.isPlayedFlag)
 				//清除百分比延时函数
 				clearTimeout(this.optionPercentageFunction)
+				clearTimeout(this.myProgressDelayFunction)
+				clearTimeout(this.likabilityDelayFunction)
 				if (this.isShowOptionPercentageFlag && !this.isPlayedFlag && this.artworkTree.parentId != 0) {
 					if (uni.getStorageSync('playMode') == 1) {
 						this.horizontalOptionPercentageFlag = true
@@ -3427,6 +3421,7 @@
 						} else {
 							this.verticalOptionPercentageFlag = false
 						}
+						clearTimeout(this.optionPercentageFunction)
 					}, 5000)
 				} else {
 					if (this.bouyNodeFlage && this.artworkTree.parentId != 0) {
@@ -3441,13 +3436,20 @@
 							} else {
 								this.verticalOptionPercentageFlag = false
 							}
+							clearTimeout(this.optionPercentageFunction)
 						}, 5000)
 					}
 				}
-				//TODO 修改
 				this.duration = e.detail.duration
 				let date = this.formatDate(this.duration)
 				this.durationStr = date
+				//自制进度条消失判断 3s后消失 (动作，浮标，视频时长小于3s) 不消失 
+				if(this.duration > 3 && this.isPosition !== 2 && this.isPosition !== 3){
+					this.myProgressDelayFunction = setTimeout(() => {
+						this.myProgressFlag = false
+						clearTimeout(this.myProgressDelayFunction)
+					}, 3000)
+				}
 				// 浮标修改
 				console.log("!this.bouyNodeFlage", !this.bouyNodeFlage)
 				if (!this.bouyNodeFlage && this.isPosition !== 3) {
@@ -3473,8 +3475,8 @@
 				//视频清除延时
 				this.likabilityDelayFunction = setTimeout(() => {
 					this.likabilityFlag = false
+					clearTimeout(this.likabilityDelayFunction)
 				}, 5000)
-				//TODO 修改
 				uni.setStorageSync('videoSize', {
 					videoHeight: e.detail.height,
 					videoWidth: e.detail.width
@@ -3534,6 +3536,7 @@
 			},
 			videoTimeupdate(e) {
 				let currentTime = e.detail.currentTime
+				//根据动作出现的时间筛选出需要展示的动作选项的数组传给组件操作 通过调用子组件方法来传递参数
 				if(this.isPosition === 3){
 					this.bindActionOptionArray = []
 					for(let i = 0; i < this.ecmArtworkNodeActionVOList.length; i++){
@@ -3661,7 +3664,7 @@
 				this.tsy = e.changedTouches[0].clientY
 			},
 			videoTouchend(e) {
-				
+				this.myProgressFlag = !this.myProgressFlag
 			},
 			// 浮标方法
 			//初始化竖屏canvas画布
