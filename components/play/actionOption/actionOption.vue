@@ -8,9 +8,9 @@
 				<view :style="{position: 'absolute',
 				left: arrData[index].actionCoordinateX * 100 + '%',
 				top: arrData[index].actionCoordinateY * 100 + (actionOptionStyleArray[index].areaWidth/windowWidth* 100) + '%',
-				color: color,
+				color: arrData[index].actionTextColor,
 				width: actionOptionStyleArray[index].areaWidth+'px',
-				}" v-if="playMode"  >{{reminderText}}</view>
+				}" v-if="playMode"  >{{arrData[index].actionTextValue ? arrData[index].actionTextValue : reminderText }}</view>
 				<view class="imageBox"
 				 :style="{position: 'absolute',
 				left: arrData[index].actionCoordinateX * 100 + '%',
@@ -34,9 +34,9 @@
 				<view :style="{position: 'absolute',
 				left: arrData[index].actionCoordinateX * 100 + '%',
 				top: arrData[index].actionCoordinateY * 100 + (actionOptionStyleArray[index].areaWidth/windowHeight* 100) +'%',
-				color: color,
+				color: arrData[index].actionTextColor,
 				width: actionOptionStyleArray[index].areaWidth+'px',
-				}"  v-if="!playMode">{{reminderText}}</view>
+				}"  v-if="!playMode">{{arrData[index].actionTextValue ? arrData[index].actionTextValue : reminderText}}</view>
 				<view class="imageBox"
 				 :style="{position: 'absolute',
 				left: arrData[index].actionCoordinateX * 100 + '%',
