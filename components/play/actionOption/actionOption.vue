@@ -6,6 +6,7 @@
 			<view class="content" v-for="(item, index) in actionOptionStyleArray" :key="index">
 				<!-- 横屏 -->
 				<view :style="{position: 'absolute',
+				opacity: actionOptionStyleArray[index].opacity/100,
 				left: arrData[index].actionCoordinateX * 100 + '%',
 				top: arrData[index].actionCoordinateY * 100 + (actionOptionStyleArray[index].areaWidth/windowWidth* 100) + '%',
 				color: arrData[index].actionTextColor,
@@ -32,6 +33,7 @@
 				</view> 
 				<!-- 竖屏 -->
 				<view :style="{position: 'absolute',
+				opacity: actionOptionStyleArray[index].opacity/100,
 				left: arrData[index].actionCoordinateX * 100 + '%',
 				top: arrData[index].actionCoordinateY * 100 + (actionOptionStyleArray[index].areaWidth/windowHeight* 100) +'%',
 				color: arrData[index].actionTextColor,
