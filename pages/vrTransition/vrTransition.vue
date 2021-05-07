@@ -237,61 +237,61 @@
 					}
 				});
 			},
-            getNextAd(){
-                if(this.adErr){
-                    console.log('因为上次有错误，删除了ad')
-                    this.advertising.offError()
-                    this.advertising.offClose()
-                    this.advertising.destroy()
-                    this.advertising = null
-                }
-                if(!this.advertising){
-                    console.log('获得新的广告')
-                    this.advertising = wx.createRewardedVideoAd({ adUnitId: 'adunit-7423fd1b2c7c5724' })
-                    this.advertising.onError(err => {
-                        console.log(err)
-                        this.adErr  = err
-                    })
-                }else {
-                    console.log('使用老的广告')
-                    this.advertising.offClose()
-                }
-            },
-            openAdvertising () {
-                this.showAdvertisingFlag = false
-                this. getNextAd()
+			getNextAd(){
+				if(this.adErr){
+					console.log('因为上次有错误，删除了ad')
+					this.advertising.offError()
+					this.advertising.offClose()
+					this.advertising.destroy()
+					this.advertising = null
+				}
+				if(!this.advertising){
+					console.log('获得新的广告')
+					this.advertising = wx.createRewardedVideoAd({ adUnitId: 'adunit-7423fd1b2c7c5724' })
+					this.advertising.onError(err => {
+						console.log(err)
+						this.adErr  = err
+					})
+				}else {
+					console.log('使用老的广告')
+					this.advertising.offClose()
+				}
+			},
+			openAdvertising () {
+				this.showAdvertisingFlag = false
+				this. getNextAd()
 
-                //捕捉错误
-                this.adErr && this.handleAdError()
+				//捕捉错误
+				this.adErr && this.handleAdError()
 
-                // 激励广告显示并加载
-                this.advertising.load().then(() => {
-                    this.advertising.show().then(() => {})
-                }).catch(() => {
-                    this.advertising.load().then(() => {
-                        this.advertising.show().then(() => {})
-                    }).catch(() => {
-                        this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
-                        //处理调取光失败方法
-                        uni.showToast({
-                            icon: 'none',
-                            title: '当前没有适合您的激励视频，请待会再试'
-                        })
-                    })
-                })
+				// 激励广告显示并加载
+				this.advertising.load().then(() => {
+					this.advertising.show().then(() => {})
+				}).catch(() => {
+					this.advertising.load().then(() => {
+						this.advertising.show().then(() => {})
+					}).catch(() => {
+						this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
+						//处理调取光失败方法
+						uni.showToast({
+							icon: 'none',
+							title: '当前没有适合您的激励视频，请待会再试'
+						})
+					})
+				})
 
-                // 监听激励广告关闭
-                this.advertising.onClose((status) => {
-                    if (status.isEnded) {
-                        const nowDate = new Date().getTime()
-                        if (nowDate === null || nowDate - this.nowDate > 5000 ) {
-                            this.nowDate = nowDate
-                            this.addLight()
-                        }
-                    }
-                    this.advertising.offClose()
-                })
-            },
+				// 监听激励广告关闭
+				this.advertising.onClose((status) => {
+					if (status.isEnded) {
+						const nowDate = new Date().getTime()
+						if (nowDate === null || nowDate - this.nowDate > 5000 ) {
+							this.nowDate = nowDate
+							this.addLight()
+						}
+					}
+					this.advertising.offClose()
+				})
+			},
 			// 关闭激励广告确认框
 			closeDialog () {
 				this.showAdvertisingFlag = false
