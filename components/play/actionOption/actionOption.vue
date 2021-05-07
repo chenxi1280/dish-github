@@ -5,6 +5,12 @@
 		<view >
 			<view class="content" v-for="(item, index) in actionOptionStyleArray" :key="index">
 				<!-- 横屏 -->
+				<view :style="{position: 'absolute',
+				left: arrData[index].actionCoordinateX * 100 + '%',
+				top: arrData[index].actionCoordinateY * 100 + (actionOptionStyleArray[index].areaWidth/windowWidth* 100) + '%',
+				color: color,
+				width: actionOptionStyleArray[index].areaWidth+'px',
+				}" v-if="playMode"  >{{reminderText}}</view>
 				<view class="imageBox"
 				 :style="{position: 'absolute',
 				left: arrData[index].actionCoordinateX * 100 + '%',
@@ -16,13 +22,21 @@
 				@touchstart="touchstart(index,$event)" 
 				@touchend="touchend(index,$event)" 
 				@touchmove="touchmove(index,$event)">
+					
 					<image :style="{opacity: actionOptionStyleArray[index].opacity,
 					width: actionOptionStyleArray[index].areaWidth * 0.618 + 'px', 
 					height: actionOptionStyleArray[index].areaHeight * 0.618 +'px'
 					}"
 					:src="actionOptionStyleArray[index].src"></image>
+					
 				</view> 
 				<!-- 竖屏 -->
+				<view :style="{position: 'absolute',
+				left: arrData[index].actionCoordinateX * 100 + '%',
+				top: arrData[index].actionCoordinateY * 100 + (actionOptionStyleArray[index].areaWidth/windowHeight* 100) +'%',
+				color: color,
+				width: actionOptionStyleArray[index].areaWidth+'px',
+				}"  v-if="!playMode">{{reminderText}}</view>
 				<view class="imageBox"
 				 :style="{position: 'absolute',
 				left: arrData[index].actionCoordinateX * 100 + '%',
@@ -90,7 +104,9 @@
 				frontAreaWidth: 0,
 				marginw: 0,
 				marginh: 0,
-				arrData: null
+				arrData: null,
+				reminderText: "沿图案滑动手指，开启互动",
+				color: "red"
 			}
 		},
 		onReady() {
@@ -115,9 +131,9 @@
 				this.paramArray = array
 				//圆 短箭头 长箭头
 				let verticalImageSrc = [
-					'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1619077580993momvment-circle.png',
-					'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1619077603467momvment-jiantou.png',
-					'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1619077233272momvment-jiantou2.png'
+					'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/circleA.gif',
+					'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/rowA.gif',
+					'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/longRowA.gif'
 				]
 				this.actionOptionStyleArray = []
 				for(let i = 0; i < array.length; i++){
