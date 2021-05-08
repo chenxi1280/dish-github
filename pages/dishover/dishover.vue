@@ -147,15 +147,16 @@
 				// 光数量
 				lightNumber: 0,
 				// 光上限
-				ecmUserLightUpLimit: 0
+				ecmUserLightUpLimit: 0,
+				timeout: null
 			}
 		},
 		onShow() {
 			// banner显示与消失
 			this.isShowBanner = true
-			const timer = setTimeout(() => {
+			this.timeout = setTimeout(() => {
 				this.isShowBanner = false
-				clearTimeout(timer)
+				clearTimeout(this.timeout)
 			}, 5000)
 			this.getLight()
 			console.log("*****************************************relaunchApplets",uni.getStorageSync("relaunchApplets"))
@@ -185,6 +186,10 @@
 			this.addRandomDataHot()
 		},
 		onHide() {
+			this.isShowBanner = false
+			if(this.timeout !== null) {
+				clearTimeout(this.timeout)
+			}
 		},
 		onShareAppMessage (res) {
 		    return {
@@ -215,9 +220,9 @@
 		onPullDownRefresh() {
 			if (this.scrollTop === 0 && !this.isShowBanner) {
 				this.isShowBanner = true
-				const timer = setTimeout(() => {
+				this.timeout = setTimeout(() => {
 					this.isShowBanner = false
-					clearTimeout(timer)
+					clearTimeout(this.timeout)
 				}, 5000)
 			}
 			uni.stopPullDownRefresh();
