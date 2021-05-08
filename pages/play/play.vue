@@ -1264,6 +1264,7 @@
 					this.advertising.offClose()
 					this.advertising.destroy()
 					this.advertising = null
+					this.adErr = null
 				}
 			    if(!this.advertising){
 					console.log('获得新的广告')
@@ -3462,6 +3463,7 @@
 					if(this.isPosition === 3){
 						this.videoContext.seek(parseInt(this.actionSectionTime - 1))
 						this.isPlayedFlag = false
+						this.actionSectionTime = 0
 					}else{
 						this.isPlayedFlag = false
 					}

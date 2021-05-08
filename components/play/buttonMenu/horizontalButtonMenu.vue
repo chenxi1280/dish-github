@@ -464,8 +464,8 @@
 					} else {
 						this.$parent.videoContext.pause()
 					}
-					//控制父组件变量
-					this.$parent.endFlag = true
+					//若作品结构只有两级此时返回到上一级就直接到开场了不会走故事线跳转逻辑所以要把弹故事线开关重置
+					this.endFlag = true
 					return this.returnToPreviouShow = true
 				}
 				//返回上一级时如果是开场不去获取百分比

@@ -244,6 +244,7 @@
 					this.advertising.offClose()
 					this.advertising.destroy()
 					this.advertising = null
+					this.adErr = null
 				}
 				if(!this.advertising){
 					console.log('获得新的广告')
@@ -262,7 +263,13 @@
 				this.getNextAd()
 
 				//捕捉错误
-				this.adErr && this.handleAdError()
+				 //&& this.handleAdError()
+				if(this.adErr) {
+					uni.showToast({
+						icon: 'none',
+						title: '当前没有适合您的激励视频，请待会再试'
+					})
+				}
 
                 this.advertising.show()
 				.catch(() => {
