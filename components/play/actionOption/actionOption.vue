@@ -5,12 +5,12 @@
 		<view >
 			<view class="content" v-for="(item, index) in actionOptionStyleArray" :key="index">
 				<!-- 横屏 -->
-				<view :style="{position: 'absolute',
+				<!-- <view :style="{position: 'absolute',
 				left: arrData[index].actionCoordinateX * 100 + '%',
 				top: arrData[index].actionCoordinateY * 100 + (actionOptionStyleArray[index].areaWidth/windowWidth* 100) + '%',
 				color: color,
 				width: actionOptionStyleArray[index].areaWidth+'px',
-				}" v-if="playMode"  >{{reminderText}}</view>
+				}" v-if="playMode"  >{{reminderText}}</view> -->
 				<view class="imageBox"
 				 :style="{position: 'absolute',
 				left: arrData[index].actionCoordinateX * 100 + '%',
@@ -31,12 +31,12 @@
 					
 				</view> 
 				<!-- 竖屏 -->
-				<view :style="{position: 'absolute',
+				<!-- <view :style="{position: 'absolute',
 				left: arrData[index].actionCoordinateX * 100 + '%',
 				top: arrData[index].actionCoordinateY * 100 + (actionOptionStyleArray[index].areaWidth/windowHeight* 100) +'%',
 				color: color,
 				width: actionOptionStyleArray[index].areaWidth+'px',
-				}"  v-if="!playMode">{{reminderText}}</view>
+				}"  v-if="!playMode">{{reminderText}}</view> -->
 				<view class="imageBox"
 				 :style="{position: 'absolute',
 				left: arrData[index].actionCoordinateX * 100 + '%',
@@ -131,10 +131,15 @@
 				this.paramArray = array
 				//圆 短箭头 长箭头
 				let verticalImageSrc = [
+					'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1619147330186momvment-circle-H.png',
+					'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1619147362693momvment-jiantou-H.png',
+					'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1619147353446momvment-jiantou2-H.png'
+				]
+				/* let verticalImageSrc = [
 					'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/circleA.gif',
 					'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/rowA.gif',
 					'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/longRowA.gif'
-				]
+				] */
 				this.actionOptionStyleArray = []
 				for(let i = 0; i < array.length; i++){
 					let eventType = array[i].actionEventType
