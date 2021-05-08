@@ -259,26 +259,24 @@
 			},
 			openAdvertising () {
 				this.showAdvertisingFlag = false
-				this. getNextAd()
+				this.getNextAd()
 
 				//捕捉错误
 				this.adErr && this.handleAdError()
 
-				// 激励广告显示并加载
-				this.advertising.load().then(() => {
-					this.advertising.show().then(() => {})
-				}).catch(() => {
-					this.advertising.load().then(() => {
-						this.advertising.show().then(() => {})
-					}).catch(() => {
-						this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
-						//处理调取光失败方法
-						uni.showToast({
-							icon: 'none',
-							title: '当前没有适合您的激励视频，请待会再试'
-						})
-					})
-				})
+                this.advertising.show()
+				.catch(() => {
+                        this.advertising.load()
+                            .then(() => this.advertising.show())
+                            .catch(err => {
+                                uni.showToast({
+                                    icon: 'none',
+                                    title: '当前没有适合您的激励视频，请待会再试'
+                                })
+                                console.log('激励视频 广告显示失败', err)
+                            })
+                    })
+
 
 				// 监听激励广告关闭
 				this.advertising.onClose((status) => {
