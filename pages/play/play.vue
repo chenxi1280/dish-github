@@ -2353,7 +2353,7 @@
 							//如果是弹窗开启那么就重播
 							this.againPlayVideo()
 						} else {
-							//TODO 需要根据后台判断标志来判断 -1重播 0自动选A 判断是浮标还是动作 动作和浮标的key不一样
+							//TODO 需要根据后台判断标志来判断 -1重播 0自动选A
 							let historyNodeBuoyList = uni.getStorageSync("historyNodeBuoyList")
 							let autoChooseFlag = historyNodeBuoyList[0].buoyPlayEndType
 							if(autoChooseFlag === -1){
