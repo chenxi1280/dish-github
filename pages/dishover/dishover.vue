@@ -5,7 +5,7 @@
 			<input class="search_input" type="" placeholder=" 查找你想看的视频" disabled="" /> -->
 			
 			<view class="banner_container" @click="this.isShowBannerImg = true" v-if="isShowBanner">
-				<image src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1619490668848%E5%9B%BE%E5%B1%82%20138.png" style="display: block;width: 100%;height:100%"/>
+				<image src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/banner.png" style="display: block;width: 100%;height:100%"/>
 			</view>
 			<scroll-view class="banner_bigImg" scroll-y="true" v-if="isShowBannerImg">
 				<view style="position: fixed; right: 20rpx;top:20rpx;width:80rpx;height: 80rpx;background: #000;border-radius: 40rpx;" @click="isShowBannerImg = false">
@@ -13,7 +13,8 @@
 				</view>
 				<image mode="widthFix" src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1619494260074%E7%81%B5%E5%B7%AB%E4%BA%92%E5%8A%A8%E4%BA%A7%E5%93%81%E5%AE%A3%E4%BC%A0.jpg"/>
 			</scroll-view>
-			<view class="nav_container" :style="{top: `${isShowBanner ? '300rpx' : '0'}`}">
+			<!--  :style="{top: `${isShowBanner ? '300rpx' : '0'}`}" -->
+			<view class="nav_container">
 				<Advertising :lightNumber.sync="lightNumber" :ecmUserLightUpLimit.sync="ecmUserLightUpLimit"></Advertising>
 				<view class="search_main" @click="go_search_page">
 					<u-search :show-action="false" ></u-search>
@@ -155,7 +156,7 @@
 			const timer = setTimeout(() => {
 				this.isShowBanner = false
 				clearTimeout(timer)
-			}, 10000)
+			}, 5000)
 			this.getLight()
 			console.log("*****************************************relaunchApplets",uni.getStorageSync("relaunchApplets"))
 			if(uni.getStorageSync("relaunchApplets") == true){
@@ -217,7 +218,7 @@
 				const timer = setTimeout(() => {
 					this.isShowBanner = false
 					clearTimeout(timer)
-				}, 10000)
+				}, 5000)
 			}
 			uni.stopPullDownRefresh();
 		},
@@ -469,7 +470,7 @@
 		height: 300rpx;
 		background-color: pink;
 		position: fixed;
-		top: 0;
+		top: 80rpx;
 	}
 	.banner_bigImg {
 		z-index: 999;
@@ -489,7 +490,7 @@
 		position: fixed;
 		width: calc(100% - 40rpx);
 		height: 80rpx;
-		top: 300rpx;
+		top: 0rpx;
 		display: flex;
 		justify-items: space-between;
 		background-color: #fff;
