@@ -150,7 +150,7 @@
 				ecmUserLightUpLimit: 0,
 				timeout: null,
 				//banner 地址
-				bannerSrc: "https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/banner.png"
+				bannerSrc: null
 			}
 		},
 		onShow() {
@@ -370,6 +370,10 @@
 								return
 							}
 							if (res.data.data.list.length != 0) {
+								//从后台获取banner 地址
+								console.log("bannerSrc: ",res.data.data.bannerAddress)
+								this.bannerSrc = res.data.data.bannerAddress
+								
 								res.data.data.list.forEach(v => {
 									v.high = 287.1
 								if (v.userLogoUrl != null) {
