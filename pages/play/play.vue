@@ -751,6 +751,28 @@
 				console.log('定时器存在并已清除')
 				clearInterval(this.buoyRef)
 			}
+			if(this.videoUrlTimeOut) {
+			    clearTimeout(this.videoUrlTimeOut)
+            }
+
+            if(this.savaPlayRecordTimOut){
+                clearTimeout(this.savaPlayRecordTimOut)
+			}
+
+            if(this.videoPlayTimeOut){
+                clearTimeout(this.videoPlayTimeOut)
+            }
+
+            if(this.optionPercentageFunction){
+                clearTimeout(this.optionPercentageFunction)
+			}
+            if(this.myProgressDelayFunction){
+                clearTimeout(this.myProgressDelayFunction)
+            }
+            if(this.likabilityDelayFunction){
+                clearTimeout(this.likabilityDelayFunction)
+            }
+
 		},
 		onShareAppMessage(res) {
 			let artworkInfo = uni.getStorageSync('artworkInfo')
@@ -1651,7 +1673,7 @@
                 this.parentId = artworkTree.parentId
 
                 if(this.parentId === 0){
-                    setTimeout(() => {
+                    this.videoUrlTimeOut = setTimeout(() => {
                         this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
                     }, 1000)
 				} else {
@@ -2178,7 +2200,7 @@
 							//三次都未请求到token
 							token = -1
 						} else {
-							setTimeout(() => {
+							this.savaPlayRecordTimOut = setTimeout(() => {
 								this.savaPlayRecord()
 							}, 100)
 							this.savaRecordCount++
@@ -2460,12 +2482,13 @@
 				// 用于解决进度条卡顿问题
 				const time = JSON.parse(JSON.stringify(this.currentTime))
 				if (this.isPlay) {
-					const timer = setTimeout(() => {
+					this.videoPlayTimeOut = setTimeout(() => {
 						if (time === this.currentTime) {
 							this.videoContext.play()
 						}
-						clearTimeout(timer)
+						clearTimeout(this.videoPlayTimeOut)
 					}, 300)
+
 				}
 				if (this.waitingVideoFlag) {
 					if (this.bouyNodeFlage) {
