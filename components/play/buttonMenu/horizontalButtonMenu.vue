@@ -547,7 +547,7 @@
 		.shareBox{
 			position: fixed;
 			right: 0;
-			top: 50%;
+			top: 90%;
 			height: 80rpx;
 			width: 100rpx;
 			transform: translate(-50%, -50%) rotateZ(90deg);
@@ -575,7 +575,7 @@
 		.shareButton{
 			position: fixed;
 			right: 0;
-			top: 50%;
+			top: 90%;
 			height: 80rpx;
 			width: 100rpx;
 			transform: translate(-50%, -50%) rotateZ(90deg);
@@ -587,7 +587,7 @@
 		.storyLineBox {
 		  position: fixed;
 		  right: 0;
-		  top: 60%;
+		  top: 50%;
 		  height: 80rpx;
 		  width: 100rpx;
 		  transform: translate(-50%, -50%) rotateZ(90deg);
@@ -619,7 +619,7 @@
 		.reportBox {
 		  position: fixed;
 		  right: 0;
-		  top: 70%;
+		  top: 60%;
 		  transform: translate(-50%, -50%) rotateZ(90deg);
 		  height: 80rpx;
 		  width: 100rpx;
@@ -651,7 +651,7 @@
 		.seeMoreBox {
 		  position: fixed;
 		  right: 0;
-		  top: 80%;
+		  top: 70%;
 		  transform: translate(-50%, -50%) rotateZ(90deg);
 		  height: 80rpx;
 		  width: 100rpx;
@@ -683,7 +683,7 @@
 		.returnToPreviousBox {
 		  position: fixed;
 		  right: 0;
-		  top: 90%;
+		  top: 80%;
 		  transform: translate(-50%, -50%) rotateZ(90deg);
 		  height: 80rpx;
 		  width: 100rpx;

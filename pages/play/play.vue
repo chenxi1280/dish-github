@@ -4046,26 +4046,26 @@
 					// 故事线 图标位置
 					this.storyLineBoxWidthMin = ww - cw - this.getPxbyRpx(140)
 					this.storyLineBoxWidthMax = this.storyLineBoxWidthMin + this.getPxbyRpx(80)
-					this.storyLineBoxHeightMin = (wh * 0.6) - ch - this.getPxbyRpx(60)
+					this.storyLineBoxHeightMin = (wh * 0.5) - ch - this.getPxbyRpx(60)
 
 					this.storyLineBoxHeightMax = this.storyLineBoxHeightMin + this.getPxbyRpx(100)
 
 					// 举报   图标位置
 					this.reportBoxWidthMin = this.storyLineBoxWidthMin
 					this.reportBoxWidthMax = this.storyLineBoxWidthMax
-					this.reportBoxHeightMin = (wh * 0.7) - ch - this.getPxbyRpx(60)
+					this.reportBoxHeightMin = (wh * 0.6) - ch - this.getPxbyRpx(60)
 					this.reportBoxHeightMax = this.reportBoxHeightMin + this.getPxbyRpx(100)
 
 					// 更多   图标位置
 					this.seeMoreBoxWidthMin = this.storyLineBoxWidthMin
 					this.seeMoreBoxWidthMax = this.storyLineBoxWidthMax
-					this.seeMoreBoxHeightMin = (wh * 0.8) - ch - this.getPxbyRpx(60)
+					this.seeMoreBoxHeightMin = (wh * 0.7) - ch - this.getPxbyRpx(60)
 					this.seeMoreBoxHeightMax = this.seeMoreBoxHeightMin + this.getPxbyRpx(100)
 
 					// 返回上一级   图标位置
 					this.returnToPreviouWidthMin = this.storyLineBoxWidthMin
 					this.returnToPreviouWidthMax = this.storyLineBoxWidthMax
-					this.returnToPreviouHeightMin = (wh * 0.9) - ch - this.getPxbyRpx(60)
+					this.returnToPreviouHeightMin = (wh * 0.8) - ch - this.getPxbyRpx(60)
 					this.returnToPreviouHeightMax = this.returnToPreviouHeightMin + this.getPxbyRpx(100)
 
 					// 广告 位置
