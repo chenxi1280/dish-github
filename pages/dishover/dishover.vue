@@ -5,7 +5,7 @@
 			<input class="search_input" type="" placeholder=" 查找你想看的视频" disabled="" /> -->
 			
 			<view class="banner_container" @click="this.isShowBannerImg = true" v-if="isShowBanner">
-				<image src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/banner.png" style="display: block;width: 100%;height:100%"/>
+				<image :src="bannerSrc" style="display: block;width: 100%;height:100%"/>
 			</view>
 			<scroll-view class="banner_bigImg" scroll-y="true" v-if="isShowBannerImg">
 				<view style="position: fixed; right: 20rpx;top:20rpx;width:80rpx;height: 80rpx;background: #000;border-radius: 40rpx;" @click="isShowBannerImg = false">
@@ -148,7 +148,9 @@
 				lightNumber: 0,
 				// 光上限
 				ecmUserLightUpLimit: 0,
-				timeout: null
+				timeout: null,
+				//banner 地址
+				bannerSrc: "https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/banner.png"
 			}
 		},
 		onShow() {

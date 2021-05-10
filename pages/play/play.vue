@@ -2349,24 +2349,38 @@
 						// 默认选A
 						this.optionIndex = 0
 						let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
-						// buoyStatus 弹窗是否开启 1开启 0默认选项
-						if (buoyPopInfo.buoyStatus) {
-							//如果是弹窗开启那么就重播
-							this.againPlayVideo()
+						
+						// 需要根据后台判断标志来判断 -1重播 0自动选A
+						let historyNodeBuoyList = uni.getStorageSync("historyNodeBuoyList")
+						let autoChooseFlag = historyNodeBuoyList[0].buoyPlayEndType
+						if (autoChooseFlag === -1) {
+							//如果用户选择了重播 那么回到第一个浮标出现的地方重播
+							console.log("canvasNodeBuoyList: ",this.canvasNodeBuoyList)
+							let min = this.getInitialTimePoint(2)
+							console.log("*********min time:",min-1)
+							this.videoContext.seek(parseInt(min-1))
+							this.videoContext.play()
 						} else {
-							//TODO 需要根据后台判断标志来判断 -1重播 0自动选A
-							let historyNodeBuoyList = uni.getStorageSync("historyNodeBuoyList")
-							let autoChooseFlag = historyNodeBuoyList[0].buoyPlayEndType
-							if(autoChooseFlag === -1){
-								//拉回到浮标出现位置
-								//获取浮标视频的选项初始渲染时间
-								console.log("canvasNodeBuoyList: ",this.canvasNodeBuoyList)
-								let min = this.getInitialTimePoint(2)
-								console.log("*********min time:",min-1)
-								this.videoContext.seek(parseInt(min-1))
-								this.videoContext.play()
-							}else{
-								//默认选A
+							//默认选A 有三种情况 选项 图片 文字
+							let buoyPopInfo = this.getBuoyPopInfo(0)
+							// buoyStatus 弹窗是否开启 1开启 0默认选项
+							if (buoyPopInfo.buoyStatus) {
+								//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
+								if (buoyPopInfo.buoyPopType === 0) {
+									this.JumpToOtherApplets(buoyPopInfo.buoyPopAppId, buoyPopInfo.buoyPopContext)
+								} else if (buoyPopInfo.buoyPopType === 1) {
+									this.stopBuoyDraw()
+									this.printContent(buoyPopInfo.buoyPopContext)
+									this.buoyDialogImageFlag = false
+									this.buoyDialogFlag = true
+								} else {
+									this.stopBuoyDraw()
+									this.buoyDialogImageSrc = buoyPopInfo.buoyPopContext + "/mobilePop"
+									this.buoyDialogFlag = true
+									this.buoyDialogImageFlag = true
+								}
+							} else {
+								//选项
 								this.buoyAutoChooseFlag = true
 								this.clickCommonOptionTodo(0)
 							}
