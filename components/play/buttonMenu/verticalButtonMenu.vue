@@ -445,6 +445,7 @@
 				this.$parent.videoContext.pause()
 			},
 			goDiscover() {
+				//频繁切换页面导致卡顿，使用回退模式 但是单页面模式无法跳转 因此如果是单页面模式设置成switchTab方式
 				uni.navigateBack({
 					delta: 1,
 					fail(err) {

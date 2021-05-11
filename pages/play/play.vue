@@ -268,7 +268,7 @@
 			<action-option :array.sync="bindActionOptionArray" ref="actionOptionChild" :playMode="playMode"
 				:referenceArray="ecmArtworkNodeActionVOList" :width="videoWidth" :height="videoHeight"
 				:style="{width: mobilePhoneWidth+'px',height: mobilePhoneHeight+'px', 
-				position: 'fixed',left: '0', top:'0'}">
+				position: 'fixed',left: '0', top:'0',zIndex: actionOptionZIndex}">
 				</action-option>
 		</view>
 	</view>
@@ -278,10 +278,6 @@
 	import {
 		baseURL
 	} from '../login/config/config.js'
-	import storyLine from '../../components/play/storyLine/storyLine.vue'
-	import {
-		horizontalStoryLine
-	} from '../../components/play/storyLine/horizontalStoryLine.vue'
 	import Advertising from '../../components/Advertising/Advertising.vue'
 	import {
 		globalBus
@@ -301,8 +297,6 @@
 		} from '../../components/play/buttonMenu/horizontalButtonMenu.vue'
 	export default {
 		components: {
-			storyLine,
-			horizontalStoryLine,
 			Advertising,
 			verticalJumpDialog,
 			horizontalJumpDialog,
@@ -610,7 +604,15 @@
 				//自制进度条开关
 				myProgressFlag: true,
 				//自制进度条延时函数
-				myProgressDelayFunction: null				
+				myProgressDelayFunction: null,
+				//是否是第一次出现动作选项开关
+				reminderIndex: 0,
+				//第一个动作出现的时间点
+				actionSectionTimeMin: 0,
+				//play页面初始化的flag
+				initPlayPageFlag: false,
+				//动态控制组件的层级
+				actionOptionZIndex: '99999'
 			}
 		},
 		onReady() {
@@ -651,6 +653,8 @@
 			this.isBouyClickCommonOptionTodo()
 		},
 		onLoad(option) {
+			this.initPlayPageFlag = true
+			this.reminderIndex = 0
 			this.token = uni.getStorageSync('token')
 			console.log("**************************this.token:", this.token)
 			if (!this.token) {
@@ -3406,6 +3410,7 @@
 				})
 			},
 			loadeddata(e) {
+				this.reminderIndex = 0
 				//展示自制进度条
 				this.myProgressFlag = true
 				// 浮标作品 禁用所有的进度条
@@ -3562,10 +3567,21 @@
 							this.bindActionOptionArray.push(this.ecmArtworkNodeActionVOList[i])
 						}
 					}
+					//actionSectionTime 动作出现时间找出最小值 找最小值在一个节点中只做一次 通过reminderIndex控制
+					if(this.reminderIndex === 0){
+						this.actionSectionTimeMin = this.bindActionOptionArray[0].actionSectionTime
+						for(let i = 0; i < this.bindActionOptionArray.length; i++){
+							if(this.bindActionOptionArray[i].actionSectionTime < this.actionSectionTimeMin){
+								this.actionSectionTimeMin = this.bindActionOptionArray[i].actionSectionTime
+							}
+						}
+						this.reminderIndex++
+					}
 					if(this.bindActionOptionArray.length !== 0){
 						this.actionOptionFlag = true
 						if(this.$refs.actionOptionChild && this.$refs.actionOptionChild.init){
-							this.$refs.actionOptionChild.init(this.bindActionOptionArray);
+							this.$refs.actionOptionChild.init(this.bindActionOptionArray,this.actionSectionTimeMin,
+							currentTime,this.initPlayPageFlag);
 						}
 					}else{
 						this.actionOptionFlag = false
