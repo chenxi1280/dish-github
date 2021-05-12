@@ -148,6 +148,10 @@
 			playedHistoryArray: {
 				type: Array,
 				default: null
+			},
+			singlePageFlag: {
+				type: Boolean,
+				default: false
 			}
 		},
 		data() {
@@ -445,13 +449,25 @@
 				this.$parent.videoContext.pause()
 			},
 			goDiscover() {
-				//频繁切换页面导致卡顿，使用回退模式 但是单页面模式无法跳转 因此如果是单页面模式设置成switchTab方式
-				uni.navigateBack({
-					delta: 1,
-					fail(err) {
-						console.log('跳转失败:', err)
-					}
-				})
+				//单页面模式的时候使用 switchTab
+				if(this.singlePageFlag){
+					console.log("jump for switchTab mode")
+					this.$parent.singlePageFlag = false
+					uni.switchTab({
+						url: '../dishover/dishover'
+					})
+				}else{
+					console.log("jump for navigateBack mode")
+					uni.navigateBack({
+						delta: 1,
+						fail(err) {
+							console.log('跳转失败:', err)
+							uni.switchTab({
+								url: '../dishover/dishover'
+							})
+						}
+					})
+				}
 			},
 			//返回上级
 			returnToPrevious() {

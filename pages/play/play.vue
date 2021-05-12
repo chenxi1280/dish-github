@@ -148,7 +148,7 @@
 				</view>
 				<verticalButtonMenu :storyLineFlag="storyLineFlag" :parentId="parentId" :artworkId="artworkId" :playedHistoryArray="playedHistoryArray"
 					:multipleResultLine="multipleResultLine" :bouyNodeFlage="bouyNodeFlage" :artworkTree="artworkTree"
-					:multipleResultReplayFlag="multipleResultReplayFlag" ref="verticalMenu"
+					:multipleResultReplayFlag="multipleResultReplayFlag" ref="verticalMenu" :singlePageFlag="singlePageFlag"
 					>
 				</verticalButtonMenu>
 			</view>
@@ -172,7 +172,7 @@
 				</view>
 				<horizontalButtonMenu :storyLineFlag="storyLineFlag" :parentId="parentId" :artworkId="artworkId" :playedHistoryArray="playedHistoryArray"
 					:multipleResultLine="multipleResultLine" :bouyNodeFlage="bouyNodeFlage" :artworkTree="artworkTree"
-					:multipleResultReplayFlag="multipleResultReplayFlag" ref="horizontalMenu"
+					:multipleResultReplayFlag="multipleResultReplayFlag" ref="horizontalMenu" :singlePageFlag="singlePageFlag"
 					>
 				</horizontalButtonMenu>
 			</view>
@@ -605,6 +605,9 @@
 				myProgressFlag: true,
 				//自制进度条延时函数
 				myProgressDelayFunction: null,
+				//是否是单页面模式
+				singlePageFlag: false
+				myProgressDelayFunction: null,
 				//是否是第一次出现动作选项开关
 				reminderIndex: 0,
 				//第一个动作出现的时间点
@@ -755,6 +758,28 @@
 				console.log('定时器存在并已清除')
 				clearInterval(this.buoyRef)
 			}
+			if(this.videoUrlTimeOut) {
+			    clearTimeout(this.videoUrlTimeOut)
+            }
+
+            if(this.savaPlayRecordTimOut){
+                clearTimeout(this.savaPlayRecordTimOut)
+			}
+
+            if(this.videoPlayTimeOut){
+                clearTimeout(this.videoPlayTimeOut)
+            }
+
+            if(this.optionPercentageFunction){
+                clearTimeout(this.optionPercentageFunction)
+			}
+            if(this.myProgressDelayFunction){
+                clearTimeout(this.myProgressDelayFunction)
+            }
+            if(this.likabilityDelayFunction){
+                clearTimeout(this.likabilityDelayFunction)
+            }
+
 		},
 		onShareAppMessage(res) {
 			let artworkInfo = uni.getStorageSync('artworkInfo')
@@ -795,6 +820,7 @@
 		methods: {
 			getToken() {
 				let _this = this
+				_this.singlePageFlag = true
 				let openid = uni.getStorageSync("openid")
 				if (openid) {
 					_this.updateUserInfo(openid)
@@ -1307,7 +1333,7 @@
                 this.advertising.onClose((status) => {
                     this.showConditionAdvertisingFlag = false
 					//status.isEnded for test
-                    if (true) {
+                    if (status.isEnded) {
                         // 关闭条件浮标 弹窗
                         this.showConditionAdvertisingFlag = false
 						//广告正确关闭业务处理
@@ -1655,7 +1681,7 @@
                 this.parentId = artworkTree.parentId
 
                 if(this.parentId === 0){
-                    setTimeout(() => {
+                    this.videoUrlTimeOut = setTimeout(() => {
                         this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
                     }, 1000)
 				} else {
@@ -2182,7 +2208,7 @@
 							//三次都未请求到token
 							token = -1
 						} else {
-							setTimeout(() => {
+							this.savaPlayRecordTimOut = setTimeout(() => {
 								this.savaPlayRecord()
 							}, 100)
 							this.savaRecordCount++
@@ -2478,12 +2504,13 @@
 				// 用于解决进度条卡顿问题
 				const time = JSON.parse(JSON.stringify(this.currentTime))
 				if (this.isPlay) {
-					const timer = setTimeout(() => {
+					this.videoPlayTimeOut = setTimeout(() => {
 						if (time === this.currentTime) {
 							this.videoContext.play()
 						}
-						clearTimeout(timer)
+						clearTimeout(this.videoPlayTimeOut)
 					}, 300)
+
 				}
 				if (this.waitingVideoFlag) {
 					if (this.bouyNodeFlage) {
