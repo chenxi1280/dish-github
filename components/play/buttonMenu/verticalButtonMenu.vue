@@ -462,6 +462,9 @@
 						delta: 1,
 						fail(err) {
 							console.log('跳转失败:', err)
+							uni.switchTab({
+								url: '../dishover/dishover'
+							})
 						}
 					})
 				}
