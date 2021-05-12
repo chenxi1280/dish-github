@@ -606,8 +606,7 @@
 				//自制进度条延时函数
 				myProgressDelayFunction: null,
 				//是否是单页面模式
-				singlePageFlag: false
-				myProgressDelayFunction: null,
+				singlePageFlag: false,
 				//是否是第一次出现动作选项开关
 				reminderIndex: 0,
 				//第一个动作出现的时间点
