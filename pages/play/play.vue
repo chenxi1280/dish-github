@@ -69,7 +69,7 @@
 			<view class="container" v-show="showCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px', 'z-index': '9999'}">
 				<canvas canvas-id="myCanvas" @touchstart="getTouchPosition" @touchend="canvasTouchendEvent"></canvas>
 			</view>
-			<view class="container" v-show="showBuoyCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px'}">
+			<view class="container" v-show="showBuoyCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px' ,'z-index': '999'}">
 				<!-- <canvas canvas-id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas> -->
 				<canvas type="2d" id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas>
 			</view>
