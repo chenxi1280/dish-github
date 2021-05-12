@@ -1176,24 +1176,27 @@
 						eventId: 2
 					},
 					success: res => {
-						uni.showToast({
-							title: '恭喜成功获得光'
-						})
-						this.getLight()
-						if(!this.bouyNodeFlage) {
-							console.log("加光 自动选择",this.optionIndex)
-							console.log("this.isVideoEndFlag",this.isVideoEndFlag)
-							if (this.isVideoEndFlag) {
+						console.log("************addLight:",res.data.status)
+						if(res.data.status === 200){
+							uni.showToast({
+								title: '恭喜成功获得光'
+							})
+							this.getLight()
+							if(!this.bouyNodeFlage) {
 								console.log("加光 自动选择",this.optionIndex)
-								this.clickCommonOptionTodo(this.optionIndex)
+								console.log("this.isVideoEndFlag",this.isVideoEndFlag)
+								if (this.isVideoEndFlag) {
+									console.log("加光 自动选择",this.optionIndex)
+									this.clickCommonOptionTodo(this.optionIndex)
+								}
+								if(this.clickCommonOptionTodoActionFlag){
+									console.log("加光 自动选择",this.optionIndex)
+									this.clickCommonOptionTodo(this.optionIndex)
+									this.clickCommonOptionTodoActionFlag = false
+								}
+							}else{
+								this.bouyClickCommonOptionTodo()
 							}
-							if(this.clickCommonOptionTodoActionFlag){
-								console.log("加光 自动选择",this.optionIndex)
-								this.clickCommonOptionTodo(this.optionIndex)
-								this.clickCommonOptionTodoActionFlag = false
-							}
-						}else{
-							this.bouyClickCommonOptionTodo()
 						}
 
 					}
@@ -1414,7 +1417,7 @@
                             const nowDate = new Date().getTime()
                             if (nowDate === null || nowDate - this.nowDate > 5000 ) {
                                 this.nowDate = nowDate
-                                this.addLight()
+								this.addLight()
                             }
                             // 浮标修改
                             if (this.bouyNodeFlage) {
@@ -1436,7 +1439,7 @@
                             const nowDate = new Date().getTime()
                             if (nowDate === null || nowDate - this.nowDate > 5000 ) {
                                 this.nowDate = nowDate
-                                this.addLight()
+								this.addLight()
                             }
                         }
                     }
