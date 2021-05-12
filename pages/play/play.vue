@@ -1328,7 +1328,7 @@
                 this.advertising.onClose((status) => {
                     this.showConditionAdvertisingFlag = false
 					//status.isEnded for test
-                    if (true) {
+                    if (status.isEnded) {
                         // 关闭条件浮标 弹窗
                         this.showConditionAdvertisingFlag = false
 						//广告正确关闭业务处理
