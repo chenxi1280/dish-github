@@ -148,6 +148,10 @@
 			playedHistoryArray: {
 				type: Array,
 				default: null
+			},
+			singlePageFlag: {
+				type: Boolean,
+				default: false
 			}
 		},
 		data() {
@@ -446,12 +450,22 @@
 				this.$parent.videoContext.pause()
 			},
 			goDiscover() {
-				uni.navigateBack({
-					delta: 1,
-					fail(err) {
-						console.log('跳转失败:', err)
-					}
-				})
+				//单页面模式的时候使用 switchTab
+				if(this.singlePageFlag){
+					console.log("jump for switchTab mode")
+					this.$parent.singlePageFlag = false
+					uni.switchTab({
+						url: '../dishover/dishover'
+					})
+				}else{
+					console.log("jump for navigateBack mode")
+					uni.navigateBack({
+						delta: 1,
+						fail(err) {
+							console.log('跳转失败:', err)
+						}
+					})
+				}
 			},
 			//返回上级
 			returnToPrevious() {

@@ -148,7 +148,7 @@
 				</view>
 				<verticalButtonMenu :storyLineFlag="storyLineFlag" :parentId="parentId" :artworkId="artworkId" :playedHistoryArray="playedHistoryArray"
 					:multipleResultLine="multipleResultLine" :bouyNodeFlage="bouyNodeFlage" :artworkTree="artworkTree"
-					:multipleResultReplayFlag="multipleResultReplayFlag" ref="verticalMenu"
+					:multipleResultReplayFlag="multipleResultReplayFlag" ref="verticalMenu" :singlePageFlag="singlePageFlag"
 					>
 				</verticalButtonMenu>
 			</view>
@@ -172,7 +172,7 @@
 				</view>
 				<horizontalButtonMenu :storyLineFlag="storyLineFlag" :parentId="parentId" :artworkId="artworkId" :playedHistoryArray="playedHistoryArray"
 					:multipleResultLine="multipleResultLine" :bouyNodeFlage="bouyNodeFlage" :artworkTree="artworkTree"
-					:multipleResultReplayFlag="multipleResultReplayFlag" ref="horizontalMenu"
+					:multipleResultReplayFlag="multipleResultReplayFlag" ref="horizontalMenu" :singlePageFlag="singlePageFlag"
 					>
 				</horizontalButtonMenu>
 			</view>
@@ -610,7 +610,9 @@
 				//自制进度条开关
 				myProgressFlag: true,
 				//自制进度条延时函数
-				myProgressDelayFunction: null				
+				myProgressDelayFunction: null,
+				//是否是单页面模式
+				singlePageFlag: false
 			}
 		},
 		onReady() {
@@ -813,6 +815,7 @@
 		methods: {
 			getToken() {
 				let _this = this
+				_this.singlePageFlag = true
 				let openid = uni.getStorageSync("openid")
 				if (openid) {
 					_this.updateUserInfo(openid)
