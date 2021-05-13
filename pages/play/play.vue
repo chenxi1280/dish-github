@@ -69,7 +69,7 @@
 			<view class="container" v-show="showCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px', 'z-index': '9999'}">
 				<canvas canvas-id="myCanvas" @touchstart="getTouchPosition" @touchend="canvasTouchendEvent"></canvas>
 			</view>
-			<view class="container" v-show="showBuoyCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px'}">
+			<view class="container" v-show="showBuoyCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px' ,'z-index': '999'}">
 				<!-- <canvas canvas-id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas> -->
 				<canvas type="2d" id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas>
 			</view>
@@ -1189,24 +1189,27 @@
 						eventId: 2
 					},
 					success: res => {
-						uni.showToast({
-							title: '恭喜成功获得光'
-						})
-						this.getLight()
-						if(!this.bouyNodeFlage) {
-							console.log("加光 自动选择",this.optionIndex)
-							console.log("this.isVideoEndFlag",this.isVideoEndFlag)
-							if (this.isVideoEndFlag) {
+						console.log("************addLight:",res.data.status)
+						if(res.data.status === 200){
+							uni.showToast({
+								title: '恭喜成功获得光'
+							})
+							this.getLight()
+							if(!this.bouyNodeFlage) {
 								console.log("加光 自动选择",this.optionIndex)
-								this.clickCommonOptionTodo(this.optionIndex)
+								console.log("this.isVideoEndFlag",this.isVideoEndFlag)
+								if (this.isVideoEndFlag) {
+									console.log("加光 自动选择",this.optionIndex)
+									this.clickCommonOptionTodo(this.optionIndex)
+								}
+								if(this.clickCommonOptionTodoActionFlag){
+									console.log("加光 自动选择",this.optionIndex)
+									this.clickCommonOptionTodo(this.optionIndex)
+									this.clickCommonOptionTodoActionFlag = false
+								}
+							}else{
+								this.bouyClickCommonOptionTodo()
 							}
-							if(this.clickCommonOptionTodoActionFlag){
-								console.log("加光 自动选择",this.optionIndex)
-								this.clickCommonOptionTodo(this.optionIndex)
-								this.clickCommonOptionTodoActionFlag = false
-							}
-						}else{
-							this.bouyClickCommonOptionTodo()
 						}
 
 					}
@@ -1434,7 +1437,7 @@
                             const nowDate = new Date().getTime()
                             if (nowDate === null || nowDate - this.nowDate > 5000 ) {
                                 this.nowDate = nowDate
-                                this.addLight()
+								this.addLight()
                             }
                             // 浮标修改
                             if (this.bouyNodeFlage) {
@@ -1456,7 +1459,7 @@
                             const nowDate = new Date().getTime()
                             if (nowDate === null || nowDate - this.nowDate > 5000 ) {
                                 this.nowDate = nowDate
-                                this.addLight()
+								this.addLight()
                             }
                         }
                     }
@@ -3997,8 +4000,6 @@
 				// console.log('nowBuoyRectList',nowBuoyRectList)
 				console.log('newY', newY, 'newX', newX)
 				// console.log('nowBuoyRectList',nowBuoyRectList)
-				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$nowBuoyRectList***********************************",
-					nowBuoyRectList)
 
 				nowBuoyRectList.forEach((v, i) => {
 					if (v != null) {
