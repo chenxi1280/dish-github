@@ -1037,16 +1037,19 @@
 				this.buoyTouchFlag = true
 				this.reCanvasNodeBuoyList()
 			},
-			videoError(e) {
-				if(this.parentId === 0){
-					uni.setStorageSync("relaunchApplets", true)
-					uni.switchTab({
-						url: '../dishover/dishover'
-					})
-				}
-				
-				console.log("********************我报错了*********: ", e)
-			},
+            videoError(e) {
+                if(this.parentId === 0){
+
+                    const artworkData = uni.getStorageSync("mainArtworkTree")
+                    this.videoUrl = ''
+
+                    this.initPlayData(artworkData, false);
+                    console.log("********************我报错了，正在重启*********: ", e)
+                }else{
+                    this.initPlayData(this.currentChildArtworkDetailTree, false);
+                    console.log("********************我作为子孙，报错了,正在重启*********: ", e)
+                }
+            },
 			//点击浮标选项弹窗关闭按钮事件
 			closeBuoyDialog() {
 				this.buoyDialogFlag = false
@@ -1607,7 +1610,9 @@
 					if (this.popupTotalNumber > 0) {
 						this.popupName = artworkTree.popupName
 					}
-				}
+				} else {
+                    this.currentChildArtworkDetailTree = artworkTree
+                }
 				this.detailId = artworkTree.pkDetailId
 				//获取用户的弹窗弹出数量
 				let popupWindowRecord = uni.getStorageSync('popupWindowRecord')
