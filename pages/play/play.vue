@@ -4055,7 +4055,7 @@
 					if (this.returnToPreviouHeightMin <= newY && this.returnToPreviouHeightMax >= newY) {
 						this.showBuoyCanvasFlag = false
 						console.log("返回上级")
-						this.returnToPrevious()
+						this.$refs.verticalMenu.returnToPrevious()
 						this.stopBuoyDraw()
 						return
 					}
