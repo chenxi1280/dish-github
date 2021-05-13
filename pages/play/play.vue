@@ -73,12 +73,13 @@
 				<!-- <canvas canvas-id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas> -->
 				<canvas type="2d" id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas>
 			</view>
+			<!--   @waiting="waitingVideo" @touchstart="videoTouchstart"-->
 			<!-- 播放主体  @click="showButton" @timeupdate="videoTimeupdate" @loadedmetadata="loadeddata"  :controls="controlsFlag" -->
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform} ">
 				<video v-if="videoShowFlag" :controls="false" :src="videoUrl" :show-mute-btn="false" :show-fullscreen-btn="false"
 				 :autoplay="autopalyFlag" id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="false" :loop="false"
-				 @ended="videoEnd(false)" @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart" @error="videoError"
-				 auto-pause-if-navigate @timeupdate="videoTimeupdate" @play="videoPlay" @waiting="waitingVideo" @loadedmetadata="loadeddata"
+				 @ended="videoEnd(false)" @pause="videoPause" @touchend="videoTouchend" @error="videoError"
+				 auto-pause-if-navigate @timeupdate="videoTimeupdate" @play="videoPlay" @loadedmetadata="loadeddata"
 				 :show-play-btn="false" @click="toggleProgress"></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
@@ -402,8 +403,8 @@
 				likabilityFlag: false,
 				//好感度数值容器
 				likabilityArray: [],
-				//入场loading的开关
-				videoloadFlag: true,
+				//入场loading的开关 for test
+				videoloadFlag: false,
 				//好感度延时函数
 				likabilityDelayFunction: null,
 				//故事线跳转到播放页的当前节点是否已播放标志
@@ -748,6 +749,8 @@
 			uni.setStorageSync('appearConditionMap', null)
 			console.log('离开play1！！！！')
 			globalBus.$off('bouyClickCommonOptionTodo')
+            //20210422xuezx销毁video
+            this.videoShowFlag = false
 			//20210422xuezx清除页面定时器
 			if (this.buoyRef != null) {
 				console.log('定时器存在并已清除')
@@ -1038,15 +1041,25 @@
 				this.reCanvasNodeBuoyList()
 			},
             videoError(e) {
+				this.videoErrorFlag = !0
+                this.videoShowFlag = false
+				this.videoUrl = ''
+				
                 if(this.parentId === 0){
-
                     const artworkData = uni.getStorageSync("mainArtworkTree")
-                    this.videoUrl = ''
 
-                    this.initPlayData(artworkData, false);
+                    setTimeout(()=>{
+                        this.videoShowFlag = true
+                        this.videoContext = uni.createVideoContext('myVideo', this)
+                        this.initPlayData(artworkData, false)
+                    }, 2000)
                     console.log("********************我报错了，正在重启*********: ", e)
                 }else{
-                    this.initPlayData(this.currentChildArtworkDetailTree, false);
+                    setTimeout(()=>{
+                        this.videoShowFlag = true
+                        this.videoContext = uni.createVideoContext('myVideo', this)
+                        this.initPlayData(this.currentChildArtworkDetailTree, false);
+                    }, 2000)
                     console.log("********************我作为子孙，报错了,正在重启*********: ", e)
                 }
             },
@@ -1199,7 +1212,14 @@
 				})
 			},
 			// 获取光
-			getLight() {
+            getLight(timeupdate) {
+                if(timeupdate){
+                    if(this.timeupdateGetLightFlag){
+                        return
+                    }else{
+                        this.timeupdateGetLightFlag = true
+                    }
+                }
 				uni.request({
 					url: baseURL + '/user/light/getUserLight',
 					method: 'POST',
@@ -1679,8 +1699,10 @@
 				//初始化视频及选项
 				const url = (artworkTree.videoUrl + '').split("://")
                 this.parentId = artworkTree.parentId
-
-                if(this.parentId === 0){
+				if(this.videoErrorFlag){
+					this.videoErrorFlag = false
+					this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				}else if(this.parentId === 0){
                     this.videoUrlTimeOut = setTimeout(() => {
                         this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
                     }, 1000)
@@ -3606,7 +3628,7 @@
 				}
 				let newTime = Math.floor(this.currentTime)
 				if (newTime == 1) {
-					this.getLight()
+                    this.getLight('timeupdate')
 				}
 				if (this.bouyNodeFlage) {
 					//速度校准
@@ -3692,10 +3714,11 @@
 				let second = (parseInt(date % 60) + '').length == 1 ? '0' + parseInt(date % 60) : parseInt(date % 60)
 				return hour + ":" + minute + ":" + second
 			},
-			videoTouchstart(e) {
-				this.tsx = e.changedTouches[0].clientX
-				this.tsy = e.changedTouches[0].clientY
-			},
+            //20200512xuezx 此方法无用
+            // videoTouchstart(e) {
+            // 	this.tsx = e.changedTouches[0].clientX
+            // 	this.tsy = e.changedTouches[0].clientY
+            // },
 			videoTouchend(e) {
 				this.myProgressFlag = !this.myProgressFlag
 			},
@@ -4199,7 +4222,8 @@
 				}, 16)
 			},
 			//视频进入 缓冲
-			waitingVideo() {
+            //20200512xuezx 不再监听此方法 视频进入 缓冲
+            waitingVideo() {
 				console.log("**********************等我一下，我在缓冲********************************")
 			},
 			// 浮标 加光回调
