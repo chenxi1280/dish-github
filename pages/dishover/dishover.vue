@@ -185,7 +185,7 @@
 				withShareTicket: true,
 				menus: ['shareAppMessage','shareTimeline']
 			})
-			this.addRandomDataHot()
+			this.addRandomDataHot(1)
 		},
 		onHide() {
 			this.isShowBanner = false
@@ -349,7 +349,7 @@
 				this['sortList' + this.currentsort]
 				this.judgesortData()
 			},
-			addRandomDataHot() {
+			addRandomDataHot(firstTime) {
 				if (this.current == 0) {
 					this.pageHot = this.pageHot + 1
 					// console.log(this.pageHot)
@@ -371,9 +371,10 @@
 							}
 							if (res.data.data.list.length != 0) {
 								//从后台获取banner 地址
-								console.log("bannerSrc: ",res.data.data.bannerAddress)
-								this.bannerSrc = res.data.data.bannerAddress
-								
+								if(firstTime === 1){
+                                    this.bannerSrc = res.data.data.bannerAddress
+								}
+
 								res.data.data.list.forEach(v => {
 									v.high = 287.1
 								if (v.userLogoUrl != null) {
@@ -385,7 +386,11 @@
 									if (v.logoPath.indexOf( '/common') == -1) {
 										v.logoPath = v.logoPath + '/common'
 									}
-								}									this.hotList.push(v)
+									this.hotList.push(v)
+									
+								}else{
+									console.log('空v', v)
+								}
 								})
 								if (res.data.data.loadStatus != null ) {
 									this.hotLoadStatus = 'nomore'

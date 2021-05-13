@@ -73,12 +73,13 @@
 				<!-- <canvas canvas-id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas> -->
 				<canvas type="2d" id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas>
 			</view>
+			<!--   @waiting="waitingVideo" @touchstart="videoTouchstart"-->
 			<!-- 播放主体  @click="showButton" @timeupdate="videoTimeupdate" @loadedmetadata="loadeddata"  :controls="controlsFlag" -->
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform} ">
 				<video v-if="videoShowFlag" :controls="false" :src="videoUrl" :show-mute-btn="false" :show-fullscreen-btn="false"
 				 :autoplay="autopalyFlag" id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="false" :loop="false"
-				 @ended="videoEnd(false)" @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart" @error="videoError"
-				 auto-pause-if-navigate @timeupdate="videoTimeupdate" @play="videoPlay" @waiting="waitingVideo" @loadedmetadata="loadeddata"
+				 @ended="videoEnd(false)" @pause="videoPause" @touchend="videoTouchend"  @error="videoError"
+				 auto-pause-if-navigate @timeupdate="videoTimeupdate" @play="videoPlay" @loadedmetadata="loadeddata"
 				 :show-play-btn="false" @click="toggleProgress"></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
@@ -752,6 +753,8 @@
 			uni.setStorageSync('appearConditionMap', null)
 			console.log('离开play1！！！！')
 			globalBus.$off('bouyClickCommonOptionTodo')
+			//20210422xuezx销毁video
+			this.videoShowFlag = false
 			//20210422xuezx清除页面定时器
 			if (this.buoyRef != null) {
 				console.log('定时器存在并已清除')
@@ -1043,13 +1046,23 @@
 			},
 			videoError(e) {
 				if(this.parentId === 0){
-					uni.setStorageSync("relaunchApplets", true)
-					uni.switchTab({
-						url: '../dishover/dishover'
-					})
-				}
+					// uni.setStorageSync("relaunchApplets", true)
+					// uni.switchTab({
+					// 	url: '../dishover/dishover'
+					// })
+
+                    const artworkData = uni.getStorageSync("mainArtworkTree")
+					this.videoUrl = ''
+
+                    this.initPlayData(artworkData, false);
+                    console.log("********************我报错了，正在重启*********: ", e)
+				}else{
+                    this.initPlayData(this.currentChildArtworkDetailTree, false);
+                    console.log("********************我作为子孙，报错了,正在重启*********: ", e)
+
+                }
 				
-				console.log("********************我报错了*********: ", e)
+
 			},
 			//点击浮标选项弹窗关闭按钮事件
 			closeBuoyDialog() {
@@ -1203,7 +1216,14 @@
 				})
 			},
 			// 获取光
-			getLight() {
+			getLight(timeupdate) {
+				if(timeupdate){
+					if(this.timeupdateGetLightFlag){
+						return
+					}else{
+						this.timeupdateGetLightFlag = true
+					}
+				}
 				uni.request({
 					url: baseURL + '/user/light/getUserLight',
 					method: 'POST',
@@ -1614,6 +1634,8 @@
 					if (this.popupTotalNumber > 0) {
 						this.popupName = artworkTree.popupName
 					}
+				} else {
+				    this.currentChildArtworkDetailTree = artworkTree
 				}
 				this.detailId = artworkTree.pkDetailId
 				//获取用户的弹窗弹出数量
@@ -3634,7 +3656,7 @@
 				}
 				let newTime = Math.floor(this.currentTime)
 				if (newTime == 1) {
-					this.getLight()
+					this.getLight('timeupdate')
 				}
 				if (this.bouyNodeFlage) {
 					//速度校准
@@ -3720,10 +3742,11 @@
 				let second = (parseInt(date % 60) + '').length == 1 ? '0' + parseInt(date % 60) : parseInt(date % 60)
 				return hour + ":" + minute + ":" + second
 			},
-			videoTouchstart(e) {
-				this.tsx = e.changedTouches[0].clientX
-				this.tsy = e.changedTouches[0].clientY
-			},
+			//20200512xuezx 此方法无用
+			// videoTouchstart(e) {
+			// 	this.tsx = e.changedTouches[0].clientX
+			// 	this.tsy = e.changedTouches[0].clientY
+			// },
 			videoTouchend(e) {
 				this.myProgressFlag = !this.myProgressFlag
 			},
@@ -4224,7 +4247,7 @@
 					this.buoyDraw()
 				}, 16)
 			},
-			//视频进入 缓冲
+			//20200512xuezx 不再监听此方法 视频进入 缓冲
 			waitingVideo() {
 				console.log("**********************等我一下，我在缓冲********************************")
 			},
