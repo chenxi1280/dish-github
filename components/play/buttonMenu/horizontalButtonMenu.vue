@@ -31,7 +31,7 @@
 			</view>
 			<view class="share">分享</view>
 		</view>
-		<button open-type="share" class="shareButton"></button>
+		<button open-type="share" class="shareButton" :style="isPosition === 2 ? 'z-index: 999':''"></button>
 		<!-- 故事线内容呈现在蒙板之上 -->
 		<view class="storyLineContentMask16" v-if="storyLineContentFlag" style="z-index: 999;">
 			<view class="storyLineContentBox">
@@ -152,6 +152,10 @@
 			singlePageFlag: {
 				type: Boolean,
 				default: false
+			},
+			isPosition: {
+				type: Number,
+				default: 0
 			}
 		},
 		data() {

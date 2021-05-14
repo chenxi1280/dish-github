@@ -24,7 +24,7 @@
 			</view>
 			<view class="returnToPrevious">返回上级</view>
 		</view>
-		<view class="shareBox" @click="share">
+		<view class="shareBox" @click="share" >
 			<view class="shareIconBox">
 				<icon class="shareIcon"></icon>
 			</view>
@@ -152,6 +152,10 @@
 			singlePageFlag: {
 				type: Boolean,
 				default: false
+			},
+			isPosition: {
+				type: Number,
+				default: 0
 			}
 		},
 		data() {

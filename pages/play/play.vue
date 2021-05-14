@@ -78,7 +78,7 @@
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform} ">
 				<video v-if="videoShowFlag" :controls="false" :src="videoUrl" :show-mute-btn="false" :show-fullscreen-btn="false"
 				 :autoplay="autopalyFlag" id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="false" :loop="false"
-				 @ended="videoEnd(false)" @pause="videoPause" @touchend="videoTouchend"  @error="videoError"
+				 @ended="videoEnd(false)" @pause="videoPause" @touchend="videoTouchend" @error="videoError"
 				 auto-pause-if-navigate @timeupdate="videoTimeupdate" @play="videoPlay" @loadedmetadata="loadeddata"
 				 :show-play-btn="false" @click="toggleProgress"></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
@@ -150,7 +150,7 @@
 				<verticalButtonMenu :storyLineFlag="storyLineFlag" :parentId="parentId" :artworkId="artworkId" :playedHistoryArray="playedHistoryArray"
 					:multipleResultLine="multipleResultLine" :bouyNodeFlage="bouyNodeFlage" :artworkTree="artworkTree"
 					:multipleResultReplayFlag="multipleResultReplayFlag" ref="verticalMenu" :singlePageFlag="singlePageFlag"
-					>
+					:isPosition="isPosition">
 				</verticalButtonMenu>
 			</view>
 			<!-- 横屏 -->
@@ -174,7 +174,7 @@
 				<horizontalButtonMenu :storyLineFlag="storyLineFlag" :parentId="parentId" :artworkId="artworkId" :playedHistoryArray="playedHistoryArray"
 					:multipleResultLine="multipleResultLine" :bouyNodeFlage="bouyNodeFlage" :artworkTree="artworkTree"
 					:multipleResultReplayFlag="multipleResultReplayFlag" ref="horizontalMenu" :singlePageFlag="singlePageFlag"
-					>
+					:isPosition="isPosition">
 				</horizontalButtonMenu>
 			</view>
 		</view>
@@ -397,7 +397,7 @@
 				likabilityFlag: false,
 				//好感度数值容器
 				likabilityArray: [],
-				//入场loading的开关
+				//入场loading的开关 for test
 				videoloadFlag: true,
 				//好感度延时函数
 				likabilityDelayFunction: null,
@@ -556,6 +556,12 @@
 				returnToPreviouWidthMax: 0,
 				returnToPreviouHeightMin: 0,
 				returnToPreviouHeightMax: 0,
+				//分享的位置
+				wxShareWidthMin: 0,
+				wxShareWidthMax: 0,
+				wxShareHeightMin: 0,
+				wxShareHeightMax: 0,
+				
 				// 浮标广告弹窗
 				showConditionAdvertisingFlag: false,
 				//是否展示返回上一级提示弹窗
@@ -710,7 +716,7 @@
 				//作品id 初始化之后需要取拿作品信息存起来待用
 				this.getPlayArtworkInfo(this.artworkId)
 			}
-			this.getNextAd()
+			// this.getNextAd()
 		},
 		onHide() {
 			// this.videoShowFlag = false
@@ -753,8 +759,8 @@
 			uni.setStorageSync('appearConditionMap', null)
 			console.log('离开play1！！！！')
 			globalBus.$off('bouyClickCommonOptionTodo')
-			//20210422xuezx销毁video
-			this.videoShowFlag = false
+            //20210422xuezx销毁video
+            this.videoShowFlag = false
 			//20210422xuezx清除页面定时器
 			if (this.buoyRef != null) {
 				console.log('定时器存在并已清除')
@@ -1044,26 +1050,33 @@
 				this.buoyTouchFlag = true
 				this.reCanvasNodeBuoyList()
 			},
-			videoError(e) {
-				if(this.parentId === 0){
-					// uni.setStorageSync("relaunchApplets", true)
-					// uni.switchTab({
-					// 	url: '../dishover/dishover'
-					// })
+            videoError(e) {
+				// this.videoErrorFlag = !0
+                // this.videoShowFlag = false
+				// this.videoUrl = ''
+                uni.setStorageSync("relaunchApplets", true)
+                uni.switchTab({
+                    url: '../dishover/dishover'
+                })
 
-                    const artworkData = uni.getStorageSync("mainArtworkTree")
-					this.videoUrl = ''
-
-                    this.initPlayData(artworkData, false);
-                    console.log("********************我报错了，正在重启*********: ", e)
-				}else{
-                    this.initPlayData(this.currentChildArtworkDetailTree, false);
-                    console.log("********************我作为子孙，报错了,正在重启*********: ", e)
-
-                }
-				
-
-			},
+                // if(this.parentId === 0){
+                //     const artworkData = uni.getStorageSync("mainArtworkTree")
+                //
+                //     setTimeout(()=>{
+                //         this.videoShowFlag = true
+                //         this.videoContext = uni.createVideoContext('myVideo', this)
+                //         this.initPlayData(artworkData, false)
+                //     }, 2000)
+                //     console.log("********************我报错了，正在重启*********: ", e)
+                // }else{
+                //     setTimeout(()=>{
+                //         this.videoShowFlag = true
+                //         this.videoContext = uni.createVideoContext('myVideo', this)
+                //         this.initPlayData(this.currentChildArtworkDetailTree, false);
+                //     }, 2000)
+                //     console.log("********************我作为子孙，报错了,正在重启*********: ", e)
+                // }
+            },
 			//点击浮标选项弹窗关闭按钮事件
 			closeBuoyDialog() {
 				this.buoyDialogFlag = false
@@ -1216,14 +1229,14 @@
 				})
 			},
 			// 获取光
-			getLight(timeupdate) {
-				if(timeupdate){
-					if(this.timeupdateGetLightFlag){
-						return
-					}else{
-						this.timeupdateGetLightFlag = true
-					}
-				}
+            getLight(timeupdate) {
+                if(timeupdate){
+                    if(this.timeupdateGetLightFlag){
+                        return
+                    }else{
+                        this.timeupdateGetLightFlag = true
+                    }
+                }
 				uni.request({
 					url: baseURL + '/user/light/getUserLight',
 					method: 'POST',
@@ -1635,8 +1648,8 @@
 						this.popupName = artworkTree.popupName
 					}
 				} else {
-				    this.currentChildArtworkDetailTree = artworkTree
-				}
+                    this.currentChildArtworkDetailTree = artworkTree
+                }
 				this.detailId = artworkTree.pkDetailId
 				//获取用户的弹窗弹出数量
 				let popupWindowRecord = uni.getStorageSync('popupWindowRecord')
@@ -1646,7 +1659,7 @@
 				this.conditionState = []
 				//初始化是否显示弹窗
 				this.popupState = uni.getStorageSync('popupState')
-				console.log('this.popupState', this.popupState)
+				console.log('进入initPlayData， this.popupState', this.popupState)
 				if (this.popupState == 1) {
 					this.popupSettings = uni.getStorageSync('popupSettings')
 					this.handlePopupSettings()
@@ -1703,14 +1716,6 @@
 				//初始化视频及选项
 				const url = (artworkTree.videoUrl + '').split("://")
                 this.parentId = artworkTree.parentId
-
-                if(this.parentId === 0){
-                    this.videoUrlTimeOut = setTimeout(() => {
-                        this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
-                    }, 1000)
-				} else {
-                    this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
-                }
 				this.imageSrc = artworkTree.nodeLastImgUrl
 				console.log("this.imageSrc: ",this.imageSrc)
 				//如果是根节点初始化存储节点分值的容器
@@ -1793,6 +1798,16 @@
 					this.linkNodeId = null
 				}
 				
+				if(this.videoErrorFlag){
+					this.videoErrorFlag = false
+					this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				}else if(this.parentId === 0){
+				    this.videoUrlTimeOut = setTimeout(() => {
+				        this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				    }, 1000)
+				} else {
+				    this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				}
 			},
 			//视频 播放后弹窗
 			popupWindowByPopupPositonEqualsOne() {
@@ -3474,8 +3489,7 @@
 					this.videoContext.pause()
 					this.videoContext.play()
 				}
-				console.log('this.videoShowFlag: ', this.videoShowFlag)
-				console.log('this.isPlayedFlag: ', this.isPlayedFlag)
+				console.log('开始加载loadeddata， isPlayedFlag和videoShowFlag: ', this.isPlayedFlag, this.videoShowFlag)
 				//清除百分比延时函数
 				clearTimeout(this.optionPercentageFunction)
 				clearTimeout(this.myProgressDelayFunction)
@@ -3656,7 +3670,7 @@
 				}
 				let newTime = Math.floor(this.currentTime)
 				if (newTime == 1) {
-					this.getLight('timeupdate')
+                    this.getLight('timeupdate')
 				}
 				if (this.bouyNodeFlage) {
 					//速度校准
@@ -3742,11 +3756,11 @@
 				let second = (parseInt(date % 60) + '').length == 1 ? '0' + parseInt(date % 60) : parseInt(date % 60)
 				return hour + ":" + minute + ":" + second
 			},
-			//20200512xuezx 此方法无用
-			// videoTouchstart(e) {
-			// 	this.tsx = e.changedTouches[0].clientX
-			// 	this.tsy = e.changedTouches[0].clientY
-			// },
+            //20200512xuezx 此方法无用
+            // videoTouchstart(e) {
+            // 	this.tsx = e.changedTouches[0].clientX
+            // 	this.tsy = e.changedTouches[0].clientY
+            // },
 			videoTouchend(e) {
 				this.myProgressFlag = !this.myProgressFlag
 			},
@@ -4078,11 +4092,24 @@
 					if (this.returnToPreviouHeightMin <= newY && this.returnToPreviouHeightMax >= newY) {
 						this.showBuoyCanvasFlag = false
 						console.log("返回上级")
-						this.$refs.verticalMenu.returnToPrevious()
+						if(this.playMode){
+							this.$refs.horizontalMenu.returnToPrevious()
+						}else{
+							this.$refs.verticalMenu.returnToPrevious()
+						}
 						this.stopBuoyDraw()
 						return
 					}
 				}
+				/* if (this.wxShareWidthMin <= newX && this.wxShareWidthMax >= newX) {
+					if (this.wxShareHeightMin <= newY && this.wxShareHeightMax >= newY) {
+						this.showBuoyCanvasFlag = false
+						console.log("分享")
+						this.$refs.verticalMenu.returnToPrevious()
+						this.stopBuoyDraw()
+						return
+					}
+				} */
 				if (this.advertisingDivWidthMin <= newX && this.advertisingDivWidthMax >= newX) {
 					if (this.advertisingDivHeightMin <= newY && this.advertisingDivHeightMax >= newY) {
 						console.log("广告")
@@ -4147,6 +4174,12 @@
 					this.returnToPreviouWidthMax = this.storyLineBoxWidthMax
 					this.returnToPreviouHeightMin = (wh * 0.8) - ch - this.getPxbyRpx(60)
 					this.returnToPreviouHeightMax = this.returnToPreviouHeightMin + this.getPxbyRpx(100)
+					
+					//分享 位置
+					// this.wxShareWidthMin = this.storyLineBoxWidthMin
+					// this.wxShareWidthMax = this.storyLineBoxWidthMax
+					// this.wxShareHeightMin = (wh * 0.9) - ch - this.getPxbyRpx(60)
+					// this.wxShareHeightMax = this.wxShareHeightMin + this.getPxbyRpx(100)
 
 					// 广告 位置
 					this.advertisingDivWidthMin = ww - this.getPxbyRpx(80) - cw
@@ -4182,6 +4215,12 @@
 					this.returnToPreviouWidthMax = this.storyLineBoxWidthMax
 					this.returnToPreviouHeightMin = (wh * 0.61) - ch
 					this.returnToPreviouHeightMax = this.returnToPreviouHeightMin + this.getPxbyRpx(80)
+					
+					//分享 位置
+					// this.wxShareWidthMin = this.storyLineBoxWidthMin
+					// this.wxShareWidthMax = this.storyLineBoxWidthMax
+					// this.wxShareHeightMin = (wh * 0.69) - ch
+					// this.wxShareHeightMax = this.wxShareHeightMin + this.getPxbyRpx(80)
 
 					// 广告 位置
 					this.advertisingDivWidthMin = this.getPxbyRpx(60) - cw
@@ -4248,7 +4287,8 @@
 				}, 16)
 			},
 			//20200512xuezx 不再监听此方法 视频进入 缓冲
-			waitingVideo() {
+            //20200512xuezx 不再监听此方法 视频进入 缓冲
+            waitingVideo() {
 				console.log("**********************等我一下，我在缓冲********************************")
 			},
 			// 浮标 加光回调
