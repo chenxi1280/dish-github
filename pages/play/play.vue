@@ -149,7 +149,7 @@
 				<verticalButtonMenu :storyLineFlag="storyLineFlag" :parentId="parentId" :artworkId="artworkId" :playedHistoryArray="playedHistoryArray"
 					:multipleResultLine="multipleResultLine" :bouyNodeFlage="bouyNodeFlage" :artworkTree="artworkTree"
 					:multipleResultReplayFlag="multipleResultReplayFlag" ref="verticalMenu" :singlePageFlag="singlePageFlag"
-					>
+					:isPosition="isPosition">
 				</verticalButtonMenu>
 			</view>
 			<!-- 横屏 -->
@@ -173,7 +173,7 @@
 				<horizontalButtonMenu :storyLineFlag="storyLineFlag" :parentId="parentId" :artworkId="artworkId" :playedHistoryArray="playedHistoryArray"
 					:multipleResultLine="multipleResultLine" :bouyNodeFlage="bouyNodeFlage" :artworkTree="artworkTree"
 					:multipleResultReplayFlag="multipleResultReplayFlag" ref="horizontalMenu" :singlePageFlag="singlePageFlag"
-					>
+					:isPosition="isPosition">
 				</horizontalButtonMenu>
 			</view>
 		</view>
@@ -4035,7 +4035,11 @@
 					if (this.returnToPreviouHeightMin <= newY && this.returnToPreviouHeightMax >= newY) {
 						this.showBuoyCanvasFlag = false
 						console.log("返回上级")
-						this.$refs.verticalMenu.returnToPrevious()
+						if(this.playMode){
+							this.$refs.horizontalMenu.returnToPrevious()
+						}else{
+							this.$refs.verticalMenu.returnToPrevious()
+						}
 						this.stopBuoyDraw()
 						return
 					}
