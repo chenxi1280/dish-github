@@ -561,6 +561,12 @@
 				returnToPreviouWidthMax: 0,
 				returnToPreviouHeightMin: 0,
 				returnToPreviouHeightMax: 0,
+				//分享的位置
+				wxShareWidthMin: 0,
+				wxShareWidthMax: 0,
+				wxShareHeightMin: 0,
+				wxShareHeightMax: 0,
+				
 				// 浮标广告弹窗
 				showConditionAdvertisingFlag: false,
 				//是否展示返回上一级提示弹窗
@@ -4034,6 +4040,15 @@
 						return
 					}
 				}
+				/* if (this.wxShareWidthMin <= newX && this.wxShareWidthMax >= newX) {
+					if (this.wxShareHeightMin <= newY && this.wxShareHeightMax >= newY) {
+						this.showBuoyCanvasFlag = false
+						console.log("分享")
+						this.$refs.verticalMenu.returnToPrevious()
+						this.stopBuoyDraw()
+						return
+					}
+				} */
 				if (this.advertisingDivWidthMin <= newX && this.advertisingDivWidthMax >= newX) {
 					if (this.advertisingDivHeightMin <= newY && this.advertisingDivHeightMax >= newY) {
 						console.log("广告")
@@ -4098,6 +4113,12 @@
 					this.returnToPreviouWidthMax = this.storyLineBoxWidthMax
 					this.returnToPreviouHeightMin = (wh * 0.8) - ch - this.getPxbyRpx(60)
 					this.returnToPreviouHeightMax = this.returnToPreviouHeightMin + this.getPxbyRpx(100)
+					
+					//分享 位置
+					// this.wxShareWidthMin = this.storyLineBoxWidthMin
+					// this.wxShareWidthMax = this.storyLineBoxWidthMax
+					// this.wxShareHeightMin = (wh * 0.9) - ch - this.getPxbyRpx(60)
+					// this.wxShareHeightMax = this.wxShareHeightMin + this.getPxbyRpx(100)
 
 					// 广告 位置
 					this.advertisingDivWidthMin = ww - this.getPxbyRpx(80) - cw
@@ -4133,6 +4154,12 @@
 					this.returnToPreviouWidthMax = this.storyLineBoxWidthMax
 					this.returnToPreviouHeightMin = (wh * 0.61) - ch
 					this.returnToPreviouHeightMax = this.returnToPreviouHeightMin + this.getPxbyRpx(80)
+					
+					//分享 位置
+					// this.wxShareWidthMin = this.storyLineBoxWidthMin
+					// this.wxShareWidthMax = this.storyLineBoxWidthMax
+					// this.wxShareHeightMin = (wh * 0.69) - ch
+					// this.wxShareHeightMax = this.wxShareHeightMin + this.getPxbyRpx(80)
 
 					// 广告 位置
 					this.advertisingDivWidthMin = this.getPxbyRpx(60) - cw
