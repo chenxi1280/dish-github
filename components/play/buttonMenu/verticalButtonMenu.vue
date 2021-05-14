@@ -24,13 +24,13 @@
 			</view>
 			<view class="returnToPrevious">返回上级</view>
 		</view>
-		<view class="shareBox" @click="share">
+		<view class="shareBox" @click="share" >
 			<view class="shareIconBox">
 				<icon class="shareIcon"></icon>
 			</view>
 			<view class="share">分享</view>
 		</view>
-		<button open-type="share" class="shareButton" id="shareButton"></button>
+		<button open-type="share" class="shareButton"></button>
 		
 		<!-- 故事线内容呈现在蒙板之上 -->
 		<view class="storyLineContentMask16" v-if="storyLineContentFlag" style="z-index: 999;">
@@ -152,6 +152,10 @@
 			singlePageFlag: {
 				type: Boolean,
 				default: false
+			},
+			isPosition: {
+				type: Number,
+				default: 0
 			}
 		},
 		data() {
@@ -196,9 +200,6 @@
 				withShareTicket: true,
 				menus: ['shareAppMessage', 'shareTimeline']
 			})
-			setTimeout(()=>{
-                shareButton
-			},5000)
 		},
 		onShareAppMessage(res) {
 			let artworkInfo = uni.getStorageSync('artworkInfo')
