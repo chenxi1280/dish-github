@@ -404,7 +404,7 @@
 				//好感度数值容器
 				likabilityArray: [],
 				//入场loading的开关 for test
-				videoloadFlag: false,
+				videoloadFlag: true,
 				//好感度延时函数
 				likabilityDelayFunction: null,
 				//故事线跳转到播放页的当前节点是否已播放标志
@@ -706,7 +706,7 @@
 				//作品id 初始化之后需要取拿作品信息存起来待用
 				this.getPlayArtworkInfo(this.artworkId)
 			}
-			this.getNextAd()
+			// this.getNextAd()
 		},
 		onHide() {
 			// this.videoShowFlag = false
@@ -1041,27 +1041,31 @@
 				this.reCanvasNodeBuoyList()
 			},
             videoError(e) {
-				this.videoErrorFlag = !0
-                this.videoShowFlag = false
-				this.videoUrl = ''
-				
-                if(this.parentId === 0){
-                    const artworkData = uni.getStorageSync("mainArtworkTree")
+				// this.videoErrorFlag = !0
+                // this.videoShowFlag = false
+				// this.videoUrl = ''
+                uni.setStorageSync("relaunchApplets", true)
+                uni.switchTab({
+                    url: '../dishover/dishover'
+                })
 
-                    setTimeout(()=>{
-                        this.videoShowFlag = true
-                        this.videoContext = uni.createVideoContext('myVideo', this)
-                        this.initPlayData(artworkData, false)
-                    }, 2000)
-                    console.log("********************我报错了，正在重启*********: ", e)
-                }else{
-                    setTimeout(()=>{
-                        this.videoShowFlag = true
-                        this.videoContext = uni.createVideoContext('myVideo', this)
-                        this.initPlayData(this.currentChildArtworkDetailTree, false);
-                    }, 2000)
-                    console.log("********************我作为子孙，报错了,正在重启*********: ", e)
-                }
+                // if(this.parentId === 0){
+                //     const artworkData = uni.getStorageSync("mainArtworkTree")
+                //
+                //     setTimeout(()=>{
+                //         this.videoShowFlag = true
+                //         this.videoContext = uni.createVideoContext('myVideo', this)
+                //         this.initPlayData(artworkData, false)
+                //     }, 2000)
+                //     console.log("********************我报错了，正在重启*********: ", e)
+                // }else{
+                //     setTimeout(()=>{
+                //         this.videoShowFlag = true
+                //         this.videoContext = uni.createVideoContext('myVideo', this)
+                //         this.initPlayData(this.currentChildArtworkDetailTree, false);
+                //     }, 2000)
+                //     console.log("********************我作为子孙，报错了,正在重启*********: ", e)
+                // }
             },
 			//点击浮标选项弹窗关闭按钮事件
 			closeBuoyDialog() {
@@ -1642,7 +1646,7 @@
 				this.conditionState = []
 				//初始化是否显示弹窗
 				this.popupState = uni.getStorageSync('popupState')
-				console.log('this.popupState', this.popupState)
+				console.log('进入initPlayData， this.popupState', this.popupState)
 				if (this.popupState == 1) {
 					this.popupSettings = uni.getStorageSync('popupSettings')
 					this.handlePopupSettings()
@@ -1699,16 +1703,6 @@
 				//初始化视频及选项
 				const url = (artworkTree.videoUrl + '').split("://")
                 this.parentId = artworkTree.parentId
-				if(this.videoErrorFlag){
-					this.videoErrorFlag = false
-					this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
-				}else if(this.parentId === 0){
-                    this.videoUrlTimeOut = setTimeout(() => {
-                        this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
-                    }, 1000)
-				} else {
-                    this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
-                }
 				this.imageSrc = artworkTree.nodeLastImgUrl
 				console.log("this.imageSrc: ",this.imageSrc)
 				//如果是根节点初始化存储节点分值的容器
@@ -1791,6 +1785,16 @@
 					this.linkNodeId = null
 				}
 				
+				if(this.videoErrorFlag){
+					this.videoErrorFlag = false
+					this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				}else if(this.parentId === 0){
+				    this.videoUrlTimeOut = setTimeout(() => {
+				        this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				    }, 1000)
+				} else {
+				    this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				}
 			},
 			//视频 播放后弹窗
 			popupWindowByPopupPositonEqualsOne() {
@@ -3457,8 +3461,7 @@
 					this.videoContext.pause()
 					this.videoContext.play()
 				}
-				console.log('this.videoShowFlag: ', this.videoShowFlag)
-				console.log('this.isPlayedFlag: ', this.isPlayedFlag)
+				console.log('开始加载loadeddata， isPlayedFlag和videoShowFlag: ', this.isPlayedFlag, this.videoShowFlag)
 				//清除百分比延时函数
 				clearTimeout(this.optionPercentageFunction)
 				clearTimeout(this.myProgressDelayFunction)

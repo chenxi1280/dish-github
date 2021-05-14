@@ -119,7 +119,7 @@
 				}],
 				currentsort: 0,
 				queryType: "测试类",
-				limit: 10,
+				limit: 100,
 				loadStatus: "loading",
 				// 底部状态
 				hotLoadStatus: 'loading',
@@ -152,6 +152,12 @@
 			}
 		},
 		onShow() {
+			if(!this.counts){
+				this.counts = 1
+			}else {
+				this.counts++
+			}
+			console.log('我被执行了两次？？？this.counts',this.counts)
 			// banner显示与消失
 			this.isShowBanner = true
 			this.timeout = setTimeout(() => {
@@ -159,7 +165,6 @@
 				clearTimeout(this.timeout)
 			}, 5000)
 			this.getLight()
-			console.log("*****************************************relaunchApplets",uni.getStorageSync("relaunchApplets"))
 			if(uni.getStorageSync("relaunchApplets") == true){
 				console.log("*****************************************重播")
 				uni.reLaunch({
@@ -228,6 +233,7 @@
 			uni.stopPullDownRefresh();
 		},
 		onReady () {
+		    console.log('看看会不会重复进入')
 			this.isRequestAes()
 			this.isGetLight()
 			if (uni.getStorageSync('token')) {
