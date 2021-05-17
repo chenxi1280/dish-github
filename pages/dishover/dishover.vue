@@ -25,7 +25,7 @@
 		
 		<!-- <u-subsection :list="items" :current="0" @change="sectionChange"></u-subsection> -->
 		<view class="content" :style="{marginTop: `${isShowBanner ? '310rpx' : '0'}`}">
-			<waterfall :flowList="hotList" :status="hotloadStatus"></waterfall>
+			<waterfall :list="hotList" :status="hotLoadStatus"></waterfall>
 			<u-loadmore :bg-color="'#f2f2f2'" :status="hotLoadStatus"  :icon="true" :icon-type="'circle'" :load-text="loadText" />
 <!-- 			<view v-if="current === 0">
 				<waterfall :flowList="hotList" :status="hotloadStatus"></waterfall>
@@ -85,7 +85,7 @@
 		baseURL,versionId
 	} from '../login/config/config.js'
 	import search from '../search/search'
-	import waterfall from './waterfall_view/waterfall.vue'
+	import waterfall from './waterfall_view/waterfalls.vue'
 	import Advertising from '../../components/Advertising/Advertising.vue'
 	import {globalBus} from '../../common/js/util.js'
 	export default {
@@ -119,7 +119,7 @@
 				}],
 				currentsort: 0,
 				queryType: "测试类",
-				limit: 100,
+				limit: 8,
 				loadStatus: "loading",
 				// 底部状态
 				hotLoadStatus: 'loading',
@@ -201,7 +201,7 @@
 		onShareAppMessage (res) {
 		    return {
 		      title: '灵巫互动',
-			  imageUrl: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605600100857%E5%9C%86%E5%BD%A2%E7%94%A8JPG.jpg',
+			    imageUrl: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605600100857%E5%9C%86%E5%BD%A2%E7%94%A8JPG.jpg',
 		      path: 'pages/dishover/dishover'
 		    }
 		},
@@ -358,7 +358,7 @@
 			addRandomDataHot(firstTime) {
 				if (this.current == 0) {
 					this.pageHot = this.pageHot + 1
-					// console.log(this.pageHot)
+					console.log(this.pageHot)
 					uni.request({
 						url:  baseURL + '/Ecmartwork/getFindArtWorks',
 						// url: 'http://localhost:8008/Ecmartwork/getFindArtWorks',
@@ -378,7 +378,7 @@
 							if (res.data.data.list.length != 0) {
 								//从后台获取banner 地址
 								if(firstTime === 1){
-                                    this.bannerSrc = res.data.data.bannerAddress
+                  this.bannerSrc = res.data.data.bannerAddress
 								}
 
 								res.data.data.list.forEach(v => {
@@ -393,7 +393,6 @@
 										v.logoPath = v.logoPath + '/common'
 									}
 									this.hotList.push(v)
-									
 								}else{
 									console.log('空v', v)
 								}
