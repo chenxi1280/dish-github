@@ -55,7 +55,6 @@
 							</view>
 						</view>
 					</view>
-					
 				</view>
 			</block>
 		</view>
@@ -76,7 +75,7 @@
 				let nl = n.length;
 				console.log('=====watch  list=====', n, o,ol,nl,this.leftHeight , this.rightHeight );
 				if (nl > ol) {
-					this.rightLeftPush(nl,ol)
+		
 					
 					if (this.list.length == 1 ) {
 						console.log(that.list[0],144)
@@ -85,13 +84,11 @@
 						return
 					}
 					
-					// if (this.leftHeight > this.rightHeight) {
-					// 	that.rightList.push(that.list[ol]);
-					// 	// that.rightLeftPush()
-					// } else {
-					// 	that.leftList.push(that.list[ol]);
-					// 	// that.leftRightPush()
-					// }
+					if (this.leftHeight >= this.rightHeight) {
+							this.rightLeftPush(nl,ol)
+					} else {
+						this.leftRightPush(nl,ol)
+					}
 					
 					
 					
