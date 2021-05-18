@@ -3,40 +3,59 @@
 		<view class="left">
 			<block v-for="(item, index) in leftList" :key="index">
 				<view class="waterfall-item" @click="goPlayPage(item.pkArtworkId,item.playMode)">
-					<image :src="item.logoPath" mode="widthFix" lazy-load @load="onImageLoad(item,$event)"></image>
-					<view class="mask_box">
-						<view class="production_userinfo">
-							<img :src="item.userLogoUrl">
-							<text>{{item.userName}}</text>
-						</view>
-						<view class="production_title">
-							<text>{{item.artworkName}}</text>
-						</view>
-						<view class="production_hot">
-							<img src="../../../static/icon/heat_degree.png">
-							<text>{{item.hotCount}}</text>
+					
+					<view v-show="item.code  == 'ad'" >
+						<ad-custom unit-id="adunit-59f062ee3b27d685" @onload="adLoad" @onerror="adError" @bindload="adLoad" @binderror="adError" ></ad-custom>
+					</view>
+					
+					<view v-if ="item.code  != 'ad'">
+						<image :src="item.logoPath" mode="widthFix" lazy-load ></image>
+							<view class="mask_box">
+								<view class="production_userinfo">
+									<img :src="item.userLogoUrl">
+									<text>{{item.userName}}</text>
+								</view>
+								<view class="production_title">
+									<text>{{item.artworkName}}</text>
+								</view>
+								<view class="production_hot">
+									<img src="../../../static/icon/heat_degree.png">
+									<text>{{item.hotCount}}</text>
+								</view>
+							</view>
 						</view>
 					</view>
-				</view>
 			</block>
 		</view>
 		<view :class="{'right': isRightStyle ,'rightOne': !isRightStyle}">
 			<block v-for="(item, index) in rightList" :key="index">
+				
+				
+				
 				<view class="waterfall-item" @click="goPlayPage(item.pkArtworkId,item.playMode)">
-					<image :src="item.logoPath" mode="widthFix" lazy-load @load="onImageLoad(item,$event)" v-if="isRightStyle"></image>
-					<view class="mask_box">
-						<view class="production_userinfo" v-if="isRightStyle">
-							<img :src="item.userLogoUrl">
-							<text>{{item.userName}}</text>
-						</view>
-						<view class="production_title" v-if="isRightStyle">
-							<text>{{item.artworkName}}</text>
-						</view>
-						<view class="production_hot" v-if="isRightStyle">
-							<img src="../../../static/icon/heat_degree.png">
-							<text>{{item.hotCount}}</text>
+					
+					
+					<view v-show="item.code  == 'ad'" >
+						<ad-custom unit-id="adunit-59f062ee3b27d685" @onload="adLoad" @onerror="adError" @bindload="adLoad" @binderror="adError" ></ad-custom>
+					</view>
+					
+					<view v-if ="item.code  != 'ad'">
+						<image :src="item.logoPath" mode="widthFix" lazy-load  @load="onImageLoad" v-if="isRightStyle" ></image>
+						<view class="mask_box" >
+							<view class="production_userinfo" v-if="isRightStyle">
+								<img :src="item.userLogoUrl">
+								<text>{{item.userName}}</text>
+							</view>
+							<view class="production_title" v-if="isRightStyle">
+								<text>{{item.artworkName}}</text>
+							</view>
+							<view class="production_hot" v-if="isRightStyle">
+								<img src="../../../static/icon/heat_degree.png">
+								<text>{{item.hotCount}}</text>
+							</view>
 						</view>
 					</view>
+					
 				</view>
 			</block>
 		</view>
@@ -57,15 +76,31 @@
 				let nl = n.length;
 				console.log('=====watch  list=====', n, o,ol,nl,this.leftHeight , this.rightHeight );
 				if (nl > ol) {
-					if (this.leftHeight > this.rightHeight) {
-						// that.list[ol].addImgUrlFlag = 123123
-						that.rightList.push(that.list[ol]);
-					} else {
-						// that.list[ol].addImgUrlFlag = 123123
-						that.leftList.push(that.list[ol]);
+					this.rightLeftPush(nl,ol)
+					
+					if (this.list.length == 1 ) {
+						console.log(that.list[0],144)
+						this.isRightStyle = false
+						this.rightList.push(this.list[0]); 
+						return
 					}
+					
+					// if (this.leftHeight > this.rightHeight) {
+					// 	that.rightList.push(that.list[ol]);
+					// 	// that.rightLeftPush()
+					// } else {
+					// 	that.leftList.push(that.list[ol]);
+					// 	// that.leftRightPush()
+					// }
+					
+					
+					
+					
+					
 					// this.onImageLoad({addImgUrlFlag : null},{detail:{height: 480, width: 270}} );
 				}
+				
+				
 			}
 		},
 		data() {
@@ -91,7 +126,29 @@
 			console.log('destroy');
 		},
 		methods: {
-			onImageLoad(item, e) {
+			
+			leftRightPush(nl,ol){
+				for (var i = ol; i < nl; i++) {
+					if (i % 2 ) {
+						this.leftList.push(this.list[i]);
+					}else{
+						this.rightList.push(this.list[i]);
+					}
+				}
+			},
+			
+			rightLeftPush(nl,ol){
+				for (var i = ol; i < nl; i++) {
+					if (i % 2 ) {
+						this.rightList.push(this.list[i]);
+					}else{
+						this.leftList.push(this.list[i]);
+					}
+				}
+
+			},
+			
+			async onImageLoad(item, e) {
 				// console.log(item,e,"item")
 				if (!e) {
 					console.log('无图片！！！！');
@@ -111,7 +168,7 @@
 					that.leftHeight += imgH; //第一张图片高度加到左边
 					that.itemIndex++;
 					if (that.list.length == 1 && that.itemIndex == 1) {
-						// console.log(that.list[0])
+						console.log(that.list[0],144)
 						this.isRightStyle = false
 						that.rightList.push(that.list[0]); //第二张图片先入栈
 						return

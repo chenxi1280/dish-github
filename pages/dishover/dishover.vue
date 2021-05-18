@@ -393,7 +393,8 @@
 										v.logoPath = v.logoPath + '/common'
 									}
 									this.hotList.push(v)
-								}else{
+
+								} else{
 									console.log('空v', v)
 								}
 								})
