@@ -3647,7 +3647,7 @@
 						}
 					}
 					//actionSectionTime 动作出现时间找出最小值 找最小值在一个节点中只做一次 通过reminderIndex控制
-					if(this.reminderIndex === 0){
+					if(this.reminderIndex === 0 && this.bindActionOptionArray.length !== 0){
 						this.actionSectionTimeMin = this.bindActionOptionArray[0].actionSectionTime
 						for(let i = 0; i < this.bindActionOptionArray.length; i++){
 							if(this.bindActionOptionArray[i].actionSectionTime < this.actionSectionTimeMin){
