@@ -716,7 +716,7 @@
 				//作品id 初始化之后需要取拿作品信息存起来待用
 				this.getPlayArtworkInfo(this.artworkId)
 			}
-			// this.getNextAd()
+			this.getNextAd()
 		},
 		onHide() {
 			// this.videoShowFlag = false
@@ -1323,21 +1323,42 @@
                 this.showAdvertisingFlag = false
             },
 			getNextAd(){
-				if(this.adErr){
-					console.log('因为上次有错误，删除了ad')
-					this.advertising.offError()
-					this.advertising.offClose()
-					this.advertising.destroy()
-					this.advertising = null
-					this.adErr = null
-				}
+				// if(this.adErr){
+				// 	console.log('因为上次有错误，删除了ad')
+				// 	this.advertising.offError()
+				// 	this.advertising.offClose()
+				// 	/this.advertising.destroy()
+				// 	this.advertising = null
+				// 	this.adErr = null
+				// }
 			    if(!this.advertising){
 					console.log('获得新的广告')
                     this.advertising = wx.createRewardedVideoAd({ adUnitId: 'adunit-7423fd1b2c7c5724' })
+                    //this.advertising.load()
 					this.advertising.onError(err => {
 					    console.log(err)
 						this.adErr  = err
 					})
+                    // 监听激励广告关闭
+                    this.advertising.onClose((status) => {
+                        this.showConditionAdvertisingFlag = false
+                        //status.isEnded for test
+                        if (status.isEnded) {
+                            // 关闭条件浮标 弹窗
+                            this.showConditionAdvertisingFlag = false
+                            //广告正确关闭业务处理
+                            this.handleAdBusiness()
+                            this.advertising.offClose()
+                            // this.advertising.destroy()
+                        } else {
+                            this.handleAdUnfinishedBusiness()
+                            // 浮标 结尾 广告 未看完 时间添加
+                            console.log('憨批用户不给光')
+                            this.clickCommonOptionTodoBuoyFlag = false
+                            this.clickCommonOptionTodoActionFlag = false
+                        }
+                        this.handleAdEnded()
+                    })
                 }else {
 					console.log('使用老的广告')
                     this.advertising.offClose()
@@ -1348,42 +1369,39 @@
                 this.showAdvertisingFlag = false
                 this.getNextAd()
                 //捕捉错误
-				this.adErr && this.handleAdError()
-           
-                // 激励广告显示并加载
-				this.advertising.load().then(() => {
-					this.advertising.show().then(() => {})
-				}).catch(() => {
-					//如果播完了并且是定位选项，需要展示canvas
-					//this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
-					this.advertising.load().then(() => {
-						this.advertising.show().then(() => {})
-					}).catch(() => {
-						this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
-						//处理调取光失败方法
-						this.handleAdError()
-					})
-				})
-                // 监听激励广告关闭
-                this.advertising.onClose((status) => {
-                    this.showConditionAdvertisingFlag = false
-					//status.isEnded for test
-                    if (status.isEnded) {
-                        // 关闭条件浮标 弹窗
-                        this.showConditionAdvertisingFlag = false
-						//广告正确关闭业务处理
-						this.handleAdBusiness()
-                        this.advertising.offClose()
-                        // this.advertising.destroy()
-                    } else {
-						this.handleAdUnfinishedBusiness()
-                        // 浮标 结尾 广告 未看完 时间添加
-                        console.log('憨批用户不给光')
-                        this.clickCommonOptionTodoBuoyFlag = false
-						this.clickCommonOptionTodoActionFlag = false
-                    }
-                    this.handleAdEnded()
+           		if(this.adErr){
+                    console.log('出现错误，但是我们不处理，因为这里是罪恶都市')
+                    // this.handleAdError()
+					// return
+				}
+
+                this.advertising.show().catch(() => {
+                    //如果播完了并且是定位选项，需要展示canvas
+                    //this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
+                    this.advertising.load().then(() => {
+                        this.advertising.show().then(() => {})
+                    }).catch((e) => {
+                        console.log(e)
+                        this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
+                        //处理调取光失败方法
+                        this.handleAdError()
+                    })
                 })
+                // 激励广告显示并加载
+                // this.advertising.load().then(() => {
+					// this.advertising.show().then(() => {})
+                // }).catch(() => {
+					// //如果播完了并且是定位选项，需要展示canvas
+					// //this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
+					// this.advertising.load().then(() => {
+					// 	this.advertising.show().then(() => {})
+					// }).catch(() => {
+					// 	this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
+					// 	//处理调取光失败方法
+					// 	this.handleAdError()
+					// })
+                // })
+
 			},
 			handleAdEnded() {
 				if (this.isVideoEndFlag) {
