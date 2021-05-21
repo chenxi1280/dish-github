@@ -25,7 +25,7 @@
 		
 		<!-- <u-subsection :list="items" :current="0" @change="sectionChange"></u-subsection> -->
 		<view class="content" :style="{marginTop: `${isShowBanner ? '310rpx' : '0'}`}">
-			<waterfall :flowList="hotList" :status="hotloadStatus"></waterfall>
+			<waterfall :list="hotList" :status="hotloadStatus"></waterfall>
 			<u-loadmore :bg-color="'#f2f2f2'" :status="hotLoadStatus"  :icon="true" :icon-type="'circle'" :load-text="loadText" />
 <!-- 			<view v-if="current === 0">
 				<waterfall :flowList="hotList" :status="hotloadStatus"></waterfall>
@@ -85,7 +85,7 @@
 		baseURL,versionId
 	} from '../login/config/config.js'
 	import search from '../search/search'
-	import waterfall from './waterfall_view/waterfall.vue'
+	import waterfall from './waterfall_view/waterfalls.vue'
 	import Advertising from '../../components/Advertising/Advertising.vue'
 	import {globalBus} from '../../common/js/util.js'
 	export default {
@@ -119,7 +119,7 @@
 				}],
 				currentsort: 0,
 				queryType: "测试类",
-				limit: 100,
+				limit: 10,
 				loadStatus: "loading",
 				// 底部状态
 				hotLoadStatus: 'loading',
