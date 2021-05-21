@@ -1446,6 +1446,9 @@
                         console.log('重新播放')
                         this.againPlayVideo()
                     }
+					if (this.isPosition == 3) {
+					    this.videoContext.play()
+					}
                 } else {
                     // 浮标修改
                     if (this.bouyNodeFlage) {
