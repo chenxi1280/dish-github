@@ -397,7 +397,7 @@
 				likabilityFlag: false,
 				//好感度数值容器
 				likabilityArray: [],
-				//入场loading的开关 for test
+				//入场loading的开关
 				videoloadFlag: true,
 				//好感度延时函数
 				likabilityDelayFunction: null,
@@ -1654,6 +1654,8 @@
 			},
 			//对节点播放数据进行筛选和提取
 			initPlayData(artworkTree, isJumpDialogCallbackFlag) {
+				console.log('进入initPlayData，artworkTree', artworkTree)
+				
 				//定位选项最后一帧截屏开关 预防直接显示了最后一帧截图
 				this.screenshotShowFlag = false
 				this.isShowMyProgress = true
@@ -1677,7 +1679,6 @@
 				this.conditionState = []
 				//初始化是否显示弹窗
 				this.popupState = uni.getStorageSync('popupState')
-				console.log('进入initPlayData， this.popupState', this.popupState)
 				if (this.popupState == 1) {
 					this.popupSettings = uni.getStorageSync('popupSettings')
 					this.handlePopupSettings()
@@ -1734,6 +1735,19 @@
 				//初始化视频及选项
 				const url = (artworkTree.videoUrl + '').split("://")
                 this.parentId = artworkTree.parentId
+				//下方url赋值一定要放在这里
+				console.log('url', url)
+				if(this.videoErrorFlag){
+					this.videoErrorFlag = false
+					this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				}else if(this.parentId === 0){
+				    this.videoUrlTimeOut = setTimeout(() => {
+				        this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				    }, 1000)
+				} else {
+				    this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				}
+				
 				this.imageSrc = artworkTree.nodeLastImgUrl
 				console.log("this.imageSrc: ",this.imageSrc)
 				//如果是根节点初始化存储节点分值的容器
@@ -1815,17 +1829,17 @@
 					console.log("***********this.playedHistoryArray223",this.playedHistoryArray)
 					this.linkNodeId = null
 				}
-				
-				if(this.videoErrorFlag){
-					this.videoErrorFlag = false
-					this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
-				}else if(this.parentId === 0){
-				    this.videoUrlTimeOut = setTimeout(() => {
-				        this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
-				    }, 1000)
-				} else {
-				    this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
-				}
+				// console.log('url', url)
+				// if(this.videoErrorFlag){
+				// 	this.videoErrorFlag = false
+				// 	this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				// }else if(this.parentId === 0){
+				//     this.videoUrlTimeOut = setTimeout(() => {
+				//         this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				//     }, 1000)
+				// } else {
+				//     this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				// }
 			},
 			//视频 播放后弹窗
 			popupWindowByPopupPositonEqualsOne() {
@@ -3651,7 +3665,7 @@
 						}
 					}
 					//actionSectionTime 动作出现时间找出最小值 找最小值在一个节点中只做一次 通过reminderIndex控制
-					if(this.reminderIndex === 0){
+					if(this.reminderIndex === 0 && this.bindActionOptionArray.length !== 0){
 						this.actionSectionTimeMin = this.bindActionOptionArray[0].actionSectionTime
 						for(let i = 0; i < this.bindActionOptionArray.length; i++){
 							if(this.bindActionOptionArray[i].actionSectionTime < this.actionSectionTimeMin){
