@@ -4,9 +4,9 @@
 			<block v-for="(item, index) in leftList" :key="index">
 				<view class="waterfall-item" @click="goPlayPage(item.pkArtworkId,item.playMode)">
 					
-					<view v-show="item.code  == 'ad'" >
+<!-- 					<view v-if="item.code  == 'ad'" >
 						<ad-custom unit-id="adunit-59f062ee3b27d685" @onload="adLoad" @onerror="adError" @bindload="adLoad" @binderror="adError" ></ad-custom>
-					</view>
+					</view> -->
 					
 					<view v-if ="item.code  != 'ad'">
 						<image :src="item.logoPath" mode="widthFix" lazy-load ></image>
@@ -35,10 +35,10 @@
 				<view class="waterfall-item" @click="goPlayPage(item.pkArtworkId,item.playMode)">
 					
 					
-					<view v-show="item.code  == 'ad'" >
+<!-- 					<view v-if="item.code  == 'ad'" >
 						<ad-custom unit-id="adunit-59f062ee3b27d685" @onload="adLoad" @onerror="adError" @bindload="adLoad" @binderror="adError" ></ad-custom>
 					</view>
-					
+					 -->
 					<view v-if ="item.code  != 'ad'">
 						<image :src="item.logoPath" mode="widthFix" lazy-load  @load="onImageLoad" v-if="isRightStyle" ></image>
 						<view class="mask_box" >

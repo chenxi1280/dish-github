@@ -397,7 +397,7 @@
 				likabilityFlag: false,
 				//好感度数值容器
 				likabilityArray: [],
-				//入场loading的开关 for test
+				//入场loading的开关
 				videoloadFlag: true,
 				//好感度延时函数
 				likabilityDelayFunction: null,
@@ -716,7 +716,7 @@
 				//作品id 初始化之后需要取拿作品信息存起来待用
 				this.getPlayArtworkInfo(this.artworkId)
 			}
-			// this.getNextAd()
+			this.getNextAd()
 		},
 		onHide() {
 			// this.videoShowFlag = false
@@ -1289,7 +1289,10 @@
 					if (this.isPosition == 1) {
 						this.showCanvasFlag = true
 					}
-
+					if(this.isPosition == 3) {
+						this.videoContext.play()
+					}
+					console.log("我关闭了获取光的弹窗")
 				} else {
 					this.videoContext.play()
 					// 浮标修改
@@ -1323,24 +1326,46 @@
                 this.showAdvertisingFlag = false
             },
 			getNextAd(){
-				if(this.adErr){
-					console.log('因为上次有错误，删除了ad')
-					this.advertising.offError()
-					this.advertising.offClose()
-					this.advertising.destroy()
-					this.advertising = null
-					this.adErr = null
-				}
+				// if(this.adErr){
+				// 	console.log('因为上次有错误，删除了ad')
+				// 	this.advertising.offError()
+				// 	this.advertising.offClose()
+				// 	/this.advertising.destroy()
+				// 	this.advertising = null
+				// 	this.adErr = null
+				// }
 			    if(!this.advertising){
 					console.log('获得新的广告')
                     this.advertising = wx.createRewardedVideoAd({ adUnitId: 'adunit-7423fd1b2c7c5724' })
+                    //this.advertising.load()
 					this.advertising.onError(err => {
 					    console.log(err)
 						this.adErr  = err
 					})
+                    // 监听激励广告关闭
+                    this.advertising.onClose((status) => {
+                        console.log('广告关闭，status是', status)
+                        this.showConditionAdvertisingFlag = false
+                        //status.isEnded for test
+                        if (status.isEnded) {
+                            // 关闭条件浮标 弹窗
+                            this.showConditionAdvertisingFlag = false
+                            //广告正确关闭业务处理
+                            this.handleAdBusiness()
+                            // this.advertising.offClose()
+                            // this.advertising.destroy()
+                        } else {
+                            this.handleAdUnfinishedBusiness()
+                            // 浮标 结尾 广告 未看完 时间添加
+                            console.log('憨批用户不给光')
+                            this.clickCommonOptionTodoBuoyFlag = false
+                            this.clickCommonOptionTodoActionFlag = false
+                        }
+                        this.handleAdEnded()
+                    })
                 }else {
 					console.log('使用老的广告')
-                    this.advertising.offClose()
+                    // this.advertising.offClose()
 				}
 			},
 			//广告新逻辑：onload就会拉取，拉去之后存错误码，拉取失败才会临时拉取
@@ -1348,42 +1373,39 @@
                 this.showAdvertisingFlag = false
                 this.getNextAd()
                 //捕捉错误
-				this.adErr && this.handleAdError()
-           
-                // 激励广告显示并加载
-				this.advertising.load().then(() => {
-					this.advertising.show().then(() => {})
-				}).catch(() => {
-					//如果播完了并且是定位选项，需要展示canvas
-					//this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
-					this.advertising.load().then(() => {
-						this.advertising.show().then(() => {})
-					}).catch(() => {
-						this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
-						//处理调取光失败方法
-						this.handleAdError()
-					})
-				})
-                // 监听激励广告关闭
-                this.advertising.onClose((status) => {
-                    this.showConditionAdvertisingFlag = false
-					//status.isEnded for test
-                    if (status.isEnded) {
-                        // 关闭条件浮标 弹窗
-                        this.showConditionAdvertisingFlag = false
-						//广告正确关闭业务处理
-						this.handleAdBusiness()
-                        this.advertising.offClose()
-                        // this.advertising.destroy()
-                    } else {
-						this.handleAdUnfinishedBusiness()
-                        // 浮标 结尾 广告 未看完 时间添加
-                        console.log('憨批用户不给光')
-                        this.clickCommonOptionTodoBuoyFlag = false
-						this.clickCommonOptionTodoActionFlag = false
-                    }
-                    this.handleAdEnded()
+           		if(this.adErr){
+                    console.log('出现错误，但是我们不处理，因为这里是罪恶都市')
+                    // this.handleAdError()
+					// return
+				}
+
+                this.advertising.show().catch(() => {
+                    //如果播完了并且是定位选项，需要展示canvas
+                    //this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
+                    this.advertising.load().then(() => {
+                        this.advertising.show().then(() => {})
+                    }).catch((e) => {
+                        console.log(e)
+                        this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
+                        //处理调取光失败方法
+                        this.handleAdError()
+                    })
                 })
+                // 激励广告显示并加载
+                // this.advertising.load().then(() => {
+					// this.advertising.show().then(() => {})
+                // }).catch(() => {
+					// //如果播完了并且是定位选项，需要展示canvas
+					// //this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
+					// this.advertising.load().then(() => {
+					// 	this.advertising.show().then(() => {})
+					// }).catch(() => {
+					// 	this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
+					// 	//处理调取光失败方法
+					// 	this.handleAdError()
+					// })
+                // })
+
 			},
 			handleAdEnded() {
 				if (this.isVideoEndFlag) {
@@ -1424,6 +1446,9 @@
                         console.log('重新播放')
                         this.againPlayVideo()
                     }
+					if (this.isPosition == 3) {
+					    this.videoContext.play()
+					}
                 } else {
                     // 浮标修改
                     if (this.bouyNodeFlage) {
@@ -1636,6 +1661,8 @@
 			},
 			//对节点播放数据进行筛选和提取
 			initPlayData(artworkTree, isJumpDialogCallbackFlag) {
+				console.log('进入initPlayData，artworkTree', artworkTree)
+				
 				//定位选项最后一帧截屏开关 预防直接显示了最后一帧截图
 				this.screenshotShowFlag = false
 				this.isShowMyProgress = true
@@ -1659,7 +1686,6 @@
 				this.conditionState = []
 				//初始化是否显示弹窗
 				this.popupState = uni.getStorageSync('popupState')
-				console.log('进入initPlayData， this.popupState', this.popupState)
 				if (this.popupState == 1) {
 					this.popupSettings = uni.getStorageSync('popupSettings')
 					this.handlePopupSettings()
@@ -1716,6 +1742,19 @@
 				//初始化视频及选项
 				const url = (artworkTree.videoUrl + '').split("://")
                 this.parentId = artworkTree.parentId
+				//下方url赋值一定要放在这里
+				console.log('url', url)
+				if(this.videoErrorFlag){
+					this.videoErrorFlag = false
+					this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				}else if(this.parentId === 0){
+				    this.videoUrlTimeOut = setTimeout(() => {
+				        this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				    }, 1000)
+				} else {
+				    this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				}
+				
 				this.imageSrc = artworkTree.nodeLastImgUrl
 				console.log("this.imageSrc: ",this.imageSrc)
 				//如果是根节点初始化存储节点分值的容器
@@ -1797,17 +1836,17 @@
 					console.log("***********this.playedHistoryArray223",this.playedHistoryArray)
 					this.linkNodeId = null
 				}
-				
-				if(this.videoErrorFlag){
-					this.videoErrorFlag = false
-					this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
-				}else if(this.parentId === 0){
-				    this.videoUrlTimeOut = setTimeout(() => {
-				        this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
-				    }, 1000)
-				} else {
-				    this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
-				}
+				// console.log('url', url)
+				// if(this.videoErrorFlag){
+				// 	this.videoErrorFlag = false
+				// 	this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				// }else if(this.parentId === 0){
+				//     this.videoUrlTimeOut = setTimeout(() => {
+				//         this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				//     }, 1000)
+				// } else {
+				//     this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				// }
 			},
 			//视频 播放后弹窗
 			popupWindowByPopupPositonEqualsOne() {
@@ -2364,7 +2403,7 @@
 				})
 			},
 			//开关控制是否展示 选项框 故事线 举报页面
-			videoEnd(isJumpDialogCallbackFlag) {
+  			videoEnd(isJumpDialogCallbackFlag) {
 				//根据是否是最后一个视频标志 最后一个视频播放结束弹出故事线 endFlag = true 表示不是最后一个视频
 				//获取用户的弹窗弹出数量
 				let popupWindowRecord = uni.getStorageSync('popupWindowRecord')
@@ -2632,6 +2671,9 @@
 				}
 			},
 			clickCommonOptionTodo(index) {
+				console.log("下标index：",index)
+				console.log("条件数组：",this.conditionState)
+				console.log("下标index：",this.conditionState[index])
 				if(this.isPosition === 3 ){
 					this.clickCommonOptionTodoActionFlag = true
 				}
@@ -2664,7 +2706,10 @@
 						this.videoContext.pause()
 						this.stopBuoyDraw()
 						this.showConditionAdvertisingFlag = true
-					} else {
+					} else if(this.isPosition === 3) {
+						this.videoContext.pause()
+						this.showConditionAdvertisingFlag = true
+					}else{
 						this.openAdvertising()
 					}
 
@@ -3633,7 +3678,7 @@
 						}
 					}
 					//actionSectionTime 动作出现时间找出最小值 找最小值在一个节点中只做一次 通过reminderIndex控制
-					if(this.reminderIndex === 0){
+					if(this.reminderIndex === 0 && this.bindActionOptionArray.length !== 0){
 						this.actionSectionTimeMin = this.bindActionOptionArray[0].actionSectionTime
 						for(let i = 0; i < this.bindActionOptionArray.length; i++){
 							if(this.bindActionOptionArray[i].actionSectionTime < this.actionSectionTimeMin){

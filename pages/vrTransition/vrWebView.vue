@@ -13,7 +13,7 @@
 		},
 		onLoad(option) {
 			const uuid = Math.random().toString(36).substring(2)
-			this.src = "https://wanxiangchengzhen.com/pcooookie/#/pages/mine/vr/vr?pkArtworkId=" + option.pkArtworkId+"&uuid="+uuid
+			this.src = "https://wanxiangchengzhen.com/cooookie/#/pages/mine/vr/vr?pkArtworkId=" + option.pkArtworkId+"&uuid="+uuid
 			console.log("***********************web-view url: ",this.src)
 		},
 		methods: {
