@@ -2058,9 +2058,6 @@
 				});
 			},
 			async customLightByUserId(eventId) {
-				if(this.playType === 1){
-					return;
-				}
 				let token = null
 				if (!this.token) {
 					token = uni.getStorageSync("token")
@@ -2721,7 +2718,7 @@
 					}
 
 				} else {
-					if (!this.iscustomLightFlag) {
+					if (!this.iscustomLightFlag && this.playType !== 1) {
 						//动作执行扣光时将视频播放结束标志置位true
 						if (this.storyLineJumpFlag) {
 							return this.customLightByUserId(3)
@@ -3293,7 +3290,7 @@
 					this.openAdvertising()
 					this.showCanvasFlag = false
 				} else {
-					if (!this.iscustomLightFlag) {
+					if (!this.iscustomLightFlag && this.playType !== 1) {
 						if (this.storyLineJumpFlag) {
 							return this.customLightByUserId(3)
 						} else {
