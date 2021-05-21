@@ -1289,7 +1289,10 @@
 					if (this.isPosition == 1) {
 						this.showCanvasFlag = true
 					}
-
+					if(this.isPosition == 3) {
+						this.videoContext.play()
+					}
+					console.log("我关闭了获取光的弹窗")
 				} else {
 					this.videoContext.play()
 					// 浮标修改
