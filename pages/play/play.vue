@@ -621,7 +621,9 @@
 				//play页面初始化的flag
 				initPlayPageFlag: false,
 				//动态控制组件的层级
-				actionOptionZIndex: '99999'
+				actionOptionZIndex: '99999',
+				//是否是免广告作品的标志
+				playType: 0
 			}
 		},
 		onReady() {
@@ -2056,6 +2058,9 @@
 				});
 			},
 			async customLightByUserId(eventId) {
+				if(this.playType === 1){
+					return;
+				}
 				let token = null
 				if (!this.token) {
 					token = uni.getStorageSync("token")
@@ -2146,9 +2151,10 @@
 							uni.setStorageSync('popupState', res.data.data.popupState)
 							this.popupTotalNumber = res.data.data.nodePopupCount
 							this.popupNameState = res.data.data.popupNameStatus
+							this.playType = res.data.data.playType
 							if (this.pkDetailId != null) return;
 							// 浮标改动
-
+							
 							this.initPlayData(res.data.data, false);
 						} else {
 							this.videoShowFlag = false
@@ -2179,6 +2185,7 @@
 							this.popupState = res.data.data.popupState
 							uni.setStorageSync('popupSettings', res.data.data.ecmArtworkNodePopupSettings)
 							// console.log('storyPopupState',	this.popupState)
+							this.playType = res.data.data.playType
 							this.initPlayData(res.data.data, false);
 						} else {
 							this.videoShowFlag = false
@@ -2695,7 +2702,7 @@
 				uni.removeStorageSync('popupSettings')
 				uni.setStorageSync('isReplay', false)
 
-				if (this.conditionState[index] == 1) {
+				if (this.conditionState[index] == 1 && this.playType !== 1) {
 					console.log('作者让你看广告啊，跟我没关系')
 
 					// this.videoContext.play()
@@ -3281,7 +3288,7 @@
 				uni.removeStorageSync('popupState')
 				uni.removeStorageSync('popupSettings')
 				uni.setStorageSync('isReplay', false)
-				if (this.conditionState[this.touchRectNum] == 1) {
+				if (this.conditionState[this.touchRectNum] == 1 && this.playType !== 1) {
 					console.log('作者让你看广告啊，跟我没关系')
 					this.openAdvertising()
 					this.showCanvasFlag = false
