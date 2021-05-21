@@ -119,7 +119,7 @@
 				}],
 				currentsort: 0,
 				queryType: "测试类",
-				limit: 100,
+				limit: 10,
 				loadStatus: "loading",
 				// 底部状态
 				hotLoadStatus: 'loading',
