@@ -1341,6 +1341,7 @@
 					})
                     // 监听激励广告关闭
                     this.advertising.onClose((status) => {
+                        console.log('广告关闭，status是', status)
                         this.showConditionAdvertisingFlag = false
                         //status.isEnded for test
                         if (status.isEnded) {
@@ -1348,7 +1349,7 @@
                             this.showConditionAdvertisingFlag = false
                             //广告正确关闭业务处理
                             this.handleAdBusiness()
-                            this.advertising.offClose()
+                            // this.advertising.offClose()
                             // this.advertising.destroy()
                         } else {
                             this.handleAdUnfinishedBusiness()
@@ -1361,7 +1362,7 @@
                     })
                 }else {
 					console.log('使用老的广告')
-                    this.advertising.offClose()
+                    // this.advertising.offClose()
 				}
 			},
 			//广告新逻辑：onload就会拉取，拉去之后存错误码，拉取失败才会临时拉取
@@ -2396,7 +2397,7 @@
 				})
 			},
 			//开关控制是否展示 选项框 故事线 举报页面
-			videoEnd(isJumpDialogCallbackFlag) {
+  			videoEnd(isJumpDialogCallbackFlag) {
 				//根据是否是最后一个视频标志 最后一个视频播放结束弹出故事线 endFlag = true 表示不是最后一个视频
 				//获取用户的弹窗弹出数量
 				let popupWindowRecord = uni.getStorageSync('popupWindowRecord')

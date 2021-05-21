@@ -154,12 +154,7 @@
 			}
 		},
 		onShow() {
-			if(!this.counts){
-				this.counts = 1
-			}else {
-				this.counts++
-			}
-			console.log('我被执行了两次？？？this.counts',this.counts)
+
 			// banner显示与消失
 			this.isShowBanner = true
 			this.timeout = setTimeout(() => {
@@ -322,6 +317,7 @@
 						'Authorization': uni.getStorageSync('token')
 					},
 					success: res => {
+					    console.log('获得广成功')
 						if (res.data.status === 200) {
 							this.ecmUserLightUpLimit = res.data.data.ecmUserLightUpLimit
 							this.lightNumber = res.data.data.lightNumber
