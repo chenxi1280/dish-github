@@ -2668,6 +2668,9 @@
 				}
 			},
 			clickCommonOptionTodo(index) {
+				console.log("下标index：",index)
+				console.log("条件数组：",this.conditionState)
+				console.log("下标index：",this.conditionState[index])
 				if(this.isPosition === 3 ){
 					this.clickCommonOptionTodoActionFlag = true
 				}
@@ -2700,7 +2703,10 @@
 						this.videoContext.pause()
 						this.stopBuoyDraw()
 						this.showConditionAdvertisingFlag = true
-					} else {
+					} else if(this.isPosition === 3) {
+						this.videoContext.pause()
+						this.showConditionAdvertisingFlag = true
+					}else{
 						this.openAdvertising()
 					}
 

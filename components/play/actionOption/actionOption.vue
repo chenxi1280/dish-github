@@ -247,6 +247,7 @@
 							let referenceFknodeId = this.referenceArray[i].fkNodeId
 							if(currentFknodeId === referenceFknodeId){
 								this.$parent.optionIndex = i
+								console.log("孩子数组的下标i: ",i)
 								this.$parent.clickCommonOptionTodo(i)
 								this.moveFlag = false
 								break
