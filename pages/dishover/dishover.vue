@@ -236,6 +236,9 @@
 			if (uni.getStorageSync('token')) {
 				this.getLight()
 				this.getAddLightCount()
+			}else{
+				console.log("发现页没有token我去获取token啦")
+				return this.getToken()
 			}
 			this.isAppReady()
 		},
@@ -246,6 +249,10 @@
 			// 游客登录时  监听app页面是否就绪  就绪则加载
 			isAppReady () {
 				globalBus.$on('getLightOfAppReady', () => {
+					if(!uni.getStorageSync('token')){
+						console.log("发现页没有token我去获取token啦")
+						return this.getToken()
+					}
 					console.log('发请求')
 					this.getAddLightCount()
 					this.getLight()
@@ -306,6 +313,11 @@
 			},
 			// 获取光
 			getLight () {
+				let token = uni.getStorageSync('token')
+				if(!token){
+					console.log("发现页没有token我去获取token啦")
+					return this.getToken()
+				}
 				uni.request({
 					url: baseURL + '/user/light/getUserLight',
 					method: 'POST',
@@ -329,6 +341,81 @@
 					}
 				})
 			},
+			
+			getToken() {
+				let _this = this
+				_this.singlePageFlag = true
+				let openid = uni.getStorageSync("openid")
+				if (openid) {
+					_this.updateUserInfo(openid)
+				} else {
+					uni.login({
+						provider: 'weixin',
+						success: async loginRes => {
+							let code = loginRes.code
+							await uni.request({
+								url: baseURL + '/getOpenid',
+								data: {
+									code: code,
+								},
+								method: 'POST',
+								header: {
+									'content-type': 'application/json'
+								},
+								success: res => {
+									if (res.data.status == 200) {
+										uni.setStorageSync("openid", res.data.data.openid)
+										_this.updateUserInfo(res.data.data.openid)
+									} else {
+										return uni.showToast({
+											icon: 'none',
+											title: '授权失败，请退出重新进入小程序'
+										})
+									}
+								}
+							})
+						},
+					})
+				}
+			},
+			async updateUserInfo(openid) {
+				let _this = this
+				let token = uni.getStorageSync("token")
+				this.string = token
+				if (!token) {
+					await uni.request({
+						url: baseURL + '/savaUserInfo',
+						data: {
+							openid: openid,
+							nickname: _this.nickName,
+							gender: _this.gender,
+							avatarurl: _this.avatarUrl,
+							country: _this.country,
+							province: _this.province,
+							city: _this.city,
+							language: _this.language
+						},
+						method: 'POST',
+						header: {
+							'content-type': 'application/json'
+						},
+						success: (res) => {
+							if (res.data.status == 200) {
+								uni.setStorageSync("token", res.data.data)
+								_this.token = res.data.data
+								this.getLight()
+								globalBus.$emit('getLightOfAppReady')
+								globalBus.$emit('initLightStyle')
+							}
+						}
+					})
+				}else{
+					this.getLight()
+					globalBus.$emit('getLightOfAppReady')
+					globalBus.$emit('initLightStyle')
+				}
+			},
+			
 			go_search_page() {
 				console.log('123')
 				uni.navigateTo({
