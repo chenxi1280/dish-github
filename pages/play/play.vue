@@ -1262,9 +1262,21 @@
 			closeConditionDialog() {
 				this.showConditionAdvertisingFlag = false
 				if (this.isVideoEndFlag) {
-					this.againPlayVideo()
+					if(this.bouyNodeFlage){
+						this.againPlayVideo()
+					}else if(this.isPosition === 3){
+						this.videoContext.play()
+					}else{
+						this.videoContext.play()
+					}
 				} else {
-					this.recoveryBuoyDraw()
+					if(this.bouyNodeFlage){
+						this.recoveryBuoyDraw()
+					}else if(this.isPosition === 3){
+						this.videoContext.play()
+					}else{
+						this.videoContext.play()
+					}
 				}
 
 			},
