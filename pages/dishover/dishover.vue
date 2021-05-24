@@ -3,7 +3,7 @@
 		<view style="position: relative;height: 80rpx;width: 750rpx;padding: 0 20rpx;box-sizing: border-box;padding-top: 10rpx;display: flex;">
 <!-- 			<icon class="search_icon"></icon>
 			<input class="search_input" type="" placeholder=" 查找你想看的视频" disabled="" /> -->
-			
+
 			<view class="banner_container" @click="this.isShowBannerImg = true" v-if="isShowBanner">
 				<image :src="bannerSrc" style="display: block;width: 100%;height:100%"/>
 			</view>
@@ -19,10 +19,10 @@
 				<view class="search_main" @click="go_search_page">
 					<u-search :show-action="false" ></u-search>
 				</view>
-			</view> 
+			</view>
 		</view>
 		<incentive :lightNumber="lightNumber" :ecmUserLightUpLimit="ecmUserLightUpLimit"></incentive>
-		
+
 		<!-- <u-subsection :list="items" :current="0" @change="sectionChange"></u-subsection> -->
 		<view class="content" :style="{marginTop: `${isShowBanner ? '310rpx' : '0'}`}">
 			<waterfall :list="hotList" :status="hotloadStatus"></waterfall>
@@ -52,7 +52,7 @@
 						<swiper-item class="swiper-item">
 							<scroll-view scroll-y style="height: 100%;width: 100%;" @scrolltolower="onreachBottom">
 								<waterfall :flowList="sortList1" :status="loadStatus"></waterfall>
-								<u-loadmore :bg-color="'#f2f2f2'" :status="loadStatus1"  :icon="true" :icon-type="'circle'" :load-text="loadText" />	
+								<u-loadmore :bg-color="'#f2f2f2'" :status="loadStatus1"  :icon="true" :icon-type="'circle'" :load-text="loadText" />
 							</scroll-view>
 						</swiper-item>
 
@@ -150,7 +150,8 @@
 				ecmUserLightUpLimit: 0,
 				timeout: null,
 				//banner 地址
-				bannerSrc: null
+        ecmBannerInfo: null,
+        bannerSrc:null
 			}
 		},
 		onShow() {
@@ -297,9 +298,9 @@
 								title: '恭喜成功获得光'
 							})
 							globalBus.$emit('getLight', res.data.data)
-							
+
 							globalBus.$emit('bouyClickCommonOptionTodo')
-							
+
 						}
 					})
 				})
@@ -374,7 +375,8 @@
 							if (res.data.data.list.length != 0) {
 								//从后台获取banner 地址
 								if(firstTime === 1){
-                  this.bannerSrc = res.data.data.bannerAddress
+                  this.ecmBannerInfo = res.data.data.ecmBannerInfo
+                  this.bannerSrc = this.ecmBannerInfo.ecmBannerAddress
 								}
 
 								res.data.data.list.forEach(v => {
