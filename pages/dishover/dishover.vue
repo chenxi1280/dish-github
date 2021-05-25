@@ -441,6 +441,7 @@
 			addRandomDataHot(firstTime) {
 				if (this.current == 0) {
 					this.pageHot = this.pageHot + 1
+					console.log("********versionId: ",versionId)
 					// console.log(this.pageHot)
 					uni.request({
 						url:  baseURL + '/Ecmartwork/getFindArtWorks',
