@@ -76,13 +76,21 @@
 				console.log('=====watch  list=====', n, o,ol,nl,this.leftHeight , this.rightHeight );
 				if (nl > ol) {
 		
-					
+		
 					if (this.list.length == 1 ) {
 						console.log(that.list[0],144)
 						this.isRightStyle = false
+						this.leftList.push(this.list[0]); 
 						this.rightList.push(this.list[0]); 
 						return
 					}
+					
+					// if (this.list.length == 1 ) {
+					// 	console.log(that.list[0],144)
+					// 	this.isRightStyle = false
+					// 	this.rightList.push(this.list[0]); 
+					// 	return
+					// }
 					
 					if (this.leftHeight >= this.rightHeight) {
 							this.rightLeftPush(nl,ol)
