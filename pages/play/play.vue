@@ -2165,7 +2165,22 @@
 							// 浮标改动
 							
 							this.initPlayData(res.data.data, false);
-						} else {
+						} else if(res.data.status == 10085) {
+							uni.showModal({
+								title: "温馨提示",
+								content: "该作品暂时无法播放",
+								showCancel: false,
+								success: function (res) {
+									if (res.confirm) {
+										uni.switchTab({
+											url: '../dishover/dishover'
+										})
+									} else if (res.cancel) {
+										
+									}
+								}
+							})
+						}else{
 							this.videoShowFlag = false
 						}
 					}
@@ -2196,7 +2211,22 @@
 							// console.log('storyPopupState',	this.popupState)
 							this.playType = res.data.data.playType
 							this.initPlayData(res.data.data, false);
-						} else {
+						} else if(res.data.status == 10085) {
+							uni.showModal({
+								title: "温馨提示",
+								content: "该作品暂时无法播放",
+								showCancel: false,
+								success: function (res) {
+									if (res.confirm) {
+										uni.switchTab({
+											url: '../dishover/dishover'
+										})
+									} else if (res.cancel) {
+										
+									}
+								}
+							})
+						}else {
 							this.videoShowFlag = false
 						}
 					}
