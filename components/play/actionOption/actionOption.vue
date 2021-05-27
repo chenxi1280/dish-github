@@ -141,11 +141,18 @@
 				this.$parent.initPlayPageFlag = false
 				this.reminderFlag = false
 				this.$parent.actionOptionZIndex = '0'
+				//22周任务 动作提醒消失的时候视频播放
+				this.$parent.videoContext.play()
+				//22周任务 动作对于一个用户终生只提醒一次
+				uni.setStorageSync("actionOptionReminderAppearFlag",true)
 			},
 			init(array,min,currentTime,initPlayPageFlag){
 				let endTime = min+4
-				if(endTime >= currentTime && currentTime >= min && initPlayPageFlag){
+				let actionOptionReminderAppearFlag = uni.getStorageSync("actionOptionReminderAppearFlag")
+				if(endTime >= currentTime && currentTime >= min && initPlayPageFlag && !actionOptionReminderAppearFlag){
 					this.reminderFlag = true
+					//22周任务 动作提醒出现的时候视频暂停
+					this.$parent.videoContext.pause()
 				}else{
 					this.$parent.initPlayPageFlag = false
 					this.reminderFlag = false
