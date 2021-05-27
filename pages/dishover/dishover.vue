@@ -258,6 +258,7 @@
 					this.getAddLightCount()
 					this.getLight()
 				})
+				globalBus.$emit('initLightStyle')
 			},
 			// 获取当前一次性看广告加光的数量
 			getAddLightCount () {

@@ -145,19 +145,15 @@
 							
 						} else {
 							// console.log('憨批用户不给光')
-							
 						}
 						console.log("广告被关闭",this.isCustom)
 						// 浮标修改
 						if (this.isCustom) {
 							this.$parent.recoveryBuoyDraw()
 						}
-						this.advertising.offClose()
-						/* this.advertising.destroy() */
 					})
 				}else {
 					console.log('使用老的广告')
-					// this.advertising.offClose()
 				}
 			},
 			// 监听是否重新获取了光的数量
