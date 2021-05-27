@@ -108,7 +108,7 @@
 </template>
 
 <script>
-	import { baseURL } from '../../../pages/dishover/config/config.js'
+	import { baseURL } from '../../../pages/login/config/config.js'
 	import { horizontalStoryLine } from '../storyLine/horizontalStoryLine.vue'
 	export default {
 		components: {
