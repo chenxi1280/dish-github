@@ -100,11 +100,62 @@
 			this.isShowNumber()
 			this.isEditLightNum()
 		},
+		created(){
+			this.getNextAd()
+		},
 		computed: {
+			
 		},
 		methods: {
-			// showNum () {
-			// },
+			getNextAd(){
+			    if(!this.advertising){
+					console.log('获得新的广告')
+					if (this.isCustom) {
+						this.$emit('customConfirmEvent')
+						return false
+					}
+					this.showAdvertisingFlag = false
+					
+					//add
+					this.advertising = wx.createRewardedVideoAd({
+						adUnitId: 'adunit-7423fd1b2c7c5724'
+					})
+					//this.advertising.load()
+					this.advertising.onError(err => {
+						uni.showToast({
+							icon: 'none',
+							title:'当前没有适合您的激励视频，请待会再试'
+						})
+					})
+					// 监听激励广告关闭
+					this.advertising.onClose((status) => {
+						//for test status.isEnded 
+						console.log('status.isEnded: ',status.isEnded)
+						if (status.isEnded) {
+							const nowDate = new Date().getTime()
+							if (nowDate === null || nowDate - this.nowDate > 5000 ) {
+								this.nowDate = nowDate
+								if(this.symbol === 0){
+									globalBus.$emit('requestOfAES')
+								}else{
+									this.$parent.getToken()
+								}
+							}
+							console.log('给光')
+							
+						} else {
+							// console.log('憨批用户不给光')
+						}
+						console.log("广告被关闭",this.isCustom)
+						// 浮标修改
+						if (this.isCustom) {
+							this.$parent.recoveryBuoyDraw()
+						}
+					})
+				}else {
+					console.log('使用老的广告')
+				}
+			},
 			// 监听是否重新获取了光的数量
 			isEditLightNum () {
 				globalBus.$on('initLightStyle', () => {
@@ -178,6 +229,34 @@
 			// },
 			// 观看激励广告
 			openAdvertising () {
+				// 与播放页统一的新逻辑
+				if (this.isCustom) {
+					this.$emit('customConfirmEvent')
+					return false
+				}
+				this.showAdvertisingFlag = false
+				
+				this.getNextAd()
+				
+				if(this.adErr){
+				    console.log('出现错误，暂不处理')
+				}
+				
+				this.advertising.show().catch(() => {
+				    //如果播完了并且是定位选项，需要展示canvas
+				    //this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
+				    this.advertising.load().then(() => {
+				        this.advertising.show().then(() => {})
+				    }).catch((e) => {
+				        uni.showToast({
+				        	icon: 'none',
+				        	title:'当前没有适合您的激励视频，请待会再试'
+				        })
+				    })
+				})
+			},
+			openAdvertisingOld22222 () {
+				// 旧逻辑
 				// const timer = uni.getStorageSync('userId') + new Date().getTime() + ''
 				// // const timer = '151dw5q4d5wq1d5wq61d'
 				// const res = this.encrypt(timer)

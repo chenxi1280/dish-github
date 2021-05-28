@@ -3,9 +3,9 @@
 		<view style="position: relative;height: 80rpx;width: 750rpx;padding: 0 20rpx;box-sizing: border-box;padding-top: 10rpx;display: flex;">
 <!-- 			<icon class="search_icon"></icon>
 			<input class="search_input" type="" placeholder=" 查找你想看的视频" disabled="" /> -->
-			
+
 			<view class="banner_container" @click="this.isShowBannerImg = true" v-if="isShowBanner">
-				<image src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/img/banner.png" style="display: block;width: 100%;height:100%"/>
+				<image :src="bannerSrc" style="display: block;width: 100%;height:100%"/>
 			</view>
 			<scroll-view class="banner_bigImg" scroll-y="true" v-if="isShowBannerImg">
 				<view style="position: fixed; right: 20rpx;top:20rpx;width:80rpx;height: 80rpx;background: #000;border-radius: 40rpx;" @click="isShowBannerImg = false">
@@ -22,10 +22,10 @@
 			</view>
 		</view>
 		<incentive :lightNumber="lightNumber" :ecmUserLightUpLimit="ecmUserLightUpLimit"></incentive>
-		
+
 		<!-- <u-subsection :list="items" :current="0" @change="sectionChange"></u-subsection> -->
 		<view class="content" :style="{marginTop: `${isShowBanner ? '310rpx' : '0'}`}">
-			<waterfall :flowList="hotList" :status="hotloadStatus"></waterfall>
+			<waterfall :list="hotList" :status="hotloadStatus"></waterfall>
 			<u-loadmore :bg-color="'#f2f2f2'" :status="hotLoadStatus"  :icon="true" :icon-type="'circle'" :load-text="loadText" />
 <!-- 			<view v-if="current === 0">
 				<waterfall :flowList="hotList" :status="hotloadStatus"></waterfall>
@@ -52,7 +52,7 @@
 						<swiper-item class="swiper-item">
 							<scroll-view scroll-y style="height: 100%;width: 100%;" @scrolltolower="onreachBottom">
 								<waterfall :flowList="sortList1" :status="loadStatus"></waterfall>
-								<u-loadmore :bg-color="'#f2f2f2'" :status="loadStatus1"  :icon="true" :icon-type="'circle'" :load-text="loadText" />	
+								<u-loadmore :bg-color="'#f2f2f2'" :status="loadStatus1"  :icon="true" :icon-type="'circle'" :load-text="loadText" />
 							</scroll-view>
 						</swiper-item>
 
@@ -85,7 +85,7 @@
 		baseURL,versionId
 	} from '../login/config/config.js'
 	import search from '../search/search'
-	import waterfall from './waterfall_view/waterfall.vue'
+	import waterfall from './waterfall_view/waterfalls.vue'
 	import Advertising from '../../components/Advertising/Advertising.vue'
 	import {globalBus} from '../../common/js/util.js'
 	export default {
@@ -119,7 +119,7 @@
 				}],
 				currentsort: 0,
 				queryType: "测试类",
-				limit: 10,
+				limit: 8,
 				loadStatus: "loading",
 				// 底部状态
 				hotLoadStatus: 'loading',
@@ -148,10 +148,14 @@
 				lightNumber: 0,
 				// 光上限
 				ecmUserLightUpLimit: 0,
-				timeout: null
+				timeout: null,
+				//banner 地址
+        ecmBannerInfo: null,
+        bannerSrc:null
 			}
 		},
 		onShow() {
+
 			// banner显示与消失
 			this.isShowBanner = true
 			this.timeout = setTimeout(() => {
@@ -159,7 +163,6 @@
 				clearTimeout(this.timeout)
 			}, 5000)
 			this.getLight()
-			console.log("*****************************************relaunchApplets",uni.getStorageSync("relaunchApplets"))
 			if(uni.getStorageSync("relaunchApplets") == true){
 				console.log("*****************************************重播")
 				uni.reLaunch({
@@ -183,7 +186,7 @@
 				withShareTicket: true,
 				menus: ['shareAppMessage','shareTimeline']
 			})
-			this.addRandomDataHot()
+			this.addRandomDataHot(1)
 		},
 		onHide() {
 			this.isShowBanner = false
@@ -194,7 +197,7 @@
 		onShareAppMessage (res) {
 		    return {
 		      title: '灵巫互动',
-			  imageUrl: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605600100857%E5%9C%86%E5%BD%A2%E7%94%A8JPG.jpg',
+			    imageUrl: 'https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1605600100857%E5%9C%86%E5%BD%A2%E7%94%A8JPG.jpg',
 		      path: 'pages/dishover/dishover'
 		    }
 		},
@@ -228,11 +231,15 @@
 			uni.stopPullDownRefresh();
 		},
 		onReady () {
+		    console.log('看看会不会重复进入')
 			this.isRequestAes()
 			this.isGetLight()
 			if (uni.getStorageSync('token')) {
 				this.getLight()
 				this.getAddLightCount()
+			}else{
+				console.log("发现页没有token我去获取token啦")
+				return this.getToken()
 			}
 			this.isAppReady()
 		},
@@ -243,10 +250,15 @@
 			// 游客登录时  监听app页面是否就绪  就绪则加载
 			isAppReady () {
 				globalBus.$on('getLightOfAppReady', () => {
+					if(!uni.getStorageSync('token')){
+						console.log("发现页没有token我去获取token啦")
+						return this.getToken()
+					}
 					console.log('发请求')
 					this.getAddLightCount()
 					this.getLight()
 				})
+				globalBus.$emit('initLightStyle')
 			},
 			// 获取当前一次性看广告加光的数量
 			getAddLightCount () {
@@ -294,15 +306,20 @@
 								title: '恭喜成功获得光'
 							})
 							globalBus.$emit('getLight', res.data.data)
-							
+
 							globalBus.$emit('bouyClickCommonOptionTodo')
-							
+
 						}
 					})
 				})
 			},
 			// 获取光
 			getLight () {
+				let token = uni.getStorageSync('token')
+				if(!token){
+					console.log("发现页没有token我去获取token啦")
+					return this.getToken()
+				}
 				uni.request({
 					url: baseURL + '/user/light/getUserLight',
 					method: 'POST',
@@ -314,6 +331,7 @@
 						'Authorization': uni.getStorageSync('token')
 					},
 					success: res => {
+					    console.log('获得广成功')
 						if (res.data.status === 200) {
 							this.ecmUserLightUpLimit = res.data.data.ecmUserLightUpLimit
 							this.lightNumber = res.data.data.lightNumber
@@ -325,6 +343,81 @@
 					}
 				})
 			},
+			
+			getToken() {
+				let _this = this
+				_this.singlePageFlag = true
+				let openid = uni.getStorageSync("openid")
+				if (openid) {
+					_this.updateUserInfo(openid)
+				} else {
+					uni.login({
+						provider: 'weixin',
+						success: async loginRes => {
+							let code = loginRes.code
+							await uni.request({
+								url: baseURL + '/getOpenid',
+								data: {
+									code: code,
+								},
+								method: 'POST',
+								header: {
+									'content-type': 'application/json'
+								},
+								success: res => {
+									if (res.data.status == 200) {
+										uni.setStorageSync("openid", res.data.data.openid)
+										_this.updateUserInfo(res.data.data.openid)
+									} else {
+										return uni.showToast({
+											icon: 'none',
+											title: '授权失败，请退出重新进入小程序'
+										})
+									}
+								}
+							})
+						},
+					})
+				}
+			},
+			async updateUserInfo(openid) {
+				let _this = this
+				let token = uni.getStorageSync("token")
+				this.string = token
+				if (!token) {
+					await uni.request({
+						url: baseURL + '/savaUserInfo',
+						data: {
+							openid: openid,
+							nickname: _this.nickName,
+							gender: _this.gender,
+							avatarurl: _this.avatarUrl,
+							country: _this.country,
+							province: _this.province,
+							city: _this.city,
+							language: _this.language
+						},
+						method: 'POST',
+						header: {
+							'content-type': 'application/json'
+						},
+						success: (res) => {
+							if (res.data.status == 200) {
+								uni.setStorageSync("token", res.data.data)
+								_this.token = res.data.data
+								this.getLight()
+								globalBus.$emit('getLightOfAppReady')
+								globalBus.$emit('initLightStyle')
+							}
+						}
+					})
+				}else{
+					this.getLight()
+					globalBus.$emit('getLightOfAppReady')
+					globalBus.$emit('initLightStyle')
+				}
+			},
+			
 			go_search_page() {
 				console.log('123')
 				uni.navigateTo({
@@ -347,9 +440,10 @@
 				this['sortList' + this.currentsort]
 				this.judgesortData()
 			},
-			addRandomDataHot() {
+			addRandomDataHot(firstTime) {
 				if (this.current == 0) {
 					this.pageHot = this.pageHot + 1
+					console.log("********versionId: ",versionId)
 					// console.log(this.pageHot)
 					uni.request({
 						url:  baseURL + '/Ecmartwork/getFindArtWorks',
@@ -368,6 +462,12 @@
 								return
 							}
 							if (res.data.data.list.length != 0) {
+								//从后台获取banner 地址
+								if(firstTime === 1){
+                  this.ecmBannerInfo = res.data.data.ecmBannerInfo
+                  this.bannerSrc = this.ecmBannerInfo.ecmBannerAddress
+								}
+
 								res.data.data.list.forEach(v => {
 									v.high = 287.1
 								if (v.userLogoUrl != null) {
@@ -379,7 +479,11 @@
 									if (v.logoPath.indexOf( '/common') == -1) {
 										v.logoPath = v.logoPath + '/common'
 									}
-								}									this.hotList.push(v)
+									this.hotList.push(v)
+
+								} else{
+									console.log('空v', v)
+								}
 								})
 								if (res.data.data.loadStatus != null ) {
 									this.hotLoadStatus = 'nomore'

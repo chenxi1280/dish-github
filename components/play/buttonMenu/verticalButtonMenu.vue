@@ -24,7 +24,7 @@
 			</view>
 			<view class="returnToPrevious">返回上级</view>
 		</view>
-		<view class="shareBox" @click="share">
+		<view class="shareBox" @click="share" >
 			<view class="shareIconBox">
 				<icon class="shareIcon"></icon>
 			</view>
@@ -108,7 +108,7 @@
 </template>
 
 <script>
-	import { baseURL } from '../../../pages/dishover/config/config.js'
+	import { baseURL } from '../../../pages/login/config/config.js'
 	import storyLine from '../storyLine/storyLine.vue'
 	export default {
 		components: {
@@ -148,6 +148,14 @@
 			playedHistoryArray: {
 				type: Array,
 				default: null
+			},
+			singlePageFlag: {
+				type: Boolean,
+				default: false
+			},
+			isPosition: {
+				type: Number,
+				default: 0
 			}
 		},
 		data() {
@@ -445,12 +453,25 @@
 				this.$parent.videoContext.pause()
 			},
 			goDiscover() {
-				uni.navigateBack({
-					delta: 1,
-					fail(err) {
-						console.log('跳转失败:', err)
-					}
-				})
+				//单页面模式的时候使用 switchTab
+				if(this.singlePageFlag){
+					console.log("jump for switchTab mode")
+					this.$parent.singlePageFlag = false
+					uni.switchTab({
+						url: '../dishover/dishover'
+					})
+				}else{
+					console.log("jump for navigateBack mode")
+					uni.navigateBack({
+						delta: 1,
+						fail(err) {
+							console.log('跳转失败:', err)
+							uni.switchTab({
+								url: '../dishover/dishover'
+							})
+						}
+					})
+				}
 			},
 			//返回上级
 			returnToPrevious() {

@@ -12,8 +12,8 @@
 		<u-modal v-model="showAdvertisingFlag" title="温馨提示" :show-confirm-button="false" z-index="9999">
 			<view class="slot-content">
 				<view style="padding: 0 20rpx;padding-top: 40rpx;">
-					<view v-if="isHaveLight">观看作品过程中会消耗光，完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view>
-					<view v-if="!isHaveLight">当前光的数量不足，完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view>
+					<view v-if="!isHaveLight">观看作品过程中会消耗光，完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view>
+					<view v-if="isHaveLight">当前光的数量不足，完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view>
 					<view @click="openAdvertising" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
 						<image src="../../static/icon/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
 						<view style="display: inline-block;margin-left: 10rpx;color: #fff;transform: translateY(-4rpx);">立即获取</view>
@@ -244,6 +244,7 @@
 					this.advertising.offClose()
 					this.advertising.destroy()
 					this.advertising = null
+					this.adErr = null
 				}
 				if(!this.advertising){
 					console.log('获得新的广告')
@@ -262,7 +263,13 @@
 				this.getNextAd()
 
 				//捕捉错误
-				this.adErr && this.handleAdError()
+				 //&& this.handleAdError()
+				if(this.adErr) {
+					uni.showToast({
+						icon: 'none',
+						title: '当前没有适合您的激励视频，请待会再试'
+					})
+				}
 
                 this.advertising.show()
 				.catch(() => {

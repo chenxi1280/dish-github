@@ -31,7 +31,7 @@
 			</view>
 			<view class="share">分享</view>
 		</view>
-		<button open-type="share" class="shareButton"></button>
+		<button open-type="share" class="shareButton" :style="isPosition === 2 ? 'z-index: 999':''"></button>
 		<!-- 故事线内容呈现在蒙板之上 -->
 		<view class="storyLineContentMask16" v-if="storyLineContentFlag" style="z-index: 999;">
 			<view class="storyLineContentBox">
@@ -108,7 +108,7 @@
 </template>
 
 <script>
-	import { baseURL } from '../../../pages/dishover/config/config.js'
+	import { baseURL } from '../../../pages/login/config/config.js'
 	import { horizontalStoryLine } from '../storyLine/horizontalStoryLine.vue'
 	export default {
 		components: {
@@ -148,6 +148,14 @@
 			playedHistoryArray: {
 				type: Array,
 				default: null
+			},
+			singlePageFlag: {
+				type: Boolean,
+				default: false
+			},
+			isPosition: {
+				type: Number,
+				default: 0
 			}
 		},
 		data() {
@@ -446,12 +454,25 @@
 				this.$parent.videoContext.pause()
 			},
 			goDiscover() {
-				uni.navigateBack({
-					delta: 1,
-					fail(err) {
-						console.log('跳转失败:', err)
-					}
-				})
+				//单页面模式的时候使用 switchTab
+				if(this.singlePageFlag){
+					console.log("jump for switchTab mode")
+					this.$parent.singlePageFlag = false
+					uni.switchTab({
+						url: '../dishover/dishover'
+					})
+				}else{
+					console.log("jump for navigateBack mode")
+					uni.navigateBack({
+						delta: 1,
+						fail(err) {
+							console.log('跳转失败:', err)
+							uni.switchTab({
+								url: '../dishover/dishover'
+							})
+						}
+					})
+				}
 			},
 			//返回上级
 			returnToPrevious() {
@@ -464,8 +485,8 @@
 					} else {
 						this.$parent.videoContext.pause()
 					}
-					//控制父组件变量
-					this.$parent.endFlag = true
+					//若作品结构只有两级此时返回到上一级就直接到开场了不会走故事线跳转逻辑所以要把弹故事线开关重置
+					this.endFlag = true
 					return this.returnToPreviouShow = true
 				}
 				//返回上一级时如果是开场不去获取百分比
@@ -547,7 +568,7 @@
 		.shareBox{
 			position: fixed;
 			right: 0;
-			top: 50%;
+			top: 90%;
 			height: 80rpx;
 			width: 100rpx;
 			transform: translate(-50%, -50%) rotateZ(90deg);
@@ -575,7 +596,7 @@
 		.shareButton{
 			position: fixed;
 			right: 0;
-			top: 50%;
+			top: 90%;
 			height: 80rpx;
 			width: 100rpx;
 			transform: translate(-50%, -50%) rotateZ(90deg);
@@ -587,7 +608,7 @@
 		.storyLineBox {
 		  position: fixed;
 		  right: 0;
-		  top: 60%;
+		  top: 50%;
 		  height: 80rpx;
 		  width: 100rpx;
 		  transform: translate(-50%, -50%) rotateZ(90deg);
@@ -619,7 +640,7 @@
 		.reportBox {
 		  position: fixed;
 		  right: 0;
-		  top: 70%;
+		  top: 60%;
 		  transform: translate(-50%, -50%) rotateZ(90deg);
 		  height: 80rpx;
 		  width: 100rpx;
@@ -651,7 +672,7 @@
 		.seeMoreBox {
 		  position: fixed;
 		  right: 0;
-		  top: 80%;
+		  top: 70%;
 		  transform: translate(-50%, -50%) rotateZ(90deg);
 		  height: 80rpx;
 		  width: 100rpx;
@@ -683,7 +704,7 @@
 		.returnToPreviousBox {
 		  position: fixed;
 		  right: 0;
-		  top: 90%;
+		  top: 80%;
 		  transform: translate(-50%, -50%) rotateZ(90deg);
 		  height: 80rpx;
 		  width: 100rpx;

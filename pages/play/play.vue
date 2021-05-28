@@ -23,7 +23,7 @@
 						<view v-if="isHaveLight">观看作品过程中会消耗光，完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view>
 						<view v-if="!isHaveLight">当前光的数量不足，完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view>
 						<view @click="openAdvertising" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
-							<image src="../../static/icon/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
+							<image src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
 							<view style="display: inline-block;margin-left: 10rpx;color: #fff;transform: translateY(-4rpx);">立即获取</view>
 						</view>
 						<view @click="closeDialog" style="position: absolute;right: 20rpx; top: 20rpx;width: 40rpx;height: 40rpx;text-align: center;line-height: 40rpx;font-size: 40rpx;">x</view>
@@ -39,7 +39,7 @@
 						<view v-if="isHaveLight">观看作品过程中会消耗光，完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view>
 						<view v-if="!isHaveLight">当前光的数量不足，完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view>
 						<view @click="openAdvertising" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
-							<image src="../../static/icon/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
+							<image src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
 							<view style="display: inline-block;margin-left: 10rpx;color: #fff;transform: translateY(-4rpx);">立即获取</view>
 						</view>
 						<view @click="closeDialog" style="position: absolute;right: 20rpx; top: 20rpx;width: 40rpx;height: 40rpx;text-align: center;line-height: 40rpx;font-size: 40rpx;">x</view>
@@ -55,7 +55,7 @@
 						<view>此选项作者设置必须观看激励视频才能播放哦</view>
 						<!-- <view v-if="!isHaveLight">当前光的数量不足，完整观看激励视频可以获得{{rewardLight}}个光的奖励哦</view> -->
 						<view @click="openAdvertising" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
-							<image src="../../static/icon/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
+							<image src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
 							<view style="display: inline-block;margin-left: 10rpx;color: #fff;transform: translateY(-4rpx);">立即观看</view>
 						</view>
 						<view @click="closeConditionDialog" style="position: absolute;right: 20rpx; top: 20rpx;width: 40rpx;height: 40rpx;text-align: center;line-height: 40rpx;font-size: 40rpx;">x</view>
@@ -69,7 +69,7 @@
 			<view class="container" v-show="showCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px', 'z-index': '9999'}">
 				<canvas canvas-id="myCanvas" @touchstart="getTouchPosition" @touchend="canvasTouchendEvent"></canvas>
 			</view>
-			<view class="container" v-show="showBuoyCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px'}">
+			<view class="container" v-show="showBuoyCanvasFlag" :style="{'width': canvasWidth+'px', 'height': canvasHeight+'px' ,'z-index': '999'}">
 				<!-- <canvas canvas-id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas> -->
 				<canvas type="2d" id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas>
 			</view>
@@ -84,8 +84,8 @@
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform} ">
 				<video v-if="videoShowFlag" :controls="false" :src="videoUrl" :show-mute-btn="false" :show-fullscreen-btn="false"
 				 :autoplay="autopalyFlag" id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="false" :loop="false"
-				 @ended="videoEnd(false)" @pause="videoPause" @touchend="videoTouchend" @touchstart="videoTouchstart" @error="videoError"
-				 auto-pause-if-navigate @timeupdate="videoTimeupdate" @play="videoPlay" @waiting="waitingVideo" @loadedmetadata="loadeddata"
+				 @ended="videoEnd(false)" @pause="videoPause" @touchend="videoTouchend" @error="videoError"
+				 auto-pause-if-navigate @timeupdate="videoTimeupdate" @play="videoPlay" @loadedmetadata="loadeddata"
 				 :show-play-btn="false" @click="toggleProgress"></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
@@ -155,8 +155,8 @@
 				</view>
 				<verticalButtonMenu :storyLineFlag="storyLineFlag" :parentId="parentId" :artworkId="artworkId" :playedHistoryArray="playedHistoryArray"
 					:multipleResultLine="multipleResultLine" :bouyNodeFlage="bouyNodeFlage" :artworkTree="artworkTree"
-					:multipleResultReplayFlag="multipleResultReplayFlag" ref="verticalMenu"
-					>
+					:multipleResultReplayFlag="multipleResultReplayFlag" ref="verticalMenu" :singlePageFlag="singlePageFlag"
+					:isPosition="isPosition">
 				</verticalButtonMenu>
 			</view>
 			<!-- 横屏 -->
@@ -179,8 +179,8 @@
 				</view>
 				<horizontalButtonMenu :storyLineFlag="storyLineFlag" :parentId="parentId" :artworkId="artworkId" :playedHistoryArray="playedHistoryArray"
 					:multipleResultLine="multipleResultLine" :bouyNodeFlage="bouyNodeFlage" :artworkTree="artworkTree"
-					:multipleResultReplayFlag="multipleResultReplayFlag" ref="horizontalMenu"
-					>
+					:multipleResultReplayFlag="multipleResultReplayFlag" ref="horizontalMenu" :singlePageFlag="singlePageFlag"
+					:isPosition="isPosition">
 				</horizontalButtonMenu>
 			</view>
 		</view>
@@ -210,7 +210,7 @@
 						<view >完整观看激励视频,免费查看结果</view>
 					</view>
 					<view @click="goAdvertisement" style="padding: 20rpx;background-color: #985ba9;width: 400rpx;margin-left: calc(50% - 200rpx); margin-top: 60rpx;text-align: center;border-radius: 10rpx;margin-bottom: 40rpx;">
-						<image src="../../static/icon/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
+						<image src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/showVideo.png" style="width: 40rpx;height: 40rpx;display: inline-block;transform: translateY(4rpx);"></image>
 						<view style="display: inline-block;margin-left: 10rpx;color: #fff;transform: translateY(-4rpx);">查看结果</view>
 					</view>
 				</view>
@@ -275,7 +275,7 @@
 			<action-option :array.sync="bindActionOptionArray" ref="actionOptionChild" :playMode="playMode"
 				:referenceArray="ecmArtworkNodeActionVOList" :width="videoWidth" :height="videoHeight"
 				:style="{width: mobilePhoneWidth+'px',height: mobilePhoneHeight+'px', 
-				position: 'fixed',left: '0', top:'0'}">
+				position: 'fixed',left: '0', top:'0',zIndex: actionOptionZIndex}">
 				</action-option>
 		</view>
 	</view>
@@ -285,10 +285,6 @@
 	import {
 		baseURL
 	} from '../login/config/config.js'
-	import storyLine from '../../components/play/storyLine/storyLine.vue'
-	import {
-		horizontalStoryLine
-	} from '../../components/play/storyLine/horizontalStoryLine.vue'
 	import Advertising from '../../components/Advertising/Advertising.vue'
 	import {
 		globalBus
@@ -308,8 +304,6 @@
 		} from '../../components/play/buttonMenu/horizontalButtonMenu.vue'
 	export default {
 		components: {
-			storyLine,
-			horizontalStoryLine,
 			Advertising,
 			verticalJumpDialog,
 			horizontalJumpDialog,
@@ -569,6 +563,12 @@
 				returnToPreviouWidthMax: 0,
 				returnToPreviouHeightMin: 0,
 				returnToPreviouHeightMax: 0,
+				//分享的位置
+				wxShareWidthMin: 0,
+				wxShareWidthMax: 0,
+				wxShareHeightMin: 0,
+				wxShareHeightMax: 0,
+				
 				// 浮标广告弹窗
 				showConditionAdvertisingFlag: false,
 				//是否展示返回上一级提示弹窗
@@ -618,7 +618,19 @@
 				//自制进度条开关
 				myProgressFlag: true,
 				//自制进度条延时函数
-				myProgressDelayFunction: null				
+				myProgressDelayFunction: null,
+				//是否是单页面模式
+				singlePageFlag: false,
+				//是否是第一次出现动作选项开关
+				reminderIndex: 0,
+				//第一个动作出现的时间点
+				actionSectionTimeMin: 0,
+				//play页面初始化的flag
+				initPlayPageFlag: false,
+				//动态控制组件的层级
+				actionOptionZIndex: '99999',
+				//是否是免广告作品的标志
+				playType: 0
 			}
 		},
 		onReady() {
@@ -659,6 +671,8 @@
 			this.isBouyClickCommonOptionTodo()
 		},
 		onLoad(option) {
+			this.initPlayPageFlag = true
+			this.reminderIndex = 0
 			this.token = uni.getStorageSync('token')
 			console.log("**************************this.token:", this.token)
 			if (!this.token) {
@@ -754,11 +768,35 @@
 			uni.setStorageSync('appearConditionMap', null)
 			console.log('离开play1！！！！')
 			globalBus.$off('bouyClickCommonOptionTodo')
+            //20210422xuezx销毁video
+            this.videoShowFlag = false
 			//20210422xuezx清除页面定时器
 			if (this.buoyRef != null) {
 				console.log('定时器存在并已清除')
 				clearInterval(this.buoyRef)
 			}
+			if(this.videoUrlTimeOut) {
+			    clearTimeout(this.videoUrlTimeOut)
+            }
+
+            if(this.savaPlayRecordTimOut){
+                clearTimeout(this.savaPlayRecordTimOut)
+			}
+
+            if(this.videoPlayTimeOut){
+                clearTimeout(this.videoPlayTimeOut)
+            }
+
+            if(this.optionPercentageFunction){
+                clearTimeout(this.optionPercentageFunction)
+			}
+            if(this.myProgressDelayFunction){
+                clearTimeout(this.myProgressDelayFunction)
+            }
+            if(this.likabilityDelayFunction){
+                clearTimeout(this.likabilityDelayFunction)
+            }
+
 		},
 		onShareAppMessage(res) {
 			let artworkInfo = uni.getStorageSync('artworkInfo')
@@ -804,6 +842,7 @@
 			},
 			getToken() {
 				let _this = this
+				_this.singlePageFlag = true
 				let openid = uni.getStorageSync("openid")
 				if (openid) {
 					_this.updateUserInfo(openid)
@@ -1025,16 +1064,33 @@
 				this.buoyTouchFlag = true
 				this.reCanvasNodeBuoyList()
 			},
-			videoError(e) {
-				if(this.parentId === 0){
-					uni.setStorageSync("relaunchApplets", true)
-					uni.switchTab({
-						url: '../dishover/dishover'
-					})
-				}
-				
-				console.log("********************我报错了*********: ", e)
-			},
+            videoError(e) {
+				// this.videoErrorFlag = !0
+                // this.videoShowFlag = false
+				// this.videoUrl = ''
+                uni.setStorageSync("relaunchApplets", true)
+                uni.switchTab({
+                    url: '../dishover/dishover'
+                })
+
+                // if(this.parentId === 0){
+                //     const artworkData = uni.getStorageSync("mainArtworkTree")
+                //
+                //     setTimeout(()=>{
+                //         this.videoShowFlag = true
+                //         this.videoContext = uni.createVideoContext('myVideo', this)
+                //         this.initPlayData(artworkData, false)
+                //     }, 2000)
+                //     console.log("********************我报错了，正在重启*********: ", e)
+                // }else{
+                //     setTimeout(()=>{
+                //         this.videoShowFlag = true
+                //         this.videoContext = uni.createVideoContext('myVideo', this)
+                //         this.initPlayData(this.currentChildArtworkDetailTree, false);
+                //     }, 2000)
+                //     console.log("********************我作为子孙，报错了,正在重启*********: ", e)
+                // }
+            },
 			//点击浮标选项弹窗关闭按钮事件
 			closeBuoyDialog() {
 				this.buoyDialogFlag = false
@@ -1160,31 +1216,41 @@
 						eventId: 2
 					},
 					success: res => {
-						uni.showToast({
-							title: '恭喜成功获得光'
-						})
-						this.getLight()
-						if(!this.bouyNodeFlage) {
-							console.log("加光 自动选择",this.optionIndex)
-							console.log("this.isVideoEndFlag",this.isVideoEndFlag)
-							if (this.isVideoEndFlag) {
+						console.log("************addLight:",res.data.status)
+						if(res.data.status === 200){
+							uni.showToast({
+								title: '恭喜成功获得光'
+							})
+							this.getLight()
+							if(!this.bouyNodeFlage) {
 								console.log("加光 自动选择",this.optionIndex)
-								this.clickCommonOptionTodo(this.optionIndex)
+								console.log("this.isVideoEndFlag",this.isVideoEndFlag)
+								if (this.isVideoEndFlag) {
+									console.log("加光 自动选择",this.optionIndex)
+									this.clickCommonOptionTodo(this.optionIndex)
+								}
+								if(this.clickCommonOptionTodoActionFlag){
+									console.log("加光 自动选择",this.optionIndex)
+									this.clickCommonOptionTodo(this.optionIndex)
+									this.clickCommonOptionTodoActionFlag = false
+								}
+							}else{
+								this.bouyClickCommonOptionTodo()
 							}
-							if(this.clickCommonOptionTodoActionFlag){
-								console.log("加光 自动选择",this.optionIndex)
-								this.clickCommonOptionTodo(this.optionIndex)
-								this.clickCommonOptionTodoActionFlag = false
-							}
-						}else{
-							this.bouyClickCommonOptionTodo()
 						}
 
 					}
 				})
 			},
 			// 获取光
-			getLight() {
+            getLight(timeupdate) {
+                if(timeupdate){
+                    if(this.timeupdateGetLightFlag){
+                        return
+                    }else{
+                        this.timeupdateGetLightFlag = true
+                    }
+                }
 				uni.request({
 					url: baseURL + '/user/light/getUserLight',
 					method: 'POST',
@@ -1210,9 +1276,21 @@
 			closeConditionDialog() {
 				this.showConditionAdvertisingFlag = false
 				if (this.isVideoEndFlag) {
-					this.againPlayVideo()
+					if(this.bouyNodeFlage){
+						this.againPlayVideo()
+					}else if(this.isPosition === 3){
+						this.videoContext.play()
+					}else{
+						this.videoContext.play()
+					}
 				} else {
-					this.recoveryBuoyDraw()
+					if(this.bouyNodeFlage){
+						this.recoveryBuoyDraw()
+					}else if(this.isPosition === 3){
+						this.videoContext.play()
+					}else{
+						this.videoContext.play()
+					}
 				}
 
 			},
@@ -1237,7 +1315,10 @@
 					if (this.isPosition == 1) {
 						this.showCanvasFlag = true
 					}
-
+					if(this.isPosition == 3) {
+						this.videoContext.play()
+					}
+					console.log("我关闭了获取光的弹窗")
 				} else {
 					this.videoContext.play()
 					// 浮标修改
@@ -1271,23 +1352,46 @@
                 this.showAdvertisingFlag = false
             },
 			getNextAd(){
-				if(this.adErr){
-					console.log('因为上次有错误，删除了ad')
-					this.advertising.offError()
-					this.advertising.offClose()
-					this.advertising.destroy()
-					this.advertising = null
-				}
+				// if(this.adErr){
+				// 	console.log('因为上次有错误，删除了ad')
+				// 	this.advertising.offError()
+				// 	this.advertising.offClose()
+				// 	/this.advertising.destroy()
+				// 	this.advertising = null
+				// 	this.adErr = null
+				// }
 			    if(!this.advertising){
 					console.log('获得新的广告')
                     this.advertising = wx.createRewardedVideoAd({ adUnitId: 'adunit-7423fd1b2c7c5724' })
+                    //this.advertising.load()
 					this.advertising.onError(err => {
 					    console.log(err)
 						this.adErr  = err
 					})
+                    // 监听激励广告关闭
+                    this.advertising.onClose((status) => {
+                        console.log('广告关闭，status是', status)
+                        this.showConditionAdvertisingFlag = false
+                        //status.isEnded for test
+                        if (status.isEnded) {
+                            // 关闭条件浮标 弹窗
+                            this.showConditionAdvertisingFlag = false
+                            //广告正确关闭业务处理
+                            this.handleAdBusiness()
+                            // this.advertising.offClose()
+                            // this.advertising.destroy()
+                        } else {
+                            this.handleAdUnfinishedBusiness()
+                            // 浮标 结尾 广告 未看完 时间添加
+                            console.log('憨批用户不给光')
+                            this.clickCommonOptionTodoBuoyFlag = false
+                            this.clickCommonOptionTodoActionFlag = false
+                        }
+                        this.handleAdEnded()
+                    })
                 }else {
 					console.log('使用老的广告')
-                    this.advertising.offClose()
+                    // this.advertising.offClose()
 				}
 			},
 			//广告新逻辑：onload就会拉取，拉去之后存错误码，拉取失败才会临时拉取
@@ -1295,42 +1399,39 @@
                 this.showAdvertisingFlag = false
                 this.getNextAd()
                 //捕捉错误
-				this.adErr && this.handleAdError()
-           
-                // 激励广告显示并加载
-				this.advertising.load().then(() => {
-					this.advertising.show().then(() => {})
-				}).catch(() => {
-					//如果播完了并且是定位选项，需要展示canvas
-					//this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
-					this.advertising.load().then(() => {
-						this.advertising.show().then(() => {})
-					}).catch(() => {
-						this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
-						//处理调取光失败方法
-						this.handleAdError()
-					})
-				})
-                // 监听激励广告关闭
-                this.advertising.onClose((status) => {
-                    this.showConditionAdvertisingFlag = false
-					//status.isEnded for test
-                    if (true) {
-                        // 关闭条件浮标 弹窗
-                        this.showConditionAdvertisingFlag = false
-						//广告正确关闭业务处理
-						this.handleAdBusiness()
-                        this.advertising.offClose()
-                        // this.advertising.destroy()
-                    } else {
-						this.handleAdUnfinishedBusiness()
-                        // 浮标 结尾 广告 未看完 时间添加
-                        console.log('憨批用户不给光')
-                        this.clickCommonOptionTodoBuoyFlag = false
-						this.clickCommonOptionTodoActionFlag = false
-                    }
-                    this.handleAdEnded()
+           		if(this.adErr){
+                    console.log('出现错误，但是我们不处理，因为这里是罪恶都市')
+                    // this.handleAdError()
+					// return
+				}
+
+                this.advertising.show().catch(() => {
+                    //如果播完了并且是定位选项，需要展示canvas
+                    //this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
+                    this.advertising.load().then(() => {
+                        this.advertising.show().then(() => {})
+                    }).catch((e) => {
+                        console.log(e)
+                        this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
+                        //处理调取光失败方法
+                        this.handleAdError()
+                    })
                 })
+                // 激励广告显示并加载
+                // this.advertising.load().then(() => {
+					// this.advertising.show().then(() => {})
+                // }).catch(() => {
+					// //如果播完了并且是定位选项，需要展示canvas
+					// //this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
+					// this.advertising.load().then(() => {
+					// 	this.advertising.show().then(() => {})
+					// }).catch(() => {
+					// 	this.showCanvasFlag = this.isVideoEndFlag && this.isPosition === 1
+					// 	//处理调取光失败方法
+					// 	this.handleAdError()
+					// })
+                // })
+
 			},
 			handleAdEnded() {
 				if (this.isVideoEndFlag) {
@@ -1371,6 +1472,9 @@
                         console.log('重新播放')
                         this.againPlayVideo()
                     }
+					if (this.isPosition == 3) {
+					    this.videoContext.play()
+					}
                 } else {
                     // 浮标修改
                     if (this.bouyNodeFlage) {
@@ -1397,7 +1501,7 @@
                             const nowDate = new Date().getTime()
                             if (nowDate === null || nowDate - this.nowDate > 5000 ) {
                                 this.nowDate = nowDate
-                                this.addLight()
+								this.addLight()
                             }
                             // 浮标修改
                             if (this.bouyNodeFlage) {
@@ -1419,7 +1523,7 @@
                             const nowDate = new Date().getTime()
                             if (nowDate === null || nowDate - this.nowDate > 5000 ) {
                                 this.nowDate = nowDate
-                                this.addLight()
+								this.addLight()
                             }
                         }
                     }
@@ -1600,7 +1704,9 @@
 					if (this.popupTotalNumber > 0) {
 						this.popupName = artworkTree.popupName
 					}
-				}
+				} else {
+                    this.currentChildArtworkDetailTree = artworkTree
+                }
 				this.detailId = artworkTree.pkDetailId
 				//获取用户的弹窗弹出数量
 				let popupWindowRecord = uni.getStorageSync('popupWindowRecord')
@@ -1610,7 +1716,6 @@
 				this.conditionState = []
 				//初始化是否显示弹窗
 				this.popupState = uni.getStorageSync('popupState')
-				console.log('this.popupState', this.popupState)
 				if (this.popupState == 1) {
 					this.popupSettings = uni.getStorageSync('popupSettings')
 					this.handlePopupSettings()
@@ -1667,14 +1772,19 @@
 				//初始化视频及选项
 				const url = (artworkTree.videoUrl + '').split("://")
                 this.parentId = artworkTree.parentId
-
-                if(this.parentId === 0){
-                    setTimeout(() => {
-                        this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
-                    }, 1000)
+				//下方url赋值一定要放在这里
+				console.log('url', url)
+				if(this.videoErrorFlag){
+					this.videoErrorFlag = false
+					this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				}else if(this.parentId === 0){
+				    this.videoUrlTimeOut = setTimeout(() => {
+				        this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				    }, 1000)
 				} else {
-                    this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
-                }
+				    this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				}
+				
 				this.imageSrc = artworkTree.nodeLastImgUrl
 				console.log("this.imageSrc: ",this.imageSrc)
 				//如果是根节点初始化存储节点分值的容器
@@ -1756,7 +1866,17 @@
 					console.log("***********this.playedHistoryArray223",this.playedHistoryArray)
 					this.linkNodeId = null
 				}
-				
+				// console.log('url', url)
+				// if(this.videoErrorFlag){
+				// 	this.videoErrorFlag = false
+				// 	this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				// }else if(this.parentId === 0){
+				//     this.videoUrlTimeOut = setTimeout(() => {
+				//         this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				//     }, 1000)
+				// } else {
+				//     this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
+				// }
 			},
 			//视频 播放后弹窗
 			popupWindowByPopupPositonEqualsOne() {
@@ -2056,11 +2176,27 @@
 							uni.setStorageSync('popupState', res.data.data.popupState)
 							this.popupTotalNumber = res.data.data.nodePopupCount
 							this.popupNameState = res.data.data.popupNameStatus
+							this.playType = res.data.data.playType
 							if (this.pkDetailId != null) return;
 							// 浮标改动
-
+							
 							this.initPlayData(res.data.data, false);
-						} else {
+						} else if(res.data.status == 10085) {
+							uni.showModal({
+								title: "温馨提示",
+								content: "该作品暂时无法播放",
+								showCancel: false,
+								success: function (res) {
+									if (res.confirm) {
+										uni.switchTab({
+											url: '../dishover/dishover'
+										})
+									} else if (res.cancel) {
+										
+									}
+								}
+							})
+						}else{
 							this.videoShowFlag = false
 						}
 					}
@@ -2089,8 +2225,24 @@
 							this.popupState = res.data.data.popupState
 							uni.setStorageSync('popupSettings', res.data.data.ecmArtworkNodePopupSettings)
 							// console.log('storyPopupState',	this.popupState)
+							this.playType = res.data.data.playType
 							this.initPlayData(res.data.data, false);
-						} else {
+						} else if(res.data.status == 10085) {
+							uni.showModal({
+								title: "温馨提示",
+								content: "该作品暂时无法播放",
+								showCancel: false,
+								success: function (res) {
+									if (res.confirm) {
+										uni.switchTab({
+											url: '../dishover/dishover'
+										})
+									} else if (res.cancel) {
+										
+									}
+								}
+							})
+						}else {
 							this.videoShowFlag = false
 						}
 					}
@@ -2196,7 +2348,7 @@
 							//三次都未请求到token
 							token = -1
 						} else {
-							setTimeout(() => {
+							this.savaPlayRecordTimOut = setTimeout(() => {
 								this.savaPlayRecord()
 							}, 100)
 							this.savaRecordCount++
@@ -2313,7 +2465,7 @@
 				})
 			},
 			//开关控制是否展示 选项框 故事线 举报页面
-			videoEnd(isJumpDialogCallbackFlag) {
+  			videoEnd(isJumpDialogCallbackFlag) {
 				//根据是否是最后一个视频标志 最后一个视频播放结束弹出故事线 endFlag = true 表示不是最后一个视频
 				//获取用户的弹窗弹出数量
 				let popupWindowRecord = uni.getStorageSync('popupWindowRecord')
@@ -2367,24 +2519,38 @@
 						// 默认选A
 						this.optionIndex = 0
 						let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
-						// buoyStatus 弹窗是否开启 1开启 0默认选项
-						if (buoyPopInfo.buoyStatus) {
-							//如果是弹窗开启那么就重播
-							this.againPlayVideo()
+						
+						// 需要根据后台判断标志来判断 -1重播 0自动选A
+						let historyNodeBuoyList = uni.getStorageSync("historyNodeBuoyList")
+						let autoChooseFlag = historyNodeBuoyList[0].buoyPlayEndType
+						if (autoChooseFlag === -1) {
+							//如果用户选择了重播 那么回到第一个浮标出现的地方重播
+							console.log("canvasNodeBuoyList: ",this.canvasNodeBuoyList)
+							let min = this.getInitialTimePoint(2)
+							console.log("*********min time:",min-1)
+							this.videoContext.seek(parseInt(min-1))
+							this.videoContext.play()
 						} else {
-							//TODO 需要根据后台判断标志来判断 -1重播 0自动选A 判断是浮标还是动作 动作和浮标的key不一样
-							let historyNodeBuoyList = uni.getStorageSync("historyNodeBuoyList")
-							let autoChooseFlag = historyNodeBuoyList[0].buoyPlayEndType
-							if(autoChooseFlag === -1){
-								//拉回到浮标出现位置
-								//获取浮标视频的选项初始渲染时间
-								console.log("canvasNodeBuoyList: ",this.canvasNodeBuoyList)
-								let min = this.getInitialTimePoint(2)
-								console.log("*********min time:",min-1)
-								this.videoContext.seek(parseInt(min-1))
-								this.videoContext.play()
-							}else{
-								//默认选A
+							//默认选A 有三种情况 选项 图片 文字
+							let buoyPopInfo = this.getBuoyPopInfo(0)
+							// buoyStatus 弹窗是否开启 1开启 0默认选项
+							if (buoyPopInfo.buoyStatus) {
+								//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
+								if (buoyPopInfo.buoyPopType === 0) {
+									this.JumpToOtherApplets(buoyPopInfo.buoyPopAppId, buoyPopInfo.buoyPopContext)
+								} else if (buoyPopInfo.buoyPopType === 1) {
+									this.stopBuoyDraw()
+									this.printContent(buoyPopInfo.buoyPopContext)
+									this.buoyDialogImageFlag = false
+									this.buoyDialogFlag = true
+								} else {
+									this.stopBuoyDraw()
+									this.buoyDialogImageSrc = buoyPopInfo.buoyPopContext + "/mobilePop"
+									this.buoyDialogFlag = true
+									this.buoyDialogImageFlag = true
+								}
+							} else {
+								//选项
 								this.buoyAutoChooseFlag = true
 								this.clickCommonOptionTodo(0)
 							}
@@ -2478,12 +2644,13 @@
 				// 用于解决进度条卡顿问题
 				const time = JSON.parse(JSON.stringify(this.currentTime))
 				if (this.isPlay) {
-					const timer = setTimeout(() => {
+					this.videoPlayTimeOut = setTimeout(() => {
 						if (time === this.currentTime) {
 							this.videoContext.play()
 						}
-						clearTimeout(timer)
+						clearTimeout(this.videoPlayTimeOut)
 					}, 300)
+
 				}
 				if (this.waitingVideoFlag) {
 					if (this.bouyNodeFlage) {
@@ -2569,6 +2736,9 @@
 				}
 			},
 			clickCommonOptionTodo(index) {
+				console.log("下标index：",index)
+				console.log("条件数组：",this.conditionState)
+				console.log("下标index：",this.conditionState[index])
 				if(this.isPosition === 3 ){
 					this.clickCommonOptionTodoActionFlag = true
 				}
@@ -2590,7 +2760,7 @@
 				uni.removeStorageSync('popupSettings')
 				uni.setStorageSync('isReplay', false)
 
-				if (this.conditionState[index] == 1) {
+				if (this.conditionState[index] == 1 && this.playType !== 1) {
 					console.log('作者让你看广告啊，跟我没关系')
 
 					// this.videoContext.play()
@@ -2601,12 +2771,15 @@
 						this.videoContext.pause()
 						this.stopBuoyDraw()
 						this.showConditionAdvertisingFlag = true
-					} else {
+					} else if(this.isPosition === 3) {
+						this.videoContext.pause()
+						this.showConditionAdvertisingFlag = true
+					}else{
 						this.openAdvertising()
 					}
 
 				} else {
-					if (!this.iscustomLightFlag) {
+					if (!this.iscustomLightFlag && this.playType !== 1) {
 						//动作执行扣光时将视频播放结束标志置位true
 						if (this.storyLineJumpFlag) {
 							return this.customLightByUserId(3)
@@ -3173,12 +3346,12 @@
 				uni.removeStorageSync('popupState')
 				uni.removeStorageSync('popupSettings')
 				uni.setStorageSync('isReplay', false)
-				if (this.conditionState[this.touchRectNum] == 1) {
+				if (this.conditionState[this.touchRectNum] == 1 && this.playType !== 1) {
 					console.log('作者让你看广告啊，跟我没关系')
 					this.openAdvertising()
 					this.showCanvasFlag = false
 				} else {
-					if (!this.iscustomLightFlag) {
+					if (!this.iscustomLightFlag && this.playType !== 1) {
 						if (this.storyLineJumpFlag) {
 							return this.customLightByUserId(3)
 						} else {
@@ -3413,6 +3586,7 @@
 				})
 			},
 			loadeddata(e) {
+				this.reminderIndex = 0
 				//展示自制进度条
 				this.myProgressFlag = true
 				// 浮标作品 禁用所有的进度条
@@ -3425,8 +3599,7 @@
 					this.videoContext.pause()
 					this.videoContext.play()
 				}
-				console.log('this.videoShowFlag: ', this.videoShowFlag)
-				console.log('this.isPlayedFlag: ', this.isPlayedFlag)
+				console.log('开始加载loadeddata， isPlayedFlag和videoShowFlag: ', this.isPlayedFlag, this.videoShowFlag)
 				//清除百分比延时函数
 				clearTimeout(this.optionPercentageFunction)
 				clearTimeout(this.myProgressDelayFunction)
@@ -3484,6 +3657,7 @@
 					if(this.isPosition === 3){
 						this.videoContext.seek(parseInt(this.actionSectionTime - 1))
 						this.isPlayedFlag = false
+						this.actionSectionTime = 0
 					}else{
 						this.isPlayedFlag = false
 					}
@@ -3568,10 +3742,21 @@
 							this.bindActionOptionArray.push(this.ecmArtworkNodeActionVOList[i])
 						}
 					}
+					//actionSectionTime 动作出现时间找出最小值 找最小值在一个节点中只做一次 通过reminderIndex控制
+					if(this.reminderIndex === 0 && this.bindActionOptionArray.length !== 0){
+						this.actionSectionTimeMin = this.bindActionOptionArray[0].actionSectionTime
+						for(let i = 0; i < this.bindActionOptionArray.length; i++){
+							if(this.bindActionOptionArray[i].actionSectionTime < this.actionSectionTimeMin){
+								this.actionSectionTimeMin = this.bindActionOptionArray[i].actionSectionTime
+							}
+						}
+						this.reminderIndex++
+					}
 					if(this.bindActionOptionArray.length !== 0){
 						this.actionOptionFlag = true
 						if(this.$refs.actionOptionChild && this.$refs.actionOptionChild.init){
-							this.$refs.actionOptionChild.init(this.bindActionOptionArray);
+							this.$refs.actionOptionChild.init(this.bindActionOptionArray,this.actionSectionTimeMin,
+							currentTime,this.initPlayPageFlag);
 						}
 					}else{
 						this.actionOptionFlag = false
@@ -3595,7 +3780,7 @@
 				}
 				let newTime = Math.floor(this.currentTime)
 				if (newTime == 1) {
-					this.getLight()
+                    this.getLight('timeupdate')
 				}
 				if (this.bouyNodeFlage) {
 					//速度校准
@@ -3681,10 +3866,11 @@
 				let second = (parseInt(date % 60) + '').length == 1 ? '0' + parseInt(date % 60) : parseInt(date % 60)
 				return hour + ":" + minute + ":" + second
 			},
-			videoTouchstart(e) {
-				this.tsx = e.changedTouches[0].clientX
-				this.tsy = e.changedTouches[0].clientY
-			},
+            //20200512xuezx 此方法无用
+            // videoTouchstart(e) {
+            // 	this.tsx = e.changedTouches[0].clientX
+            // 	this.tsy = e.changedTouches[0].clientY
+            // },
 			videoTouchend(e) {
 				this.myProgressFlag = !this.myProgressFlag
 			},
@@ -3938,8 +4124,6 @@
 				// console.log('nowBuoyRectList',nowBuoyRectList)
 				console.log('newY', newY, 'newX', newX)
 				// console.log('nowBuoyRectList',nowBuoyRectList)
-				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$nowBuoyRectList***********************************",
-					nowBuoyRectList)
 
 				nowBuoyRectList.forEach((v, i) => {
 					if (v != null) {
@@ -4018,11 +4202,24 @@
 					if (this.returnToPreviouHeightMin <= newY && this.returnToPreviouHeightMax >= newY) {
 						this.showBuoyCanvasFlag = false
 						console.log("返回上级")
-						this.returnToPrevious()
+						if(this.playMode){
+							this.$refs.horizontalMenu.returnToPrevious()
+						}else{
+							this.$refs.verticalMenu.returnToPrevious()
+						}
 						this.stopBuoyDraw()
 						return
 					}
 				}
+				/* if (this.wxShareWidthMin <= newX && this.wxShareWidthMax >= newX) {
+					if (this.wxShareHeightMin <= newY && this.wxShareHeightMax >= newY) {
+						this.showBuoyCanvasFlag = false
+						console.log("分享")
+						this.$refs.verticalMenu.returnToPrevious()
+						this.stopBuoyDraw()
+						return
+					}
+				} */
 				if (this.advertisingDivWidthMin <= newX && this.advertisingDivWidthMax >= newX) {
 					if (this.advertisingDivHeightMin <= newY && this.advertisingDivHeightMax >= newY) {
 						console.log("广告")
@@ -4066,27 +4263,33 @@
 					// 故事线 图标位置
 					this.storyLineBoxWidthMin = ww - cw - this.getPxbyRpx(140)
 					this.storyLineBoxWidthMax = this.storyLineBoxWidthMin + this.getPxbyRpx(80)
-					this.storyLineBoxHeightMin = (wh * 0.6) - ch - this.getPxbyRpx(60)
+					this.storyLineBoxHeightMin = (wh * 0.5) - ch - this.getPxbyRpx(60)
 
 					this.storyLineBoxHeightMax = this.storyLineBoxHeightMin + this.getPxbyRpx(100)
 
 					// 举报   图标位置
 					this.reportBoxWidthMin = this.storyLineBoxWidthMin
 					this.reportBoxWidthMax = this.storyLineBoxWidthMax
-					this.reportBoxHeightMin = (wh * 0.7) - ch - this.getPxbyRpx(60)
+					this.reportBoxHeightMin = (wh * 0.6) - ch - this.getPxbyRpx(60)
 					this.reportBoxHeightMax = this.reportBoxHeightMin + this.getPxbyRpx(100)
 
 					// 更多   图标位置
 					this.seeMoreBoxWidthMin = this.storyLineBoxWidthMin
 					this.seeMoreBoxWidthMax = this.storyLineBoxWidthMax
-					this.seeMoreBoxHeightMin = (wh * 0.8) - ch - this.getPxbyRpx(60)
+					this.seeMoreBoxHeightMin = (wh * 0.7) - ch - this.getPxbyRpx(60)
 					this.seeMoreBoxHeightMax = this.seeMoreBoxHeightMin + this.getPxbyRpx(100)
 
 					// 返回上一级   图标位置
 					this.returnToPreviouWidthMin = this.storyLineBoxWidthMin
 					this.returnToPreviouWidthMax = this.storyLineBoxWidthMax
-					this.returnToPreviouHeightMin = (wh * 0.9) - ch - this.getPxbyRpx(60)
+					this.returnToPreviouHeightMin = (wh * 0.8) - ch - this.getPxbyRpx(60)
 					this.returnToPreviouHeightMax = this.returnToPreviouHeightMin + this.getPxbyRpx(100)
+					
+					//分享 位置
+					// this.wxShareWidthMin = this.storyLineBoxWidthMin
+					// this.wxShareWidthMax = this.storyLineBoxWidthMax
+					// this.wxShareHeightMin = (wh * 0.9) - ch - this.getPxbyRpx(60)
+					// this.wxShareHeightMax = this.wxShareHeightMin + this.getPxbyRpx(100)
 
 					// 广告 位置
 					this.advertisingDivWidthMin = ww - this.getPxbyRpx(80) - cw
@@ -4122,6 +4325,12 @@
 					this.returnToPreviouWidthMax = this.storyLineBoxWidthMax
 					this.returnToPreviouHeightMin = (wh * 0.61) - ch
 					this.returnToPreviouHeightMax = this.returnToPreviouHeightMin + this.getPxbyRpx(80)
+					
+					//分享 位置
+					// this.wxShareWidthMin = this.storyLineBoxWidthMin
+					// this.wxShareWidthMax = this.storyLineBoxWidthMax
+					// this.wxShareHeightMin = (wh * 0.69) - ch
+					// this.wxShareHeightMax = this.wxShareHeightMin + this.getPxbyRpx(80)
 
 					// 广告 位置
 					this.advertisingDivWidthMin = this.getPxbyRpx(60) - cw
@@ -4187,8 +4396,9 @@
 					this.buoyDraw()
 				}, 16)
 			},
-			//视频进入 缓冲
-			waitingVideo() {
+			//20200512xuezx 不再监听此方法 视频进入 缓冲
+            //20200512xuezx 不再监听此方法 视频进入 缓冲
+            waitingVideo() {
 				console.log("**********************等我一下，我在缓冲********************************")
 			},
 			// 浮标 加光回调

@@ -2,15 +2,25 @@
 	<view :class="playMode ? 'horizontal-moment-box' : ''" :style="{width: playMode ? windowHeight - marginh +'px' : windowWidth - marginw + 'px',
 	 height: playMode ? windowWidth +'px' : windowHeight +'px', zIndex: '998', position: 'absolute'}">
 		<!-- :style="{width: windowWidth+'px', height: windowHeight+'px', zIndex: '998'}" -->
-		<view >
+		<view v-if="reminderFlag" :style="{width: reminderMaskWidth+'px', 
+								height: reminderMaskHeight+'px', 
+								position: 'fixed',
+								left: '0',
+								top: '0',
+								zIndex: '9999'}" @click="closeReminderBox">
+			<view class="reminderTextBox" :style="{
+					transform: playMode ? 'transform: rotate(90deg)' : '',
+					marginTop: playMode ? '20rpx' : ''
+				}">
+				<view class="slideIconBox">
+					<icon></icon>
+				</view>
+				<view class="reminderText">{{arrData[0].actionTextValue ? arrData[0].actionTextValue : reminderText }}</view>
+			</view>
+		</view>>
+		<view>
 			<view class="content" v-for="(item, index) in actionOptionStyleArray" :key="index">
 				<!-- 横屏 -->
-				<view :style="{position: 'absolute',
-				left: arrData[index].actionCoordinateX * 100 + '%',
-				top: arrData[index].actionCoordinateY * 100 + (actionOptionStyleArray[index].areaWidth/windowWidth* 100) + '%',
-				color: color,
-				width: actionOptionStyleArray[index].areaWidth+'px',
-				}" v-if="playMode"  >{{reminderText}}</view>
 				<view class="imageBox"
 				 :style="{position: 'absolute',
 				left: arrData[index].actionCoordinateX * 100 + '%',
@@ -31,12 +41,6 @@
 					
 				</view> 
 				<!-- 竖屏 -->
-				<view :style="{position: 'absolute',
-				left: arrData[index].actionCoordinateX * 100 + '%',
-				top: arrData[index].actionCoordinateY * 100 + (actionOptionStyleArray[index].areaWidth/windowHeight* 100) +'%',
-				color: color,
-				width: actionOptionStyleArray[index].areaWidth+'px',
-				}"  v-if="!playMode">{{reminderText}}</view>
 				<view class="imageBox"
 				 :style="{position: 'absolute',
 				left: arrData[index].actionCoordinateX * 100 + '%',
@@ -105,13 +109,20 @@
 				marginw: 0,
 				marginh: 0,
 				arrData: null,
-				reminderText: "沿图案滑动手指，开启互动",
-				color: "red"
+				reminderText: "沿图案滑动，开启互动",
+				color: "red",
+				reminderMaskWidth: 0,
+				reminderMaskHeight: 0,
+				//动作提醒开关
+				reminderFlag: false
 			}
 		},
 		onReady() {
+			console.log("***********************playmode: ",this.playMode)
 			//将用户手机窗口尺寸记录方便在方法中调用
 			const {windowWidth,windowHeight} = uni.getSystemInfoSync()
+			this.reminderMaskWidth = windowWidth
+			this.reminderMaskHeight = windowHeight
 			if (this.playMode) {
 				this.marginw = windowHeight - this.width
 				this.marginh = windowWidth - this.height
@@ -126,7 +137,27 @@
 			console.log(this.marginw, this.marginh, this.width, this.height, '--------------------')
 		},
 		methods: {
-			init(array){
+			closeReminderBox(){
+				this.$parent.initPlayPageFlag = false
+				this.reminderFlag = false
+				this.$parent.actionOptionZIndex = '0'
+				//22周任务 动作提醒消失的时候视频播放
+				this.$parent.videoContext.play()
+				//22周任务 动作对于一个用户终生只提醒一次
+				uni.setStorageSync("actionOptionReminderAppearFlag",true)
+			},
+			init(array,min,currentTime,initPlayPageFlag){
+				let endTime = min+4
+				let actionOptionReminderAppearFlag = uni.getStorageSync("actionOptionReminderAppearFlag")
+				if(endTime >= currentTime && currentTime >= min && initPlayPageFlag && !actionOptionReminderAppearFlag){
+					this.reminderFlag = true
+					//22周任务 动作提醒出现的时候视频暂停
+					this.$parent.videoContext.pause()
+				}else{
+					this.$parent.initPlayPageFlag = false
+					this.reminderFlag = false
+					this.$parent.actionOptionZIndex = '0'
+				}
 				this.arrData = array
 				this.paramArray = array
 				//圆 短箭头 长箭头
@@ -150,8 +181,6 @@
 						this.areaRight = parseInt(array[i].actionCoordinateX*this.windowWidth)
 						this.areatop = parseInt(array[i].actionCoordinateY*this.windowHeight)
 					}
-					// console.log("******left: ",this.areaRight)
-					// console.log("******top: ",this.areatop)
 					let scale = array[i].actionScale
 					let imageWidth = parseInt(this.areaWidth*scale)
 					let imageHeight = parseInt(this.areaHeight*scale)
@@ -173,57 +202,16 @@
 				}
 			},
 			touchmove(index,e){
-				// console.log("**************e：",e)
 				let x = e.touches[0].pageX
 				let y = e.touches[0].pageY
 				if(this.isValid){
 					this.moveFlag = true
 				}
-				// console.log("*********x: ",x,"*********y: ",y)
-				/* if(this.playMode === 0){
-					if(this.isValid){
-						let infos = this.actionOptionStyleArray[index]
-						let xLowLimit = infos.right
-						let xUpLimit = infos.right + infos.areaWidth
-						let yLowLimit = infos.top
-						let yUpLimit = infos.top + infos.areaHeight
-						// console.log("************xLowLimit: ",xLowLimit,"**********xUpLimit: ",xUpLimit,
-						// "**********yLowLimit: ",yLowLimit,"**********yUpLimit: ",yUpLimit)
-						if(x >= xLowLimit && x <= xUpLimit && y >= yLowLimit && y <= yUpLimit){
-							this.isValid = true
-						}else{
-							this.isValid = false
-						}
-					}
-				}else{
-					if(this.isValid){
-						let infos = this.paramArray[index]
-						let right = infos.actionCoordinateY*this.windowWidth
-						let top = infos.actionCoordinateX*this.windowHeight
-						let areaWidth = parseInt(infos.actionWide*this.windowHeight)
-						let areaHeight = parseInt(infos.actionHigh*this.windowHeight)
-						let xUpLimit = this.windowWidth - right
-						let xLowLimit = xUpLimit - areaHeight
-						let yLowLimit = top
-						let yUpLimit = top + areaWidth
-						// console.log("************xLowLimit: ",xLowLimit,"**********xUpLimit: ",xUpLimit,
-						// "**********yLowLimit: ",yLowLimit,"**********yUpLimit: ",yUpLimit)
-						if(x >= xLowLimit && x <= xUpLimit && y >= yLowLimit && y <= yUpLimit){
-							this.isValid = true
-						}else{
-							this.isValid = false
-						}
-					}
-				} */
-				// console.log("***********isValid2: ",this.isValid)
 			},
 			touchstart(index,e){
 				this.isValid = true
-				console.log(1)
-				// console.log("**************e：",e)
 				let x = e.touches[0].pageX
 				let y = e.touches[0].pageY
-				console.log("*********x: ",x,"*********y: ",y)
 				/* if(this.playMode === 0){
 					let infos = this.actionOptionStyleArray[index]
 					let xLowLimit = infos.right
@@ -255,29 +243,18 @@
 						this.isValid = false
 					}
 				} */
-				console.log("***********isValid1: ",this.isValid)
 			},
 			touchend(index,e){
-				// console.log("**************e：",e)
-				console.log(3)
 				let x = e.changedTouches[0].pageX
 				let y = e.changedTouches[0].pageY
-				console.log("*********x: ",x,"*********y: ",y)
 				if(this.playMode === 0){
 					if(this.isValid && this.moveFlag){
-						// let infos = this.actionOptionStyleArray[index]
-						// let xLowLimit = infos.right
-						// let xUpLimit = infos.right + infos.areaWidth
-						// let yLowLimit = infos.top
-						// let yUpLimit = infos.top + infos.areaHeight
-						// console.log("************xLowLimit: ",xLowLimit,"**********xUpLimit: ",xUpLimit,
-						// "**********yLowLimit: ",yLowLimit,"**********yUpLimit: ",yUpLimit)
-						// if(x >= xLowLimit && x <= xUpLimit && y >= yLowLimit && y <= yUpLimit){
 						for(let i = 0; i < this.referenceArray.length; i++){
 							let currentFknodeId = this.paramArray[index].fkNodeId
 							let referenceFknodeId = this.referenceArray[i].fkNodeId
 							if(currentFknodeId === referenceFknodeId){
 								this.$parent.optionIndex = i
+								console.log("孩子数组的下标i: ",i)
 								this.$parent.clickCommonOptionTodo(i)
 								this.moveFlag = false
 								break
@@ -288,18 +265,6 @@
 					}
 				}else{
 					if(this.isValid && this.moveFlag){
-						// let infos = this.paramArray[index]
-						// let right = infos.actionCoordinateY*this.windowWidth
-						// let top = infos.actionCoordinateX*this.windowHeight
-						// let areaWidth = parseInt(infos.actionWide*this.windowHeight)
-						// let areaHeight = parseInt(infos.actionHigh*this.windowHeight)
-						// let xUpLimit = this.windowWidth - right
-						// let xLowLimit = xUpLimit - areaHeight
-						// let yLowLimit = top
-						// let yUpLimit = top + areaWidth
-						// console.log("************xLowLimit: ",xLowLimit,"**********xUpLimit: ",xUpLimit,
-						// "**********yLowLimit: ",yLowLimit,"**********yUpLimit: ",yUpLimit)
-						// if(x >= xLowLimit && x <= xUpLimit && y >= yLowLimit && y <= yUpLimit){
 						for(let i = 0; i < this.referenceArray.length; i++){
 							let currentFknodeId = this.paramArray[index].fkNodeId
 							let referenceFknodeId = this.referenceArray[i].fkNodeId
@@ -323,6 +288,31 @@
 	page{
 		width: 100%;
 		height: 100%;
+	}
+	.reminderTextBox{
+		width: 300rpx;
+		height: 300rpx;
+		position: fixed;
+		background-color: rgba(0, 0, 0, 0.5);
+		left: 30%;
+		top: 15%;
+		border-radius: 50rpx;
+		text-align: center;
+		.slideIconBox{
+			width: 200rpx;
+			height: 200rpx;
+			margin-left: 50rpx;
+			icon{
+				width: 100%;
+				height: 100%;
+				background: url(../../../static/icon/slide.png) no-repeat center;
+				background-size: 150rpx;
+			}
+		}
+		.reminderText{
+			color: white;
+			margin-top: 20rpx;
+		}
 	}
 	.horizontal-moment-box {
 		top: 50%;

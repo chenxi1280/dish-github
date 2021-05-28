@@ -5,6 +5,7 @@
 </template>
 
 <script>
+	import {vrBaseURL} from '../login/config/config.js'
 	export default {
 		data () {
 			return {
@@ -13,7 +14,7 @@
 		},
 		onLoad(option) {
 			const uuid = Math.random().toString(36).substring(2)
-			this.src = "https://wanxiangchengzhen.com/pcooookie/#/pages/mine/vr/vr?pkArtworkId=" + option.pkArtworkId+"&uuid="+uuid
+			this.src = vrBaseURL+"?pkArtworkId=" + option.pkArtworkId+"&uuid="+uuid
 			console.log("***********************web-view url: ",this.src)
 		},
 		methods: {

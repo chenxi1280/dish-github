@@ -32,7 +32,7 @@
 	import mswiper from '../../m-swiper/m-swiper.vue'
 	import {
 		baseURL
-	} from '../../../pages/dishover/config/config.js'
+	} from '../../../pages/login/config/config.js'
 	export default {
 		props: {
 			//需要传递的2个值pkArtworkId 作品id ，pkDetailIds 播放过的节点id数组
