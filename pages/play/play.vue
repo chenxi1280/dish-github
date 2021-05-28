@@ -73,6 +73,13 @@
 				<!-- <canvas canvas-id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas> -->
 				<canvas type="2d" id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas>
 			</view>
+			<!-- 动作蒙版 -->
+			<view v-if="!videoloadFlag && isPosition === 3 && isShowMovementTips" class="movement_mask" :style="{'transform': transform, 'width': playMode ? '100vh' : '100vw', 'height': playMode ? '100vw' : '100vh'}" @click="changeMovementFlag">
+				<image v-if="!playMode" :style="{'width': playMode ? '100vh' : '100vw', 'height': playMode ? '100vw' : '100vh'}" 
+				src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/ivetool-icons/%E5%8A%A8%E4%BD%9C/%E5%85%A8%E5%B1%8F%E5%8A%A8%E4%BD%9C.gif"></image>
+				<image v-else :style="{'width': playMode ? '100vh' : '100vw', 'height': playMode ? '100vw' : '100vh'}"
+				src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/ivetool-icons/%E5%8A%A8%E4%BD%9C/%E5%85%A8%E5%B1%8F%E5%8A%A8%E4%BD%9C-h.gif"></image>
+			</view>
 			<!-- 播放主体  @click="showButton" @timeupdate="videoTimeupdate" @loadedmetadata="loadeddata"  :controls="controlsFlag" -->
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform} ">
 				<video v-if="videoShowFlag" :controls="false" :src="videoUrl" :show-mute-btn="false" :show-fullscreen-btn="false"
@@ -312,6 +319,7 @@
 		},
 		data() {
 			return {
+				isShowMovementTips: false,
 				nowDate: null,
 				// 是否显示进度条
 				isShowMyProgress: true,
@@ -789,6 +797,11 @@
 			}
 		},
 		methods: {
+			changeMovementFlag () {
+				this.isShowMovementTips = false
+				uni.setStorageSync('movementFlag', true)
+				this.videoContext.play()
+			},
 			getToken() {
 				let _this = this
 				let openid = uni.getStorageSync("openid")
@@ -1570,6 +1583,12 @@
 			},
 			//对节点播放数据进行筛选和提取
 			initPlayData(artworkTree, isJumpDialogCallbackFlag) {
+				const flag = uni.getStorageSync('movementFlag')
+				if (flag) {
+					this.isShowMovementTips = false
+				} else {
+					this.isShowMovementTips = true
+				}
 				//定位选项最后一帧截屏开关 预防直接显示了最后一帧截图
 				this.screenshotShowFlag = false
 				this.isShowMyProgress = true
@@ -2473,7 +2492,10 @@
 						this.waitingVideoFlag = false
 					}
 				}
-
+				const timer = setTimeout(() => {
+					if (this.isShowMovementTips) this.videoContext.pause()
+					clearTimeout(timer)
+				}, 50)
 			},
 			//视屏暂停操作
 			videoPause() {
@@ -4453,7 +4475,21 @@
         height: 100%;
       }
     }
-
+		.movement_mask {
+			z-index: 9999999;
+			width: 750rpx;
+			height: 100vh;
+			position: fixed;
+			left: 50%;
+			top: 50%;
+			background-color: rgba($color: #000000, $alpha: 0.5);
+			transform: translate(-50%, -50%);
+			image {
+				display: block;
+				width: 100%;
+				height: 100vh;
+			}
+		}
     .videoBox {
       position: absolute;
       left: 50%;

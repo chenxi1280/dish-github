@@ -19,7 +19,7 @@
 				<view class="search_main" @click="go_search_page">
 					<u-search :show-action="false" ></u-search>
 				</view>
-			</view> 
+			</view>
 		</view>
 		<incentive :lightNumber="lightNumber" :ecmUserLightUpLimit="ecmUserLightUpLimit"></incentive>
 		
