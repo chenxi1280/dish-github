@@ -1065,6 +1065,7 @@
 				this.reCanvasNodeBuoyList()
 			},
             videoError(e) {
+				console.log("视频播放报错")
 				// this.videoErrorFlag = !0
                 // this.videoShowFlag = false
 				// this.videoUrl = ''
@@ -2468,6 +2469,7 @@
   			videoEnd(isJumpDialogCallbackFlag) {
 				//根据是否是最后一个视频标志 最后一个视频播放结束弹出故事线 endFlag = true 表示不是最后一个视频
 				//获取用户的弹窗弹出数量
+				console.log("视频播放结束了")
 				let popupWindowRecord = uni.getStorageSync('popupWindowRecord')
 				if (!this.isMultipleResultPlayEnd) {
 					//不是多结局作品的结局视频从storage获取弹窗标志
@@ -2609,10 +2611,11 @@
 					//拉回到浮标出现位置
 					//获取浮标视频的选项初始渲染时间
 					console.log("canvasNodeBuoyList: ",this.canvasNodeBuoyList)
-					let min = this.canvasNodeBuoyList[0][0].buoySectionTime
-					for (let i = 0; i < this.canvasNodeBuoyList.length; i++) {
+					//二维数组得第一层的length是代表着选项的个数 元素代表着每一个选项
+					let min = this.ecmArtworkNodeBuoyList[0][0].buoySectionTime
+					for (let i = 0; i < this.ecmArtworkNodeBuoyList.length; i++) {
 						//找出最小的buoySectionTime
-						let time = this.canvasNodeBuoyList[i][0].buoySectionTime
+						let time = this.ecmArtworkNodeBuoyList[i][0].buoySectionTime
 						if(time < min){
 							min = time
 						}
@@ -2661,6 +2664,7 @@
 					}
 				}
 				const timer = setTimeout(() => {
+					console.log("我去暂停视频了 延时")
 					if (this.isShowMovementTips) this.videoContext.pause()
 					clearTimeout(timer)
 				}, 50)
@@ -2668,6 +2672,7 @@
 			//视屏暂停操作
 			videoPause() {
 				this.isPlay = false
+				console.log("视频播放暂停了")
 			},
 			//展示故事线内容的时候暂停视频
 			showStoryLineContent() {
@@ -3647,7 +3652,7 @@
 					}, 3000)
 				}
 				// 浮标修改
-				console.log("!this.bouyNodeFlage", !this.bouyNodeFlage)
+				console.log("this.bouyNodeFlage", this.bouyNodeFlage)
 				if (!this.bouyNodeFlage && this.isPosition !== 3) {
 					//判断是不是故事线跳转过来的第一个视频 第一个视频需要快进到结尾进行播放
 					if (this.isPlayedFlag) {

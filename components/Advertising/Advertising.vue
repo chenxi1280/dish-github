@@ -101,7 +101,7 @@
 			this.isEditLightNum()
 		},
 		created(){
-			this.getNextAd()
+			// this.getNextAd()
 		},
 		computed: {
 			
@@ -228,7 +228,7 @@
 			// 	return CryptoJS.enc.Utf8.stringify(decrypt).toString();
 			// },
 			// 观看激励广告
-			openAdvertising () {
+			openAdvertising000000NewLogic () {
 				// 与播放页统一的新逻辑
 				if (this.isCustom) {
 					this.$emit('customConfirmEvent')
@@ -255,7 +255,7 @@
 				    })
 				})
 			},
-			openAdvertisingOld22222 () {
+			openAdvertising () {
 				// 旧逻辑
 				// const timer = uni.getStorageSync('userId') + new Date().getTime() + ''
 				// // const timer = '151dw5q4d5wq1d5wq61d'
