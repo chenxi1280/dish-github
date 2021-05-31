@@ -86,7 +86,7 @@
 				 :autoplay="autopalyFlag" id="myVideo" :enable-play-gesture="playGestureFlag" :enable-progress-gesture="false" :loop="false"
 				 @ended="videoEnd(false)" @pause="videoPause" @touchend="videoTouchend" @error="videoError"
 				 auto-pause-if-navigate @timeupdate="videoTimeupdate" @play="videoPlay" @loadedmetadata="loadeddata"
-				 :show-play-btn="false" @click="toggleProgress"></video>
+				 :show-play-btn="false" @click="toggleProgress" @seekcomplete="bindseekcomplete"></video>
 				<!-- 视频播放结束触发事件显示最后一帧截图 -->
 				<view v-if="screenshotShowFlag" class="screenshot" :style="{backgroundImage: 'url(' + imageSrc + ')',
 				'background-repeat':'no-repeat', backgroundSize:'100% 100%'}"></view>
@@ -835,6 +835,9 @@
 			}
 		},
 		methods: {
+			bindseekcomplete(){
+				console.log("seek完成了")
+			},
 			changeMovementFlag () {
 				this.isShowMovementTips = false
 				uni.setStorageSync('movementFlag', true)
@@ -2532,7 +2535,10 @@
 							let min = this.getInitialTimePoint(2)
 							console.log("*********min time:",min-1)
 							this.videoContext.seek(parseInt(min-1))
-							this.videoContext.play()
+							let playTimeout = setTimeout(() => {
+								this.videoContext.play()
+								clearTimeout(playTimeout)
+							}, 100)
 						} else {
 							//默认选A 有三种情况 选项 图片 文字
 							let buoyPopInfo = this.getBuoyPopInfo(0)
@@ -2566,7 +2572,7 @@
 							//拉回到动作出现位置
 							//获取动作视频的选项初始渲染时间
 							let min = this.getInitialTimePoint(3)
-							console.log("*********min time:",min-1)
+							console.log("*********min time:",parseInt(min-1))
 							this.videoContext.seek(parseInt(min-1))
 							this.videoContext.play()
 						}else{
@@ -2664,8 +2670,7 @@
 					}
 				}
 				const timer = setTimeout(() => {
-					console.log("我去暂停视频了 延时")
-					if (this.isShowMovementTips) this.videoContext.pause()
+					if (this.isShowMovementTips && this.isPosition === 3) this.videoContext.pause()
 					clearTimeout(timer)
 				}, 50)
 			},
