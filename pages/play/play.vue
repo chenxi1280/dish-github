@@ -2521,8 +2521,9 @@
 						let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
 						
 						// 需要根据后台判断标志来判断 -1重播 0自动选A
-						let historyNodeBuoyList = uni.getStorageSync("historyNodeBuoyList")
-						let autoChooseFlag = historyNodeBuoyList[0].buoyPlayEndType
+						console.log("************ecmArtworkNodeBuoyList: ",this.ecmArtworkNodeBuoyList)
+						let autoChooseFlag = this.ecmArtworkNodeBuoyList[0][0].buoyPlayEndType
+						console.log("************autoChooseFlag: ",autoChooseFlag)
 						if (autoChooseFlag === -1) {
 							//如果用户选择了重播 那么回到第一个浮标出现的地方重播
 							console.log("canvasNodeBuoyList: ",this.canvasNodeBuoyList)
