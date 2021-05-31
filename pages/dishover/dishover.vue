@@ -463,8 +463,9 @@
 							if (res.data.data.list.length != 0) {
 								//从后台获取banner 地址
 								if(firstTime === 1){
+									console.log(res)
                   this.ecmBannerInfo = res.data.data.ecmBannerInfo
-                  this.bannerSrc = this.ecmBannerInfo.ecmBannerAddress
+                  this.bannerSrc = res.data.data.bannerAddress
 								}
 
 								res.data.data.list.forEach(v => {
