@@ -676,7 +676,7 @@
 			this.token = uni.getStorageSync('token')
 			console.log("**************************this.token:", this.token)
 			if (!this.token) {
-				console.log("**************************11:")
+				console.log("**************************11")
 				this.getToken()
 			}
 			uni.showShareMenu({
@@ -906,6 +906,8 @@
 								_this.token = res.data.data
 								this.getLight()
 								globalBus.$emit('getLightOfAppReady')
+								console.log("***********get token end")
+								console.log("***********get token end: ",ss_this.token)
 							}
 						}
 					})
