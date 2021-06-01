@@ -675,9 +675,22 @@
 			this.reminderIndex = 0
 			this.token = uni.getStorageSync('token')
 			console.log("**************************this.token:", this.token)
-			if (!this.token) {
-				console.log("**************************11")
-				this.getToken()
+			let times = 0
+			const that = this
+			durationGetToken ()
+			function durationGetToken () {
+				if (times < 150 && !that.token) {
+					console.log('获取token', that.token, times)
+					that.getToken()
+					times ++
+					setInterval(durationGetToken, 100)
+				}else{
+					if(times!=0 && !that.alreadyGetArtwork){
+						that.alreadyGetArtwork = !0
+						that.getArtworkTreeByArtworkId()
+					}
+				}
+				
 			}
 			uni.showShareMenu({
 				withShareTicket: true,
@@ -844,12 +857,19 @@
 				this.videoContext.play()
 			},
 			getToken() {
+				console.log("20")
 				let _this = this
 				_this.singlePageFlag = true
 				let openid = uni.getStorageSync("openid")
 				if (openid) {
+					console.log("21")
 					_this.updateUserInfo(openid)
 				} else {
+					if(this.requesttingToken2) {
+						return
+					}
+					this.requesttingToken2 = !0
+					console.log("22")
 					uni.login({
 						provider: 'weixin',
 						success: async loginRes => {
@@ -865,6 +885,7 @@
 								},
 								success: res => {
 									if (res.data.status == 200) {
+										console.log("31")
 										uni.setStorageSync("openid", res.data.data.openid)
 										_this.updateUserInfo(res.data.data.openid)
 									} else {
@@ -880,9 +901,15 @@
 				}
 			},
 			async updateUserInfo(openid) {
+				if(this.requesttingToken) {
+					return
+				}
+				this.requesttingToken = !0
 				let _this = this
 				let token = uni.getStorageSync("token")
 				this.string = token
+				console.log("32")
+				console.log("updateUserInfo function token: ",token)
 				if (!token) {
 					await uni.request({
 						url: baseURL + '/savaUserInfo',
@@ -901,16 +928,36 @@
 							'content-type': 'application/json'
 						},
 						success: (res) => {
+							console.log("33")
+							console.log("request status: ",res.data.status)
 							if (res.data.status == 200) {
-								uni.setStorageSync("token", res.data.data)
-								_this.token = res.data.data
-								this.getLight()
-								globalBus.$emit('getLightOfAppReady')
+								if(!this.token){
+									console.log("34")
+									uni.setStorageSync("token", res.data.data)
+									_this.token = res.data.data
+									// this.getArtworkTreeByArtworkId()
+									console.log("get token end:", _this.token)
+									console.log("***************this.token:", _this.token)
+									this.getLight()
+									globalBus.$emit('getLightOfAppReady')
+								}
+								// console.log("34")
+								// uni.setStorageSync("token", res.data.data)
+								// _this.token = res.data.data
+								// // this.getArtworkTreeByArtworkId()
+								// console.log("get token end:", _this.token)
+								// console.log("***************this.token:", _this.token)
+								// this.getLight()
+								// globalBus.$emit('getLightOfAppReady')
 								console.log("***********get token end")
 								console.log("***********get token end: ",ss_this.token)
 							}
 						}
 					})
+				}else{
+					_this.token = uni.getStorageSync("token")
+					console.log("updateUserInfo function token: ",_this.token)
+					// this.getArtworkTreeByArtworkId()
 				}
 			},
 			toggleProgress() {
@@ -2162,7 +2209,13 @@
 			},
 			//异步请求获取作品树 by ArtworkId
 			async getArtworkTreeByArtworkId() {
+				console.log("41")
+				console.log("*************getArtworkTreeByArtworkId",this.token)
 				console.log(this.artworkId)
+				if(!this.token){
+					console.log("46")
+					return;
+				}
 				// this.artworkId = 10208
 				await uni.request({
 					url: baseURL + "/wxPlay/playArtWorkByChildTree",
@@ -2173,7 +2226,9 @@
 						token: this.token
 					},
 					success: res => {
+						console.log("res.data.status: ",res.data.status)
 						if (res.data.status == 200) {
+							console.log("42")
 							uni.setStorageSync("mainArtworkTree", res.data.data)
 							//传到播放页面带pkDetailId参数 说明故事线跳转，只需要存一棵主树跳转节点不用去播放视频
 							uni.setStorageSync('playMode', res.data.data.playMode)
@@ -2185,9 +2240,11 @@
 							this.playType = res.data.data.playType
 							if (this.pkDetailId != null) return;
 							// 浮标改动
-							
+							console.log("45")
+							this.videoShowFlag = true
 							this.initPlayData(res.data.data, false);
 						} else if(res.data.status == 10085) {
+							console.log("43")
 							uni.showModal({
 								title: "温馨提示",
 								content: "该作品暂时无法播放",
@@ -2203,6 +2260,7 @@
 								}
 							})
 						}else{
+							console.log("44")
 							this.videoShowFlag = false
 						}
 					}
