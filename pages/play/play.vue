@@ -75,7 +75,7 @@
 			</view>
 			<!-- 动作蒙版 -->
 			<view v-if="!videoloadFlag && isPosition === 3 && isShowMovementTips" class="movement_mask" :style="{'transform': transform, 'width': playMode ? '100vh' : '100vw', 'height': playMode ? '100vw' : '100vh'}" @click="changeMovementFlag">
-				<image v-if="!playMode" :style="{'width': playMode ? '100vh' : '100vw', 'height': playMode ? '100vw' : '100vh'}" 
+				<image v-if="!playMode" :style="{'width': playMode ? '100vh' : '100vw', 'height': playMode ? '100vw' : '100vh'}"
 				src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/ivetool-icons/%E5%8A%A8%E4%BD%9C/%E5%85%A8%E5%B1%8F%E5%8A%A8%E4%BD%9C.gif"></image>
 				<image v-else :style="{'width': playMode ? '100vh' : '100vw', 'height': playMode ? '100vw' : '100vh'}"
 				src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/ivetool-icons/%E5%8A%A8%E4%BD%9C/%E5%85%A8%E5%B1%8F%E5%8A%A8%E4%BD%9C-h.gif"></image>
@@ -260,7 +260,7 @@
 			<view class="buoyDialog_mask">
 				<icon @click="closeBuoyDialog" class="horizontalCloseIcon" v-if="playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
 				<icon @click="closeBuoyDialog" class="verticalCloseIcon" v-if="!playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
-				<view class="buoyDialog" :style="{'transform': transform , 'z-index': 17}">		
+				<view class="buoyDialog" :style="{'transform': transform , 'z-index': 17}">
 					<view class="buoyDialogImage"  v-if="buoyDialogImageFlag">
 						<image :src = "buoyDialogImageSrc"></image>
 					</view>
@@ -274,7 +274,7 @@
 		<view v-if="actionOptionFlag">
 			<action-option :array.sync="bindActionOptionArray" ref="actionOptionChild" :playMode="playMode"
 				:referenceArray="ecmArtworkNodeActionVOList" :width="videoWidth" :height="videoHeight"
-				:style="{width: mobilePhoneWidth+'px',height: mobilePhoneHeight+'px', 
+				:style="{width: mobilePhoneWidth+'px',height: mobilePhoneHeight+'px',
 				position: 'fixed',left: '0', top:'0',zIndex: actionOptionZIndex}">
 				</action-option>
 		</view>
@@ -568,7 +568,7 @@
 				wxShareWidthMax: 0,
 				wxShareHeightMin: 0,
 				wxShareHeightMax: 0,
-				
+
 				// 浮标广告弹窗
 				showConditionAdvertisingFlag: false,
 				//是否展示返回上一级提示弹窗
@@ -690,7 +690,7 @@
 						that.getArtworkTreeByArtworkId()
 					}
 				}
-				
+
 			}
 			uni.showShareMenu({
 				withShareTicket: true,
@@ -982,8 +982,8 @@
 				this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
 					// console.log("nodeBuoyList",nodeBuoyList,"index",index)
 					nodeBuoyList.forEach((nodeBuoy) => {
-							nodeBuoy.x = nodeBuoy.startX 
-							nodeBuoy.y = nodeBuoy.startY 
+							nodeBuoy.x = nodeBuoy.startX
+							nodeBuoy.y = nodeBuoy.startY
 							nodeBuoy.vx = nodeBuoy.startVX
 							nodeBuoy.vy = nodeBuoy.startVY
 						}
@@ -997,12 +997,12 @@
 					this.buoyRectList[index] = null
 					// console.log("nodeBuoyList",nodeBuoyList,"index",index)
 					nodeBuoyList.forEach((nodeBuoy) => {
-						
-						// nodeBuoy.x = nodeBuoy.startX 
+
+						// nodeBuoy.x = nodeBuoy.startX
 						// nodeBuoy.y = nodeBuoy.startY
 						// nodeBuoy.vx = nodeBuoy.startVX
 						// nodeBuoy.vy = nodeBuoy.startVY
-						
+
 						//当时间相等时
 						// console.log('时间',nodeBuoy.buoySectionTime === newTime)
 						if (newTime >= nodeBuoy.buoySectionTime && nodeBuoy.targetTime >= newTime) {
@@ -1013,7 +1013,7 @@
 							nodeBuoy.vy = nodeBuoy.startVY
 							this.buoyRectList[index] = nodeBuoy
 						}
-									
+
 					})
 					// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
 				})
@@ -1151,14 +1151,17 @@
 				this.i = 0
 				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index1***********************************", this.optionIndex)
 				let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
+        console.log("buoyPopInfo",buoyPopInfo)
 				if (buoyPopInfo.buoyStatus) {
-					if (this.isVideoEndFlag) {
-						this.againPlayVideo()
-					} else {
-						console.log("**************************recoveryBuoyDraw*****************")
-						this.recoveryBuoyDraw()
-					}
-				} else {
+				// 	if (this.isVideoEndFlag) {
+				// 		this.againPlayVideo()
+        //     this.clickCommonOptionTodo(this.optionIndex)
+				// 	} else {
+				// 		console.log("**************************recoveryBuoyDraw*****************")
+				// 		// this.recoveryBuoyDraw()
+        //     this.clickCommonOptionTodo(this.optionIndex)
+				// 	}
+				// } else {
 					this.clickCommonOptionTodo(this.optionIndex)
 				}
 			},
@@ -1220,7 +1223,7 @@
 								videoContext.play()
 							},
 							complete(res) {
-					
+
 							}
 						})
 					}
@@ -1837,7 +1840,7 @@
 				} else {
 				    this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
 				}
-				
+
 				this.imageSrc = artworkTree.nodeLastImgUrl
 				console.log("this.imageSrc: ",this.imageSrc)
 				//如果是根节点初始化存储节点分值的容器
@@ -1898,7 +1901,7 @@
 						this.getTargetTree(mainTree, linkId)
 					} else {
 						console.log("endFlag3")
-						//是不是最后一个视频标志 
+						//是不是最后一个视频标志
 						this.endFlag = false;
 					}
 				}
@@ -2255,7 +2258,7 @@
 											url: '../dishover/dishover'
 										})
 									} else if (res.cancel) {
-										
+
 									}
 								}
 							})
@@ -2302,7 +2305,7 @@
 											url: '../dishover/dishover'
 										})
 									} else if (res.cancel) {
-										
+
 									}
 								}
 							})
@@ -2584,7 +2587,7 @@
 						// 默认选A
 						this.optionIndex = 0
 						let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
-						
+
 						// 需要根据后台判断标志来判断 -1重播 0自动选A
 						console.log("************ecmArtworkNodeBuoyList: ",this.ecmArtworkNodeBuoyList)
 						let autoChooseFlag = this.ecmArtworkNodeBuoyList[0][0].buoyPlayEndType
@@ -2701,7 +2704,7 @@
 					}
 					return min
 				}
-				
+
 			},
 			videoPlay() {
 				console.log(123456000011123)
@@ -2736,7 +2739,7 @@
 			},
 			//视屏暂停操作
 			videoPause() {
-				this.isPlay = false
+				// this.isPlay = false
 				console.log("视频播放暂停了")
 			},
 			//展示故事线内容的时候暂停视频
@@ -3709,7 +3712,7 @@
 				this.duration = e.detail.duration
 				let date = this.formatDate(this.duration)
 				this.durationStr = date
-				//自制进度条消失判断 3s后消失 (动作，浮标，视频时长小于3s) 不消失 
+				//自制进度条消失判断 3s后消失 (动作，浮标，视频时长小于3s) 不消失
 				if(this.duration > 3 && this.isPosition !== 2 && this.isPosition !== 3){
 					this.myProgressDelayFunction = setTimeout(() => {
 						this.myProgressFlag = false
@@ -3853,35 +3856,36 @@
 				if (newTime == 1) {
                     this.getLight('timeupdate')
 				}
+
 				if (this.bouyNodeFlage) {
-					//速度校准
+					// //速度校准
 					this.buoySpeedCalibration()
 					// 当前时间
 					this.buoyNewTime = this.currentTime
-					
+          // console.log(this.buoyRectList,this.currentTime )
 					if (this.buoyTouchFlag) {
 						this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
 							// 变量 为几号位置 数组
 							this.buoyRectList[index] = null
-							// console.log("nodeBuoyList",nodeBuoyList,"index",index)
+							console.log("nodeBuoyList",nodeBuoyList,"index",index)
 							nodeBuoyList.forEach((nodeBuoy) => {
-								
-								// nodeBuoy.x = nodeBuoy.startX 
+
+								// nodeBuoy.x = nodeBuoy.startX
 								// nodeBuoy.y = nodeBuoy.startY
 								// nodeBuoy.vx = nodeBuoy.startVX
 								// nodeBuoy.vy = nodeBuoy.startVY
-								
+
 								//当时间相等时
 								// console.log('时间',nodeBuoy.buoySectionTime === newTime)
 								if (newTime >= nodeBuoy.buoySectionTime && nodeBuoy.targetTime >= newTime) {
-									console.log("nodeBuoy",nodeBuoy)
+									// console.log("nodeBuoy",nodeBuoy)
 									nodeBuoy.x = nodeBuoy.startX + (newTime - nodeBuoy.buoySectionTime) * nodeBuoy.startVX * 60
 									nodeBuoy.y = nodeBuoy.startY + (newTime - nodeBuoy.buoySectionTime) * nodeBuoy.startVY * 60
 									nodeBuoy.vx = nodeBuoy.startVX
 									nodeBuoy.vy = nodeBuoy.startVY
 									this.buoyRectList[index] = nodeBuoy
 								}
-					
+
 							})
 							// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
 						})
@@ -3912,10 +3916,12 @@
 							})
 							this.buoyTouchFlag = false
 						}
-						return
+						// console.log('我在这里被返回')
+						// return
 					}
 					//获取视频当前时间
 					this.buoyCurrentTime = newTime
+
 					// 遍历 初始化后的可直接用于画图的 类canvas对象2维数组 index 位置下表
 					this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
 						// 变量 为几号位置 数组
@@ -3925,6 +3931,7 @@
 							//当时间相等时
 							// console.log(newTime)
 							if (nodeBuoy.buoySectionTime === newTime) {
+                console.log("nodeBuoy",nodeBuoy)
 								this.buoyRectList[index] = nodeBuoy
 							}
 						})
@@ -3999,7 +4006,7 @@
 							}
 						}
 						// }
-						
+
 						if (v != null) {
 							v.draw();
 							v.x += v.vx;
@@ -4089,7 +4096,7 @@
 							if (uni.getStorageSync('playMode') == 1) {
 								// console.log("横屏")
 								// for test v.buoyOpacity
-								let rectOpacity = (v.buoyOpacity - 0) / 100
+								let rectOpacity = 1
 
 								let rectX = parseInt(((1 - (v.buoyCoordinateY - 0) - (v.buoyHigh - 0)) * this.canvasWidth).toFixed(0))
 								// console.log('矩形框的x轴坐标: ',rectX)
@@ -4100,7 +4107,7 @@
 								// console.log('矩形框的高: ',rectH)
 								//矩形框宽度
 								let rectH = parseInt(((v.buoyWide - 0) * this.canvasHeight).toFixed(0))
-								// 浮标出现的时间 
+								// 浮标出现的时间
 								let buoySectionTime = parseInt(v.buoySectionTime - 0)
 								// 目标时间
 								let targetTime = parseInt(nodeBuoyList[i + 1].buoySectionTime - 0)
@@ -4131,7 +4138,7 @@
 							} else {
 								// console.log("竖屏")
 								// for test v.buoyOpacity
-								let rectOpacity = (v.buoyOpacity - 0) / 100
+								let rectOpacity = 1
 
 								let rectX = parseInt(((v.buoyCoordinateX - 0) * this.canvasWidth).toFixed(0))
 								// console.log('矩形框的x轴坐标: ',rectX)
@@ -4355,7 +4362,7 @@
 					this.returnToPreviouWidthMax = this.storyLineBoxWidthMax
 					this.returnToPreviouHeightMin = (wh * 0.8) - ch - this.getPxbyRpx(60)
 					this.returnToPreviouHeightMax = this.returnToPreviouHeightMin + this.getPxbyRpx(100)
-					
+
 					//分享 位置
 					// this.wxShareWidthMin = this.storyLineBoxWidthMin
 					// this.wxShareWidthMax = this.storyLineBoxWidthMax
@@ -4396,7 +4403,7 @@
 					this.returnToPreviouWidthMax = this.storyLineBoxWidthMax
 					this.returnToPreviouHeightMin = (wh * 0.61) - ch
 					this.returnToPreviouHeightMax = this.returnToPreviouHeightMin + this.getPxbyRpx(80)
-					
+
 					//分享 位置
 					// this.wxShareWidthMin = this.storyLineBoxWidthMin
 					// this.wxShareWidthMax = this.storyLineBoxWidthMax
@@ -4436,7 +4443,7 @@
 			// (rectX, rectY, rectH, rectW, vx, vy, rectOpacity, nodeId, buoySectionTime, buoyType)
 			// 浮标 视频回复方法
 			recoveryBuoyDraw() {
-				//视频回复 
+				//视频回复
 				this.videoContext.play()
 				//canvas 回来
 				this.showBuoyCanvasFlag = true
@@ -4454,10 +4461,10 @@
 							buoyRect.vx = (buoyRect.targetX - buoyRect.x) / ((buoyRect.targetTime - this.currentTime) * 58)
 							buoyRect.vy = (buoyRect.targetY - buoyRect.y) / ((buoyRect.targetTime - this.currentTime) * 58)
 						} else {
-						
+
 						}
 					}
-					
+
 				})
 			},
 			startBuoy() {
@@ -4504,7 +4511,7 @@
 					this.bouyClickCommonOptionTodo()
 				})
 			},
-			// 获取改浮标下 有没有 视频 false 没有视频 true 有视频，index 为第几个选择 
+			// 获取改浮标下 有没有 视频 false 没有视频 true 有视频，index 为第几个选择
 			getBuoyPopVideo(index) {
 				if (this.ecmArtworkNodeBuoyList[index][0].buoyVideoUrlStatus == null || this.ecmArtworkNodeBuoyList[index][0].buoyVideoUrlStatus ==
 					0) {
@@ -4839,7 +4846,7 @@
             }
           }
 
-          .title { 
+          .title {
             text-align: center;
             color: white;
             font-size: 36rpx;
@@ -5165,7 +5172,7 @@
           }
         }
       }
-	  
+
     }
 
   }
