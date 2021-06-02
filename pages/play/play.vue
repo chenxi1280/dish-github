@@ -74,7 +74,7 @@
 				<canvas type="2d" id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas>
 			</view>
 			<!-- 动作蒙版 -->
-			<view v-if="!videoloadFlag && isPosition === 3 && isShowMovementTips" class="movement_mask" :style="{'transform': transform, 'width': playMode ? '100vh' : '100vw', 'height': playMode ? '100vw' : '100vh'}" @click="changeMovementFlag">
+			<!-- <view v-if="!videoloadFlag && isPosition === 3 && isShowMovementTips" class="movement_mask" :style="{'transform': transform, 'width': playMode ? '100vh' : '100vw', 'height': playMode ? '100vw' : '100vh'}" @click="changeMovementFlag">
 				<image v-if="!playMode" :style="{'width': playMode ? '100vh' : '100vw', 'height': playMode ? '100vw' : '100vh'}"
 				src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/ivetool-icons/%E5%8A%A8%E4%BD%9C/%E5%85%A8%E5%B1%8F%E5%8A%A8%E4%BD%9C.gif"></image>
 				<image v-else :style="{'width': playMode ? '100vh' : '100vw', 'height': playMode ? '100vw' : '100vh'}"
@@ -1151,7 +1151,6 @@
 				this.i = 0
 				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index1***********************************", this.optionIndex)
 				let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
-        console.log("buoyPopInfo",buoyPopInfo)
 				if (buoyPopInfo.buoyStatus) {
 				// 	if (this.isVideoEndFlag) {
 				// 		this.againPlayVideo()
@@ -3856,18 +3855,17 @@
 				if (newTime == 1) {
                     this.getLight('timeupdate')
 				}
-
 				if (this.bouyNodeFlage) {
 					// //速度校准
 					this.buoySpeedCalibration()
 					// 当前时间
 					this.buoyNewTime = this.currentTime
-          // console.log(this.buoyRectList,this.currentTime )
+
 					if (this.buoyTouchFlag) {
 						this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
 							// 变量 为几号位置 数组
 							this.buoyRectList[index] = null
-							console.log("nodeBuoyList",nodeBuoyList,"index",index)
+							// console.log("nodeBuoyList",nodeBuoyList,"index",index)
 							nodeBuoyList.forEach((nodeBuoy) => {
 
 								// nodeBuoy.x = nodeBuoy.startX
@@ -3916,12 +3914,10 @@
 							})
 							this.buoyTouchFlag = false
 						}
-						// console.log('我在这里被返回')
-						// return
+						return
 					}
 					//获取视频当前时间
 					this.buoyCurrentTime = newTime
-
 					// 遍历 初始化后的可直接用于画图的 类canvas对象2维数组 index 位置下表
 					this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
 						// 变量 为几号位置 数组
@@ -3931,7 +3927,6 @@
 							//当时间相等时
 							// console.log(newTime)
 							if (nodeBuoy.buoySectionTime === newTime) {
-                console.log("nodeBuoy",nodeBuoy)
 								this.buoyRectList[index] = nodeBuoy
 							}
 						})
@@ -4096,7 +4091,7 @@
 							if (uni.getStorageSync('playMode') == 1) {
 								// console.log("横屏")
 								// for test v.buoyOpacity
-								let rectOpacity = 1
+								let rectOpacity = (v.buoyOpacity - 0) / 100
 
 								let rectX = parseInt(((1 - (v.buoyCoordinateY - 0) - (v.buoyHigh - 0)) * this.canvasWidth).toFixed(0))
 								// console.log('矩形框的x轴坐标: ',rectX)
@@ -4138,7 +4133,7 @@
 							} else {
 								// console.log("竖屏")
 								// for test v.buoyOpacity
-								let rectOpacity = 1
+								let rectOpacity = (v.buoyOpacity - 0) / 100
 
 								let rectX = parseInt(((v.buoyCoordinateX - 0) * this.canvasWidth).toFixed(0))
 								// console.log('矩形框的x轴坐标: ',rectX)
