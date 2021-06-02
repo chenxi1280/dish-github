@@ -8,10 +8,8 @@
 								left: '0',
 								top: '0',
 								zIndex: '9999'}" @click="closeReminderBox">
-			<view class="reminderTextBox" :style="{
-					transform: playMode ? 'transform: rotate(90deg)' : '',
-					marginTop: playMode ? '20rpx' : ''
-				}">
+			<view class="reminderTextBox" :style="{transform: playMode ? 'transform: rotate(90deg)' : '',
+				marginTop: playMode ? '20rpx' : ''}">
 				<view class="slideIconBox">
 					<icon></icon>
 				</view>
@@ -153,6 +151,11 @@
 					this.reminderFlag = true
 					//22周任务 动作提醒出现的时候视频暂停
 					this.$parent.videoContext.pause()
+					// 22周-三秒后消失
+					const timer = setTimeout(() => {
+						this.closeReminderBox()
+						clearTimeout(timer)
+					}, 3000)
 				}else{
 					this.$parent.initPlayPageFlag = false
 					this.reminderFlag = false
@@ -305,8 +308,8 @@
 			icon{
 				width: 100%;
 				height: 100%;
-				background: url(../../../static/icon/slide.png) no-repeat center;
-				background-size: 150rpx;
+				background: url('https://sike-1259692143.cos.ap-chongqing.myqcloud.com/ivetool-icons/%E5%8A%A8%E4%BD%9C/%E5%85%A8%E5%B1%8F%E5%8A%A8%E4%BD%9C.gif') no-repeat center;
+				background-size: 220rpx;
 			}
 		}
 		.reminderText{
