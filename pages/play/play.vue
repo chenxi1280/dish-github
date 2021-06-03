@@ -630,7 +630,11 @@
 				//动态控制组件的层级
 				actionOptionZIndex: '99999',
 				//是否是免广告作品的标志
-				playType: 0
+				playType: 0,
+        // 浮标 条件传递 对象
+        buoyPopInfoTouch:null,
+        // 浮标 条件 广告 成功 标志
+        adOpenBuoyDialogFlag: false
 			}
 		},
 		onReady() {
@@ -764,6 +768,7 @@
 			}
 			globalBus.$emit('bouyClickCommonOptionTodo')
 			if(this.bouyNodeFlage){
+        console.log("是769")
 				this.recoveryBuoyDraw()
 			}
 		},
@@ -1146,22 +1151,21 @@
 			//点击浮标选项弹窗关闭按钮事件
 			closeBuoyDialog() {
 				this.buoyDialogFlag = false
-				this.buoyDialogWords = null
-				this.i = 0
-				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index1***********************************", this.optionIndex)
-				let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
-				if (buoyPopInfo.buoyStatus) {
-				// 	if (this.isVideoEndFlag) {
-				// 		this.againPlayVideo()
-        //     this.clickCommonOptionTodo(this.optionIndex)
-				// 	} else {
-				// 		console.log("**************************recoveryBuoyDraw*****************")
-				// 		// this.recoveryBuoyDraw()
-        //     this.clickCommonOptionTodo(this.optionIndex)
-				// 	}
-				// } else {
-					this.clickCommonOptionTodo(this.optionIndex)
-				}
+        // this.clickCommonOptionTodo(this.optionIndex)
+        this.buoyDialogWords = null
+        this.i = 0
+        console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index1***********************************", this.optionIndex)
+        let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
+        if (buoyPopInfo.buoyStatus) {
+          if (this.isVideoEndFlag) {
+            this.againPlayVideo()
+          } else {
+            console.log("**************************recoveryBuoyDraw*****************")
+            this.recoveryBuoyDraw()
+          }
+        } else {
+          this.clickCommonOptionTodo(this.optionIndex)
+        }
 			},
 			//浮标视频 点击打印文字
 			printContent(str) {
@@ -1339,7 +1343,8 @@
 					}
 				} else {
 					if(this.bouyNodeFlage){
-						this.recoveryBuoyDraw()
+            console.log("是1343")
+            this.recoveryBuoyDraw()
 					}else if(this.isPosition === 3){
 						this.videoContext.play()
 					}else{
@@ -1377,6 +1382,7 @@
 					this.videoContext.play()
 					// 浮标修改
 					if (this.bouyNodeFlage) {
+            console.log("是1381")
 						this.recoveryBuoyDraw()
 					}
 				}
@@ -1500,7 +1506,13 @@
 				} else {
 					// 浮标修改
 					if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
-						this.recoveryBuoyDraw()
+            console.log("是1504",this.buoyPopInfoTouch ,this.adOpenBuoyDialogFlag )
+            if (this.adOpenBuoyDialogFlag ) {
+              this.stopBuoyDraw()
+              this.adOpenBuoyDialogFlag = false
+            }else  {
+              this.recoveryBuoyDraw()
+            }
 					} else {
 						this.videoContext.play()
 					}
@@ -1535,6 +1547,7 @@
                         if (this.showConditionAdvertisingFlag) {
                             this.showConditionAdvertisingFlag = false
                         }
+                      console.log("是1539")
                         this.recoveryBuoyDraw()
                     }
                 }
@@ -1559,6 +1572,7 @@
                             }
                             // 浮标修改
                             if (this.bouyNodeFlage) {
+                              console.log("这 浮标开始重播")
                                 this.recoveryBuoyDraw()
                             }
                         }
@@ -1569,6 +1583,7 @@
                         this.multipleResultCallbackTodo(false)
                     } else {
                         // 条件 广告
+                      console.log("这是条件广告成功的回调")
                         if (this.conditionState[this.optionIndex] == 1) {
                             //成功播放完广告
                             this.customLightSuccessCallBack(this.optionIndex)
@@ -1607,6 +1622,7 @@
                 } else {
 
                     if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
+                      console.log("是1613")
                         this.recoveryBuoyDraw()
                     }
                     this.videoContext.play()
@@ -2172,7 +2188,7 @@
 			},
 
 			customLightSuccessCallBack(index) {
-				console.log('扣光成功的回调')
+				console.log('条件？ -》扣光成功的回调')
 				if (this.storyLineJumpFlag) {
 					this.iscustomLightFlag = true
 					this.storyLineJumpFlag = false
@@ -2188,7 +2204,14 @@
 				} else {
 					this.background.splice(index, 1, "")
 					// 播放结束清除延时函数
-					this.optionTouchendTodo(index)
+          console.log("this.buoyPopInfoTouch",this.buoyPopInfoTouch)
+          if ( this.buoyPopInfoTouch != null) {
+            this.adOpenBuoyDialogFlag = true
+            this.openBuoyDialog( this.buoyPopInfoTouch)
+          }else {
+
+            this.optionTouchendTodo(index)
+          }
 				}
 				//保存有效观看记录
 				if (!this.isClickOptionFlag) {
@@ -2598,21 +2621,35 @@
 							//默认选A 有三种情况 选项 图片 文字
 							let buoyPopInfo = this.getBuoyPopInfo(0)
 							// buoyStatus 弹窗是否开启 1开启 0默认选项
+
 							if (buoyPopInfo.buoyStatus) {
-								//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
-								if (buoyPopInfo.buoyPopType === 0) {
-									this.JumpToOtherApplets(buoyPopInfo.buoyPopAppId, buoyPopInfo.buoyPopContext)
-								} else if (buoyPopInfo.buoyPopType === 1) {
-									this.stopBuoyDraw()
-									this.printContent(buoyPopInfo.buoyPopContext)
-									this.buoyDialogImageFlag = false
-									this.buoyDialogFlag = true
-								} else {
-									this.stopBuoyDraw()
-									this.buoyDialogImageSrc = buoyPopInfo.buoyPopContext + "/mobilePop"
-									this.buoyDialogFlag = true
-									this.buoyDialogImageFlag = true
-								}
+                console.log(this.conditionState,this.conditionState[this.optionIndex],this.playType)
+                if (this.conditionState[this.optionIndex] == 1 && this.playType !== 1) {
+                  console.log('作者让你看广告啊，跟我没关系')
+
+                  //视频暂停
+                  this.videoContext.pause()
+                  this.stopBuoyDraw()
+                  this.showConditionAdvertisingFlag = true
+                  this.buoyPopInfoTouch = buoyPopInfo
+
+                }else {
+                  this.openBuoyDialog(buoyPopInfo)
+                }
+								// //buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
+								// if (buoyPopInfo.buoyPopType === 0) {
+								// 	this.JumpToOtherApplets(buoyPopInfo.buoyPopAppId, buoyPopInfo.buoyPopContext)
+								// } else if (buoyPopInfo.buoyPopType === 1) {
+								// 	this.stopBuoyDraw()
+								// 	this.printContent(buoyPopInfo.buoyPopContext)
+								// 	this.buoyDialogImageFlag = false
+								// 	this.buoyDialogFlag = true
+								// } else {
+								// 	this.stopBuoyDraw()
+								// 	this.buoyDialogImageSrc = buoyPopInfo.buoyPopContext + "/mobilePop"
+								// 	this.buoyDialogFlag = true
+								// 	this.buoyDialogImageFlag = true
+								// }
 							} else {
 								//选项
 								this.buoyAutoChooseFlag = true
@@ -2828,7 +2865,7 @@
 					// this.videoContext.play()
 					// 浮标修改
 					if (this.bouyNodeFlage) {
-						// this.recoveryBuoyDraw()
+
 						//视频暂停
 						this.videoContext.pause()
 						this.stopBuoyDraw()
@@ -4122,7 +4159,7 @@
 							} else {
 								// console.log("竖屏")
 								// for test v.buoyOpacity
-								let rectOpacity = (v.buoyOpacity - 0) / 100
+								let rectOpacity = 1
 
 								let rectX = parseInt(((v.buoyCoordinateX - 0) * this.canvasWidth).toFixed(0))
 								// console.log('矩形框的x轴坐标: ',rectX)
@@ -4200,20 +4237,19 @@
 								console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index2***********************************", i)
 								// buoyStatus 弹窗是否开启 1开启 0默认选项
 								if (buoyPopInfo.buoyStatus) {
-									//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
-									if (buoyPopInfo.buoyPopType === 0) {
-										this.JumpToOtherApplets(buoyPopInfo.buoyPopAppId, buoyPopInfo.buoyPopContext)
-									} else if (buoyPopInfo.buoyPopType === 1) {
-										this.stopBuoyDraw()
-										this.printContent(buoyPopInfo.buoyPopContext)
-										this.buoyDialogImageFlag = false
-										this.buoyDialogFlag = true
-									} else {
-										this.stopBuoyDraw()
-										this.buoyDialogImageSrc = buoyPopInfo.buoyPopContext + "/mobilePop"
-										this.buoyDialogFlag = true
-										this.buoyDialogImageFlag = true
-									}
+                  console.log(this.conditionState,this.conditionState[this.optionIndex],this.playType)
+                  if (this.conditionState[this.optionIndex] == 1 && this.playType !== 1) {
+                    console.log('作者让你看广告啊，跟我没关系')
+
+                    //视频暂停
+                    this.videoContext.pause()
+                    this.stopBuoyDraw()
+                    this.showConditionAdvertisingFlag = true
+                    this.buoyPopInfoTouch = buoyPopInfo
+
+                  }else {
+                    this.openBuoyDialog(buoyPopInfo)
+                  }
 								} else {
 									this.buoyAutoChooseFlag = false
 									this.clickCommonOptionTodo(i)
@@ -4293,6 +4329,27 @@
 				}
 
 			},
+      openBuoyDialog(buoyPopInfo) {
+        this.stopBuoyDraw()
+        //buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
+        if (buoyPopInfo.buoyPopType === 0) {
+          this.JumpToOtherApplets(buoyPopInfo.buoyPopAppId, buoyPopInfo.buoyPopContext)
+        } else if (buoyPopInfo.buoyPopType === 1) {
+          this.stopBuoyDraw()
+          this.printContent(buoyPopInfo.buoyPopContext)
+          this.buoyDialogImageFlag = false
+          this.buoyDialogFlag = true
+        } else {
+          this.stopBuoyDraw()
+          this.buoyDialogImageSrc = buoyPopInfo.buoyPopContext + "/mobilePop"
+          this.buoyDialogFlag = true
+          this.buoyDialogImageFlag = true
+        }
+        this.buoyPopInfoTouch = null
+
+      },
+
+
 			// 清除浮标
 			clearNodeBuoyInfo() {
 				this.clearAnimation()
@@ -4427,6 +4484,7 @@
 			// (rectX, rectY, rectH, rectW, vx, vy, rectOpacity, nodeId, buoySectionTime, buoyType)
 			// 浮标 视频回复方法
 			recoveryBuoyDraw() {
+        console.log("就是调用的recoveryBuoyDraw  浮标开始重播")
 				//视频回复
 				this.videoContext.play()
 				//canvas 回来
