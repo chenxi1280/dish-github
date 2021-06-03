@@ -4159,7 +4159,7 @@
 							} else {
 								// console.log("竖屏")
 								// for test v.buoyOpacity
-								let rectOpacity = 1
+								let rectOpacity = (v.buoyOpacity - 0) / 100
 
 								let rectX = parseInt(((v.buoyCoordinateX - 0) * this.canvasWidth).toFixed(0))
 								// console.log('矩形框的x轴坐标: ',rectX)
