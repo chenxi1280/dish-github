@@ -1351,6 +1351,9 @@
 						this.videoContext.play()
 					}
 				}
+				if (this.buoyPopInfoTouch  != null) {
+          this.buoyPopInfoTouch = null
+        }
 
 			},
 			againPlayVideo() {
@@ -1446,6 +1449,9 @@
                             console.log('憨批用户不给光')
                             this.clickCommonOptionTodoBuoyFlag = false
                             this.clickCommonOptionTodoActionFlag = false
+                            if (this.buoyPopInfoTouch  != null) {
+                              this.buoyPopInfoTouch = null
+                            }
                         }
                         this.handleAdEnded()
                     })
