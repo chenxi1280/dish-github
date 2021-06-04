@@ -11,7 +11,7 @@
 				<view style="position: fixed; right: 20rpx;top:20rpx;width:80rpx;height: 80rpx;background: #000;border-radius: 40rpx;" @click="isShowBannerImg = false">
 					<image src="/static/icon/dialogClose.png" style="display: block;width: 100%;height: 100%;"/>
 				</view>
-				<image mode="widthFix" src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1619494260074%E7%81%B5%E5%B7%AB%E4%BA%92%E5%8A%A8%E4%BA%A7%E5%93%81%E5%AE%A3%E4%BC%A0.jpg"/>
+				<image mode="widthFix" :src="ecmBannerInfoImg"/>
 			</scroll-view>
 			<!--  :style="{top: `${isShowBanner ? '300rpx' : '0'}`}" -->
 			<view class="nav_container">
@@ -151,6 +151,7 @@
 				timeout: null,
 				//banner 地址
         ecmBannerInfo: null,
+        ecmBannerInfoImg:"https://sike-1259692143.cos.ap-chongqing.myqcloud.com/baseImg/1619494260074%E7%81%B5%E5%B7%AB%E4%BA%92%E5%8A%A8%E4%BA%A7%E5%93%81%E5%AE%A3%E4%BC%A0.jpg",
         bannerSrc:null
 			}
 		},
@@ -343,7 +344,7 @@
 					}
 				})
 			},
-			
+
 			getToken() {
 				let _this = this
 				_this.singlePageFlag = true
@@ -417,7 +418,7 @@
 					globalBus.$emit('initLightStyle')
 				}
 			},
-			
+
 			go_search_page() {
 				console.log('123')
 				uni.navigateTo({
@@ -467,6 +468,11 @@
 									console.log(res)
                   this.ecmBannerInfo = res.data.data.ecmBannerInfo
                   this.bannerSrc = res.data.data.bannerAddress
+                  if ( this.ecmBannerInfo != null) {
+										if(this.ecmBannerInfo.ecmBannerConnectionState == 1) {
+											this.ecmBannerInfoImg = this.ecmBannerInfo.ecmBannerConnectionUrl
+										}
+                  }
 								}
 
 								res.data.data.list.forEach(v => {
