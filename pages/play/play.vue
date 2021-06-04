@@ -2149,6 +2149,8 @@
 							if (result.data.msg === "success") {
 								this.previewSceneFlag = true
 								this.artworkId = a
+								this.getArtworkTreeByArtworkId()
+								console.log("***********checkUserIdInfos artworkId: ",this.artworkId)
 							}
 						} else {
 							console.log(result.data.msg)
@@ -2233,10 +2235,14 @@
 			async getArtworkTreeByArtworkId() {
 				console.log("41")
 				console.log("*************getArtworkTreeByArtworkId",this.token)
-				console.log(this.artworkId)
+				console.log("***********getArtworkTreeByArtworkId artworkId: ",this.artworkId)
 				if(!this.token){
 					console.log("46")
 					return;
+				}
+				let previewFlag = 0
+				if(this.previewSceneFlag){
+					previewFlag = 1
 				}
 				// this.artworkId = 10208
 				await uni.request({
@@ -2245,7 +2251,8 @@
 					dataType: 'json',
 					data: {
 						pkArtworkId: this.artworkId,
-						token: this.token
+						token: this.token,
+						previewFlag: previewFlag
 					},
 					success: res => {
 						console.log("res.data.status: ",res.data.status)
