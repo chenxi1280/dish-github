@@ -1,8 +1,10 @@
 <template>
 	<view>
 	   <view class="popup-box" v-if="horizontalJumpDialogFlag">
-			<image :src="imageUrl" @click="JumpToOtherApplets" ></image>
-			<icon @click="closeDialog" ></icon>
+		<view class="content-box" :style="{'width': popupImageHeight+'px', 'height': popupImageWidth+'px'}">
+			<image :src="imageUrl" @click="JumpToOtherApplets"  ></image>
+			<icon @click="closeDialog"></icon>
+		</view>
 	   </view>
 	</view>
 </template>
@@ -39,12 +41,20 @@
 			artworkTree: {
 				type: Object,
 				default: null
+			},
+			popupImageWidth: {
+				type: Number,
+				default: 0
+			},
+			popupImageHeight:{
+				type: Number,
+				default: 0
 			}
 		},
 		onReady() {
 		},
 		onLoad() {
-			console.log("******************************popImageUrl: ",popImageUrl)
+			console.log("******************************popupImageWidth: ",this.popupImageWidth)
 		},
 		methods: {
 			closeDialog(){
@@ -107,26 +117,35 @@ page {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.8);
     z-index: 99999;
-    image {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%) rotateZ(90deg);
-      width: 500rpx;
-      height: 500rpx;
-      // border-radius: 40rpx;
-      z-index: 18;
-    }
-    icon {
-      position: absolute;
-      right: 10%;
-      top: 70%;
-      width: 60rpx;
-      height: 60rpx;
-      background: url(../../static/icon/dialogClose.png) no-repeat center;
-      background-size: 60rpx;
-      z-index: 18;
-    }
+	.content-box{
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%) rotateZ(90deg);
+		z-index: 18;
+		image {
+			width: 100%;
+			height: 100%;
+		  // position: absolute;
+		  // left: 50%;
+		  // top: 50%;
+		  // transform: translate(-50%, -50%) rotateZ(90deg);
+		  // width: 500rpx;
+		  // height: 500rpx;
+		  // border-radius: 40rpx;
+		  // z-index: 18;
+		}
+		icon {
+		  position: absolute;
+		  right: -60rpx;
+		  top: -60rpx;
+		  width: 60rpx;
+		  height: 60rpx;
+		  background: url(../../static/icon/dialogClose.png) no-repeat center;
+		  background-size: 60rpx;
+		  // z-index: 18;
+		}
+	}
   }
 }
 </style>

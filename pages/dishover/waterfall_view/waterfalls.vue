@@ -73,7 +73,7 @@
 				let that = this;
 				let ol = o.length;
 				let nl = n.length;
-				console.log('=====watch  list=====', n, o,ol,nl,this.leftHeight , this.rightHeight );
+				// console.log('=====watch  list=====', n, o,ol,nl,this.leftHeight , this.rightHeight );
 				if (nl > ol) {
 		
 		

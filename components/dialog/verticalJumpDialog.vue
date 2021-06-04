@@ -1,8 +1,10 @@
 <template>
 	<view>
 	   <view class="popup-box" v-if="verticalJumpDialogFlag">
-		  <image :src="imageUrl" @click="JumpToOtherApplets" ></image>
-		  <icon @click="closeDialog" ></icon>
+		  <view class="content-box" :style="{'width': popupImageWidth+'px', 'height': popupImageHeight+'px'}">
+			  <image :src="imageUrl" @click="JumpToOtherApplets" ></image>
+			  <icon @click="closeDialog" ></icon>
+		  </view>
 	   </view>
 	</view>
 </template>
@@ -38,12 +40,20 @@
 			artworkTree: {
 				type: Object,
 				default: null
+			},
+			popupImageWidth: {
+				type: Number,
+				default: 0
+			},
+			popupImageHeight:{
+				type: Number,
+				default: 0
 			}
 		},
 		onReady() {
 		},
 		onLoad() {
-			console.log("******************************popImageUrl: ",popImageUrl)
+			console.log("******************************popupImageWidth: ",this.popupImageWidth)
 		},
 		methods: {
 			closeDialog(){
@@ -105,26 +115,35 @@ page {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.8);
-    image {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: 500rpx;
-      height: 500rpx;
-      // border-radius: 40rpx;
-      z-index: 9999;
-    }
-    icon {
-      position: absolute;
-      left: 80%;
-      top: 20%;
-      width: 60rpx;
-      height: 60rpx;
-      background: url(../../static/icon/dialogClose.png) no-repeat center;
-      background-size: 60rpx;
-      z-index: 18;
-    }
+	.content-box{
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		z-index: 18;
+		image {
+			width: 100%;
+			height: 100%;
+		  // position: absolute;
+		  // left: 50%;
+		  // top: 50%;
+		  // transform: translate(-50%, -50%);
+		  // width: 500rpx;
+		  // height: 500rpx;
+		  // border-radius: 40rpx;
+		  // z-index: 9999;
+		}
+		icon {
+		  position: absolute;
+		  right: -60rpx;
+		  top: -60rpx;
+		  width: 60rpx;
+		  height: 60rpx;
+		  background: url(../../static/icon/dialogClose.png) no-repeat center;
+		  background-size: 60rpx;
+		  // z-index: 18;
+		}
+	}
   }
 }
 </style>

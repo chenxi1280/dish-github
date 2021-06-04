@@ -219,13 +219,15 @@
 		<view v-if="verticalJumpDialogFlag" style="z-index: 9999;">
 			<vertical-jump-dialog :imageUrl="popupImageUrl" :navigatorUrl="navigatorUrl" :appId="appId" :artworkId="artworkId"
 			:popupPosition="popupPosition" v-on:videoEnd="videoEnd" v-on:initPlayData="initPlayData" :artworkTree="artworkTree"
-			ref="verticalJumpDialog" v-on:multipleResultCallbackTodo="multipleResultCallbackTodo" >
+			ref="verticalJumpDialog" v-on:multipleResultCallbackTodo="multipleResultCallbackTodo" :popupImageWidth="popupImageWidth"
+			:popupImageHeight="popupImageHeight">
 			</vertical-jump-dialog>
 		</view>
 		<view v-if="horizontalJumpDialogFlag">
 			<horizontal-jump-dialog :imageUrl="popupImageUrl" :navigatorUrl="navigatorUrl" :appId="appId" :artworkId="artworkId"
 			:popupPosition="popupPosition" v-on:videoEnd="videoEnd" v-on:initPlayData="initPlayData" :artworkTree="artworkTree"
-			ref="horizontalJumpDialog" v-on:multipleResultCallbackTodo="multipleResultCallbackTodo">
+			ref="horizontalJumpDialog" v-on:multipleResultCallbackTodo="multipleResultCallbackTodo" :popupImageWidth="popupImageWidth"
+			:popupImageHeight="popupImageHeight">
 			</horizontal-jump-dialog>
 		</view>
 		<view v-if="popupNameState && popupTotalNumber > 0 ? true : false">
@@ -479,6 +481,10 @@
 				navigatorUrl: 'pages/dishover/dishover', //'pages/index/index'
 				//跳转到的目标小程序的appId
 				appId: "wxa001a9842ad0f851", //'wx25e1eb19e2d9e715'
+				//用户定义的弹窗的宽
+				popupImageWidth: 0,
+				//用户定义的弹窗的高s
+				popupImageHeight: 0,
 				//弹窗出现位置的标志
 				popupPosition: 0, //展示在视频开始
 				//弹窗是否展示名称
@@ -630,7 +636,9 @@
 				//动态控制组件的层级
 				actionOptionZIndex: '99999',
 				//是否是免广告作品的标志
-				playType: 0
+				playType: 0,
+				//是否是预览的场景
+				previewSceneFlag: false
 			}
 		},
 		onReady() {
@@ -2004,6 +2012,19 @@
 				this.popupPosition = this.popupSettings.popupPosition
 				this.popupContextState = this.popupSettings.popupContextStates
 				this.navigatorUrl = this.popupSettings.popupSkip
+				let widthScale = this.popupSettings.popImgWidth
+				this.popupImageScale = this.popupSettings.popImgScale
+				this.popupImageWidth = this.mobilePhoneWidth * widthScale
+				let array = this.popupImageScale.split(":")
+				let scale = array[0]/array[1]
+				console.log("***********scale: ",scale)
+				if(this.playMode == 1){
+					this.popupImageHeight = this.popupImageWidth * scale
+				}else{
+					this.popupImageHeight = this.popupImageWidth * scale
+				}
+				console.log("**************this.popupImageWidth:",this.popupImageWidth)
+				console.log("**************this.popupImageHeight:",this.popupImageHeight)
 				if (this.popupSettings.popupContext.search("/mobilePop")) {
 					this.popupImageUrl = this.popupSettings.popupContext
 				} else {
@@ -2126,6 +2147,7 @@
 						if (result.data.status == 200) {
 							console.log(result.data.msg)
 							if (result.data.msg === "success") {
+								this.previewSceneFlag = true
 								this.artworkId = a
 							}
 						} else {
@@ -2237,7 +2259,9 @@
 							uni.setStorageSync('popupState', res.data.data.popupState)
 							this.popupTotalNumber = res.data.data.nodePopupCount
 							this.popupNameState = res.data.data.popupNameStatus
-							this.playType = res.data.data.playType
+							if(!this.previewSceneFlag){
+								this.playType = res.data.data.playType
+							}
 							if (this.pkDetailId != null) return;
 							// 浮标改动
 							console.log("45")
@@ -2289,7 +2313,7 @@
 							this.popupState = res.data.data.popupState
 							uni.setStorageSync('popupSettings', res.data.data.ecmArtworkNodePopupSettings)
 							// console.log('storyPopupState',	this.popupState)
-							this.playType = res.data.data.playType
+							// this.playType = res.data.data.playType
 							this.initPlayData(res.data.data, false);
 						} else if(res.data.status == 10085) {
 							uni.showModal({
@@ -2559,7 +2583,7 @@
 				this.percent = 100
 				this.isVideoEndFlag = true
 				console.log('this.endFlag2: ', this.endFlag)
-				console.log("***********playedHistoryArray333: ",JSON.parse(uni.getStorageSync("pkDetailIds")))
+				// console.log("***********playedHistoryArray333: ",JSON.parse(uni.getStorageSync("pkDetailIds")))
 				if (this.endFlag) {
 					if (this.isPosition == 1) {
 						this.chooseTipsShowFlag = false
