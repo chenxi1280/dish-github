@@ -74,12 +74,12 @@
 				<canvas type="2d" id='posterCanvas' @touchstart="canvasBuoyTouchstart"></canvas>
 			</view>
 			<!-- 动作蒙版 -->
-			<view v-if="!videoloadFlag && isPosition === 3 && isShowMovementTips" class="movement_mask" :style="{'transform': transform, 'width': playMode ? '100vh' : '100vw', 'height': playMode ? '100vw' : '100vh'}" @click="changeMovementFlag">
-				<image v-if="!playMode" :style="{'width': playMode ? '100vh' : '100vw', 'height': playMode ? '100vw' : '100vh'}" 
+			<!-- <view v-if="!videoloadFlag && isPosition === 3 && isShowMovementTips" class="movement_mask" :style="{'transform': transform, 'width': playMode ? '100vh' : '100vw', 'height': playMode ? '100vw' : '100vh'}" @click="changeMovementFlag">
+				<image v-if="!playMode" :style="{'width': playMode ? '100vh' : '100vw', 'height': playMode ? '100vw' : '100vh'}"
 				src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/ivetool-icons/%E5%8A%A8%E4%BD%9C/%E5%85%A8%E5%B1%8F%E5%8A%A8%E4%BD%9C.gif"></image>
 				<image v-else :style="{'width': playMode ? '100vh' : '100vw', 'height': playMode ? '100vw' : '100vh'}"
 				src="https://sike-1259692143.cos.ap-chongqing.myqcloud.com/ivetool-icons/%E5%8A%A8%E4%BD%9C/%E5%85%A8%E5%B1%8F%E5%8A%A8%E4%BD%9C-h.gif"></image>
-			</view>
+			</view> -->
 			<!-- 播放主体  @click="showButton" @timeupdate="videoTimeupdate" @loadedmetadata="loadeddata"  :controls="controlsFlag" -->
 			<view class="videoBox" :style="{'width': videoWidth+'px', 'height': videoHeight+'px', 'transform': transform} ">
 				<video v-if="videoShowFlag" :controls="false" :src="videoUrl" :show-mute-btn="false" :show-fullscreen-btn="false"
@@ -219,15 +219,13 @@
 		<view v-if="verticalJumpDialogFlag" style="z-index: 9999;">
 			<vertical-jump-dialog :imageUrl="popupImageUrl" :navigatorUrl="navigatorUrl" :appId="appId" :artworkId="artworkId"
 			:popupPosition="popupPosition" v-on:videoEnd="videoEnd" v-on:initPlayData="initPlayData" :artworkTree="artworkTree"
-			ref="verticalJumpDialog" v-on:multipleResultCallbackTodo="multipleResultCallbackTodo" :popupImageWidth="popupImageWidth"
-			:popupImageHeight="popupImageHeight">
+			ref="verticalJumpDialog" v-on:multipleResultCallbackTodo="multipleResultCallbackTodo" >
 			</vertical-jump-dialog>
 		</view>
 		<view v-if="horizontalJumpDialogFlag">
 			<horizontal-jump-dialog :imageUrl="popupImageUrl" :navigatorUrl="navigatorUrl" :appId="appId" :artworkId="artworkId"
 			:popupPosition="popupPosition" v-on:videoEnd="videoEnd" v-on:initPlayData="initPlayData" :artworkTree="artworkTree"
-			ref="horizontalJumpDialog" v-on:multipleResultCallbackTodo="multipleResultCallbackTodo" :popupImageWidth="popupImageWidth"
-			:popupImageHeight="popupImageHeight">
+			ref="horizontalJumpDialog" v-on:multipleResultCallbackTodo="multipleResultCallbackTodo">
 			</horizontal-jump-dialog>
 		</view>
 		<view v-if="popupNameState && popupTotalNumber > 0 ? true : false">
@@ -262,7 +260,7 @@
 			<view class="buoyDialog_mask">
 				<icon @click="closeBuoyDialog" class="horizontalCloseIcon" v-if="playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
 				<icon @click="closeBuoyDialog" class="verticalCloseIcon" v-if="!playMode" :style="{'transform': transform , 'z-index': 18}"></icon>
-				<view class="buoyDialog" :style="{'transform': transform , 'z-index': 17}">		
+				<view class="buoyDialog" :style="{'transform': transform , 'z-index': 17}">
 					<view class="buoyDialogImage"  v-if="buoyDialogImageFlag">
 						<image :src = "buoyDialogImageSrc"></image>
 					</view>
@@ -276,7 +274,7 @@
 		<view v-if="actionOptionFlag">
 			<action-option :array.sync="bindActionOptionArray" ref="actionOptionChild" :playMode="playMode"
 				:referenceArray="ecmArtworkNodeActionVOList" :width="videoWidth" :height="videoHeight"
-				:style="{width: mobilePhoneWidth+'px',height: mobilePhoneHeight+'px', 
+				:style="{width: mobilePhoneWidth+'px',height: mobilePhoneHeight+'px',
 				position: 'fixed',left: '0', top:'0',zIndex: actionOptionZIndex}">
 				</action-option>
 		</view>
@@ -481,10 +479,6 @@
 				navigatorUrl: 'pages/dishover/dishover', //'pages/index/index'
 				//跳转到的目标小程序的appId
 				appId: "wxa001a9842ad0f851", //'wx25e1eb19e2d9e715'
-				//用户定义的弹窗的宽
-				popupImageWidth: 0,
-				//用户定义的弹窗的高s
-				popupImageHeight: 0,
 				//弹窗出现位置的标志
 				popupPosition: 0, //展示在视频开始
 				//弹窗是否展示名称
@@ -574,7 +568,7 @@
 				wxShareWidthMax: 0,
 				wxShareHeightMin: 0,
 				wxShareHeightMax: 0,
-				
+
 				// 浮标广告弹窗
 				showConditionAdvertisingFlag: false,
 				//是否展示返回上一级提示弹窗
@@ -638,7 +632,11 @@
 				//是否是免广告作品的标志
 				playType: 0,
 				//是否是预览的场景
-				previewSceneFlag: false
+				previewSceneFlag: false,
+        // 浮标 条件传递 对象
+        buoyPopInfoTouch:null,
+        // 浮标 条件 广告 成功 标志
+        adOpenBuoyDialogFlag: false
 			}
 		},
 		onReady() {
@@ -698,7 +696,7 @@
 						that.getArtworkTreeByArtworkId()
 					}
 				}
-				
+
 			}
 			uni.showShareMenu({
 				withShareTicket: true,
@@ -860,7 +858,6 @@
 				console.log("seek完成了")
 			},
 			changeMovementFlag () {
-				this.isShowMovementTips = false
 				uni.setStorageSync('movementFlag', true)
 				this.videoContext.play()
 			},
@@ -990,8 +987,8 @@
 				this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
 					// console.log("nodeBuoyList",nodeBuoyList,"index",index)
 					nodeBuoyList.forEach((nodeBuoy) => {
-							nodeBuoy.x = nodeBuoy.startX 
-							nodeBuoy.y = nodeBuoy.startY 
+							nodeBuoy.x = nodeBuoy.startX
+							nodeBuoy.y = nodeBuoy.startY
 							nodeBuoy.vx = nodeBuoy.startVX
 							nodeBuoy.vy = nodeBuoy.startVY
 						}
@@ -1005,12 +1002,12 @@
 					this.buoyRectList[index] = null
 					// console.log("nodeBuoyList",nodeBuoyList,"index",index)
 					nodeBuoyList.forEach((nodeBuoy) => {
-						
-						// nodeBuoy.x = nodeBuoy.startX 
+
+						// nodeBuoy.x = nodeBuoy.startX
 						// nodeBuoy.y = nodeBuoy.startY
 						// nodeBuoy.vx = nodeBuoy.startVX
 						// nodeBuoy.vy = nodeBuoy.startVY
-						
+
 						//当时间相等时
 						// console.log('时间',nodeBuoy.buoySectionTime === newTime)
 						if (newTime >= nodeBuoy.buoySectionTime && nodeBuoy.targetTime >= newTime) {
@@ -1021,7 +1018,7 @@
 							nodeBuoy.vy = nodeBuoy.startVY
 							this.buoyRectList[index] = nodeBuoy
 						}
-									
+
 					})
 					// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
 				})
@@ -1155,20 +1152,21 @@
 			//点击浮标选项弹窗关闭按钮事件
 			closeBuoyDialog() {
 				this.buoyDialogFlag = false
-				this.buoyDialogWords = null
-				this.i = 0
-				console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index1***********************************", this.optionIndex)
-				let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
-				if (buoyPopInfo.buoyStatus) {
-					if (this.isVideoEndFlag) {
-						this.againPlayVideo()
-					} else {
-						console.log("**************************recoveryBuoyDraw*****************")
-						this.recoveryBuoyDraw()
-					}
-				} else {
-					this.clickCommonOptionTodo(this.optionIndex)
-				}
+        // this.clickCommonOptionTodo(this.optionIndex)
+        this.buoyDialogWords = null
+        this.i = 0
+        console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index1***********************************", this.optionIndex)
+        let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
+        if (buoyPopInfo.buoyStatus) {
+          if (this.isVideoEndFlag) {
+            this.againPlayVideo()
+          } else {
+            console.log("**************************recoveryBuoyDraw*****************")
+            this.recoveryBuoyDraw()
+          }
+        } else {
+          this.clickCommonOptionTodo(this.optionIndex)
+        }
 			},
 			//浮标视频 点击打印文字
 			printContent(str) {
@@ -1228,7 +1226,7 @@
 								videoContext.play()
 							},
 							complete(res) {
-					
+
 							}
 						})
 					}
@@ -1353,6 +1351,9 @@
 						this.videoContext.play()
 					}
 				}
+				if (this.buoyPopInfoTouch  != null) {
+          this.buoyPopInfoTouch = null
+        }
 
 			},
 			againPlayVideo() {
@@ -1447,6 +1448,9 @@
                             console.log('憨批用户不给光')
                             this.clickCommonOptionTodoBuoyFlag = false
                             this.clickCommonOptionTodoActionFlag = false
+                            if (this.buoyPopInfoTouch  != null) {
+                              this.buoyPopInfoTouch = null
+                            }
                         }
                         this.handleAdEnded()
                     })
@@ -1507,7 +1511,13 @@
 				} else {
 					// 浮标修改
 					if (this.bouyNodeFlage && !this.showConditionAdvertisingFlag) {
-						this.recoveryBuoyDraw()
+            console.log("是1504",this.buoyPopInfoTouch ,this.adOpenBuoyDialogFlag )
+            if (this.adOpenBuoyDialogFlag ) {
+              this.stopBuoyDraw()
+              this.adOpenBuoyDialogFlag = false
+            }else  {
+              this.recoveryBuoyDraw()
+            }
 					} else {
 						this.videoContext.play()
 					}
@@ -1748,12 +1758,6 @@
 			},
 			//对节点播放数据进行筛选和提取
 			initPlayData(artworkTree, isJumpDialogCallbackFlag) {
-				const flag = uni.getStorageSync('movementFlag')
-				if (flag) {
-					this.isShowMovementTips = false
-				} else {
-					this.isShowMovementTips = true
-				}
 				//定位选项最后一帧截屏开关 预防直接显示了最后一帧截图
 				this.screenshotShowFlag = false
 				this.isShowMyProgress = true
@@ -1845,7 +1849,7 @@
 				} else {
 				    this.videoUrl = "https://" + url[1] + '?uuid=' + uuid
 				}
-				
+
 				this.imageSrc = artworkTree.nodeLastImgUrl
 				console.log("this.imageSrc: ",this.imageSrc)
 				//如果是根节点初始化存储节点分值的容器
@@ -1906,7 +1910,7 @@
 						this.getTargetTree(mainTree, linkId)
 					} else {
 						console.log("endFlag3")
-						//是不是最后一个视频标志 
+						//是不是最后一个视频标志
 						this.endFlag = false;
 					}
 				}
@@ -2012,19 +2016,6 @@
 				this.popupPosition = this.popupSettings.popupPosition
 				this.popupContextState = this.popupSettings.popupContextStates
 				this.navigatorUrl = this.popupSettings.popupSkip
-				let widthScale = this.popupSettings.popImgWidth
-				this.popupImageScale = this.popupSettings.popImgScale
-				this.popupImageWidth = this.mobilePhoneWidth * widthScale
-				let array = this.popupImageScale.split(":")
-				let scale = array[0]/array[1]
-				console.log("***********scale: ",scale)
-				if(this.playMode == 1){
-					this.popupImageHeight = this.popupImageWidth * scale
-				}else{
-					this.popupImageHeight = this.popupImageWidth * scale
-				}
-				console.log("**************this.popupImageWidth:",this.popupImageWidth)
-				console.log("**************this.popupImageHeight:",this.popupImageHeight)
 				if (this.popupSettings.popupContext.search("/mobilePop")) {
 					this.popupImageUrl = this.popupSettings.popupContext
 				} else {
@@ -2147,10 +2138,7 @@
 						if (result.data.status == 200) {
 							console.log(result.data.msg)
 							if (result.data.msg === "success") {
-								this.previewSceneFlag = true
 								this.artworkId = a
-								this.getArtworkTreeByArtworkId()
-								console.log("***********checkUserIdInfos artworkId: ",this.artworkId)
 							}
 						} else {
 							console.log(result.data.msg)
@@ -2217,7 +2205,14 @@
 				} else {
 					this.background.splice(index, 1, "")
 					// 播放结束清除延时函数
-					this.optionTouchendTodo(index)
+          console.log("this.buoyPopInfoTouch",this.buoyPopInfoTouch)
+          if ( this.buoyPopInfoTouch != null) {
+            this.adOpenBuoyDialogFlag = true
+            this.openBuoyDialog( this.buoyPopInfoTouch)
+          }else {
+
+            this.optionTouchendTodo(index)
+          }
 				}
 				//保存有效观看记录
 				if (!this.isClickOptionFlag) {
@@ -2235,14 +2230,10 @@
 			async getArtworkTreeByArtworkId() {
 				console.log("41")
 				console.log("*************getArtworkTreeByArtworkId",this.token)
-				console.log("***********getArtworkTreeByArtworkId artworkId: ",this.artworkId)
+				console.log(this.artworkId)
 				if(!this.token){
 					console.log("46")
 					return;
-				}
-				let previewFlag = 0
-				if(this.previewSceneFlag){
-					previewFlag = 1
 				}
 				// this.artworkId = 10208
 				await uni.request({
@@ -2251,8 +2242,7 @@
 					dataType: 'json',
 					data: {
 						pkArtworkId: this.artworkId,
-						token: this.token,
-						previewFlag: previewFlag
+						token: this.token
 					},
 					success: res => {
 						console.log("res.data.status: ",res.data.status)
@@ -2266,9 +2256,7 @@
 							uni.setStorageSync('popupState', res.data.data.popupState)
 							this.popupTotalNumber = res.data.data.nodePopupCount
 							this.popupNameState = res.data.data.popupNameStatus
-							if(!this.previewSceneFlag){
-								this.playType = res.data.data.playType
-							}
+							this.playType = res.data.data.playType
 							if (this.pkDetailId != null) return;
 							// 浮标改动
 							console.log("45")
@@ -2286,7 +2274,7 @@
 											url: '../dishover/dishover'
 										})
 									} else if (res.cancel) {
-										
+
 									}
 								}
 							})
@@ -2320,7 +2308,7 @@
 							this.popupState = res.data.data.popupState
 							uni.setStorageSync('popupSettings', res.data.data.ecmArtworkNodePopupSettings)
 							// console.log('storyPopupState',	this.popupState)
-							// this.playType = res.data.data.playType
+							this.playType = res.data.data.playType
 							this.initPlayData(res.data.data, false);
 						} else if(res.data.status == 10085) {
 							uni.showModal({
@@ -2333,7 +2321,7 @@
 											url: '../dishover/dishover'
 										})
 									} else if (res.cancel) {
-										
+
 									}
 								}
 							})
@@ -2590,7 +2578,7 @@
 				this.percent = 100
 				this.isVideoEndFlag = true
 				console.log('this.endFlag2: ', this.endFlag)
-				// console.log("***********playedHistoryArray333: ",JSON.parse(uni.getStorageSync("pkDetailIds")))
+				console.log("***********playedHistoryArray333: ",JSON.parse(uni.getStorageSync("pkDetailIds")))
 				if (this.endFlag) {
 					if (this.isPosition == 1) {
 						this.chooseTipsShowFlag = false
@@ -2615,7 +2603,7 @@
 						// 默认选A
 						this.optionIndex = 0
 						let buoyPopInfo = this.getBuoyPopInfo(this.optionIndex)
-						
+
 						// 需要根据后台判断标志来判断 -1重播 0自动选A
 						console.log("************ecmArtworkNodeBuoyList: ",this.ecmArtworkNodeBuoyList)
 						let autoChooseFlag = this.ecmArtworkNodeBuoyList[0][0].buoyPlayEndType
@@ -2635,20 +2623,33 @@
 							let buoyPopInfo = this.getBuoyPopInfo(0)
 							// buoyStatus 弹窗是否开启 1开启 0默认选项
 							if (buoyPopInfo.buoyStatus) {
-								//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
-								if (buoyPopInfo.buoyPopType === 0) {
-									this.JumpToOtherApplets(buoyPopInfo.buoyPopAppId, buoyPopInfo.buoyPopContext)
-								} else if (buoyPopInfo.buoyPopType === 1) {
-									this.stopBuoyDraw()
-									this.printContent(buoyPopInfo.buoyPopContext)
-									this.buoyDialogImageFlag = false
-									this.buoyDialogFlag = true
-								} else {
-									this.stopBuoyDraw()
-									this.buoyDialogImageSrc = buoyPopInfo.buoyPopContext + "/mobilePop"
-									this.buoyDialogFlag = true
-									this.buoyDialogImageFlag = true
-								}
+                console.log(this.conditionState,this.conditionState[this.optionIndex],this.playType)
+                if (this.conditionState[this.optionIndex] == 1 && this.playType !== 1) {
+                  console.log('作者让你看广告啊，跟我没关系')
+
+                  //视频暂停
+                  this.videoContext.pause()
+                  this.stopBuoyDraw()
+                  this.showConditionAdvertisingFlag = true
+                  this.buoyPopInfoTouch = buoyPopInfo
+
+                }else {
+                  this.openBuoyDialog(buoyPopInfo)
+                }
+								// //buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
+								// if (buoyPopInfo.buoyPopType === 0) {
+								// 	this.JumpToOtherApplets(buoyPopInfo.buoyPopAppId, buoyPopInfo.buoyPopContext)
+								// } else if (buoyPopInfo.buoyPopType === 1) {
+								// 	this.stopBuoyDraw()
+								// 	this.printContent(buoyPopInfo.buoyPopContext)
+								// 	this.buoyDialogImageFlag = false
+								// 	this.buoyDialogFlag = true
+								// } else {
+								// 	this.stopBuoyDraw()
+								// 	this.buoyDialogImageSrc = buoyPopInfo.buoyPopContext + "/mobilePop"
+								// 	this.buoyDialogFlag = true
+								// 	this.buoyDialogImageFlag = true
+								// }
 							} else {
 								//选项
 								this.buoyAutoChooseFlag = true
@@ -2732,7 +2733,7 @@
 					}
 					return min
 				}
-				
+
 			},
 			videoPlay() {
 				console.log(123456000011123)
@@ -2760,10 +2761,6 @@
 						this.waitingVideoFlag = false
 					}
 				}
-				const timer = setTimeout(() => {
-					if (this.isShowMovementTips && this.isPosition === 3) this.videoContext.pause()
-					clearTimeout(timer)
-				}, 50)
 			},
 			//视屏暂停操作
 			videoPause() {
@@ -3740,7 +3737,7 @@
 				this.duration = e.detail.duration
 				let date = this.formatDate(this.duration)
 				this.durationStr = date
-				//自制进度条消失判断 3s后消失 (动作，浮标，视频时长小于3s) 不消失 
+				//自制进度条消失判断 3s后消失 (动作，浮标，视频时长小于3s) 不消失
 				if(this.duration > 3 && this.isPosition !== 2 && this.isPosition !== 3){
 					this.myProgressDelayFunction = setTimeout(() => {
 						this.myProgressFlag = false
@@ -3889,30 +3886,30 @@
 					this.buoySpeedCalibration()
 					// 当前时间
 					this.buoyNewTime = this.currentTime
-					
+
 					if (this.buoyTouchFlag) {
 						this.canvasNodeBuoyList.forEach((nodeBuoyList, index) => {
 							// 变量 为几号位置 数组
 							this.buoyRectList[index] = null
 							// console.log("nodeBuoyList",nodeBuoyList,"index",index)
 							nodeBuoyList.forEach((nodeBuoy) => {
-								
-								// nodeBuoy.x = nodeBuoy.startX 
+
+								// nodeBuoy.x = nodeBuoy.startX
 								// nodeBuoy.y = nodeBuoy.startY
 								// nodeBuoy.vx = nodeBuoy.startVX
 								// nodeBuoy.vy = nodeBuoy.startVY
-								
+
 								//当时间相等时
 								// console.log('时间',nodeBuoy.buoySectionTime === newTime)
 								if (newTime >= nodeBuoy.buoySectionTime && nodeBuoy.targetTime >= newTime) {
-									console.log("nodeBuoy",nodeBuoy)
+									// console.log("nodeBuoy",nodeBuoy)
 									nodeBuoy.x = nodeBuoy.startX + (newTime - nodeBuoy.buoySectionTime) * nodeBuoy.startVX * 60
 									nodeBuoy.y = nodeBuoy.startY + (newTime - nodeBuoy.buoySectionTime) * nodeBuoy.startVY * 60
 									nodeBuoy.vx = nodeBuoy.startVX
 									nodeBuoy.vy = nodeBuoy.startVY
 									this.buoyRectList[index] = nodeBuoy
 								}
-					
+
 							})
 							// this.buoyRef = this.buoyCanvas.requestAnimationFrame(() => this.buoyDraw())
 						})
@@ -4030,7 +4027,7 @@
 							}
 						}
 						// }
-						
+
 						if (v != null) {
 							v.draw();
 							v.x += v.vx;
@@ -4131,7 +4128,7 @@
 								// console.log('矩形框的高: ',rectH)
 								//矩形框宽度
 								let rectH = parseInt(((v.buoyWide - 0) * this.canvasHeight).toFixed(0))
-								// 浮标出现的时间 
+								// 浮标出现的时间
 								let buoySectionTime = parseInt(v.buoySectionTime - 0)
 								// 目标时间
 								let targetTime = parseInt(nodeBuoyList[i + 1].buoySectionTime - 0)
@@ -4240,20 +4237,19 @@
 								console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$index2***********************************", i)
 								// buoyStatus 弹窗是否开启 1开启 0默认选项
 								if (buoyPopInfo.buoyStatus) {
-									//buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
-									if (buoyPopInfo.buoyPopType === 0) {
-										this.JumpToOtherApplets(buoyPopInfo.buoyPopAppId, buoyPopInfo.buoyPopContext)
-									} else if (buoyPopInfo.buoyPopType === 1) {
-										this.stopBuoyDraw()
-										this.printContent(buoyPopInfo.buoyPopContext)
-										this.buoyDialogImageFlag = false
-										this.buoyDialogFlag = true
-									} else {
-										this.stopBuoyDraw()
-										this.buoyDialogImageSrc = buoyPopInfo.buoyPopContext + "/mobilePop"
-										this.buoyDialogFlag = true
-										this.buoyDialogImageFlag = true
-									}
+                  console.log(this.conditionState,this.conditionState[this.optionIndex],this.playType)
+                  if (this.conditionState[this.optionIndex] == 1 && this.playType !== 1) {
+                    console.log('作者让你看广告啊，跟我没关系')
+
+                    //视频暂停
+                    this.videoContext.pause()
+                    this.stopBuoyDraw()
+                    this.showConditionAdvertisingFlag = true
+                    this.buoyPopInfoTouch = buoyPopInfo
+
+                  }else {
+                    this.openBuoyDialog(buoyPopInfo)
+                  }
 								} else {
 									this.buoyAutoChooseFlag = false
 									this.clickCommonOptionTodo(i)
@@ -4333,6 +4329,27 @@
 				}
 
 			},
+      openBuoyDialog(buoyPopInfo) {
+        this.stopBuoyDraw()
+        //buoyPopType 类型有三种 对应 0其他小程序 1文字 2图片
+        if (buoyPopInfo.buoyPopType === 0) {
+          this.JumpToOtherApplets(buoyPopInfo.buoyPopAppId, buoyPopInfo.buoyPopContext)
+        } else if (buoyPopInfo.buoyPopType === 1) {
+          this.stopBuoyDraw()
+          this.printContent(buoyPopInfo.buoyPopContext)
+          this.buoyDialogImageFlag = false
+          this.buoyDialogFlag = true
+        } else {
+          this.stopBuoyDraw()
+          this.buoyDialogImageSrc = buoyPopInfo.buoyPopContext + "/mobilePop"
+          this.buoyDialogFlag = true
+          this.buoyDialogImageFlag = true
+        }
+        this.buoyPopInfoTouch = null
+
+      },
+
+
 			// 清除浮标
 			clearNodeBuoyInfo() {
 				this.clearAnimation()
@@ -4386,7 +4403,7 @@
 					this.returnToPreviouWidthMax = this.storyLineBoxWidthMax
 					this.returnToPreviouHeightMin = (wh * 0.8) - ch - this.getPxbyRpx(60)
 					this.returnToPreviouHeightMax = this.returnToPreviouHeightMin + this.getPxbyRpx(100)
-					
+
 					//分享 位置
 					// this.wxShareWidthMin = this.storyLineBoxWidthMin
 					// this.wxShareWidthMax = this.storyLineBoxWidthMax
@@ -4427,7 +4444,7 @@
 					this.returnToPreviouWidthMax = this.storyLineBoxWidthMax
 					this.returnToPreviouHeightMin = (wh * 0.61) - ch
 					this.returnToPreviouHeightMax = this.returnToPreviouHeightMin + this.getPxbyRpx(80)
-					
+
 					//分享 位置
 					// this.wxShareWidthMin = this.storyLineBoxWidthMin
 					// this.wxShareWidthMax = this.storyLineBoxWidthMax
@@ -4467,7 +4484,7 @@
 			// (rectX, rectY, rectH, rectW, vx, vy, rectOpacity, nodeId, buoySectionTime, buoyType)
 			// 浮标 视频回复方法
 			recoveryBuoyDraw() {
-				//视频回复 
+				//视频回复
 				this.videoContext.play()
 				//canvas 回来
 				this.showBuoyCanvasFlag = true
@@ -4485,10 +4502,10 @@
 							buoyRect.vx = (buoyRect.targetX - buoyRect.x) / ((buoyRect.targetTime - this.currentTime) * 58)
 							buoyRect.vy = (buoyRect.targetY - buoyRect.y) / ((buoyRect.targetTime - this.currentTime) * 58)
 						} else {
-						
+
 						}
 					}
-					
+
 				})
 			},
 			startBuoy() {
@@ -4535,7 +4552,7 @@
 					this.bouyClickCommonOptionTodo()
 				})
 			},
-			// 获取改浮标下 有没有 视频 false 没有视频 true 有视频，index 为第几个选择 
+			// 获取改浮标下 有没有 视频 false 没有视频 true 有视频，index 为第几个选择
 			getBuoyPopVideo(index) {
 				if (this.ecmArtworkNodeBuoyList[index][0].buoyVideoUrlStatus == null || this.ecmArtworkNodeBuoyList[index][0].buoyVideoUrlStatus ==
 					0) {
@@ -4870,7 +4887,7 @@
             }
           }
 
-          .title { 
+          .title {
             text-align: center;
             color: white;
             font-size: 36rpx;
@@ -5196,7 +5213,7 @@
           }
         }
       }
-	  
+
     }
 
   }
